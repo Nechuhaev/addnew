@@ -1,0 +1,26 @@
+.user-avatar {
+    background: #eee;
+    text-align: center;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    font-size: 22px;
+    font-weight: 900;
+    border-radius: 100px;
+    color: #000;
+}
+.user-avatar .inner {
+    text-align: center;
+    width: 100%;
+}
+.user-avatar.large-avatar {
+    font-size: 36px;
+    width: 160px;
+    height: 160px;
+}
+.form-group label.col-md-12 {
+    font-weight: 600;
+    margin-bottom: 0;
+    color: #6b6b6b;
+}

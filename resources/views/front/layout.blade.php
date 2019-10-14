@@ -113,10 +113,24 @@
                 </div>
 
                 <div class="header-account">
-                    <span class="header-welcome">Добро пожаловать, <strong>гость</strong>!</span>
-                    <a href="/register.html" rel="nofollow" class="header-link link-register">Регистрация</a>
-                    <a href="/login.html" rel="nofollow" class="header-link link-login">Вход</a>
-                    <a href="/create-advert.html" class="btn btn-advert"><i class="icon icon-plus"></i> Подать объявление</a>
+                    @if(Auth::check())
+                        <span class="header-welcome">Добро пожаловать, <strong>{{ Auth::user()->email }}</strong>!</span>
+                        <a href="{{ route('profile.ads') }}" rel="nofollow" class="header-link link-register">Кабинет</a>
+                        <a href="{{ route('logout') }}"
+                           onclick="event.preventDefault();
+                                    document.getElementById('logout-form').submit();"
+                           rel="nofollow" class="header-link link-login">Выход</a>
+
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                            @csrf
+                        </form>
+                    @else
+                        <span class="header-welcome">Добро пожаловать, <strong>Зарегистрированный гость</strong>!</span>
+                        <a href="{{ route('register') }}" rel="nofollow" class="header-link link-register">Регистрация</a>
+                        <a href="{{ route('login') }}" rel="nofollow" class="header-link link-login">Вход</a>
+                    @endif
+                        <a href="/create-advert.html" class="btn btn-advert"><i class="icon icon-plus"></i> Подать объявление</a>
+
                 </div>
 
             </div>

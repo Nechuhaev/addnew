@@ -15,6 +15,7 @@
     <link href="{{ asset('assets/admin/assets/libs/chartist/dist/chartist.min.css') }}" rel="stylesheet">
     <!-- Custom CSS -->
     <link href="{{ asset('assets/admin/dist/css/style.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/admin/dist/css/custom.css') }}" rel="stylesheet">
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -55,19 +56,10 @@
                         <!-- Logo icon -->
                         <b class="logo-icon">
                             <!--You can put here icon as well // <i class="wi wi-sunset"></i> //-->
-                            <!-- Dark Logo icon -->
-                            <img src="{{ asset('assets/admin/assets/images/logo-icon.png') }}" alt="homepage" class="dark-logo" />
-                            <!-- Light Logo icon -->
-                            <img src="{{ asset('assets/admin/assets/images/logo-light-icon.png') }}" alt="homepage" class="light-logo" />
+                            <img src="{{ asset('assets/front/img/logo.png') }}" alt="homepage" class="light-logo" />
                         </b>
                         <!--End Logo icon -->
                         <!-- Logo text -->
-                        <span class="logo-text">
-                                <!-- dark Logo text -->
-                                <img src="{{ asset('assets/admin/assets/images/logo-text.png') }}" alt="homepage" class="dark-logo" />
-                            <!-- Light Logo text -->
-                                <img src="{{ asset('assets/admin/assets/images/logo-light-text.png') }}" class="light-logo" alt="homepage" />
-                            </span>
                     </a>
                 </div>
                 <!-- ============================================================== -->
@@ -119,9 +111,12 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark pro-pic" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="{{ asset('assets/admin/assets/images/users/1.jpg') }}" alt="user" class="rounded-circle" width="31"></a>
                         <div class="dropdown-menu dropdown-menu-right user-dd animated">
-                            <a class="dropdown-item" href="javascript:void(0)"><i class="ti-user m-r-5 m-l-5"></i> My Profile</a>
-                            <a class="dropdown-item" href="javascript:void(0)"><i class="ti-wallet m-r-5 m-l-5"></i> My Balance</a>
-                            <a class="dropdown-item" href="javascript:void(0)"><i class="ti-email m-r-5 m-l-5"></i> Inbox</a>
+                            <a class="dropdown-item" href="{{ route('logout') }}"
+                               onclick="event.preventDefault();
+                                                     document.getElementById('logout-form').submit();"><i class="ti-user m-r-5 m-l-5"></i> Выход</a>
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                @csrf
+                            </form>
                         </div>
                     </li>
                     <!-- ============================================================== -->
@@ -168,6 +163,22 @@
         <!-- Container fluid  -->
         <!-- ============================================================== -->
         <div class="container-fluid">
+            @if(session()->has('success'))
+                <div class="alert alert-success">
+                    {{ session()->get('success') }}
+                </div>
+            @endif
+
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul style="padding: 0 0 0 10px;margin: 0;">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             @yield('content')
         </div>
         <!-- ============================================================== -->
@@ -177,8 +188,7 @@
         <!-- footer -->
         <!-- ============================================================== -->
         <footer class="footer text-center">
-            All Rights Reserved by Nice admin. Designed and Developed by
-            <a href="https://wrappixel.com">WrapPixel</a>.
+            Прежде чем говорить о правах, давайте подумаем об обязанностях.
         </footer>
         <!-- ============================================================== -->
         <!-- End footer -->

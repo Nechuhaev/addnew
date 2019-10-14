@@ -70,7 +70,7 @@
                 </a>
             </li>
             <li class="sidebar-item">
-                <a href="{{ route('admin.articleCategories') }}" class="sidebar-link">
+                <a href="{{ route('admin.article.category.index') }}" class="sidebar-link">
                     <i class="mdi mdi-label"></i>
                     <span class="hide-menu">Категории статей</span>
                 </a>

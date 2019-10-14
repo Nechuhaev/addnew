@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\ArticleCategory;
+use App\User;
 use Illuminate\Http\Request;
 
 class AdminPageController extends Controller
@@ -16,11 +18,13 @@ class AdminPageController extends Controller
     }
 
     public function users() {
-        return view('admin.empty');
+        $users = User::orderBy('created_at', 'desc')->paginate(15);
+        return view('admin.users.list', ['users' => $users]);
     }
 
-    public function user() {
-        return view('admin.empty');
+    public function user(Request $request) {
+        $user = User::where('id', (int)$request->id)->first();
+        return view('admin.users.user', ['user' => $user]);
     }
 
     public function ads() {
@@ -56,19 +60,11 @@ class AdminPageController extends Controller
     }
 
     public function articles () {
-        return view('admin.empty');
+        return view('admin.articles.list');
     }
 
     public function article() {
-        return view('admin.empty');
-    }
-
-    public function articleCategories() {
-        return view('admin.empty');
-    }
-
-    public function articleCategory() {
-        return view('admin.empty');
+        return view('admin.articles.article');
     }
 
     public function countries() {
