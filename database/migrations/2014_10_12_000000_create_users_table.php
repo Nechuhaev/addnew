@@ -23,6 +23,7 @@ class CreateUsersTable extends Migration
             $table->string('facebook_url', 255)->nullable();
             $table->string('twitter_url', 255)->nullable();
             $table->string('password');
+            $table->string('is_admin')->default(0);
             $table->string('info', 5000)->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();

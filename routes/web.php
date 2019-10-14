@@ -54,13 +54,15 @@ Route::get('/search', function () {
 
 //Route::get('/home', 'HomeController@index')->name('home');
 
-
-
-Route::prefix('admin')->group(function () {
+Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::get('/', 'AdminPageController@index')->name('admin.index');
 
-    Route::get('/users', 'AdminPageController@users')->name('admin.users');
-    Route::get('/user/{id}', 'AdminPageController@user')->name('admin.user');
+    /*
+     * Users
+     */
+    Route::get('/users', 'Admin\User\UserController@showUsersList')->name('admin.users');
+    Route::get('/user/{id}', 'Admin\User\UserController@showUserInformation')->name('admin.user');
+    Route::post('/user/update', 'Admin\User\UserController@update')->name('admin.user.update');
 
     Route::get('/ads', 'AdminPageController@ads')->name('admin.ads');
     Route::get('/ad', 'AdminPageController@ad')->name('admin.ad');

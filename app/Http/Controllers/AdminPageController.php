@@ -17,16 +17,6 @@ class AdminPageController extends Controller
         return view('admin.index');
     }
 
-    public function users() {
-        $users = User::orderBy('created_at', 'desc')->paginate(15);
-        return view('admin.users.list', ['users' => $users]);
-    }
-
-    public function user(Request $request) {
-        $user = User::where('id', (int)$request->id)->first();
-        return view('admin.users.user', ['user' => $user]);
-    }
-
     public function ads() {
         return view('admin.empty');
     }

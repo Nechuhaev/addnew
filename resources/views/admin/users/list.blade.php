@@ -32,8 +32,6 @@
                                     </div>
                                 </div>
                                 <div class="col-3">
-                                    <div><small class="text-muted">Имя пользователя</small></div>
-                                    {{ $user->username }}
                                     <div><small class="text-muted">ФИО</small></div>
                                     {{ $user->fullname }}
                                 </div>
