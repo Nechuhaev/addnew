@@ -221,6 +221,15 @@
 <script src="{{ asset('assets/admin/assets/libs/chartist/dist/chartist.min.js') }}"></script>
 <script src="{{ asset('assets/admin/assets/libs/chartist-plugin-tooltips/dist/chartist-plugin-tooltip.min.js') }}"></script>
 <script src="{{ asset('assets/admin/dist/js/pages/dashboards/dashboard1.js') }}"></script>
+<script src="/vendor/laravel-filemanager/js/lfm.js"></script>
+
+<script>
+    jQuery(function () {
+        jQuery('#lfm').filemanager('image');
+    });
+
+</script>
+
 </body>
 
 </html>

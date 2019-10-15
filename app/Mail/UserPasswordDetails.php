@@ -33,7 +33,7 @@ class UserPasswordDetails extends Mailable
      */
     public function build()
     {
-        return $this->view('mail.user_password_details')->with([
+        return $this->to($this->email)->view('mail.user_password_details')->with([
             'email' => $this->email,
             'password' => $this->password,
             'login_url' => route('login')

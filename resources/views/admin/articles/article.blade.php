@@ -16,12 +16,22 @@
 @endsection
 
 @section('content')
+
     <div class="row">
         <!-- Column -->
         <div class="col-lg-4 col-xlg-3 col-md-5">
             <div class="card">
                 <div class="card-body">
-                    <img src="http://placehold.it/400x250" class="img-fluid" alt="">
+
+                    <div class="input-group">
+   <span class="input-group-btn">
+     <a id="lfm" data-input="thumbnail" data-preview="holder" class="btn btn-primary">
+       <i class="fa fa-picture-o"></i> Choose
+     </a>
+   </span>
+                        <input id="thumbnail" class="form-control" type="text" name="filepath">
+                    </div>
+                    <img id="holder" class="img-fluid" style="margin-top: 20px" src="http://placehold.it/400x250">
                 </div>
             </div>
             <div class="card">
@@ -136,31 +146,46 @@
         <!-- Column -->
     </div>
 
-    <script src="https://cdn.tiny.cloud/1/acl3zjjcwn2wu5y9ad8741ibtyz1fcoi1iwhsdhpqblv1q2y/tinymce/5/tinymce.min.js"></script>
+    <script src="https://cdn.tiny.cloud/1/acl3zjjcwn2wu5y9ad8741ibtyz1fcoi1iwhsdhpqblv1q2y/tinymce/4/tinymce.min.js"></script>
 
     <script>
-        // document.addEventListener('load', function (ev) {
-        //     $('.fileupload-field')
-        //         .fileupload({
-        //             disableImageResize: false,
-        //             previewMaxWidth: 320,
-        //             previewMaxHeight: 320
-        //         })
-        //         .bind('fileuploadprocessalways', function(e, data)
-        //         {
-        //             var canvas = data.files[0].preview;
-        //             var dataURL = canvas.toDataURL();
-        //             $("#some-image").css("background-image", 'url(' + dataURL +')');
-        //
-        //         })
-        // })
+
+        var editor_config = {
+            path_absolute : "/",
+            selector: "textarea.content",
+            height: 400,
+            plugins: [
+                "advlist autolink lists link image charmap print preview hr anchor pagebreak",
+                "searchreplace wordcount visualblocks visualchars code fullscreen",
+                "insertdatetime media nonbreaking save table contextmenu directionality",
+                "emoticons template paste textcolor colorpicker textpattern"
+            ],
+            toolbar: "styleselect | alignleft aligncenter alignright | bullist numlist | outdent indent | link image media | code",
+            relative_urls: false,
+            file_browser_callback : function(field_name, url, type, win) {
+                var x = window.innerWidth || document.documentElement.clientWidth || document.getElementsByTagName('body')[0].clientWidth;
+                var y = window.innerHeight|| document.documentElement.clientHeight|| document.getElementsByTagName('body')[0].clientHeight;
+
+                var cmsURL = editor_config.path_absolute + 'laravel-filemanager?field_name=' + field_name;
+                if (type == 'image') {
+                    cmsURL = cmsURL + "&type=Images";
+                } else {
+                    cmsURL = cmsURL + "&type=Files";
+                }
+
+                tinyMCE.activeEditor.windowManager.open({
+                    file : cmsURL,
+                    title : 'Filemanager',
+                    width : x * 0.8,
+                    height : y * 0.8,
+                    resizable : "yes",
+                    close_previous : "no"
+                });
+            }
+        };
+
+        tinymce.init(editor_config);
 
 
-        tinymce.init({
-            selector:'textarea.content',
-            height: 700,
-            plugins: "image",
-            images_upload_url: 'postAcceptor.php',
-            automatic_uploads: false
-    });</script>
+    </script>
 @endsection

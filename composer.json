@@ -12,8 +12,10 @@
         "davejamesmiller/laravel-breadcrumbs": "5.x",
         "fideloper/proxy": "^4.0",
         "laravel/framework": "^6.0",
+        "laravel/helpers": "^1.1",
         "laravel/tinker": "^1.0",
-        "laravel/ui": "^1.0"
+        "laravel/ui": "^1.0",
+        "unisharp/laravel-filemanager": "~1.8"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.6",
