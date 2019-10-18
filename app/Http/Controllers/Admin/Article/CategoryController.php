@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin\Article;
 use App\ArticleCategory;
 use App\Http\Controllers\Controller;
 
-use App\Http\Requests\ArticleCategoryStoreRequest;
+use App\Http\Requests\Article\ArticleCategoryStoreRequest;
 //use Illuminate\Http\Request;
 
 use Illuminate\Http\Request;
@@ -22,7 +22,7 @@ class CategoryController extends Controller
     public function index() {
         $categories = ArticleCategory::orderBy('created_at', 'desc')->paginate(5);
 
-        return view('admin.articles.categories', ['categories' => $categories]);
+        return view('admin.article.category.list', ['categories' => $categories]);
     }
 
     /**
@@ -45,7 +45,7 @@ class CategoryController extends Controller
 
         $action = route('admin.article.category.create');
 
-        return view('admin.articles.category', [
+        return view('admin.article.category.single', [
             'category' => $category,
             'page_title' => $page_title,
             'action' => $action,

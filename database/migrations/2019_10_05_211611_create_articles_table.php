@@ -18,8 +18,11 @@ class CreateArticlesTable extends Migration
             $table->string('name', 255);
             $table->string('slug', 255);
             $table->text('content');
-            $table->integer('sort_order');
-            $table->string('image');
+            $table->text('excerpt', 2000);
+            $table->string('meta_title', 255)->nullable();
+            $table->string('meta_description', 255)->nullable();
+            $table->integer('sort_order')->default(0);
+            $table->string('image')->nullable();
             $table->timestamps();
         });
     }

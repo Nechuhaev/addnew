@@ -222,10 +222,51 @@
 <script src="{{ asset('assets/admin/assets/libs/chartist-plugin-tooltips/dist/chartist-plugin-tooltip.min.js') }}"></script>
 <script src="{{ asset('assets/admin/dist/js/pages/dashboards/dashboard1.js') }}"></script>
 <script src="/vendor/laravel-filemanager/js/lfm.js"></script>
+<script src="https://cdn.tiny.cloud/1/acl3zjjcwn2wu5y9ad8741ibtyz1fcoi1iwhsdhpqblv1q2y/tinymce/4/tinymce.min.js"></script>
 
 <script>
+
+    var editor_config = {
+        path_absolute : "/",
+        selector: "textarea.content",
+        height: 400,
+        plugins: [
+            "advlist autolink lists link image charmap print preview hr anchor pagebreak",
+            "searchreplace wordcount visualblocks visualchars code fullscreen",
+            "insertdatetime media nonbreaking save table contextmenu directionality",
+            "emoticons template paste textcolor colorpicker textpattern"
+        ],
+        toolbar: "styleselect | alignleft aligncenter alignright | bullist numlist | outdent indent | link image media | code",
+        relative_urls: false,
+        file_browser_callback : function(field_name, url, type, win) {
+            var x = window.innerWidth || document.documentElement.clientWidth || document.getElementsByTagName('body')[0].clientWidth;
+            var y = window.innerHeight|| document.documentElement.clientHeight|| document.getElementsByTagName('body')[0].clientHeight;
+
+            var cmsURL = editor_config.path_absolute + 'laravel-filemanager?field_name=' + field_name;
+            if (type == 'image') {
+                cmsURL = cmsURL + "&type=Images";
+            } else {
+                cmsURL = cmsURL + "&type=Files";
+            }
+
+            tinyMCE.activeEditor.windowManager.open({
+                file : cmsURL,
+                title : 'Filemanager',
+                width : x * 0.8,
+                height : y * 0.8,
+                resizable : "yes",
+                close_previous : "no"
+            });
+        }
+    };
+
+    tinymce.init(editor_config);
+
     jQuery(function () {
-        jQuery('#lfm').filemanager('image');
+        if (jQuery('#lfm').length) {
+            jQuery('#lfm').filemanager('image');
+        }
+
     });
 
 </script>

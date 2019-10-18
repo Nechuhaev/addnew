@@ -40,3 +40,22 @@ Breadcrumbs::for('admin.article.category', function ($trail, $category = null) {
     $trail->push($title, $route);
 });
 
+// Главная > Статьи
+Breadcrumbs::for('admin.article.list', function ($trail) {
+    $trail->parent('admin.index');
+    $trail->push('Статьи', route('admin.articles'));
+});
+// Главная > Статьи > Добавить новую / Редактировать
+Breadcrumbs::for('admin.article.article', function ($trail, $article = null) {
+    $trail->parent('admin.article.list');
+
+    if (!$article) {
+        $title = 'Добавить статью';
+        $route = route('admin.article.add');
+    } else {
+        $title = $article->name;
+        $route = route('admin.article.update', $article->id);
+    }
+
+    $trail->push($title, $route);
+});

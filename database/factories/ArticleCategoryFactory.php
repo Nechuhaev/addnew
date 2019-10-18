@@ -10,9 +10,9 @@ $factory->define(ArticleCategory::class, function (Faker $faker) {
     return [
         'name' => $faker->realText(70),
         'slug' => $faker->slug,
-        'content' => $faker->realText(10),
+        'content' => $faker->realText(rand(800, 2000)),
         'meta_title' => $faker->optional()->realText(100),
         'meta_description' => $faker->optional()->realText(100),
-        'sort_order' => $faker->numberBetween(0, 100)
+        'sort_order' => rand(0, 100)
     ];
 });

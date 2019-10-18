@@ -34,13 +34,16 @@ class ArticleCategory extends Model
 {
     protected $fillable = ['name', 'slug', 'content', 'sort_order'];
 
+    public function articles() {
+        return $this->belongsToMany(Article::class);
+    }
+
     public function setSortOrderAttribute($value) {
         if (!isset($value)) {
             $this->attributes['sort_order'] = 0;
         } else {
             $this->attributes['sort_order'] = $value;
         }
-
     }
 
     public function setSlugAttribute($value) {
@@ -49,5 +52,9 @@ class ArticleCategory extends Model
         } else {
             $this->attributes['slug'] = $value;
         }
+    }
+
+    public function getHrefAttribute() {
+        return route('blog.article', ['slug' => $this->slug]);
     }
 }

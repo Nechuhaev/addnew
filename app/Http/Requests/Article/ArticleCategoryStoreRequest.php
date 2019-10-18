@@ -1,14 +1,12 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Article;
 
-use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
-use Session;
+use Illuminate\Support\Facades\Auth;
 
 class ArticleCategoryStoreRequest extends FormRequest
 {
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -16,7 +14,11 @@ class ArticleCategoryStoreRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        if (Auth::check()) {
+            return (Auth::user()->is_admin);
+        }
+
+        return false;
     }
 
     /**
@@ -32,11 +34,12 @@ class ArticleCategoryStoreRequest extends FormRequest
         }
         return [
             'name' => 'required|string',
-            'slug' => 'unique:article_categories' . $update_param,
+            'slug' => 'unique:articles' . $update_param,
             'meta_title' => 'max:255',
             'meta_description' => 'max:255',
         ];
     }
+
 
     /**
      * Custom validation messages
@@ -46,13 +49,10 @@ class ArticleCategoryStoreRequest extends FormRequest
     public function messages()
     {
         return [
-            'name.required' => 'Введите название статьи',
-            'slug.unique' => 'Категории с таким slug уже добавлены',
+            'name.required' => 'Введите название категории',
+            'slug.unique' => 'Такой slug уже существует',
             'meta_title.max' => 'Максимальная длина поля Meta-тег title: :max символов',
             'meta_description.max' => 'Максимальная длина поля Meta-тег description: :max символов'
         ];
     }
-
-
-
 }

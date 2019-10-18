@@ -24005,6 +24005,18 @@ body .jqstooltip {
 .comment-footer .action-icons a.active, .comment-footer .action-icons a:hover {
     color: #137eff
 }
+.cart-list-item-list {
+    margin: 0;
+    padding-left: 16px;
+    font-size: 12px;
+}
+.select-image {
+    color: #fff!important;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 10px;
+    line-height: 21px;
+}
 
 @media (min-width: 768px) {
     .bc-content {

@@ -28,11 +28,22 @@ Route::prefix('/')->group(function () {
     Route::get('password/reset/{token}', 'Front\User\Auth\ResetPasswordController@showResetForm')->name('password.reset');
     Route::post('register', 'Front\User\Auth\RegisterController@register');
     Route::get('register', 'Front\User\Auth\RegisterController@showRegistrationForm')->name('register');
+
+    Route::get('blog', 'Front\Article\ArticleController@showArticles')->name('blog');
+    Route::get('blog/article', 'Front\Article\ArticleController@showArticle')->name('blog.article');
 });
 
+/*
+ * Profile routes
+ */
 Route::prefix('profile')->group(function () {
     Route::get('/', 'Front\User\UserController@edit')->name('profile.index');
     Route::get('/ads', 'Front\User\UserController@ads')->name('profile.ads');
+});
+
+Route::prefix('blog')->group(function () {
+    Route::get('/', 'Front\Article\ArticleController@showArticles')->name('blog.index');
+    Route::get('/{slug}', 'Front\Article\ArticleController@showArticle')->name('blog.article');
 });
 
 //dd(strtoupper("4oigctjdg0"));
@@ -78,8 +89,12 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::get('/pages', 'AdminPageController@pages')->name('admin.pages');
     Route::get('/page', 'AdminPageController@page')->name('admin.page');
 
-    Route::get('/articles', 'AdminPageController@articles')->name('admin.articles');
-    Route::get('/article', 'AdminPageController@article')->name('admin.article');
+    Route::get('/articles', 'Admin\Article\ArticleController@showArticles')->name('admin.articles');
+    Route::get('/article/add', 'Admin\Article\ArticleController@showArticleAddForm')->name('admin.article.add');
+    Route::post('/article/add', 'Admin\Article\ArticleController@add')->name('admin.article.create');
+    Route::get('/article/edit/{id}', 'Admin\Article\ArticleController@showArticleEditForm')->name('admin.article.edit');
+    Route::post('/article/update', 'Admin\Article\ArticleController@update')->name('admin.article.update');
+    Route::post('/article/delete', 'Admin\Article\ArticleController@delete')->name('admin.article.delete');
 
     Route::get('/articleCategories', 'Admin\Article\CategoryController@index')->name('admin.article.category.index');
     Route::get('/articleCategory', 'Admin\Article\CategoryController@add')->name('admin.article.category.add');
