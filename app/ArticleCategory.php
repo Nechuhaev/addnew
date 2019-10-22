@@ -55,6 +55,6 @@ class ArticleCategory extends Model
     }
 
     public function getHrefAttribute() {
-        return route('blog.article', ['slug' => $this->slug]);
+        return route('blog.category', ['slug' => $this->slug]);
     }
 }

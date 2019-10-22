@@ -38,13 +38,26 @@ Route::prefix('/')->group(function () {
  */
 Route::prefix('profile')->group(function () {
     Route::get('/', 'Front\User\UserController@edit')->name('profile.index');
+    Route::post('/update', 'Front\User\UserController@updateUser')->name('profile.update');
     Route::get('/ads', 'Front\User\UserController@ads')->name('profile.ads');
+    Route::get('/password', 'Front\User\UserController@password')->name('profile.password');
+    Route::post('/password/update', 'Front\User\UserController@updatePassword')->name('profile.password.update');
 });
 
 Route::prefix('blog')->group(function () {
     Route::get('/', 'Front\Article\ArticleController@showArticles')->name('blog.index');
     Route::get('/{slug}', 'Front\Article\ArticleController@showArticle')->name('blog.article');
+    Route::get('/category/{slug}', 'Front\Article\ArticleController@showCategory')->name('blog.category');
 });
+
+// Автор объявлений
+Route::prefix('author')->group(function () {
+    Route::get('/{id}', 'Front\Article\ArticleController@showArticles')->name('author.index');
+});
+
+
+
+
 
 //dd(strtoupper("4oigctjdg0"));
 

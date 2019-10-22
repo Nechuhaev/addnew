@@ -2,6 +2,7 @@
 
 namespace App;
 
+use DateTime;
 use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Support\Str;
@@ -34,6 +35,7 @@ class Article extends Model
 
     protected $fillable = ['name', 'slug', 'excerpt', 'content', 'sort_order', 'meta_title', 'meta_description', 'image'];
 
+
     public function categories() {
         return $this->belongsToMany(ArticleCategory::class);
     }
@@ -54,11 +56,16 @@ class Article extends Model
         }
     }
 
-    public function getExcerptAttribute() {
+    public function getReadMoreAttribute() {
         $excerpt_length = 515;
-        //return substr(strip_tags($this->content), $excerpt_length) . (strlen(strip_tags($this->content)) > $excerpt_length)? '...' : '';
-        //$excerpt = mb_substr(strip_tags($this->content), 0, $excerpt_length) . (strlen(strip_tags($this->content)) > $excerpt_length) ? '...' : '';
-        return Str::words(strip_tags($this->content), 90, " <a href=\"{$this->href}\" class=\"more-link\">Продолжить чтение...</a>");
+
+        return Str::words(strip_tags($this->excerpt), 90, " <a href=\"{$this->href}\" class=\"more-link\">Продолжить чтение...</a>");
+    }
+
+    public function getCreatedAtAttribute($value) {
+        $date = new DateTime($value);
+        //return $this->created_at->format('d.m.Y H:m');
+        return $date->format('d.m.Y H:m');
     }
 
     public function getHrefAttribute() {

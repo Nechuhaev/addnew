@@ -40,7 +40,6 @@ class UserController extends Controller
 
 
             if (count($validator->errors())) {
-                dd($validator->errors());
                 return redirect()->back()->withErrors($validator)->withInput();
             }
 

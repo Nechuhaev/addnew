@@ -59,3 +59,36 @@ Breadcrumbs::for('admin.article.article', function ($trail, $article = null) {
 
     $trail->push($title, $route);
 });
+
+
+
+/**
+ * *******************************************************************************
+ * ******************************* FRONT PART ************************************
+ * *******************************************************************************
+ */
+Breadcrumbs::for('index', function ($trail) {
+    $trail->push('Главная', route('index'));
+});
+
+
+/**
+ * ******************************* ПРОФИЛЬ *******************************
+ */
+// Главная > Редактировать профиль
+Breadcrumbs::for('profile.edit', function ($trail) {
+    $trail->parent('index');
+    $trail->push('Редактировать профиль', route('profile.index'));
+});
+
+// Главная > Изменить пароль
+Breadcrumbs::for('profile.password', function ($trail) {
+    $trail->parent('index');
+    $trail->push('Изменить пароль', route('profile.password'));
+});
+
+// Главная > Мои объявления
+Breadcrumbs::for('profile.ads', function ($trail) {
+    $trail->parent('index');
+    $trail->push('Мои объявления', route('profile.ads'));
+});

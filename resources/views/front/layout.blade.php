@@ -5,11 +5,9 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <title>Стартовый макет</title>
+    <title>@yield('meta_title')</title>
     <!-- <base href=""> -->
-
-    <meta name="description" content="">
-    <meta name="keywords" content="">
+    <meta name="description" content="@yield('meta_description')">
 
     <link href="{{ asset('assets/front/css/start.min.css') }}" rel="stylesheet">
 </head>
@@ -125,7 +123,7 @@
                             @csrf
                         </form>
                     @else
-                        <span class="header-welcome">Добро пожаловать, <strong>Зарегистрированный гость</strong>!</span>
+                        <span class="header-welcome">Добро пожаловать, <strong>гость</strong>!</span>
                         <a href="{{ route('register') }}" rel="nofollow" class="header-link link-register">Регистрация</a>
                         <a href="{{ route('login') }}" rel="nofollow" class="header-link link-login">Вход</a>
                     @endif
@@ -206,7 +204,7 @@
     <div class="container">
         <div class="footer-inner">
             <ul class="footer-menu">
-                <li><a href="https://addnew.biz/">Главная</a></li>
+                <li><a href="/">Главная</a></li>
                 <li><a href="{{ route('blog.index') }}">Блог</a></li>
                 <li><a href="https://addnew.biz/regions/">Страны</a></li>
                 <li><a href="#">Контакты</a></li>

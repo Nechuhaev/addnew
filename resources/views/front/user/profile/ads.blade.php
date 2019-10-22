@@ -7,10 +7,7 @@
                 <img src="img/banners/banner-4.jpg" alt="">
             </div>
 
-            <ul class="breadcrumb">
-                <li><a href="/">Главная</a></li>
-                <li><span>Мои объявления</span></li>
-            </ul>
+            {{ Breadcrumbs::render('profile.ads') }}
 
             <div class="columns columns-nowrap">
                 <div class="column-content">
@@ -144,37 +141,7 @@
                     </table>
 
                 </div>
-                <aside class="column-right">
-                    <h2 class="account-h2">Личный кабинет</h2>
-                    <ul class="account-menu">
-                        <li><a href="#">Мои объявления</a></li>
-                        <li><a href="#">Редактировать профиль</a></li>
-                        <li><a href="#">Выход</a></li>
-                    </ul>
-                    <h2 class="account-h2">Информация об учётной записи</h2>
-                    <div class="account-author author">
-                        <div class="author-photo">
-                            <img alt="" src="https://secure.gravatar.com/avatar/f17c59914122f91f742418889e41b124?s=250&amp;d=mm&amp;r=g" srcset="https://secure.gravatar.com/avatar/f17c59914122f91f742418889e41b124?s=500&amp;d=mm&amp;r=g 2x" class="author-avatar" height="250" width="250">
-                        </div>
-                        <ul class="author-info">
-                            <li><strong><a href="https://addnew.biz/author/lightlana/">LightLana</a></strong></li>
-                            <li><strong>Активен с:</strong> Апрель 19, 2016 2:34 пп</li>
-                            <li><strong>Последний вход:</strong> Сентябрь 3, 2019 8:45 дп</li>
-                        </ul>
-                    </div>
-                    <div class="account-mail">
-                        <img class="img-svg" height="20" width="20" src="img/dashicons/email.svg" />
-                        <a href="mailto:mail@mail.ru">mail@mail.ru</a>
-                    </div>
-                    <h2 class="account-h2">Статистика учётной записи</h2>
-                    <ul class="account-info">
-                        <li>Активный объявлений: <strong>0</strong></li>
-                        <li>Объявлений в ожидании: <strong>0</strong></li>
-                        <li>Неактивных объявлений: <strong>2</strong></li>
-                        <li>Всего объявлений: <strong>2</strong></li>
-                    </ul>
-
-                </aside>
+                @include('front.sidebars.user')
             </div>
         </div>
     </main>

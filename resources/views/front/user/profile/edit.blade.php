@@ -1,5 +1,8 @@
 @extends('front.layout')
 
+@section('meta_title', "Редактировать профиль {$user->email}")
+@section('meta_description', "Редактировать профиль {$user->email}")
+
 @section('content')
     <main class="account-page">
         <div class="container">
@@ -7,90 +10,134 @@
                 <img src="img/banners/banner-4.jpg" alt="">
             </div>
 
-            <ul class="breadcrumb">
-                <li><a href="/">Главная</a></li>
-                <li><span>Редактировать профиль</span></li>
-            </ul>
+            {{ Breadcrumbs::render('profile.edit') }}
 
             <div class="columns columns-nowrap">
                 <div class="column-content">
                     <h1>Редактировать профиль</h1>
 
-                    <div class="account-author author-edit">
-                        <div class="author-photo">
-                            <img alt="" src="https://secure.gravatar.com/avatar/f17c59914122f91f742418889e41b124?s=250&amp;d=mm&amp;r=g" srcset="https://secure.gravatar.com/avatar/f17c59914122f91f742418889e41b124?s=500&amp;d=mm&amp;r=g 2x" class="author-avatar" height="250" width="250">
+                    @if(session()->has('success'))
+                        <div class="alert success">
+                            {{ session()->get('success') }}
+                        </div>
+                    @endif
+
+                    @if ($errors->any())
+                        <div class="alert danger">
+                            <ul style="padding: 0 0 0 10px;margin: 0;">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    <form class="form-account" action="{{ $action }}" method="post" enctype="multipart/form-data" >
+                        @csrf
+
+                        <div class="account-author author-edit">
+                            <div class="author-photo">
+                                <img alt="" src="{{ $user->image ?? 'https://secure.gravatar.com/avatar/f17c59914122f91f742418889e41b124?s=250&amp;d=mm&amp;r=g' }}" class="author-avatar" height="250" width="250">
+                            </div>
+
+                            <div class="upload-file upload-avatar">
+                                <label>Аватар</label><br>
+                                <label class="upload-label">
+                                    <input name="image" type="file" class="input-file"  />
+                                    <div>Загрузить аватар</div>
+                                    <input class="input-file-name" type="text" id="input-file-name" value="Файл не выбран." disabled />
+                                </label>
+
+                                <span class="form-help">Максимальный размер файла: 1024 KB.</span>
+                            </div>
                         </div>
 
-                        <div class="upload-file upload-avatar">
-                            <label>Аватар</label><br>
-                            <label class="upload-label">
-                                <input name="file" type="file" class="input-file"  />
-                                <div>Загрузить аватар</div>
-                                <input class="input-file-name" type="text" id="input-file-name" value="Файл не выбран." disabled />
-                            </label>
 
-                            <span class="form-help">Максимальный размер файла: 1024 KB.</span>
-                        </div>
-                    </div>
-
-                    <form class="form-account" action="#" method="post" enctype="multipart/form-data" >
                         <div class="columns">
+
                             <div class="col-2">
                                 <div class="form-group">
-                                    <label>Имя пользователя</label>
-                                    <input type="text" class="form-control" disabled="disabled" value="UserName">
+                                    <label for="firstname">Имя</label>
+                                    <input type="text"
+                                           id="firstname"
+                                           name="firstname"
+                                           value="{{ $user->firstname ?? old('firstname') }}"
+                                           class="form-control">
                                 </div>
                                 <div class="form-group">
-                                    <label>Псевдоним</label>
-                                    <input type="text" class="form-control" value="UserName">
+                                    <label for="email">Почта</label>
+                                    <input disabled
+                                           type="email"
+                                           name="email"
+                                           id="email"
+                                           class="form-control"
+                                           value="{{ $user->email ?? old('email') }}">
                                 </div>
                                 <div class="form-group">
-                                    <label>Отображаемое имя</label>
-                                    <input type="text" class="form-control" value="UserName">
-                                </div>
-                            </div>
-                            <div class="col-2">
-                                <div class="form-group">
-                                    <label>Имя</label>
-                                    <input type="text" class="form-control">
+                                    <label for="site_url">Сайт</label>
+                                    <input type="text"
+                                           id="site_url"
+                                           name="site_url"
+                                           value="{{ $user->site_url ?? old('site_url') }}"
+                                           class="form-control">
                                 </div>
                                 <div class="form-group">
-                                    <label>Фамилия</label>
-                                    <input type="text" class="form-control">
-                                </div>
-                                <div class="form-group">
-                                    <label>Почта</label>
-                                    <input type="mail" class="form-control" value="mail@mail.ru">
-                                </div>
-                            </div>
-                            <div class="col-2">
-                                <div class="form-group">
-                                    <label>Обо мне</label>
-                                    <textarea rows="8" class="form-control"></textarea>
-                                </div>
-                                <div class="form-group">
-                                    <label>Новый пароль</label>
-                                    <input type="text" class="form-control" placeholder="">
-                                    <span class="form-help">Пароль должен быть минимум из семи символов.</span>
-                                    <button class="btn">Сгенерировать пароль</button>
-                                </div>
-                            </div>
-                            <div class="col-2">
-                                <div class="form-group">
-                                    <label>Сайт</label>
-                                    <input type="text" class="form-control">
-                                </div>
-                                <div class="form-group">
-                                    <label>Twitter:</label>
-                                    <input type="text" class="form-control">
+                                    <label for="twitter_url">Twitter:</label>
+                                    <input type="text"
+                                           id="twitter_url"
+                                           name="twitter_url"
+                                           value="{{ $user->twitter_url ?? old('twitter_url') }}"
+                                           class="form-control">
                                     <span class="form-help">Введите ваше имя пользователя в Twitter без URL-адреса.</span>
                                 </div>
                                 <div class="form-group">
-                                    <label>Facebook:</label>
-                                    <input type="text" class="form-control">
+                                    <label for="facebook_url">Facebook:</label>
+                                    <input type="text"
+                                           id="facebook_url"
+                                           name="facebook_url"
+                                           value="{{ $user->facebook_url ?? old('facebook_url') }}"
+                                           class="form-control">
                                     <span class="form-help">Введите ваше имя пользователя в Facebook без URL-адреса. До сих пор нет? <a href="#">Получить специальный адрес</a></span>
                                 </div>
                             </div>
+
+                            <div class="col-2">
+                                <div class="form-group">
+                                    <label for="lastname">Фамилия</label>
+                                    <input type="text"
+                                           id="lastname"
+                                           name="lastname"
+                                           value="{{ $user->lastname ?? old('lastname') }}"
+                                           class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="telephone">Номер телефона</label>
+                                    <input type="tel"
+                                           name="telephone"
+                                           id="telephone"
+                                           value="{{ $user->telephone ?? old('telephone') }}"
+                                           class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="info">Обо мне</label>
+                                    <textarea rows="8"
+                                              id="info"
+                                              name="info"
+                                              class="form-control">{{ $user->info ?? old('info') }}</textarea>
+                                </div>
+                            </div>
+
+
+                            {{--<div class="col-2">--}}
+
+                                {{--<div class="form-group">--}}
+                                    {{--<label>Новый пароль</label>--}}
+                                    {{--<input type="text" class="form-control" placeholder="">--}}
+                                    {{--<span class="form-help">Пароль должен быть минимум из семи символов.</span>--}}
+                                    {{--<button class="btn">Сгенерировать пароль</button>--}}
+                                {{--</div>--}}
+                            {{--</div>--}}
+
                         </div>
 
                         <div class="form-action">
@@ -99,37 +146,7 @@
 
                     </form>
                 </div>
-                <aside class="column-right">
-                    <h2 class="account-h2">Личный кабинет</h2>
-                    <ul class="account-menu">
-                        <li><a href="#">Мои объявления</a></li>
-                        <li><a href="#">Редактировать профиль</a></li>
-                        <li><a href="#">Выход</a></li>
-                    </ul>
-                    <h2 class="account-h2">Информация об учётной записи</h2>
-                    <div class="account-author author">
-                        <div class="author-photo">
-                            <img alt="" src="https://secure.gravatar.com/avatar/f17c59914122f91f742418889e41b124?s=250&amp;d=mm&amp;r=g" srcset="https://secure.gravatar.com/avatar/f17c59914122f91f742418889e41b124?s=500&amp;d=mm&amp;r=g 2x" class="author-avatar" height="250" width="250">
-                        </div>
-                        <ul class="author-info">
-                            <li><strong><a href="https://addnew.biz/author/lightlana/">LightLana</a></strong></li>
-                            <li><strong>Активен с:</strong> Апрель 19, 2016 2:34 пп</li>
-                            <li><strong>Последний вход:</strong> Сентябрь 3, 2019 8:45 дп</li>
-                        </ul>
-                    </div>
-                    <div class="account-mail">
-                        <img class="img-svg" height="20" width="20" src="img/dashicons/email.svg" />
-                        <a href="mailto:mail@mail.ru">mail@mail.ru</a>
-                    </div>
-                    <h2 class="account-h2">Статистика учётной записи</h2>
-                    <ul class="account-info">
-                        <li>Активный объявлений: <strong>0</strong></li>
-                        <li>Объявлений в ожидании: <strong>0</strong></li>
-                        <li>Неактивных объявлений: <strong>2</strong></li>
-                        <li>Всего объявлений: <strong>2</strong></li>
-                    </ul>
-
-                </aside>
+                @include('front.sidebars.user')
             </div>
 
         </div>

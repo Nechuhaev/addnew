@@ -74,7 +74,7 @@ class AdminPageController extends Controller
     }
 
     public function adSenseBlocks() {
-        return view('admin.empty');
+        return view('admin.settings.list');
     }
 
     public function adSenseBlock() {
