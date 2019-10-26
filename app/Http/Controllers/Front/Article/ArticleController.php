@@ -23,6 +23,8 @@ class ArticleController extends Controller
 
         $article = Article::where('slug', $slug)->first();
 
+        dd($article->toArray());
+
         return view('front.article.article', ['article' => $article]);
     }
 
