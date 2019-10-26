@@ -82,7 +82,7 @@ class ArticleController extends Controller
                 ];
             }
 
-            return view('admin.articles.article', [
+            return view('admin.article.single', [
                 'action' => $action,
                 'default' => $default,
                 'categories' => $categories_to_view,
