@@ -15,6 +15,14 @@ class CreateAdCategoriesTable extends Migration
     {
         Schema::create('ad_categories', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->integer('parent_id')->default(0);
+            $table->text('image', 255)->nullable();
+            $table->text('name', 255);
+            $table->text('slug', 255);
+            $table->text('content')->nullable();
+            $table->text('meta_title', 255)->nullable();
+            $table->text('meta_description', 255)->nullable();
+            $table->integer('sort_order')->default(0);
             $table->timestamps();
         });
     }

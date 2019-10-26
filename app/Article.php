@@ -50,7 +50,7 @@ class Article extends Model
 
     public function setSlugAttribute($value) {
         if (!isset($value)) {
-            $this->attributes['slug'] = str2url($this->attributes['name']);
+            $this->attributes['slug'] = str_slug($this->attributes['name']);
         } else {
             $this->attributes['slug'] = $value;
         }

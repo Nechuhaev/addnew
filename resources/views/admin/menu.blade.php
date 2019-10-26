@@ -37,13 +37,19 @@
                 </a>
             </li>
             <li class="sidebar-item">
-                <a href="{{ route('admin.countries') }}" class="sidebar-link">
+                <a href="{{ route('admin.adCountries') }}" class="sidebar-link">
                     <i class="mdi mdi-google-maps"></i>
                     <span class="hide-menu">Страны</span>
                 </a>
             </li>
             <li class="sidebar-item">
-                <a href="{{ route('admin.cities') }}" class="sidebar-link">
+                <a href="{{ route('admin.adRegions') }}" class="sidebar-link">
+                    <i class="mdi mdi-google-maps"></i>
+                    <span class="hide-menu">Области / Регионы</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ route('admin.adCities') }}" class="sidebar-link">
                     <i class="mdi mdi-city"></i>
                     <span class="hide-menu">Города</span>
                 </a>

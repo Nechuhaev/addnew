@@ -15,6 +15,12 @@ class CreateAdCountriesTable extends Migration
     {
         Schema::create('ad_countries', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->string('name', 255);
+            $table->string('slug', 255);
+            $table->string('content');
+            $table->string('meta_title', 255);
+            $table->string('meta_description', 255);
+            $table->integer('sort_order');
             $table->timestamps();
         });
     }

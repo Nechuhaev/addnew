@@ -74,7 +74,7 @@ class CategoryController extends Controller
 
         $action = route('admin.article.category.update', $category->id);
 
-        return view('admin.articles.category', [
+        return view('admin.article.category.single', [
             'category' => $category,
             'page_title' => $page_title,
             'action' => $action,

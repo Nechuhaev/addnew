@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateAdCitiesTable extends Migration
+class CreateAdRegionsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,9 @@ class CreateAdCitiesTable extends Migration
      */
     public function up()
     {
-        Schema::create('ad_cities', function (Blueprint $table) {
+        Schema::create('ad_regions', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer('region_id');
+            $table->integer('country_id');
             $table->string('name', 255);
             $table->string('slug', 255);
             $table->string('content');
@@ -33,6 +33,6 @@ class CreateAdCitiesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('ad_cities');
+        Schema::dropIfExists('ad_regions');
     }
 }

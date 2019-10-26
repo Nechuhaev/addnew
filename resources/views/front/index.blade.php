@@ -4,13 +4,13 @@
     <main class="home-page">
         <div class="container">
             <div class="banner">
-                <img src="img/banners/banner.jpg" alt="">
+                <img src="{{ asset('assets/front/img/banners/banner.jpg') }}" alt="">
             </div>
             <div class="columns">
                 <div class="col">
                     <ul class="catalog">
                         <li class="first first-64">
-                            <img src="img/icons/icon-1.png" alt="" class="catalog-img">
+                            <img src="{{ asset('assets/front/img/icons/icon-1.png') }}" alt="" class="catalog-img">
                             <a href="https://addnew.biz/transport/">Транспорт</a></li>
                         <li><a href="https://addnew.biz/transport/transport-logistika/">Транспорт / логистика</a></li>
                         <li><a href="https://addnew.biz/transport/legkovyie-avtomobili/">Легковые автомобили</a></li>
@@ -27,7 +27,7 @@
                     </ul>
                     <ul class="catalog">
                         <li class="first first-65">
-                            <img src="img/icons/icon-2.png" alt="" class="catalog-img">
+                            <img src="{{ asset('assets/front/img/icons/icon-2.png') }}" alt="" class="catalog-img">
                             <a href="https://addnew.biz/biznes-i-uslugi/">Бизнес и услуги</a></li>
                         <li><a href="https://addnew.biz/biznes-i-uslugi/stroitelstvo-remont-uborka/">Строительство / ремонт / уборка</a></li>
                         <li><a href="https://addnew.biz/biznes-i-uslugi/finansovyie-uslugi-partnerstvo/">Финансовые услуги / партнерство</a></li>
@@ -53,7 +53,7 @@
                     </ul>
                     <ul class="catalog">
                         <li class="first first-72">
-                            <img src="img/icons/icon-3.png" alt="" class="catalog-img">
+                            <img src="{{ asset('assets/front/img/icons/icon-3.png') }}" alt="" class="catalog-img">
                             <a href="https://addnew.biz/hobbi-otdyih-i-sport/">Хобби</a></li>
                         <li><a href="https://addnew.biz/hobbi-otdyih-i-sport/znakomstva-i-kontaktyi/">Знакомства и контакты</a></li>
                         <li><a href="https://addnew.biz/hobbi-otdyih-i-sport/antikvariat-kollektsii/">Антиквариат / коллекции</a></li>
@@ -71,7 +71,7 @@
                 <div class="col">
                     <ul class="catalog">
                         <li class="first first-67">
-                            <img src="img/icons/icon-4.png" alt="" class="catalog-img">
+                            <img src="{{ asset('assets/front/img/icons/icon-4.png') }}" alt="" class="catalog-img">
                             <a href="https://addnew.biz/nedvizhimost-2/">Недвижимость</a></li>
                         <li><a href="https://addnew.biz/nedvizhimost-2/snimu/">Сниму</a></li>
                         <li><a href="https://addnew.biz/nedvizhimost-2/arenda-kvartir/">Аренда квартир</a></li>
@@ -92,7 +92,7 @@
                     </ul>
                     <ul class="catalog">
                         <li class="first first-70">
-                            <img src="img/icons/icon-5.png" alt="" class="catalog-img">
+                            <img src="{{ asset('assets/front/img/icons/icon-5.png') }}" alt="" class="catalog-img">
                             <a href="https://addnew.biz/elektronika/">Электроника</a></li>
                         <li><a href="https://addnew.biz/elektronika/telefonyi/">Телефоны</a></li>
                         <li><a href="https://addnew.biz/elektronika/kompyuteryi/">Компьютеры</a></li>
@@ -109,12 +109,12 @@
                     </ul>
                     <ul class="catalog">
                         <li class="first first-2986">
-                            <img src="img/icons/icon-6.png" alt="" class="catalog-img">
+                            <img src="{{ asset('assets/front/img/icons/icon-6.png') }}" alt="" class="catalog-img">
                             <a href="https://addnew.biz/otdam-darom/">Отдам даром</a></li>
                     </ul>
                     <ul class="catalog">
                         <li class="first first-68">
-                            <img src="img/icons/icon-7.png" alt="" class="catalog-img">
+                            <img src="{{ asset('assets/front/img/icons/icon-7.png') }}" alt="" class="catalog-img">
                             <a href="https://addnew.biz/zhivotnyie/">Животные</a></li>
                         <li><a href="https://addnew.biz/zhivotnyie/sobaki/">Собаки</a></li>
                         <li><a href="https://addnew.biz/zhivotnyie/koshki/">Кошки</a></li>
@@ -134,7 +134,7 @@
                 <div class="col">
                     <ul class="catalog">
                         <li class="first first-63">
-                            <img src="img/icons/icon-8.png" alt="" class="catalog-img">
+                            <img src="{{ asset('assets/front/img/icons/icon-8.png') }}" alt="" class="catalog-img">
                             <a href="https://addnew.biz/detskiy-mir/">Детский мир</a></li>
                         <li><a href="https://addnew.biz/detskiy-mir/detskaya-obuv/">Детская обувь</a></li>
                         <li><a href="https://addnew.biz/detskiy-mir/detskaya-odezhda/">Детская одежда</a></li>
@@ -148,11 +148,11 @@
                         <li><a href="https://addnew.biz/detskiy-mir/tovaryi-dlya-shkolnikov/">Товары для школьников</a></li>
                     </ul>
                     <div class="banner">
-                        <img src="img/banners/banner-3.jpg" alt="">
+                        <img src="{{ asset('assets/front/img/banners/banner-3.jpg') }}" alt="">
                     </div>
                     <ul class="catalog">
                         <li class="first first-66">
-                            <img src="img/icons/icon-9.png" alt="" class="catalog-img">
+                            <img src="{{ asset('assets/front/img/icons/icon-9.png') }}" alt="" class="catalog-img">
                             <a href="https://addnew.biz/rabota/">Работа</a></li>
                         <li><a href="https://addnew.biz/rabota/ishhu-rabotu/">Ищу работу</a></li>
                         <li><a href="https://addnew.biz/rabota/predlagayu-rabotu/">Предлагаю работу</a></li>
@@ -162,7 +162,7 @@
                 <div class="col">
                     <ul class="catalog">
                         <li class="first first-69">
-                            <img src="img/icons/icon-10.png" alt="" class="catalog-img">
+                            <img src="{{ asset('assets/front/img/icons/icon-10.png') }}" alt="" class="catalog-img">
                             <a href="https://addnew.biz/dom-i-sad/">Дом и сад</a></li>
                         <li><a href="https://addnew.biz/dom-i-sad/kantstovaryi-rashodnyie-materialyi/">Канцтовары / расходные материалы</a></li>
                         <li><a href="https://addnew.biz/dom-i-sad/mebel/">Мебель</a></li>
@@ -177,7 +177,7 @@
                     </ul>
                     <ul class="catalog">
                         <li class="first first-2982">
-                            <img src="img/icons/icon-11.png" alt="" class="catalog-img">
+                            <img src="{{ asset('assets/front/img/icons/icon-11.png') }}" alt="" class="catalog-img">
                             <a href="https://addnew.biz/stroitelstvo-i-remont/">Строительство и ремонт</a></li>
                         <li><a href="https://addnew.biz/stroitelstvo-i-remont/stroitelnyie-materialyi/">Строительные материалы</a></li>
                         <li><a href="https://addnew.biz/stroitelstvo-i-remont/zamki-i-furnitura/">Замки и фурнитура</a></li>
@@ -200,7 +200,7 @@
                     </ul>
                     <ul class="catalog">
                         <li class="first first-71">
-                            <img src="img/icons/icon-12.png" alt="" class="catalog-img">
+                            <img src="{{ asset('assets/front/img/icons/icon-12.png') }}" alt="" class="catalog-img">
                             <a href="https://addnew.biz/moda-i-stil/">Мода и стиль</a></li>
                         <li><a href="https://addnew.biz/moda-i-stil/odezhda-obuv/">Одежда / обувь</a></li>
                         <li><a href="https://addnew.biz/moda-i-stil/dlya-svadbyi/">Для свадьбы</a></li>
@@ -212,7 +212,7 @@
                     </ul>
                     <ul class="catalog">
                         <li class="first first-2989">
-                            <img src="img/icons/icon-13.png" alt="" class="catalog-img">
+                            <img src="{{ asset('assets/front/img/icons/icon-13.png') }}" alt="" class="catalog-img">
                             <a href="https://addnew.biz/oborudovanie-2/">Оборудование</a></li>
                         <li><a href="https://addnew.biz/oborudovanie-2/torgovoe-oborudovanie/">Торговое оборудование</a></li>
                         <li><a href="https://addnew.biz/oborudovanie-2/proizvodstvennoe-oborudovanie/">Производственное оборудование</a></li>
@@ -248,7 +248,7 @@
             </div>
 
             <div class="banner">
-                <img src="img/banners/banner-2.jpg" alt="">
+                <img src="{{ asset('assets/front/img/banners/banner-2.jpg') }}" alt="">
             </div>
 
             <h2 class="last-advs-header">Последние объявления</h2>

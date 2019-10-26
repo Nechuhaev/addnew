@@ -15,7 +15,11 @@ class CreateAdTagsTable extends Migration
     {
         Schema::create('ad_tags', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->timestamps();
+            $table->string('name', 255);
+            $table->string('slug', 255);
+            $table->string('content')->nullable();
+            $table->string('meta_title', 255)->nullable();
+            $table->string('meta_description', 255)->nullable();
         });
     }
 

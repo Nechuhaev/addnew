@@ -24,3 +24,29 @@
     margin-bottom: 0;
     color: #6b6b6b;
 }
+.table-middle-cell td,
+.table-middle-cell th {
+    vertical-align: middle;
+}
+.table-middle-cell th {
+    font-weight: bold;
+    color: #000;
+    background: #eee;
+}
+.cell-actions {
+    width: 100px;
+}
+.cell-actions a {
+    padding: 0 5px;
+}
+.category-form label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #000;
+    line-height: 13px;
+    margin-bottom: 5px;
+}
+.sidebar-item .first-level {
+    /*padding-left: 22px !important;*/
+    background: #2e4054 !important;
+}

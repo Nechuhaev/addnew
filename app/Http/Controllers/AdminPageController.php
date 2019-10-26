@@ -25,21 +25,6 @@ class AdminPageController extends Controller
         return view('admin.empty');
     }
 
-    public function adCategories() {
-        return view('admin.empty');
-    }
-
-    public function adCategory() {
-        return view('admin.empty');
-    }
-
-    public function adTags() {
-        return view('admin.empty');
-    }
-
-    public function adTag() {
-        return view('admin.empty');
-    }
 
     public function pages() {
         return view('admin.empty');
@@ -74,7 +59,7 @@ class AdminPageController extends Controller
     }
 
     public function adSenseBlocks() {
-        return view('admin.settings.list');
+        //return view('admin.settings.list');
     }
 
     public function adSenseBlock() {

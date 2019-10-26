@@ -15,6 +15,22 @@ class CreateAdsTable extends Migration
     {
         Schema::create('ads', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->integer('category_id');
+            $table->integer('city_id');
+            $table->string('image', 255)->nullable();
+            $table->string('name', 255);
+            $table->string('slug', 255);
+            $table->string('author');
+            $table->string('content');
+            $table->string('price')->nullable();
+            $table->string('telephone');
+            $table->string('email');
+            $table->string('meta_title', 255)->nullable();
+            $table->string('meta_description', 255)->nullable();
+            $table->boolean('is_archive')->default(0);
+            $table->integer('total_views')->default(0);
+            $table->integer('today_views')->default(0);
+            $table->integer('bad_rating')->default(0);
             $table->timestamps();
         });
     }
