@@ -107,6 +107,11 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
 
     // Объявления > Страны
     Route::get('/countries', 'Admin\Ad\Country@showForm')->name('admin.adCountries');
+    Route::get('/countries/search', 'Admin\Ad\Country@search')->name('admin.adCountries.search');
+    Route::get('/countries/{id}', 'Admin\Ad\Country@showForm')->name('admin.adCountries.edit');
+    Route::post('/countries/create', 'Admin\Ad\Country@create')->name('admin.adCountries.create');
+    Route::post('/countries/update', 'Admin\Ad\Country@update')->name('admin.adCountries.update');
+    Route::get('/countries/delete/{id}', 'Admin\Ad\Country@showForm')->name('admin.adCountries.delete');
 
     // Объявления > Области / Регионы
     Route::get('/regions', 'Admin\Ad\Region@showForm')->name('admin.adRegions');

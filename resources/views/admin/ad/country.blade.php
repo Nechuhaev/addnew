@@ -27,76 +27,76 @@
         <div class="col-4">
             <div class="card">
                 <div class="card-body">
-                    <form action="" class="category-form">
-
-
-                        <div class="form-group">
-                            <label>Родительская категория</label>
-                            <div>
-                                <select name="" class="form-control" id="">
-                                    <option value="0">У этой категории нет родителей :(</option>
-                                    <option value="1">Категория 1</option>
-                                </select>
-                            </div>
-                        </div>
+                    <form action="{{ $action }}" method="POST" class="category-form">
+                        @csrf
+                        @if($country)
+                            <input type="hidden" name="country_id" value="{{ $country->id }}">
+                        @endif
 
                         <div class="form-group">
-                            <label>Название категории</label>
+                            <label>Страна</label>
                             <div>
                                 <input type="text"
                                        name="name"
-                                       value=""
-                                       placeholder="noobmaster69"
+                                       id="name"
+                                       value="{{ old('name') ?? $country->name ?? '' }}"
+                                       placeholder=""
                                        class="form-control form-control-line">
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label>Slug</label>
+                            <label for="slug">Slug</label>
                             <div>
                                 <input type="text"
-                                       name="name"
-                                       value=""
-                                       placeholder="noobmaster69"
+                                       name="slug"
+                                       id="slug"
+                                       value="{{ old('slug') ?? $country->slug ?? '' }}"
+                                       placeholder=""
                                        class="form-control form-control-line">
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label>Описание категории</label>
+                            <label for="content">Описание категории</label>
                             <div>
-                                <textarea name="excerpt" rows="5"
-                                          class="form-control form-control-line"></textarea>
+                                <textarea name="content"
+                                          id="content"
+                                          class="content form-control form-control-line">{{ old('content') ?? $country->content ?? '' }}</textarea>
 
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label>Meta-тег title</label>
+                            <label for="meta_title">Meta-тег title</label>
                             <div>
                                 <input type="text"
-                                       name="name"
-                                       value=""
-                                       placeholder="noobmaster69"
+                                       name="meta_title"
+                                       id="meta_title"
+                                       value="{{ old('meta_title') ?? $country->meta_title ?? '' }}"
+                                       placeholder=""
                                        class="form-control form-control-line">
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label>Meta-тег description</label>
+                            <label for="meta_description">Meta-тег description</label>
                             <div>
-                                <textarea name="excerpt" rows="5"
-                                          class="form-control form-control-line"></textarea>
+                                <textarea name="meta_description"
+                                          rows="5"
+                                          id="meta_description"
+                                          class="form-control form-control-line">{{ old('meta_description') ?? $country->meta_description ?? '' }}</textarea>
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label>Порядок сортировки</label>
+                            <label for="sort_order">Порядок сортировки</label>
                             <div>
                                 <input type="text"
-                                       name="name"
-                                       value=""
-                                       placeholder="noobmaster69"
+                                       name="sort_order"
+                                       id="sort_order"
+                                       value="{{ old('sort_order') ?? $country->sort_order ?? '' }}"
+                                       placeholder=""
                                        class="form-control form-control-line">
                             </div>
                         </div>
@@ -110,11 +110,12 @@
                                         <i class="fa fa-picture-o"></i> Выбрать
                                         </a>
                                     </span>
-                                    <input id="thumbnail" value="" class="form-control" type="text" name="image">
+                                    <input id="thumbnail" value="{{ old('image') ?? $country->image ?? '' }}" class="form-control" type="text" name="image">
                                 </div>
-                                <img id="holder" class="img-fluid" style="margin-top: 20px" src="http://placehold.it/400x250">
+                                <img id="holder" class="img-fluid" style="margin-top: 20px" src="{{ old('image') ?? $country->image ?? 'http://placehold.it/400x250' }}">
                             </div>
                         </div>
+
                         <hr>
                         <div class="form-group text-center">
                             <button class="btn btn-success">Сохранить</button>
@@ -127,122 +128,37 @@
         <div class="col-8">
             <div class="card">
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-8">
-                            <input type="text"
-                                   name="name"
-                                   value=""
-                                   placeholder="Поиск меток"
-                                   class="form-control form-control-line">
+                    <form action="{{ $action_search }}" method="GET">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <input type="text"
+                                       name="name"
+                                       value="{{ $requested_country ?? "" }}"
+                                       placeholder="Поиск по странам"
+                                       class="form-control form-control-line">
+                            </div>
+                            <div class="col-md-4"><button class="btn btn-primary btn-block">Искать</button></div>
                         </div>
-                        <div class="col-md-4"><button class="btn btn-primary btn-block">Найти метки</button></div>
-                    </div>
+                    </form>
 
                     <hr>
 
-                    <table class="table table-bordered table-hover table-middle-cell">
-
-                        <tr>
-                            <td>Страна</td>
-                            <td class="text-center cell-actions">
-                                <a href="#"><i class="mdi mdi-18px mdi-table-edit"></i></a>
-                                <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Страна</td>
-                            <td class="text-center cell-actions">
-                                <a href="#"><i class="mdi mdi-18px mdi-table-edit"></i></a>
-                                <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Страна</td>
-                            <td class="text-center cell-actions">
-                                <a href="#"><i class="mdi mdi-18px mdi-table-edit"></i></a>
-                                <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Страна</td>
-                            <td class="text-center cell-actions">
-                                <a href="#"><i class="mdi mdi-18px mdi-table-edit"></i></a>
-                                <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Страна</td>
-                            <td class="text-center cell-actions">
-                                <a href="#"><i class="mdi mdi-18px mdi-table-edit"></i></a>
-                                <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Страна</td>
-                            <td class="text-center cell-actions">
-                                <a href="#"><i class="mdi mdi-18px mdi-table-edit"></i></a>
-                                <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Страна</td>
-                            <td class="text-center cell-actions">
-                                <a href="#"><i class="mdi mdi-18px mdi-table-edit"></i></a>
-                                <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Страна</td>
-                            <td class="text-center cell-actions">
-                                <a href="#"><i class="mdi mdi-18px mdi-table-edit"></i></a>
-                                <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Страна</td>
-                            <td class="text-center cell-actions">
-                                <a href="#"><i class="mdi mdi-18px mdi-table-edit"></i></a>
-                                <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Страна</td>
-                            <td class="text-center cell-actions">
-                                <a href="#"><i class="mdi mdi-18px mdi-table-edit"></i></a>
-                                <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Страна</td>
-                            <td class="text-center cell-actions">
-                                <a href="#"><i class="mdi mdi-18px mdi-table-edit"></i></a>
-                                <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Страна</td>
-                            <td class="text-center cell-actions">
-                                <a href="#"><i class="mdi mdi-18px mdi-table-edit"></i></a>
-                                <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Страна</td>
-                            <td class="text-center cell-actions">
-                                <a href="#"><i class="mdi mdi-18px mdi-table-edit"></i></a>
-                                <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Страна</td>
-                            <td class="text-center cell-actions">
-                                <a href="#"><i class="mdi mdi-18px mdi-table-edit"></i></a>
-                                <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
-                            </td>
-                        </tr>
-
-
-                    </table>
+                    @if($countries->items())
+                        <table class="table table-bordered table-hover table-middle-cell">
+                            @foreach($countries as $country_item)
+                                <tr>
+                                    <td>{{ $country_item->name }}</td>
+                                    <td class="text-center cell-actions">
+                                        <a href="{{ route('admin.adCountries.edit', ['id' => $country_item->id]) }}"><i class="mdi mdi-18px mdi-table-edit"></i></a>
+                                        <a href="{{ route('admin.adCountries.delete', ['id' => $country_item->id]) }}" onclick="return confirm('Вы пытаетесь удалить страну {{ $country_item->name }}. Подтвердите действие.')" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </table>
+                        {{ $countries->links() }}
+                    @else
+                        <p>Стран не найдено</p>
+                    @endif
                 </div>
             </div>
         </div>
