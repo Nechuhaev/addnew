@@ -111,10 +111,15 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::get('/countries/{id}', 'Admin\Ad\Country@showForm')->name('admin.adCountries.edit');
     Route::post('/countries/create', 'Admin\Ad\Country@create')->name('admin.adCountries.create');
     Route::post('/countries/update', 'Admin\Ad\Country@update')->name('admin.adCountries.update');
-    Route::get('/countries/delete/{id}', 'Admin\Ad\Country@showForm')->name('admin.adCountries.delete');
+    Route::get('/countries/delete/{id}', 'Admin\Ad\Country@delete')->name('admin.adCountries.delete');
 
     // Объявления > Области / Регионы
     Route::get('/regions', 'Admin\Ad\Region@showForm')->name('admin.adRegions');
+    Route::get('/regions/search', 'Admin\Ad\Region@search')->name('admin.adRegions.search');
+    Route::get('/regions/{id}', 'Admin\Ad\Region@showForm')->name('admin.adRegions.edit');
+    Route::post('/regions/create', 'Admin\Ad\Region@create')->name('admin.adRegions.create');
+    Route::post('/regions/update', 'Admin\Ad\Region@update')->name('admin.adRegions.update');
+    Route::get('/regions/delete/{id}', 'Admin\Ad\Region@delete')->name('admin.adRegions.delete');
 
     // Объявления > Города
     Route::get('/cities', 'Admin\Ad\City@showForm')->name('admin.adCities');
