@@ -60,4 +60,8 @@ class AdCountry extends Model
             $this->attributes['slug'] = $value;
         }
     }
+
+    public function regions() {
+        return $this->hasMany(AdRegion::class, 'country_id');
+    }
 }

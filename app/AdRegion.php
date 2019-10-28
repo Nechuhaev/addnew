@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class AdRegion extends Model
 {
     protected $fillable = [
-        'region_id',
+        'country_id',
         'name',
         'slug',
         'content',
@@ -59,5 +59,9 @@ class AdRegion extends Model
         } else {
             $this->attributes['slug'] = $value;
         }
+    }
+
+    public function country() {
+        return $this->belongsTo(AdCountry::class, 'country_id');
     }
 }
