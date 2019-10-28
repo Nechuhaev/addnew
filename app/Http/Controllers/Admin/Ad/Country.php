@@ -44,12 +44,13 @@ class Country extends Controller
         $country = null;
 
         $action = route('admin.adCountries.create');
-
+        // TODO Вывести искомую страну во view
         return view('admin.ad.country')->with([
             'action' => $action,
             'country' => $country,
             'countries' => $countries,
-            'action_search' => route('admin.adCountries.search')
+            'action_search' => route('admin.adCountries.search'),
+            'requested_country' => $requested_country
         ]);
     }
 
