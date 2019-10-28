@@ -21,7 +21,7 @@ class CreateAdCitiesTable extends Migration
             $table->string('content');
             $table->string('meta_title', 255);
             $table->string('meta_description', 255);
-            $table->integer('sort_order');
+            $table->integer('sort_order')->default(0)->nullable();
             $table->timestamps();
         });
     }
