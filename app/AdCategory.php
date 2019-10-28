@@ -62,12 +62,4 @@ class AdCategory extends Model
             $this->attributes['slug'] = $value;
         }
     }
-
-    public function setSortOrderAttribute($value) {
-        if (!isset($value)) {
-            $this->attributes['sort_order'] = 0;
-        } else {
-            $this->attributes['sort_order'] = (int)$value;
-        }
-    }
 }
