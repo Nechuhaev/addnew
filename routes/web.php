@@ -90,6 +90,11 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::get('/user/{id}', 'Admin\User\UserController@showUserInformation')->name('admin.user');
     Route::post('/user/update', 'Admin\User\UserController@update')->name('admin.user.update');
 
+
+    // Объявления
+    Route::get('/ads', 'AdminPageController@ads')->name('admin.ads');
+    Route::get('/ad', 'AdminPageController@ad')->name('admin.ad');
+
     // Объявления > Категории
     Route::get('/adCategories', 'Admin\Ad\Category@showForm')->name('admin.adCategories');
     Route::get('/adCategories/{id}', 'Admin\Ad\Category@showForm')->name('admin.adCategories.edit');
@@ -123,9 +128,13 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
 
     // Объявления > Города
     Route::get('/cities', 'Admin\Ad\City@showForm')->name('admin.adCities');
+    Route::get('/cities/search', 'Admin\Ad\City@search')->name('admin.adCities.search');
+    Route::get('/cities/{id}', 'Admin\Ad\City@showForm')->name('admin.adCities.edit');
+    Route::post('/cities/create', 'Admin\Ad\City@create')->name('admin.adCities.create');
+    Route::post('/cities/update', 'Admin\Ad\City@update')->name('admin.adCities.update');
+    Route::get('/cities/delete/{id}', 'Admin\Ad\City@delete')->name('admin.adCities.delete');
 
-    Route::get('/ads', 'AdminPageController@ads')->name('admin.ads');
-    Route::get('/ad', 'AdminPageController@ad')->name('admin.ad');
+
 
     Route::get('/adCategory', 'AdminPageController@adCategory')->name('admin.adCategory');
     Route::get('/country', 'AdminPageController@country')->name('admin.country');
