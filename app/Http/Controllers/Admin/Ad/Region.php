@@ -146,12 +146,20 @@ class Region extends Controller
      */
     public function delete($region_id)
     {
-        #TODO: синхронизация удаленной области к городам
-        if ($region_id)
-        {
-            AdRegion::find($region_id)->delete();
+        if ($region_id) {
+            $region = AdRegion::find($region_id);
+
+            if (!$region->cities->count()) {
+                $region->delete();
+                $data['success'] = 'Информация об области удалена';
+            } else {
+                $data['error'] = 'Удалить информацию об области можно только есль с ней не связан ни один город.';
+            }
+
+        } else {
+            $data['error'] = 'Ошибка удаления области. Возможно, она была удалена раньше';
         }
-        return redirect(route('admin.adRegions'))->with('success', 'Область / регион удален');
+        return redirect(route('admin.adRegions'))->with($data);
     }
 
 }

@@ -27,7 +27,7 @@
         <div class="col-4">
             <div class="card">
                 <div class="card-body">
-                    <form action="{{ $action }}" method="POST" class="region-form">
+                    <form action="{{ $action }}" method="POST" class="category-form">
                         @csrf
                         @if ($region)
                             <input type="hidden" name="region_id" value="{{ $region->id }}">
@@ -151,16 +151,20 @@
                     @if ($regions)
                     <table class="table table-bordered table-hover table-middle-cell">
                         <tr>
-                            <th>Регион</th>
+                            <th class="text-center">ID</th>
+                            <th>Область (Регион)</th>
                             <th>Страна</th>
+                            <th style="max-width: 80px" class="text-center">Городов</th>
                             <th class="text-center cell-actions">
                             </th>
                         </tr>
 
                         @foreach($regions as $region_item)
                             <tr>
-                                <td>{{ $region_item->name }}</td>
+                                <td class="text-center">{{ $region_item->id }}</td>
+                                <td><b>{{ $region_item->name }}</b></td>
                                 <td>{{ $region_item->country->name }}</td>
+                                <td style="max-width: 80px" class="text-center">{{ $region_item->cities->count() }}</td>
                                 <td class="text-center cell-actions">
                                     <a href="{{ route('admin.adRegions.edit', ['id' => $region_item->id]) }}"><i class="mdi mdi-18px mdi-table-edit"></i></a>
                                     <a href="{{ route('admin.adRegions.delete', ['id' => $region_item->id]) }}" onclick="return confirm('Вы пытаетесь удалить регион {{ $region_item->name }}. Подтвердите действие.')" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
