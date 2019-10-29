@@ -186,8 +186,8 @@
                                     </td>
                                 </tr>
                             @endforeach
-
                         </table>
+                        {{ $cities->links() }}
                     @else
                         <p>Города не найдены</p>
                     @endif

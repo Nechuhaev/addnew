@@ -168,6 +168,7 @@
                             </tr>
                         @endforeach
                     </table>
+                    {{ $regions->links() }}
                     @endif
                 </div>
             </div>
