@@ -146,7 +146,7 @@
                     @if($countries->items())
                         <table class="table table-bordered table-hover table-middle-cell">
                             <tr>
-                                <th class="text-center">#</th>
+                                <th class="text-center">ID</th>
                                 <th>Страна</th>
                                 <th class="text-center" style="max-width: 50px">Областей</th>
                                 <th class="text-center" style="max-width: 50px">Городов</th>

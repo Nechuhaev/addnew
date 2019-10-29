@@ -3,7 +3,7 @@ Template Name: Admin Template
 Author: Niravjoshi / Wrappixel
 File: scss
 */
-@import url("https://fonts.googleapis.com/css?family=Rubik:300,400,500,700,900");
+@import url("https://fonts.googleapis.com/css?family=PT+Sans+Caption:400,700&display=swap&subset=cyrillic");
 /*Theme Colors*/
 /*Topbar Colors*/
 /*Sidebar Colors*/
@@ -84,7 +84,7 @@ File: scss
   --breakpoint-md: 768px;
   --breakpoint-lg: 992px;
   --breakpoint-xl: 1200px;
-  --font-family-sans-serif: "Rubik", sans-serif;
+  --font-family-sans-serif: "PT Sans Caption", sans-serif;
   --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
 
 *,
@@ -108,7 +108,7 @@ article, aside, figcaption, figure, footer, header, hgroup, main, nav, section {
 
 body {
   margin: 0;
-  font-family: "Rubik", sans-serif;
+  font-family: "PT Sans Caption", sans-serif;
   font-size: 0.875rem;
   font-weight: 400;
   line-height: 1.5;
@@ -1093,7 +1093,7 @@ pre {
   background-color: transparent; }
   .table th,
   .table td {
-    padding: 1rem;
+    padding: 0.5rem;
     vertical-align: top;
     border-top: 1px solid #dee2e6; }
   .table thead th {
@@ -1366,7 +1366,7 @@ pre {
     opacity: 1; }
 
 select.form-control:not([size]):not([multiple]) {
-  height: calc(2.0625rem + 2px); }
+  height: 35px; }
 
 select.form-control:focus::-ms-value {
   color: #4F5467;
@@ -4171,7 +4171,7 @@ button.close {
   z-index: 1070;
   display: block;
   margin: 0;
-  font-family: "Rubik", sans-serif;
+  font-family: "PT Sans Caption", sans-serif;
   font-style: normal;
   font-weight: 400;
   line-height: 1.5;
@@ -4256,7 +4256,7 @@ button.close {
   z-index: 1060;
   display: block;
   max-width: 276px;
-  font-family: "Rubik", sans-serif;
+  font-family: "PT Sans Caption", sans-serif;
   font-style: normal;
   font-weight: 400;
   line-height: 1.5;
@@ -7442,10 +7442,12 @@ Notify
         margin: 0px;
         padding: 0 10px 0 10px;
         justify-content: space-between; }
+        .topbar .top-navbar .navbar-header .navbar-brand a {margin: 0 auto}
         .topbar .top-navbar .navbar-header .navbar-brand .dark-logo {
           display: none; }
         .topbar .top-navbar .navbar-header .navbar-brand .logo-icon {
           margin-right: 5px; }
+          .topbar .top-navbar .navbar-header .navbar-brand .logo-icon img{max-width:180px}
         .topbar .top-navbar .navbar-header .navbar-brand .sidebartoggler {
           color: #fff; }
     .topbar .top-navbar .navbar-nav > .nav-item > .nav-link {

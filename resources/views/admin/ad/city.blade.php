@@ -27,7 +27,7 @@
         <div class="col-4">
             <div class="card">
                 <div class="card-body">
-                    <form action="{{ $action }}" method="POST" class="city-form">
+                    <form action="{{ $action }}" method="POST" class="category-form">
                         @csrf
 
                         @if ($city)
@@ -169,6 +169,7 @@
                     @if ($cities)
                         <table class="table table-bordered table-hover table-middle-cell">
                             <tr>
+                                <th class="text-center">ID</th>
                                 <th>Город</th>
                                 <th>Регион</th>
                                 <th>Страна</th>
@@ -177,7 +178,8 @@
 
                             @foreach($cities as $city_item)
                                 <tr>
-                                    <td>{{ $city_item->name }}</td>
+                                    <td class="text-center">{{ $city_item->id }}</td>
+                                    <td><b>{{ $city_item->name }}</b></td>
                                     <td>{{ $city_item->region->name }}</td>
                                     <td>{{ $city_item->region->country->name }}</td>
                                     <td class="text-center cell-actions">
