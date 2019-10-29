@@ -162,7 +162,7 @@
                                        placeholder="Поиск городов"
                                        class="form-control form-control-line">
                             </div>
-                            <div class="col-md-4"><button class="btn btn-primary btn-block">Найти область</button></div>
+                            <div class="col-md-4"><button class="btn btn-primary btn-block">Найти город</button></div>
                         </div>
                     </form>
                     <hr>

@@ -107,11 +107,21 @@ class Country extends Controller
 
     public function delete($country_id)
     {
-        #TODO: синхронизация удаленной метки к объявлениям
+
         if ($country_id) {
-            AdCountry::find($country_id)->delete();
+            $country = AdCountry::find($country_id);
+
+            if (!$country->regions->count()) {
+                $country->delete();
+                $data['success'] = 'Информация о стране удалена';
+            } else {
+                $data['error'] = 'Удалить страну можно только есль с ней не связан ни один регион.';
+            }
+
+        } else {
+            $data['error'] = 'Ошибка удаления страны. Возможно, эта страна была удалена раньше';
         }
-        return redirect(route('admin.adCountries'))->with('success', 'Данные страны удалены');
+        return redirect(route('admin.adCountries'))->with($data);
     }
 
 }

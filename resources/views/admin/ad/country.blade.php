@@ -145,9 +145,19 @@
 
                     @if($countries->items())
                         <table class="table table-bordered table-hover table-middle-cell">
+                            <tr>
+                                <th class="text-center">#</th>
+                                <th>Страна</th>
+                                <th class="text-center" style="max-width: 50px">Областей</th>
+                                <th class="text-center" style="max-width: 50px">Городов</th>
+                                <th></th>
+                            </tr>
                             @foreach($countries as $country_item)
                                 <tr>
-                                    <td>{{ $country_item->name }}</td>
+                                    <td class="text-center">{{ $country_item->id }}</td>
+                                    <td><b>{{ $country_item->name }}</b></td>
+                                    <td class="text-center" style="max-width: 50px">{{ $country_item->regions->count() }}</td>
+                                    <td class="text-center" style="max-width: 50px">{{ $country_item->total_cities }}</td>
                                     <td class="text-center cell-actions">
                                         <a href="{{ route('admin.adCountries.edit', ['id' => $country_item->id]) }}"><i class="mdi mdi-18px mdi-table-edit"></i></a>
                                         <a href="{{ route('admin.adCountries.delete', ['id' => $country_item->id]) }}" onclick="return confirm('Вы пытаетесь удалить страну {{ $country_item->name }}. Подтвердите действие.')" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>

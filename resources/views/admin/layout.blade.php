@@ -169,6 +169,13 @@
                 </div>
             @endif
 
+                @if(session()->has('error'))
+                    <div class="alert alert-danger">
+                        {{ session()->get('error') }}
+                    </div>
+                @endif
+
+
             @if ($errors->any())
                 <div class="alert alert-danger">
                     <ul style="padding: 0 0 0 10px;margin: 0;">

@@ -61,7 +61,27 @@ class AdCountry extends Model
         }
     }
 
+    /**
+     * Связь с областями
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function regions() {
         return $this->hasMany(AdRegion::class, 'country_id');
     }
+
+    /**
+     * Количество городов, которые отнесены к стране
+     * @return int
+     */
+    public function getTotalCitiesAttribute()
+    {
+        $total_cities = 0;
+
+        $this->regions()->each(function ($region) use (&$total_cities) {
+            $total_cities += $region->cities->count();
+        });
+
+        return $total_cities;
+    }
+
 }
