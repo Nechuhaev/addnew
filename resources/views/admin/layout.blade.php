@@ -266,8 +266,26 @@
         if (jQuery('#lfm').length) {
             jQuery('#lfm').filemanager('image');
         }
-
     });
+
+    var city = {
+        'loadRegions': function (el) {
+
+            var regions_text = "<option value='0'>Выберите область</option>";
+
+            var value = $(el).val();
+            $('[name=region_id]').prop('disabled', true);
+            $.getJSON("{{ url('/api/ad/country') }}/" + value, function ( data ) {
+
+                $.each( data.data.regions, function ( key, val ) {
+                    regions_text += "<option value='" + val.id + "'>" + val.name + "</option>";
+                } )
+
+                $('[name=region_id]').html(regions_text);
+                $('[name=region_id]').prop('disabled', false);
+            });
+        }
+    }
 
 </script>
 

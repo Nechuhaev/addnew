@@ -61,7 +61,21 @@ class AdRegion extends Model
         }
     }
 
-    public function country() {
+    /**
+     * Обратная связь к странам (Один регион - одна страна)
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function country()
+    {
         return $this->belongsTo(AdCountry::class, 'country_id');
+    }
+
+    /**
+     * Связь с городами (один регион - много городов)
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function cities()
+    {
+        return $this->hasMany(AdCity::class, 'region_id');
     }
 }
