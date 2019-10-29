@@ -153,6 +153,19 @@
         <div class="col-8">
             <div class="card">
                 <div class="card-body">
+                    <form action="{{ $action_search }}" method="GET">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <input type="text"
+                                       name="name"
+                                       value="{{ $requested_city ?? "" }}"
+                                       placeholder="Поиск городов"
+                                       class="form-control form-control-line">
+                            </div>
+                            <div class="col-md-4"><button class="btn btn-primary btn-block">Найти область</button></div>
+                        </div>
+                    </form>
+                    <hr>
                     @if ($cities)
                         <table class="table table-bordered table-hover table-middle-cell">
                             <tr>
