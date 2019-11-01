@@ -17,6 +17,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+// Объявления > Категории
+Route::get('/ad/category/autocomplete/{name?}', 'API\Ad\Category@autocomplete');
 // Объявления > Страны
 Route::get('/ad/countries', 'API\Ad\Country@all');
 Route::get('/ad/country/{id}', 'API\Ad\Country@show')->name('api.country');

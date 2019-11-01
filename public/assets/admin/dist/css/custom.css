@@ -1,3 +1,27 @@
+/**
+jQuery autocomplete
+ */
+.ui-autocomplete.ui-front {
+    background: #d4d4d4;
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    width: 277px !important;
+}
+.ui-autocomplete.ui-front li.ui-menu-item {
+    padding: 5px 13px;
+    border-bottom: 1px solid #eee;
+    color: #000;
+    font-size: 12px;
+}
+.ui-autocomplete.ui-front li.ui-menu-item:hover {
+    background: #eee;
+    color: #000;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+
 .user-avatar {
     background: #eee;
     text-align: center;
@@ -49,4 +73,33 @@
 .sidebar-item .first-level {
     /*padding-left: 22px !important;*/
     background: #2e4054 !important;
+}
+.card-heading {
+    font-weight: 900;
+    color: #000;
+    padding: 10px 1.25rem;
+    background: #eaeaea;
+    text-transform: uppercase;
+    border-top: 1px solid #e4e4e4;
+    border-left: 1px solid #e4e4e4;
+    border-right: 1px solid #e4e4e4;
+}
+.ad-form-label-desc {
+    font-size: 13px;
+}
+.ad-image i {
+    position: absolute;
+    right: 0;
+    top: -13px;
+    background: #333;
+    padding: 2px 8px;
+    border-radius: 30px;
+    display: none;
+    cursor: pointer;
+}
+.ad-image:hover i {
+    display: block;
+}
+.ad-image:hover {
+    opacity: 0.9;
 }

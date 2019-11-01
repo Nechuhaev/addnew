@@ -93,7 +93,7 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
 
     // Объявления
     Route::get('/ads', 'AdminPageController@ads')->name('admin.ads');
-    Route::get('/ad', 'AdminPageController@ad')->name('admin.ad');
+    Route::get('/ad', 'Admin\Ad\Ad@show')->name('admin.ad');
 
     // Объявления > Категории
     Route::get('/adCategories', 'Admin\Ad\Category@showForm')->name('admin.adCategories');

@@ -212,6 +212,10 @@
 <!-- All Jquery -->
 <!-- ============================================================== -->
 <script src="{{ asset('assets/admin/assets/libs/jquery/dist/jquery.min.js') }}"></script>
+<script
+        src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"
+        integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E="
+        crossorigin="anonymous"></script>
 <!-- Bootstrap tether Core JavaScript -->
 <script src="{{ asset('assets/admin/assets/libs/popper.js/dist/umd/popper.min.js') }}"></script>
 <script src="{{ asset('assets/admin/assets/libs/bootstrap/dist/js/bootstrap.min.js') }}"></script>
@@ -229,6 +233,7 @@
 <script src="{{ asset('assets/admin/assets/libs/chartist-plugin-tooltips/dist/chartist-plugin-tooltip.min.js') }}"></script>
 <script src="{{ asset('assets/admin/dist/js/pages/dashboards/dashboard1.js') }}"></script>
 <script src="/vendor/laravel-filemanager/js/lfm.js"></script>
+<script src="{{ asset('assets/admin/assets/libs/addnew_file.js') }}"></script>
 <script src="https://cdn.tiny.cloud/1/acl3zjjcwn2wu5y9ad8741ibtyz1fcoi1iwhsdhpqblv1q2y/tinymce/4/tinymce.min.js"></script>
 
 <script>
@@ -273,6 +278,60 @@
         if (jQuery('#lfm').length) {
             jQuery('#lfm').filemanager('image');
         }
+
+        jQuery('.filepicker').addnewfile('image');
+
+        jQuery(".datepicker").datepicker({
+            dateFormat: 'yy-mm-dd',
+            beforeShow: function(input, inst)
+            {
+                var txtBoxOffset = $(this).offset();
+                var top = txtBoxOffset.top;
+                setTimeout(function () {
+                    inst.dpDiv.css({
+                        top: top + 35,
+                        left: 'initial',//show at the end of textBox
+                        right: 40//show at the end of textBox
+                    });
+                }, 0);
+
+                //inst.dpDiv.css({marginTop: -input.offsetHeight + 'px', marginRight: input.offsetWidth - 20 + 'px'});
+            }
+        });
+
+        {{--var availableTags = [];--}}
+
+        {{--$('#category').on('keyup', function (e) {--}}
+            {{--$.getJSON("{{ url('/api/ad/category/autocomplete') }}/" + $(this).val(), function (data) {--}}
+                {{--console.log(data);--}}
+            {{--});--}}
+        {{--})--}}
+
+
+        $( "#ad_category" ).autocomplete({
+            minLength: 0,
+            source: function (request, response) {
+                $.getJSON("{{ url('/api/ad/category/autocomplete') }}/" + encodeURIComponent(request.term), function (json) {
+
+                    response($.map(json.data, function(item){
+                        return {
+                            id: item.id,
+                            label: item.path
+                        }
+                    }));
+                    console.log(json.data);
+                });
+
+            },
+            select: function (elem, item) {
+                console.log(item.item['label']);
+                $( "#ad_category" ).val(item.item['label']);
+                $( "#ad_category_id" ).val(item.item['id']);
+
+            }
+        }).focus(function () {
+            $(this).autocomplete('search', '');
+        });
     });
 
     var city = {
