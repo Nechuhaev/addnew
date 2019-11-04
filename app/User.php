@@ -131,4 +131,16 @@ class User extends Authenticatable
         return $gradients[array_rand($gradients)];
     }
 
+    public function getUsernameAttribute() {
+        if ($this->firstname) {
+            $username = $this->firstname . ' ' . $this->lastname;
+        }
+
+        if (trim($username)) {
+            return $username;
+        } else {
+            $username = explode('@', $this->email);
+            return $username[0];
+        }
+    }
 }

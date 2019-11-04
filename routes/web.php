@@ -92,8 +92,12 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
 
 
     // Объявления
-    Route::get('/ads', 'AdminPageController@ads')->name('admin.ads');
+    Route::get('/ads', 'Admin\Ad\Ad@showList')->name('admin.ads');
     Route::get('/ad', 'Admin\Ad\Ad@show')->name('admin.ad');
+    Route::get('/ad/{id}', 'Admin\Ad\Ad@edit')->name('admin.ad.edit');
+    Route::post('/ad/create', 'Admin\Ad\Ad@create')->name('admin.ad.create');
+    Route::post('/ad/update', 'Admin\Ad\Ad@update')->name('admin.ad.update');
+    Route::get('/ad/delete/{id}', 'Admin\Ad\Ad@delete')->name('admin.ad.delete');
 
     // Объявления > Категории
     Route::get('/adCategories', 'Admin\Ad\Category@showForm')->name('admin.adCategories');

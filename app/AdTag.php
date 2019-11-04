@@ -55,9 +55,13 @@ class AdTag extends Model
                 $this->attributes['slug'] = $slug;
             }
 
-
         } else {
             $this->attributes['slug'] = $value;
         }
+    }
+
+    public function ads()
+    {
+        return $this->belongsToMany('App\Ad', 'ad_tag', 'tag_id', 'ad_id');
     }
 }

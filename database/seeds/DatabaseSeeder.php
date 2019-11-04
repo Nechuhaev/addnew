@@ -14,6 +14,9 @@ class DatabaseSeeder extends Seeder
 
         $this->call(AdminSeeder::class);
         //$this->call(UsersTableSeeder::class);
+        //Создать произвольные статьи
         $this->call(ArticlesTableSeeder::class);
+
+
     }
 }

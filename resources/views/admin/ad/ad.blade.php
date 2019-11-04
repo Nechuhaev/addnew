@@ -23,7 +23,11 @@
 @endsection
 
 @section('content')
-    <form action="" method="POST" class="category-form">
+    <form action="{{ $action }}" method="POST" class="category-form">
+        @csrf
+        @if(isset($ad))
+            <input type="hidden" name="ad_id" value="{{ $ad->id }}">
+        @endif
         <div class="row">
             <div class="col-8">
                 <div class="card">
@@ -59,12 +63,20 @@
                         <div class="form-group">
                             <label for="price">Цена</label>
                             <div>
-                                <input type="text"
-                                       name="price"
-                                       id="price"
-                                       value="{{ old('price') ?? $ad->price ?? '' }}"
-                                       placeholder="Цена услуги / товара, грн"
-                                       class="form-control form-control-line">
+                                <div class="input-group">
+                                    <input type="text"
+                                           name="price"
+                                           id="price"
+                                           value="{{ old('price') ?? $ad->price ?? '' }}"
+                                           placeholder="Цена услуги / товара, грн"
+                                           class="form-control form-control-line">
+                                    <select name="currency" class="form-control">
+                                        <option value="1">UAH</option>
+                                        <option value="2">EUR</option>
+                                        <option value="3">USD</option>
+                                    </select>
+                                </div>
+
                             </div>
                         </div>
 
@@ -88,15 +100,15 @@
                     <div class="card-body">
 
                         <div class="form-group">
-                            <label for="user">Автор</label>
+                            <label for="ad_user">Автор</label>
                             <div>
                                 <input type="text"
-                                       name="user"
-                                       id="user"
-                                       value="{{ old('user') ?? $ad->user->name ?? '' }}"
+                                       name="ad_user"
+                                       id="ad_user"
+                                       value="{{ old('ad_user') ?? $ad->user->name ?? '' }}"
                                        placeholder="Начните вводить имя автора"
                                        class="form-control form-control-line">
-                                <input type="hidden" name="user_id" value="{{ old('user_id') ?? $ad->user->id ?? '' }}">
+                                <input type="hidden" id="ad_user_id" name="user_id" value="{{ old('user_id') ?? $ad->user->id ?? '' }}">
                             </div>
                         </div>
 
@@ -136,8 +148,9 @@
                             <label for="meta_title">Список меток</label>
                             <div>
                                 <input type="text"
-                                       name="meta_title"
-                                       id="meta_title"
+                                       name="tags"
+                                       id="tags"
+                                       data-json="{{ json_encode(['tag1', 'tag2']) }}"
                                        value="{{ old('meta_title') ?? $ad->meta_title ?? '' }}"
                                        placeholder=""
                                        class="form-control form-control-line">
@@ -184,22 +197,12 @@
                         <div class="form-group">
                             <div class="row">
                                 <div class="col-5 align-self-center">
-                                    <span class="ad-form-label-desc">Активно до</span>
-                                </div>
-                                <div class="col-7">
-                                    <input type="text" class="form-control datepicker">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="row">
-                                <div class="col-5 align-self-center">
                                     <span class="ad-form-label-desc">Статус</span>
                                 </div>
                                 <div class="col-7">
-                                    <select name="" class="form-control" id="">
+                                    <select name="status" class="form-control" id="">
                                         <option value="1">Активно</option>
-                                        <option value="1">В архиве</option>
+                                        <option value="0" {{ (old('status') == 0 || (isset($ad) && $ad->status == 0)) ? 'selected' : '' }}>В архиве</option>
                                     </select>
                                 </div>
                             </div>
@@ -215,7 +218,7 @@
                     </div>
                     <div class="card-body">
                         <div class="form-group">
-                            <label for="meta_description">Категория</label>
+                            <label for="ad_category">Категория</label>
                             <div>
                                 <input type="text"
                                        name="category"
@@ -227,14 +230,15 @@
                             </div>
                         </div>
                         <div class="">
-                            <label for="meta_description">Город</label>
+                            <label for="ad_invalid">Гоpод</label>
                             <div>
                                 <input type="text"
-                                       name="slug"
-                                       id="slug"
-                                       value="{{ old('slug') ?? $ad->slug ?? '' }}"
+                                       name="invalid"
+                                       id="ad_invalid"
+                                       value="{{ old('city') ?? $ad->city->name ?? '' }}"
                                        placeholder="Введите название города"
                                        class="form-control form-control-line">
+                                <input type="hidden" id="ad_city_id" name="city_id" value="{{ old('city_id') ?? $ad->city->id ?? '' }}">
                             </div>
                         </div>
                     </div>
@@ -249,8 +253,8 @@
                             <div class="col-12">
                                 <div class="ad-image">
                                     <i class="mdi mdi-24px mdi-delete text-danger"></i>
-                                    <img src="http://placehold.it/300x200" class="img-fluid filepicker">
-                                    <input type="hidden" name="images[1]">
+                                    <img src="{{ old('image') ?? $ad->image ?? 'http://placehold.it/300x200' }}" class="img-fluid filepicker">
+                                    <input type="hidden" name="image" value="{{ old('image') ?? $ad->image ?? '' }}">
                                 </div>
                             </div>
                         </div>

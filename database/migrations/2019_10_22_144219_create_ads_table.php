@@ -18,7 +18,8 @@ class CreateAdsTable extends Migration
             $table->integer('category_id');
             $table->integer('city_id');
             $table->string('user_id');
-            $table->string('images', 255)->nullable();
+            $table->string('image');
+            $table->string('images')->nullable();
             $table->string('name', 255);
             $table->string('slug', 255);
             $table->string('content');
@@ -27,7 +28,7 @@ class CreateAdsTable extends Migration
             $table->string('email');
             $table->string('meta_title', 255)->nullable();
             $table->string('meta_description', 255)->nullable();
-            $table->boolean('is_archive')->default(0);
+            $table->boolean('status')->default(1);
             $table->integer('total_views')->default(0);
             $table->integer('today_views')->default(0);
             $table->integer('bad_rating')->default(0);

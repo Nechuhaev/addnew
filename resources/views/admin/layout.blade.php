@@ -16,6 +16,7 @@
     <!-- Custom CSS -->
     <link href="{{ asset('assets/admin/dist/css/style.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/admin/dist/css/custom.css') }}" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tag-editor/1.0.20/jquery.tag-editor.min.css" rel="stylesheet">
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -226,134 +227,22 @@
 <!--Menu sidebar -->
 <script src="{{ asset('assets/admin/dist/js/sidebarmenu.js') }}"></script>
 <!--Custom JavaScript -->
-<script src="{{ asset('assets/admin/dist/js/custom.min.js') }}"></script>
-<!--This page JavaScript -->
-<!--chartis chart-->
-<script src="{{ asset('assets/admin/assets/libs/chartist/dist/chartist.min.js') }}"></script>
-<script src="{{ asset('assets/admin/assets/libs/chartist-plugin-tooltips/dist/chartist-plugin-tooltip.min.js') }}"></script>
 <script src="{{ asset('assets/admin/dist/js/pages/dashboards/dashboard1.js') }}"></script>
 <script src="/vendor/laravel-filemanager/js/lfm.js"></script>
 <script src="{{ asset('assets/admin/assets/libs/addnew_file.js') }}"></script>
 <script src="https://cdn.tiny.cloud/1/acl3zjjcwn2wu5y9ad8741ibtyz1fcoi1iwhsdhpqblv1q2y/tinymce/4/tinymce.min.js"></script>
 
-<script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/caret/1.3.7/jquery.caret.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tag-editor/1.0.20/jquery.tag-editor.min.js"></script>
 
-    var editor_config = {
-        path_absolute : "/",
-        selector: "textarea.content",
-        height: 400,
-        plugins: [
-            "advlist autolink lists link image charmap print preview hr anchor pagebreak",
-            "searchreplace wordcount visualblocks visualchars code fullscreen",
-            "insertdatetime media nonbreaking save table contextmenu directionality",
-            "emoticons template paste textcolor colorpicker textpattern"
-        ],
-        toolbar: "styleselect | alignleft aligncenter alignright | bullist numlist | outdent indent | link image media | code",
-        relative_urls: false,
-        file_browser_callback : function(field_name, url, type, win) {
-            var x = window.innerWidth || document.documentElement.clientWidth || document.getElementsByTagName('body')[0].clientWidth;
-            var y = window.innerHeight|| document.documentElement.clientHeight|| document.getElementsByTagName('body')[0].clientHeight;
+<script src="{{ asset('assets/admin/dist/js/custom.min.js') }}"></script>
+<!--chartis chart-->
+<script src="{{ asset('assets/admin/assets/libs/chartist/dist/chartist.min.js') }}"></script>
+<script src="{{ asset('assets/admin/assets/libs/chartist-plugin-tooltips/dist/chartist-plugin-tooltip.min.js') }}"></script>
 
-            var cmsURL = editor_config.path_absolute + 'laravel-filemanager?field_name=' + field_name;
-            if (type == 'image') {
-                cmsURL = cmsURL + "&type=Images";
-            } else {
-                cmsURL = cmsURL + "&type=Files";
-            }
+<!--This page JavaScript -->
+<script src="{{ asset('assets/admin/dist/js/admin.js') }}"></script>
 
-            tinyMCE.activeEditor.windowManager.open({
-                file : cmsURL,
-                title : 'Filemanager',
-                width : x * 0.8,
-                height : y * 0.8,
-                resizable : "yes",
-                close_previous : "no"
-            });
-        }
-    };
-
-    tinymce.init(editor_config);
-
-    jQuery(function () {
-        if (jQuery('#lfm').length) {
-            jQuery('#lfm').filemanager('image');
-        }
-
-        jQuery('.filepicker').addnewfile('image');
-
-        jQuery(".datepicker").datepicker({
-            dateFormat: 'yy-mm-dd',
-            beforeShow: function(input, inst)
-            {
-                var txtBoxOffset = $(this).offset();
-                var top = txtBoxOffset.top;
-                setTimeout(function () {
-                    inst.dpDiv.css({
-                        top: top + 35,
-                        left: 'initial',//show at the end of textBox
-                        right: 40//show at the end of textBox
-                    });
-                }, 0);
-
-                //inst.dpDiv.css({marginTop: -input.offsetHeight + 'px', marginRight: input.offsetWidth - 20 + 'px'});
-            }
-        });
-
-        {{--var availableTags = [];--}}
-
-        {{--$('#category').on('keyup', function (e) {--}}
-            {{--$.getJSON("{{ url('/api/ad/category/autocomplete') }}/" + $(this).val(), function (data) {--}}
-                {{--console.log(data);--}}
-            {{--});--}}
-        {{--})--}}
-
-
-        $( "#ad_category" ).autocomplete({
-            minLength: 0,
-            source: function (request, response) {
-                $.getJSON("{{ url('/api/ad/category/autocomplete') }}/" + encodeURIComponent(request.term), function (json) {
-
-                    response($.map(json.data, function(item){
-                        return {
-                            id: item.id,
-                            label: item.path
-                        }
-                    }));
-                    console.log(json.data);
-                });
-
-            },
-            select: function (elem, item) {
-                console.log(item.item['label']);
-                $( "#ad_category" ).val(item.item['label']);
-                $( "#ad_category_id" ).val(item.item['id']);
-
-            }
-        }).focus(function () {
-            $(this).autocomplete('search', '');
-        });
-    });
-
-    var city = {
-        'loadRegions': function (el) {
-
-            var regions_text = "<option value='0'>Выберите область</option>";
-
-            var value = $(el).val();
-            $('[name=region_id]').prop('disabled', true);
-            $.getJSON("{{ url('/api/ad/country') }}/" + value, function ( data ) {
-
-                $.each( data.data.regions, function ( key, val ) {
-                    regions_text += "<option value='" + val.id + "'>" + val.name + "</option>";
-                } )
-
-                $('[name=region_id]').html(regions_text);
-                $('[name=region_id]').prop('disabled', false);
-            });
-        }
-    }
-
-</script>
 
 </body>
 
