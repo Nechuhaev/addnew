@@ -24,11 +24,20 @@ class Ad extends Model
     ];
 
     /**
+     * Дата добавления объявления
+     * @return false|string
+     */
+    public function getCreatedDateAttribute() {
+        return date('d-m-Y', strtotime($this->created_at));
+    }
+
+    /**
      * Слаг должен содержать английские символы
      * И быть уникальным
      * @param $value
      */
-    public function setSlugAttribute($value) {
+    public function setSlugAttribute($value)
+    {
         if (!isset($value)) {
             // Похожите
 
@@ -67,8 +76,39 @@ class Ad extends Model
         }
     }
 
+    /**
+     * Обратная связь к пользователю
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Связь с тегами
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
     public function tags()
     {
         return $this->belongsToMany('App\AdTag', 'ad_tag', 'ad_id', 'tag_id');
+    }
+
+    /**
+     * Связь с категорией
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function category()
+    {
+        return $this->belongsTo(AdCategory::class, 'category_id');
+    }
+
+    /**
+     * Связь с городом
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function city()
+    {
+        return $this->belongsTo(AdCity::class, 'city_id');
     }
 }

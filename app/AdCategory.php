@@ -17,13 +17,39 @@ class AdCategory extends Model
         'sort_order'
     ];
 
+    /**
+     * Получить родительскую категорию
+     * @return mixed|static
+     */
+    public function getParentAttribute()
+    {
+        if ($this->parent_id) {
+            return AdCategory::find($this->parent_id);
+        }
+    }
+
+    /**
+     * Полный путь категории
+     * @return string
+     */
+    public function getPathAttribute()
+    {
+        $path = "";
+        if ($this->parent_id) {
+            $path .= $this->parent->name . ' > ';
+        }
+        $path .= $this->name;
+
+        return $path;
+    }
 
     /**
      * Слаг должен содержать английские символы
      * И быть уникальным
      * @param $value
      */
-    public function setSlugAttribute($value) {
+    public function setSlugAttribute($value)
+    {
         if (!isset($value)) {
             // Похожите
 
@@ -61,5 +87,14 @@ class AdCategory extends Model
         } else {
             $this->attributes['slug'] = $value;
         }
+    }
+
+    /**
+     * Связь категорий с таблицей объявлений
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function ads()
+    {
+        return $this->hasMany(Ad::class, 'category_id');
     }
 }

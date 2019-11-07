@@ -103,3 +103,14 @@ jQuery autocomplete
 .ad-image:hover {
     opacity: 0.9;
 }
+.card-body .ad-actions {
+    position: absolute;
+    right: 0;
+    height: 100%;
+    top: 0;
+    background: #eee;
+    z-index: 1;
+    border-left: 1px solid #afafaf;
+    width: 0;
+    overflow: hidden;
+}

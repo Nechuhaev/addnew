@@ -61,8 +61,31 @@ class AdCity extends Model
         }
     }
 
+    public function getPathAttribute() {
+        $path = [
+            $this->region->country->name,
+            $this->region->name,
+            $this->name
+        ];
+
+        return implode(' > ', $path);
+    }
+
+    /**
+     * Обратная связь с областями
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function region()
     {
         return $this->belongsTo(AdRegion::class, 'region_id');
+    }
+
+    /**
+     * Связь с объявлениями
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function ads()
+    {
+        return $this->hasMany(Ad::class, 'city_id');
     }
 }

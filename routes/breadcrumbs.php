@@ -60,6 +60,23 @@ Breadcrumbs::for('admin.article.article', function ($trail, $article = null) {
     $trail->push($title, $route);
 });
 
+// Главная > Объявления
+Breadcrumbs::for('admin.ads', function ($trail) {
+    $trail->parent('admin.index');
+    $trail->push('Объявления', route('admin.ads'));
+});
+
+// Главная > Объявления > Добавить
+Breadcrumbs::for('admin.ad', function ($trail) {
+    $trail->parent('admin.ads');
+    $trail->push('Добавить', route('admin.ad'));
+});
+// Главная > Объявления > Изменить
+Breadcrumbs::for('admin.ad.edit', function ($trail, $ad = null) {
+    $trail->parent('admin.ads');
+    $trail->push($ad->name, route('admin.ad.edit', ['id' => $ad->id]));
+});
+
 
 
 /**

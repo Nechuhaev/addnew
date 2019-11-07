@@ -143,4 +143,8 @@ class User extends Authenticatable
             return $username[0];
         }
     }
+
+    public function ads() {
+        return $this->hasMany(Ad::class);
+    }
 }

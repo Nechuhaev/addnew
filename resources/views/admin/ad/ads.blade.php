@@ -4,18 +4,11 @@
     <div class="page-breadcrumb">
         <div class="row">
             <div class="col-5 align-self-center">
-                <h4 class="page-title">Dashboard</h4>
+                <a href="{{ route('admin.ad') }}" class="btn btn-primary">Добавить объявление</a>
             </div>
             <div class="col-7 align-self-center">
                 <div class="d-flex align-items-center justify-content-end">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item">
-                                <a href="#">Home</a>
-                            </li>
-                            <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
-                        </ol>
-                    </nav>
+                    {{ Breadcrumbs::render('admin.ads') }}
                 </div>
             </div>
         </div>
@@ -24,53 +17,69 @@
 
 @section('content')
 
+
+    {{--<div class="row">--}}
+        {{--<div class="col-12">--}}
+            {{--<div class="card">--}}
+                {{--<div class="card-body">--}}
+                {{--<form action="{{ $search }}" method="get" class="search-form">--}}
+                    {{--<div class="row">--}}
+                        {{--<div class="col-10">--}}
+                            {{--<input type="text" name="search" class="form-control"--}}
+                            {{--placeholder="Название / Email автора">--}}
+                        {{--</div>--}}
+                        {{--<div class="col-2">--}}
+                            {{--<button class="btn btn-default btn-block">Искать</button>--}}
+                        {{--</div>--}}
+                    {{--</div>--}}
+                {{--</form>--}}
+            {{--</div>--}}
+            {{--</div>--}}
+        {{--</div>--}}
+    {{--</div>--}}
+
     <div class="row">
         <div class="col-12">
-            <div class="card">
 
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-1">
-                            <div class="user-avatar" style="background: linear-gradient(#c1cfdc, #da89c1);">
-                                <div class="inner">
-                                    A.K.
-                                </div>
+            @if($ads)
+                @foreach($ads as $ad)
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-2">
+                                <img src="{{ $ad->image }}" class="img-fluid">
                             </div>
-                        </div>
-                        <div class="col-3">
-                            <div><small class="text-muted">ФИО</small></div>
-                            Anatolii Koziura
-                        </div>
-                        <div class="col-3">
-                            <div><small class="text-muted">email</small></div>
-                            anatolii.koziura@gmail.com
-                        </div>
-                        <div class="col-2">
-                            <div><small class="text-muted">Дата регистрации</small></div>
-                            04-11-2019
-                        </div>
-                        <div class="col-2">
-                            <div><small class="text-muted">Объявлений</small></div>
-                            2
-                        </div>
-                        <div class="col-1 text-right">
-                            <a href="http://addnew.loc/admin/user/1"><i class="mdi mdi-24px mdi-account-edit"></i></a>
+                            <div class="col-3">
+                                <b>{{ $ad->name }}</b>
+                                <div><small class="text-muted">Категория</small></div>
+                                {{ $ad->category->path }}
+                            </div>
+                            <div class="col-3">
+                                <div><small class="text-muted">Добавлено</small></div>
+                                {{ $ad->created_date }}
+                                <div><small class="text-muted">Автор</small></div>
+                                {{ $ad->user->email }}
+                            </div>
+                            <div class="col-3">
+                                <div><small class="text-muted">Город</small></div>
+                                {{ $ad->city->path }}
+                            </div>
+                            <div class="col-1 text-right">
+                                <a href="{{ route('admin.ad.edit', ['id' => $ad->id]) }}"><i class="mdi mdi-24px mdi-account-edit"></i></a>
+                            </div>
                         </div>
                     </div>
                 </div>
-
-            </div>
+            @endforeach
+                {{ $ads->links() }}
+            @else
+                <div class="card">
+                    <div class="card-body">
+                        <p>Объявлений не найдено</p>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
-
-
-
+</div>
 @endsection

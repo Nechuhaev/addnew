@@ -3,41 +3,62 @@
 namespace App\Http\Controllers\Admin\Ad;
 
 use App\Ad as AdModel;
+use App\AdCategory;
 use App\AdTag;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 class Ad extends Controller
 {
-    public function showList() {
-        return view('admin.ad.ads');
-    }
+    public function showList(Request $request = null) {
 
-    public function show($id = null) {
-
-        if ($id) {
-            $action = route('admin.ad.update');
+        //dd($request->all());
+        if ($request) {
+            $ads = AdModel::where('name', 'like', '%' .$request->search. '%')
+                ->orderBy('created_at', 'asc')
+                ->paginate(15);
         } else {
-            $action = route('admin.ad.create');
+            $ads = AdModel::orderBy('created_at', 'asc')
+                ->paginate(15);
         }
 
+        return view('admin.ad.ads')->with([
+            'ads' => $ads,
+        ]);
+    }
+
+    /**
+     * Форма добавления объявления
+     * @return $this
+     */
+    public function show() {
         return view('admin.ad.ad')->with([
-            'action' => $action
+            'action' => route('admin.ad.create')
+        ]);
+    }
+
+
+    /**
+     * Форма редактирования объявления
+     * @param $id
+     * @return $this
+     */
+    public function edit($id)
+    {
+        $ad = AdModel::find($id);
+        return view('admin.ad.ad')->with([
+            'action' => route('admin.ad.update'),
+            'ad' => $ad
         ]);
     }
 
     /**
      * Добавить новое объявление
      * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
     public function create(Request $request)
     {
-
-
-
-
-
-
         $errors = [
             'category_id.required' => "Категория не выбрана",
             'city_id.required' => "Город не выбран",
@@ -107,5 +128,4 @@ class Ad extends Controller
         return redirect(route('admin.ads'))
             ->with('success', 'Объявление добавлено');
     }
-
 }
