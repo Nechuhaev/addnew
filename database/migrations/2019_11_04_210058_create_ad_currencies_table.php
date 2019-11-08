@@ -18,6 +18,8 @@ class CreateAdCurrenciesTable extends Migration
             $table->string('name', 50);
             $table->float('rate');
             $table->string('code', 3);
+            $table->string('symbol', 10);
+            $table->string('is_default', 1)->default(0);
         });
     }
 

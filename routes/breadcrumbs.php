@@ -1,9 +1,22 @@
 <?php
 
+/**
+ * *******************************************************************************
+ * ******************************* Главная ***************************************
+ * *******************************************************************************
+ */
+
 // Главная
 Breadcrumbs::for('admin.index', function ($trail) {
     $trail->push('Главная', route('admin.index'));
 });
+
+
+/**
+ * *******************************************************************************
+ * ******************************* Пользователи **********************************
+ * *******************************************************************************
+ */
 
 // Главная > Пользователи
 Breadcrumbs::for('admin.users', function ($trail) {
@@ -20,6 +33,11 @@ Breadcrumbs::for('admin.user', function ($trail, $user) {
 });
 
 
+/**
+ * *******************************************************************************
+ * ******************************* Статьи ****************************************
+ * *******************************************************************************
+ */
 // Главная > Категории статей
 Breadcrumbs::for('admin.article.categories', function ($trail) {
     $trail->parent('admin.index');
@@ -60,6 +78,13 @@ Breadcrumbs::for('admin.article.article', function ($trail, $article = null) {
     $trail->push($title, $route);
 });
 
+
+/**
+ * *******************************************************************************
+ * ******************************* Объявления ************************************
+ * *******************************************************************************
+ */
+
 // Главная > Объявления
 Breadcrumbs::for('admin.ads', function ($trail) {
     $trail->parent('admin.index');
@@ -76,6 +101,38 @@ Breadcrumbs::for('admin.ad.edit', function ($trail, $ad = null) {
     $trail->parent('admin.ads');
     $trail->push($ad->name, route('admin.ad.edit', ['id' => $ad->id]));
 });
+
+// Главная > Объявления > Категории
+Breadcrumbs::for('admin.adCategories', function ($trail) {
+    $trail->parent('admin.ads');
+    $trail->push('Категории', route('admin.adCategories'));
+});
+// Главная > Объявления > Теги
+Breadcrumbs::for('admin.adTags', function ($trail) {
+    $trail->parent('admin.ads');
+    $trail->push('Метки', route('admin.adTags'));
+});
+// Главная > Объявления > Страны
+Breadcrumbs::for('admin.adCountries', function ($trail) {
+    $trail->parent('admin.ads');
+    $trail->push('Страны', route('admin.adCountries'));
+});
+// Главная > Объявления > Страны > Области
+Breadcrumbs::for('admin.adRegions', function ($trail) {
+    $trail->parent('admin.adCountries');
+    $trail->push('Области', route('admin.adRegions'));
+});
+// Главная > Объявления > Страны > Области > Города
+Breadcrumbs::for('admin.adCities', function ($trail) {
+    $trail->parent('admin.adRegions');
+    $trail->push('Города', route('admin.adCities'));
+});
+// Главная > Объявления > Валюьы
+Breadcrumbs::for('admin.adCurrencies', function ($trail) {
+    $trail->parent('admin.ads');
+    $trail->push('Валюты', route('admin.adCurrencies'));
+});
+
 
 
 

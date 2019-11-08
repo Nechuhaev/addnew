@@ -54,6 +54,12 @@
                     <span class="hide-menu">Города</span>
                 </a>
             </li>
+            <li class="sidebar-item">
+                <a href="{{ route('admin.adCurrencies') }}" class="sidebar-link">
+                    <i class="mdi mdi-currency-usd"></i>
+                    <span class="hide-menu">Валюты</span>
+                </a>
+            </li>
         </ul>
     </li>
 

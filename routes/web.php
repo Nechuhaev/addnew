@@ -139,6 +139,14 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::post('/cities/update', 'Admin\Ad\City@update')->name('admin.adCities.update');
     Route::get('/cities/delete/{id}', 'Admin\Ad\City@delete')->name('admin.adCities.delete');
 
+    // Объявления > Валюты
+    Route::get('/currencies', 'Admin\Ad\Currency@showForm')->name('admin.adCurrencies');
+    Route::get('/currencies/search', 'Admin\Ad\Currency@search')->name('admin.adCurrencies.search');
+    Route::get('/currencies/{id}', 'Admin\Ad\Currency@showForm')->name('admin.adCurrencies.edit');
+    Route::post('/currencies/create', 'Admin\Ad\Currency@create')->name('admin.adCurrencies.create');
+    Route::post('/currencies/update', 'Admin\Ad\Currency@update')->name('admin.adCurrencies.update');
+    Route::get('/currencies/delete/{id}', 'Admin\Ad\Currency@delete')->name('admin.adCurrencies.delete');
+
 
 
     Route::get('/adCategory', 'AdminPageController@adCategory')->name('admin.adCategory');
