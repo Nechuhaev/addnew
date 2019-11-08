@@ -93,6 +93,7 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
 
     // Объявления
     Route::get('/ads', 'Admin\Ad\Ad@showList')->name('admin.ads');
+    Route::get('/ads/{search}', 'Admin\Ad\Ad@showList')->name('admin.ads.search');
     Route::get('/ad', 'Admin\Ad\Ad@show')->name('admin.ad');
     Route::get('/ad/{id}', 'Admin\Ad\Ad@edit')->name('admin.ad.edit');
     Route::post('/ad/create', 'Admin\Ad\Ad@create')->name('admin.ad.create');

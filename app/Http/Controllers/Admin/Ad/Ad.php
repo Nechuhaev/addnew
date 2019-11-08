@@ -10,11 +10,14 @@ use Illuminate\Http\Request;
 
 class Ad extends Controller
 {
-    public function showList(Request $request = null) {
+    public function showList(Request $request) {
 
         //dd($request->all());
-        if ($request) {
-            $ads = AdModel::where('name', 'like', '%' .$request->search. '%')
+        if ($request->has('search')) {
+            $ads = AdModel::where('name', 'like', '%' . $request->get('search') . '%')
+                ->orWhere('content', 'like', '%' . $request->get('search') . '%')
+                ->orWhere('email', 'like', '%' . $request->get('search') . '%')
+                ->orWhere('telephone', 'like', '%' . $request->get('search') . '%')
                 ->orderBy('created_at', 'asc')
                 ->paginate(15);
         } else {
@@ -24,6 +27,8 @@ class Ad extends Controller
 
         return view('admin.ad.ads')->with([
             'ads' => $ads,
+            'search_action' => route('admin.ads'),
+            'search' => $request->get('search')
         ]);
     }
 

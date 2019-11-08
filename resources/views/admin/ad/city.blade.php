@@ -166,7 +166,7 @@
                         </div>
                     </form>
                     <hr>
-                    @if ($cities)
+                    @if ($cities->items())
                         <table class="table table-bordered table-hover table-middle-cell">
                             <tr>
                                 <th class="text-center">ID</th>

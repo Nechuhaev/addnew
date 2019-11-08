@@ -18,30 +18,32 @@
 @section('content')
 
 
-    {{--<div class="row">--}}
-        {{--<div class="col-12">--}}
-            {{--<div class="card">--}}
-                {{--<div class="card-body">--}}
-                {{--<form action="{{ $search }}" method="get" class="search-form">--}}
-                    {{--<div class="row">--}}
-                        {{--<div class="col-10">--}}
-                            {{--<input type="text" name="search" class="form-control"--}}
-                            {{--placeholder="Название / Email автора">--}}
-                        {{--</div>--}}
-                        {{--<div class="col-2">--}}
-                            {{--<button class="btn btn-default btn-block">Искать</button>--}}
-                        {{--</div>--}}
-                    {{--</div>--}}
-                {{--</form>--}}
-            {{--</div>--}}
-            {{--</div>--}}
-        {{--</div>--}}
-    {{--</div>--}}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                <form action="{{ $search_action }}" method="get" class="search-form">
+                    <div class="row">
+                        <div class="col-10">
+                            <input type="text"
+                                   name="search"
+                                   class="form-control"
+                                   value="{{ $search ?? '' }}"
+                                   placeholder="Поиск по названию / описанию / телефону и email">
+                        </div>
+                        <div class="col-2">
+                            <button class="btn btn-default btn-block">Искать</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            </div>
+        </div>
+    </div>
 
     <div class="row">
         <div class="col-12">
-
-            @if($ads)
+            @if($ads->items())
                 @foreach($ads as $ad)
                 <div class="card">
                     <div class="card-body">
@@ -75,7 +77,7 @@
             @else
                 <div class="card">
                     <div class="card-body">
-                        <p>Объявлений не найдено</p>
+                        Объявлений не найдено
                     </div>
                 </div>
             @endif
