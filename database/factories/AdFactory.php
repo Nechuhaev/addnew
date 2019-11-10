@@ -8,11 +8,40 @@ use App\AdRegion;
 use App\AdCity;
 use App\AdCategory;
 use App\AdCurrency;
+use \App\User;
 use Faker\Generator as Faker;
 
 $factory->define(Ad::class, function (Faker $faker) {
+    $city = AdCity::all()->random(1)->first();
+    $category = AdCategory::all()->random(1)->first();
+    $currency = AdCurrency::all()->random(1)->first();
+    $user = User::all()->random(1)->first();
+
+    $images = [
+        $faker->imageUrl(),
+        $faker->imageUrl(),
+        $faker->imageUrl(),
+        $faker->imageUrl()
+    ];
+
     return [
-        //
+        'category_id' => $category->id,
+        'city_id' => $city->id,
+        'user_id' => $user->id,
+        'currency_id' => $currency->id,
+        'image' => $faker->imageUrl(),
+        'images' => $images,
+        'name' => $faker->realText(rand(10, 20)),
+        'slug' => $faker->slug,
+        'content' => $faker->text(999),
+        'price' => rand(1, 100),
+        'telephone' => $faker->phoneNumber,
+        'email' => $faker->unique()->safeEmail,
+        'meta_title' => $faker->optional()->realText(100),
+        'meta_description' => $faker->optional()->realText(100),
+        'status' => rand(0, 1),
+        'total_views' => rand(100, 500),
+        'today_views' => rand(10, 40),
     ];
 });
 

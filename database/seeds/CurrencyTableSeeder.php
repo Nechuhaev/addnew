@@ -37,7 +37,7 @@ class CurrencyTableSeeder extends Seeder
 
         $currency->name = 'Euro';
         $currency->code = 'EUR';
-        $currency->rate = '28';
+        $currency->rate = '27';
         $currency->symbol = 'E';
 
         $currency->save();

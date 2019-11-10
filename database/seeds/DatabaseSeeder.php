@@ -14,8 +14,6 @@ class DatabaseSeeder extends Seeder
 
         $this->call(AdminSeeder::class);
         $this->call(CurrencyTableSeeder::class);
-        //$this->call(UsersTableSeeder::class);
-        //Создать произвольные статьи
         $this->call(ArticlesTableSeeder::class);
         $this->call(AdTableSeeder::class);
 
