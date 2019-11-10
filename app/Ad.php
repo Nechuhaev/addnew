@@ -10,6 +10,7 @@ class Ad extends Model
         'category_id',
         'city_id',
         'user_id',
+        'currency_id',
         'image',
         'images',
         'name',
@@ -31,6 +32,24 @@ class Ad extends Model
      */
     public function getDateActiveAttribute($value) {
         return date('Y-m-d', strtotime($value));
+    }
+
+    public function getImagesAttribute($value) {
+        return explode(', ', $value);
+    }
+
+    public function setImagesAttribute(array $value) {
+
+        //dd($value);
+        $images = array_unique($value);
+
+        foreach ($images as $key => $image) {
+            if (!$image) unset($images[$key]);
+        }
+
+        //dd($images);
+
+        $this->attributes['images'] = implode(', ', $images);
     }
 
     /**

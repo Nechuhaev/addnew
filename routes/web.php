@@ -98,14 +98,14 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::get('/ad/{id}', 'Admin\Ad\Ad@edit')->name('admin.ad.edit');
     Route::post('/ad/create', 'Admin\Ad\Ad@create')->name('admin.ad.create');
     Route::post('/ad/update', 'Admin\Ad\Ad@update')->name('admin.ad.update');
-    Route::get('/ad/delete/{id}', 'Admin\Ad\Ad@delete')->name('admin.ad.delete');
+    Route::post('/ad/delete', 'Admin\Ad\Ad@delete')->name('admin.ad.delete');
+    Route::post('/ad/archive', 'Admin\Ad\Ad@archive')->name('admin.ad.archive');
 
     // Объявления > Категории
     Route::get('/adCategories', 'Admin\Ad\Category@showForm')->name('admin.adCategories');
     Route::get('/adCategories/{id}', 'Admin\Ad\Category@showForm')->name('admin.adCategories.edit');
     Route::post('/adCategories/create', 'Admin\Ad\Category@create')->name('admin.adCategories.create');
     Route::post('/adCategories/update', 'Admin\Ad\Category@update')->name('admin.adCategories.update');
-    Route::get('/adCategories/delete/{id}', 'Admin\Ad\Category@delete')->name('admin.adCategories.delete');
 
     // Объявления > Теги
     Route::get('/adTags', 'Admin\Ad\Tag@showForm')->name('admin.adTags');

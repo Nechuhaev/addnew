@@ -271,56 +271,39 @@
                             </div>
                         </div>
                         <br>
+
                         <div class="row">
-                            <div class="col-6">
-                                <div class="ad-image">
-                                    <i class="mdi mdi-24px mdi-delete text-danger"></i>
-                                    <img src="http://placehold.it/300x200" class="img-fluid filepicker">
-                                    <input type="hidden" name="images[2]">
+                            @for($i = 0; $i < 4; $i++)
+                                <div class="col-6">
+                                    <div class="ad-image" style="{{ ($i < 2) ? 'min-height: 80px; margin-bottom: 15px' : '' }}">
+                                        <i class="mdi mdi-24px mdi-delete text-danger"></i>
+                                        @if(isset(old('images')[$i]))
+                                            <img src="{{ old('images')[$i] }}" class="img-fluid filepicker">
+                                            <input type="hidden" name="images[{{ $i }}]" value="{{ old('images')[$i]}}">
+                                        @elseif (isset($ad->images[$i]))
+                                            <img src="{{ $ad->images[$i] }}" class="img-fluid filepicker">
+                                            <input type="hidden" name="images[{{ $i }}]" value="{{ $ad->images[$i]}}">
+                                        @else
+                                            <img src="{{ 'http://placehold.it/300x200' }}" class="img-fluid filepicker">
+                                            <input type="hidden" name="images[{{ $i }}]" value="">
+                                        @endif
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="ad-image">
-                                    <i class="mdi mdi-24px mdi-delete text-danger"></i>
-                                    <img src="http://placehold.it/300x200" class="img-fluid filepicker">
-                                    <input type="hidden" name="images[3]">
-                                </div>
-                            </div>
-                        </div>
-                        <br>
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="ad-image">
-                                    <i class="mdi mdi-24px mdi-delete text-danger"></i>
-                                    <img src="http://placehold.it/300x200" class="img-fluid filepicker">
-                                    <input type="hidden" name="images[4]">
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="ad-image">
-                                    <i class="mdi mdi-24px mdi-delete text-danger"></i>
-                                    <img src="http://placehold.it/300x200" class="img-fluid filepicker">
-                                    <input type="hidden" name="images[5]">
-                                </div>
-                            </div>
+                            @endfor
                         </div>
                     </div>
                 </div>
 
                 <div class="card">
                     <div class="card-body">
-
-
-                            <div class="row">
-                                <div class="col-9">
-                                    <button class="btn btn-warning">Переместить в архив</button>
-                                </div>
-                                <div class="col-3">
-                                    <button class="btn btn-danger btn-block"><i class="mdi mdi-15px mdi-delete"></i></button>
-                                </div>
+                        <div class="row">
+                            <div class="col-9">
+                                <button formaction="{{ route('admin.ad.archive') }}" class="btn btn-warning">Переместить в архив</button>
                             </div>
-
-
+                            <div class="col-3">
+                                <button formaction="{{ route('admin.ad.delete') }}" class="btn btn-danger btn-block"><i class="mdi mdi-15px mdi-delete"></i></button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

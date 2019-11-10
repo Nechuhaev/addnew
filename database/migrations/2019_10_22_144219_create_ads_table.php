@@ -17,12 +17,13 @@ class CreateAdsTable extends Migration
             $table->bigIncrements('id');
             $table->integer('category_id');
             $table->integer('city_id');
-            $table->string('user_id');
+            $table->integer('user_id');
+            $table->integer('currency_id');
             $table->string('image');
             $table->string('images')->nullable();
             $table->string('name', 255);
             $table->string('slug', 255);
-            $table->string('content');
+            $table->text('content');
             $table->string('price')->nullable();
             $table->string('telephone');
             $table->string('email');
