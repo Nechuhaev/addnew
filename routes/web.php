@@ -106,6 +106,7 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::get('/adCategories/{id}', 'Admin\Ad\Category@showForm')->name('admin.adCategories.edit');
     Route::post('/adCategories/create', 'Admin\Ad\Category@create')->name('admin.adCategories.create');
     Route::post('/adCategories/update', 'Admin\Ad\Category@update')->name('admin.adCategories.update');
+    Route::get('/adCategories/delete/{id}', 'Admin\Ad\Category@delete')->name('admin.adCategories.delete');
 
     // Объявления > Теги
     Route::get('/adTags', 'Admin\Ad\Tag@showForm')->name('admin.adTags');

@@ -26,6 +26,7 @@ class Category extends Controller
             }
         }
 
+
         foreach ($categories as $key => $category) {
             $categories_tree[$category['parent_id']]['children'][] = $category;
             unset($categories[$key]);
@@ -40,6 +41,7 @@ class Category extends Controller
         } else {
             $action = route('admin.adCategories.create');
         }
+
 
         return view('admin.ad.category')->with([
             'action' => $action,
