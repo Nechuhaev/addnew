@@ -32,6 +32,7 @@ class CreateAdsTable extends Migration
             $table->integer('total_views')->default(0);
             $table->integer('today_views')->default(0);
             $table->integer('bad_rating')->default(0);
+            $table->timestamp('date_active')->useCurrent();
             $table->timestamps();
         });
     }

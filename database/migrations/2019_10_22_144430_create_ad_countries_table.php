@@ -18,7 +18,7 @@ class CreateAdCountriesTable extends Migration
             $table->string('name', 255);
             $table->string('image', 255);
             $table->string('slug', 255);
-            $table->string('content')->nullable();
+            $table->text('content')->nullable();
             $table->string('meta_title', 255)->nullable();
             $table->string('meta_description', 255)->nullable();
             $table->integer('sort_order')->default(0)->nullable();

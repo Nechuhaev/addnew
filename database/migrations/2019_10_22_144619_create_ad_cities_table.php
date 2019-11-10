@@ -18,7 +18,7 @@ class CreateAdCitiesTable extends Migration
             $table->integer('region_id')->unsigned();
             $table->string('name', 255);
             $table->string('slug', 255);
-            $table->string('content')->nullable();
+            $table->text('content')->nullable();
             $table->string('meta_title', 255)->nullable();
             $table->string('meta_description', 255)->nullable();
             $table->integer('sort_order')->default(0)->nullable();

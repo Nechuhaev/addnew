@@ -20,15 +20,17 @@ class Ad extends Model
         'email',
         'meta_title',
         'meta_description',
-        'status'
+        'status',
+        'date_active'
     ];
 
+    protected $dates = ['date_active'];
     /**
      * Дата добавления объявления
      * @return false|string
      */
-    public function getCreatedDateAttribute() {
-        return date('d-m-Y', strtotime($this->created_at));
+    public function getDateActiveAttribute($value) {
+        return date('Y-m-d', strtotime($value));
     }
 
     /**
@@ -92,6 +94,10 @@ class Ad extends Model
     public function tags()
     {
         return $this->belongsToMany('App\AdTag', 'ad_tag', 'ad_id', 'tag_id');
+    }
+
+    public function currency() {
+        return $this->belongsTo(AdCurrency::class, 'currency_id');
     }
 
     /**

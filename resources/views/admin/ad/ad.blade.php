@@ -63,11 +63,21 @@
                                            value="{{ old('price') ?? $ad->price ?? '' }}"
                                            placeholder="Цена услуги / товара, грн"
                                            class="form-control form-control-line">
-                                    <select name="currency" class="form-control">
-                                        <option value="1">UAH</option>
-                                        <option value="2">EUR</option>
-                                        <option value="3">USD</option>
-                                    </select>
+                                    @if($currencies->count())
+                                        <select style="margin-left: 15px;" name="currency_id" class="form-control">
+                                        @foreach($currencies as $currency)
+                                            @if (isset($ad->currency->id))
+                                            <option @if($ad->currency->id == $currency->id) selected @endif value="{{ $currency->id }}">{{ $currency->name }}</option>
+                                            @else
+                                            <option @if($currency->is_default) selected @endif value="{{ $currency->id }}">{{ $currency->name }}</option>
+                                            @endif
+                                        @endforeach
+                                        </select>
+                                    @else
+                                        <div class="form-control btn-warning">Сначала <a href="{{ route('admin.adCurrencies') }}">добавьте валюту</a></div>
+                                    @endif
+
+
                                 </div>
 
                             </div>
@@ -98,7 +108,7 @@
                                 <input type="text"
                                        name="ad_user"
                                        id="ad_user"
-                                       value="{{ old('ad_user') ?? $ad->user->name ?? '' }}"
+                                       value="{{ old('ad_user') ?? $ad->user->email ?? '' }}"
                                        placeholder="Начните вводить имя автора"
                                        class="form-control form-control-line">
                                 <input type="hidden" id="ad_user_id" name="user_id" value="{{ old('user_id') ?? $ad->user->id ?? '' }}">
@@ -180,10 +190,10 @@
 
                             <div class="row">
                                 <div class="col-5 align-self-center">
-                                    <span class="ad-form-label-desc">Дата публикации</span>
+                                    <span class="ad-form-label-desc">Дата активации</span>
                                 </div>
                                 <div class="col-7">
-                                    <input type="text" class="form-control datepicker">
+                                    <input type="text" name="date_active" value="{{ old('date_active') ?? $ad->date_active ?? '' }}" class="form-control datepicker">
                                 </div>
                             </div>
                         </div>
@@ -194,8 +204,17 @@
                                 </div>
                                 <div class="col-7">
                                     <select name="status" class="form-control" id="">
-                                        <option value="1">Активно</option>
-                                        <option value="0" {{ (old('status') == 0 || (isset($ad) && $ad->status == 0)) ? 'selected' : '' }}>В архиве</option>
+                                        @if(isset($ad))
+                                            <option value="1" {{ ($ad->status == 1) ? 'selected' : '' }}>Активно</option>
+                                            <option value="0" {{ ($ad->status == 0) ? 'selected' : '' }}>В архиве</option>
+                                        @elseif (old('status') || old('status') === '0')
+                                            <option value="1" {{ (old('status') == 1) ? 'selected' : '' }}>Активно</option>
+                                            <option value="0" {{ (old('status') == 0) ? 'selected' : '' }}>В архиве</option>
+                                        @else
+                                            <option value="1" selected>Активно</option>
+                                            <option value="0">В архиве</option>
+                                        @endif
+
                                     </select>
                                 </div>
                             </div>

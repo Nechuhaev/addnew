@@ -18,4 +18,9 @@ class AdCurrency extends Model
     public function getIsDefaultAttribute() {
         return ($this->rate == 1) ? 1 : 0;
     }
+
+    public function ads()
+    {
+        return $this->hasMany(Ad::class, 'currency_id');
+    }
 }

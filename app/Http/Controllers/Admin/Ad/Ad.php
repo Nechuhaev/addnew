@@ -4,14 +4,16 @@ namespace App\Http\Controllers\Admin\Ad;
 
 use App\Ad as AdModel;
 use App\AdCategory;
+use App\AdCity;
+use App\AdCurrency;
 use App\AdTag;
 use App\Http\Controllers\Controller;
+use App\User;
 use Illuminate\Http\Request;
 
 class Ad extends Controller
 {
     public function showList(Request $request) {
-
         //dd($request->all());
         if ($request->has('search')) {
             $ads = AdModel::where('name', 'like', '%' . $request->get('search') . '%')
@@ -37,8 +39,26 @@ class Ad extends Controller
      * @return $this
      */
     public function show() {
+        $currencies = AdCurrency::all();
+
+        $tempAd = new AdModel();
+
+        $tempAd->name = 'Name';
+        $tempAd->slug = 'temp-'.rand(1, 1000);
+        $tempAd->price = '29.3';
+        $tempAd->currency = AdCurrency::find(2);
+        $tempAd->content = 'temp content temp content temp content temp content temp content temp content temp content temp content';
+        $tempAd->user = User::find(1);
+        $tempAd->telephone = '099 9992 92 29';
+        $tempAd->email = 'anatolii@gmail.com';
+        $tempAd->category = AdCategory::find(rand(1,30));
+        $tempAd->city = AdCity::find(rand(1,100));
+        $tempAd->status = 1;
+
         return view('admin.ad.ad')->with([
-            'action' => route('admin.ad.create')
+            'action' => route('admin.ad.create'),
+            'currencies' => $currencies,
+            'ad' => $tempAd
         ]);
     }
 
@@ -50,10 +70,12 @@ class Ad extends Controller
      */
     public function edit($id)
     {
+        $currencies = AdCurrency::all();
         $ad = AdModel::find($id);
         return view('admin.ad.ad')->with([
             'action' => route('admin.ad.update'),
-            'ad' => $ad
+            'ad' => $ad,
+            'currencies' => $currencies
         ]);
     }
 
@@ -68,6 +90,7 @@ class Ad extends Controller
             'category_id.required' => "Категория не выбрана",
             'city_id.required' => "Город не выбран",
             'user_id.required' => "Выберите пользователя!",
+            'currency_id.required' => "Выберите валюту",
             'image.required' => "Выберите главное изображение для объявления",
             'name.required' => "Введите название объявления",
             'slug.required' => "Введите слаг к объявлению",
