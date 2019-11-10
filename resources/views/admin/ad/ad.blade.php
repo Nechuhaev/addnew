@@ -153,8 +153,8 @@
                                 <input type="text"
                                        name="tags"
                                        id="tags"
-                                       data-json="{{ json_encode(['tag1', 'tag2']) }}"
-                                       value="{{ old('meta_title') ?? $ad->meta_title ?? '' }}"
+                                       data-json="{{ (isset($ad)) ? json_encode($ad->tags()->pluck('name')->toArray()): '' }}"
+                                       value=""
                                        placeholder=""
                                        class="form-control form-control-line">
                             </div>

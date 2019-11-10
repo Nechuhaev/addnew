@@ -58,7 +58,7 @@ class Ad extends Controller
         return view('admin.ad.ad')->with([
             'action' => route('admin.ad.create'),
             'currencies' => $currencies,
-            'ad' => $tempAd
+            //'ad' => $tempAd
         ]);
     }
 
@@ -72,6 +72,7 @@ class Ad extends Controller
     {
         $currencies = AdCurrency::all();
         $ad = AdModel::find($id);
+
         return view('admin.ad.ad')->with([
             'action' => route('admin.ad.update'),
             'ad' => $ad,
