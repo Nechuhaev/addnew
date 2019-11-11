@@ -206,7 +206,7 @@
             <ul class="footer-menu">
                 <li><a href="/">Главная</a></li>
                 <li><a href="{{ route('blog.index') }}">Блог</a></li>
-                <li><a href="https://addnew.biz/regions/">Страны</a></li>
+                <li><a href="{{ route('countries') }}">Страны</a></li>
                 <li><a href="#">Контакты</a></li>
                 <li><a href="#">Confide</a></li>
             </ul>

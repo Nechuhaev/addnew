@@ -22,7 +22,7 @@ class AdTableSeeder extends Seeder
         //Дочерние категории
         factory(App\AdCategory::class, 250)->create();
 
-        factory(App\Ad::class, 50000)->create();
+        factory(App\Ad::class, 1500)->create();
 
 
     }

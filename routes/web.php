@@ -37,6 +37,8 @@ Route::prefix('/')->group(function () {
     Route::get('blog/article', 'Front\Article\ArticleController@showArticle')->name('blog.article');
 });
 
+
+
 /*
  * Profile routes
  */
@@ -57,6 +59,11 @@ Route::prefix('blog')->group(function () {
 // Автор объявлений
 Route::prefix('author')->group(function () {
     Route::get('/{id}', 'Front\Article\ArticleController@showArticles')->name('author.index');
+});
+
+// Страны
+Route::prefix('regions')->group(function () {
+    Route::get('/', 'Front\Ad\Country@getList')->name('countries');
 });
 
 
