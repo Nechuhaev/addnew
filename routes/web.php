@@ -64,6 +64,10 @@ Route::prefix('author')->group(function () {
 // Страны
 Route::prefix('regions')->group(function () {
     Route::get('/', 'Front\Ad\Country@getList')->name('countries');
+    Route::get('/{country}', 'Front\Ad\Country@page')->name('country.page');
+    Route::get('/{country}/{region}/{city}', 'Front\Ad\Country@city')->name('city.page');
+    //Route::get('/{country}/{region}', 'Front\Ad\Country@getList')->name('region');
+    //Route::get('/{country}/{region}/{city}', 'Front\Ad\Country@getList')->name('city');
 });
 
 

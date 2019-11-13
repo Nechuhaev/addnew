@@ -23,4 +23,8 @@ class AdCurrency extends Model
     {
         return $this->hasMany(Ad::class, 'currency_id');
     }
+
+    public static function convert($amount, $to = false, $format = true) {
+        return $amount .' грн.';
+    }
 }

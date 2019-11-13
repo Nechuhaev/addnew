@@ -11,11 +11,11 @@
                 @foreach($countries as $country)
                     <div class="col">
                         <div class="country-wrap">
-                            <a href="https://addnew.biz/ukraina/" class="country-name"><img src="{{ $country['image'] }}"> <span>{{ $country['name'] }}</span> </a>
+                            <a href="{{ $country['url'] }}" class="country-name"><img src="{{ $country['image'] }}"> <span>{{ $country['name'] }}</span> </a>
                             @if($country['cities'])
                                 <ul class="cities-list cities-list-visible">
                                 @foreach($country['cities'] as $city)
-                                    <li><a href="https://addnew.biz/ukraina/kievskaya-obl/kiev">{{ $city['name'] }} <span class="city-rate">{{ $city['ads_count'] }}</span></a></li>
+                                    <li><a href="{{ $city['url'] }}">{{ $city['name'] }} <span class="city-rate">{{ $city['ads_count'] }}</span></a></li>
                                 @endforeach
                                 </ul>
                             @endif

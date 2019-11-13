@@ -3,6 +3,8 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class Ad extends Model
 {
@@ -135,5 +137,49 @@ class Ad extends Model
     public function city()
     {
         return $this->belongsTo(AdCity::class, 'city_id');
+    }
+
+    public static function getLoopArray($data) : array
+    {
+        $ads = [];
+        foreach ($data as $ad) {
+            $city_url_path = $ad->country_slug . '/' . $ad->region_slug . '/'. $ad->city_slug;
+
+            $ads[] = [
+                'name' => $ad->name,
+                'url' => $ad->slug,
+                'image' => $ad->image,
+                'price' => AdCurrency::convert($ad->price),
+                'content' => Str::words(strip_tags($ad->content), 20, "..."),
+                'city' => $ad->city,
+                'city_url' => route('country.page', ['path' => $city_url_path]),
+                'country' => $ad->country,
+                'country_url' => route('country.page', ['path' => $ad->country_slug])
+            ];
+        }
+
+        return $ads;
+    }
+
+    public static function getAds($defaults = true)
+    {
+        return DB::table('ads')
+            ->select(['ads.id',
+                'ads.slug',
+                'ads.name',
+                'ads.image',
+                'ads.content',
+                'ads.price',
+                'ads.currency_id',
+                'ad_cities.name AS city',
+                'ad_cities.slug AS city_slug',
+                'ad_regions.slug AS region_slug',
+                'ad_countries.name AS country',
+                'ad_countries.slug AS country_slug'
+            ])
+            ->leftJoin('ad_cities', 'ad_cities.id', '=', 'ads.city_id')
+            ->leftJoin('ad_regions', 'ad_cities.region_id', '=', 'ad_regions.id')
+            ->leftJoin('ad_countries', 'ad_regions.country_id', '=', 'ad_countries.id')
+            ->orderBy('ads.created_at', 'desc');
     }
 }

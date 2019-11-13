@@ -166,3 +166,17 @@ Breadcrumbs::for('profile.ads', function ($trail) {
     $trail->parent('index');
     $trail->push('Мои объявления', route('profile.ads'));
 });
+
+// Главная > Страны
+Breadcrumbs::for('countries', function ($trail) {
+    $trail->parent('index');
+    $trail->push('Страны', route('countries'));
+});
+
+// Главная > Страны > Страна
+Breadcrumbs::for('countries.country', function ($trail, $country = null) {
+    $trail->parent('countries');
+    $trail->push($country->name, route('countries', ['path' => $country->slug]));
+});
+// Главная > Страны > Страна > Регион
+// Главная > Страны > Страна > Регион > Город
