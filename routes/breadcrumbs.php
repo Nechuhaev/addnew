@@ -174,9 +174,24 @@ Breadcrumbs::for('countries', function ($trail) {
 });
 
 // Главная > Страны > Страна
-Breadcrumbs::for('countries.country', function ($trail, $country = null) {
+Breadcrumbs::for('country.page', function ($trail, $country = null) {
     $trail->parent('countries');
-    $trail->push($country->name, route('countries', ['path' => $country->slug]));
+    $trail->push($country->name, route('country.page', ['country' => $country->slug]));
 });
 // Главная > Страны > Страна > Регион
+Breadcrumbs::for('region.page', function ($trail, $region = null) {
+    $trail->parent('country.page', $region->country);
+    $trail->push($region->name, route('region.page', [
+        'country' => $region->country->slug,
+        'region' => $region->slug
+    ]));
+});
 // Главная > Страны > Страна > Регион > Город
+Breadcrumbs::for('city.page', function ($trail, $city = null) {
+    $trail->parent('region.page', $city->region);
+    $trail->push($city->name, route('city.page', [
+        'country' => $city->region->country->slug,
+        'region' => $city->region->slug,
+        'city' => $city->slug
+    ]));
+});

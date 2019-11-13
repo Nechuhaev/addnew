@@ -16,59 +16,50 @@
  * ******************************* FRONT PART ************************************
  * *******************************************************************************
  */
-
+// Главная
 Route::get('/', "Front\HomeController@index")->name('index');
-Route::prefix('/')->group(function () {
 
-    /*
-     * Auth routes
-     */
-    Route::get('login', 'Front\User\Auth\LoginController@showLoginForm')->name('login');
-    Route::post('login', 'Front\User\Auth\LoginController@login');
-    Route::post('logout', 'Front\User\Auth\LoginController@logout')->name('logout');
-    Route::post('password/email', 'Front\User\Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
-    Route::post('password/reset', 'Front\User\Auth\ResetPasswordController@reset')->name('password.update');
-    Route::get('password/reset', 'Front\User\Auth\ForgotPasswordController@showLinkRequestForm')->name('password.request');
-    Route::get('password/reset/{token}', 'Front\User\Auth\ResetPasswordController@showResetForm')->name('password.reset');
-    Route::post('register', 'Front\User\Auth\RegisterController@register');
-    Route::get('register', 'Front\User\Auth\RegisterController@showRegistrationForm')->name('register');
+// Авторизация
+Route::get('/login', 'Front\User\Auth\LoginController@showLoginForm')->name('login');
+Route::post('login', 'Front\User\Auth\LoginController@login');
+Route::post('logout', 'Front\User\Auth\LoginController@logout')->name('logout');
+Route::post('password/email', 'Front\User\Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
+Route::post('password/reset', 'Front\User\Auth\ResetPasswordController@reset')->name('password.update');
+Route::get('/password/reset', 'Front\User\Auth\ForgotPasswordController@showLinkRequestForm')->name('password.request');
+Route::get('/password/reset/{token}', 'Front\User\Auth\ResetPasswordController@showResetForm')->name('password.reset');
+Route::post('register', 'Front\User\Auth\RegisterController@register');
+Route::get('/register', 'Front\User\Auth\RegisterController@showRegistrationForm')->name('register');
 
-    Route::get('blog', 'Front\Article\ArticleController@showArticles')->name('blog');
-    Route::get('blog/article', 'Front\Article\ArticleController@showArticle')->name('blog.article');
-});
+// Категории объявлений
+//Route::get('/{category}', 'Front\User\Auth\RegisterController@showRegistrationForm')->name('register');
+//Route::get('/{category}/{sub_category}', 'Front\User\Auth\RegisterController@showRegistrationForm')->name('register');
+//Route::get('/{s}', 'Front\User\Auth\RegisterController@showRegistrationForm')->name('register');
 
 
 
-/*
- * Profile routes
- */
-Route::prefix('profile')->group(function () {
-    Route::get('/', 'Front\User\UserController@edit')->name('profile.index');
-    Route::post('/update', 'Front\User\UserController@updateUser')->name('profile.update');
-    Route::get('/ads', 'Front\User\UserController@ads')->name('profile.ads');
-    Route::get('/password', 'Front\User\UserController@password')->name('profile.password');
-    Route::post('/password/update', 'Front\User\UserController@updatePassword')->name('profile.password.update');
-});
+// Профиль
+Route::get('/profile/', 'Front\User\UserController@edit')->name('profile.index');
+Route::post('profile/update', 'Front\User\UserController@updateUser')->name('profile.update');
+Route::get('/profile/ads', 'Front\User\UserController@ads')->name('profile.ads');
+Route::get('/profile/password', 'Front\User\UserController@password')->name('profile.password');
+Route::post('profile/password/update', 'Front\User\UserController@updatePassword')->name('profile.password.update');
 
-Route::prefix('blog')->group(function () {
-    Route::get('/', 'Front\Article\ArticleController@showArticles')->name('blog.index');
-    Route::get('/{slug}', 'Front\Article\ArticleController@showArticle')->name('blog.article');
-    Route::get('/category/{slug}', 'Front\Article\ArticleController@showCategory')->name('blog.category');
-});
+
+// Блог
+Route::get('/blog/', 'Front\Article\ArticleController@showArticles')->name('blog.index');
+Route::get('/blog/{slug}', 'Front\Article\ArticleController@showArticle')->name('blog.article');
+Route::get('/blog/category/{slug}', 'Front\Article\ArticleController@showCategory')->name('blog.category');
+
 
 // Автор объявлений
-Route::prefix('author')->group(function () {
-    Route::get('/{id}', 'Front\Article\ArticleController@showArticles')->name('author.index');
-});
+Route::get('/author/{id}', 'Front\Article\ArticleController@showArticles')->name('author.index');
+
 
 // Страны
-Route::prefix('regions')->group(function () {
-    Route::get('/', 'Front\Ad\Country@getList')->name('countries');
-    Route::get('/{country}', 'Front\Ad\Country@page')->name('country.page');
-    Route::get('/{country}/{region}/{city}', 'Front\Ad\Country@city')->name('city.page');
-    //Route::get('/{country}/{region}', 'Front\Ad\Country@getList')->name('region');
-    //Route::get('/{country}/{region}/{city}', 'Front\Ad\Country@getList')->name('city');
-});
+Route::get('/regions/', 'Front\Ad\Country@getList')->name('countries');
+Route::get('/regions/{country}', 'Front\Ad\Country@page')->name('country.page');
+Route::get('/regions/{country}/{region}', 'Front\Ad\Region@page')->name('region.page');
+Route::get('/regions/{country}/{region}/{city}', 'Front\Ad\City@page')->name('city.page');
 
 
 
