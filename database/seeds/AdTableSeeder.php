@@ -22,8 +22,15 @@ class AdTableSeeder extends Seeder
         //Дочерние категории
         factory(App\AdCategory::class, 250)->create();
 
-        factory(App\Ad::class, 1500)->create();
+        $tags = factory(App\AdTag::class, 2000)->create();
 
+        factory(App\Ad::class, 10000)->create();
+
+        App\Ad::all()->each(function ($article) use ($tags) {
+            $article->tags()->attach(
+                $tags->random(rand(1, 8))->pluck('id')->toArray()
+            );
+        });
 
     }
 }

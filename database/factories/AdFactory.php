@@ -8,6 +8,7 @@ use App\AdRegion;
 use App\AdCity;
 use App\AdCategory;
 use App\AdCurrency;
+use App\AdTag;
 use \App\User;
 use Faker\Generator as Faker;
 
@@ -107,4 +108,17 @@ $factory->define(AdCategory::class, function (Faker $faker) {
         'sort_order' => rand(0, 100)
     ];
 });
+
+
+// Теги
+$factory->define(AdTag::class, function (Faker $faker) {
+    return [
+        'name' => $faker->realText(rand(10, 11)),
+        'slug' => $faker->slug,
+        'content' => $faker->realText(rand(200, 700)),
+        'meta_title' => $faker->optional()->realText(100),
+        'meta_description' => $faker->optional()->realText(100),
+    ];
+});
+
 
