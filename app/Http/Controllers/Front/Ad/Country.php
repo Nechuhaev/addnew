@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Front\Ad;
 
 use App\Ad;
 use App\AdCountry;
+use App\AdRegion;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -68,6 +69,9 @@ class Country extends Controller
 
         $entity = AdCountry::where('slug', '=', $country)->first();
 
+        $children = $entity->regions;
+        //dd($children);
+
         $results = Ad::getAds()->where('ad_countries.id', $entity->id)
             ->paginate(15);
 
@@ -77,6 +81,7 @@ class Country extends Controller
             'entity' => $entity,
             'ads' => $ads,
             'links' => $results->links('front.widgets.paginate'),
+            'children' => $children,
             'breadcrumbs' => 'country.page'
         ]);
     }

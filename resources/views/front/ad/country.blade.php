@@ -10,6 +10,17 @@
 
         {{ Breadcrumbs::render($breadcrumbs, $entity) }}
 
+        @if(isset($children))
+        <div class="children">
+            @foreach($children as $child)
+                <div class="child">
+                    <a href="{{ $child->slug }}">{{ $child->name }}</a>
+                </div>
+            @endforeach
+        </div>
+        @endif
+
+
         <div class="columns columns-nowrap">
             <div class="column-content">
                 <div class="banner">
@@ -17,7 +28,6 @@
                 </div>
 
                 <div class="category">
-
                     @if($ads)
                         @foreach($ads as $ad)
                             <div class="category-item">
@@ -37,7 +47,7 @@
                                     </p>
                                 </div>
                                 <div class="category-price">
-                                    <strong>100 грн.</strong>
+                                    <strong>{{ $ad['price'] }}</strong>
                                 </div>
                             </div>
                         @endforeach

@@ -61,6 +61,10 @@ class AdRegion extends Model
         }
     }
 
+    public function getSlugAttribute($slug) {
+        return $this->country->slug . '/' . $slug;
+    }
+
     /**
      * Обратная связь к странам (Один регион - одна страна)
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
