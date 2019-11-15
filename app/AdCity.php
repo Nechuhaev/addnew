@@ -61,6 +61,10 @@ class AdCity extends Model
         }
     }
 
+    public function getSlugAttribute($slug) {
+        return $this->region->country->slug . '/' . $this->region->slug . '/' . $slug;
+    }
+
     public function getPathAttribute() {
         $path = [
             $this->region->country->name,

@@ -69,7 +69,6 @@ class Country extends Controller
 
         $entity = AdCountry::where('slug', '=', $country)->first();
 
-        $children = $entity->regions;
         //dd($children);
 
         $results = Ad::getAds()->where('ad_countries.id', $entity->id)
@@ -81,7 +80,7 @@ class Country extends Controller
             'entity' => $entity,
             'ads' => $ads,
             'links' => $results->links('front.widgets.paginate'),
-            'children' => $children,
+            'children' => $entity->regions,
             'breadcrumbs' => 'country.page'
         ]);
     }

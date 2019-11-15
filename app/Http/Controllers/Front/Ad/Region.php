@@ -22,6 +22,7 @@ class Region extends Controller
             'entity' => $entity,
             'ads' => $ads,
             'links' => $results->links('front.widgets.paginate'),
+            'children' => $entity->cities,
             'breadcrumbs' => 'region.page'
         ]);
     }
