@@ -10,6 +10,8 @@
     <meta name="description" content="@yield('meta_description')">
 
     <link href="{{ asset('assets/front/css/start.min.css') }}" rel="stylesheet">
+    <!-- Styles -->
+    <link rel="stylesheet" href="{{ asset('assets/front/css/style.min.css') }}" media="all">
 </head>
 <body class=""> <!-- fixed -->
 <div class="debugGrid">
@@ -254,8 +256,6 @@
 
 <div class="backdrop"></div>
 
-<!-- Styles -->
-<link rel="stylesheet" href="{{ asset('assets/front/css/style.min.css') }}" media="all">
 <style>
     .start-page{
         min-height: calc(100% - 87px);

@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -28,6 +29,25 @@ class Ad extends Model
     ];
 
     protected $dates = ['date_active'];
+
+    /**
+     * Дата начала показа объявления
+     * @return false|string
+     */
+    public function getDateStartAttribute() {
+        $date = Carbon::createFromFormat($this->getDateFormat(), $this->getOriginal('date_active'));
+        return date('d.m.Y', strtotime($date));
+    }
+
+    /**
+     * Дата окончания показа объявления
+     * @return false|string
+     */
+    public function getDateEndAttribute() {
+        $date = Carbon::createFromFormat($this->getDateFormat(), $this->getOriginal('date_active'));
+        return date('d.m.Y', strtotime($date->addDays(30)));
+    }
+
     /**
      * Дата добавления объявления
      * @return false|string
@@ -99,6 +119,10 @@ class Ad extends Model
         }
     }
 
+    public function getSlugAttribute($slug) {
+        return 'ads/' . $slug;
+    }
+
     /**
      * Обратная связь к пользователю
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -147,7 +171,7 @@ class Ad extends Model
 
             $ads[] = [
                 'name' => $ad->name,
-                'url' => $ad->slug,
+                'slug' => $ad->slug,
                 'image' => $ad->image,
                 'price' => AdCurrency::convert($ad->price),
                 'content' => Str::words(strip_tags($ad->content), 20, "..."),

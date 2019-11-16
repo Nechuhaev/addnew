@@ -24,7 +24,7 @@ class AdTableSeeder extends Seeder
 
         $tags = factory(App\AdTag::class, 2000)->create();
 
-        factory(App\Ad::class, 150000)->create();
+        factory(App\Ad::class, 1500)->create();
 
         App\Ad::all()->each(function ($article) use ($tags) {
             $article->tags()->attach(

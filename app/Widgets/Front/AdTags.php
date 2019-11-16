@@ -13,7 +13,7 @@ class AdTags extends AbstractWidget
      */
     protected $config = [
         'heading' => 'Категории',
-        'categories' => []
+        'tags' => []
     ];
 
     /**

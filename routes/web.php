@@ -51,6 +51,9 @@ Route::get('/blog/{slug}', 'Front\Article\ArticleController@showArticle')->name(
 Route::get('/blog/category/{slug}', 'Front\Article\ArticleController@showCategory')->name('blog.category');
 
 
+// Объявление
+Route::get('/ads/{slug}', 'Front\Ad\Ad@page')->name('ad');
+
 // Автор объявлений
 Route::get('/author/{id}', 'Front\Article\ArticleController@showArticles')->name('author.index');
 
