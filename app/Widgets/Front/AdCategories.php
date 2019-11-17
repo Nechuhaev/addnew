@@ -29,7 +29,7 @@ class AdCategories extends AbstractWidget
         foreach ($categories as $category) {
             $this->config['categories'][] = [
                 'name' => $category->name,
-                'url' => $category->slug,
+                'url' => $category->url,
                 'image' => $category->image
             ];
         }

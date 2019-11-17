@@ -61,8 +61,11 @@ class AdRegion extends Model
         }
     }
 
-    public function getSlugAttribute($slug) {
-        return $this->country->slug . '/' . $slug;
+    public function getUrlAttribute() {
+        return route('region.page', [
+            'country' => $this->country->slug,
+            'region' => $this->slug,
+        ]);
     }
 
     /**

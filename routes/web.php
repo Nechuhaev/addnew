@@ -52,7 +52,7 @@ Route::get('/blog/category/{slug}', 'Front\Article\ArticleController@showCategor
 
 
 // Объявление
-Route::get('/ads/{slug}', 'Front\Ad\Ad@page')->name('ad');
+Route::get('/ads/{slug}', 'Front\Ad\Ad@page')->name('ad.page');
 
 
 // Теги объявлений
@@ -70,7 +70,7 @@ Route::get('/regions/{country}/{region}/{city}', 'Front\Ad\City@page')->name('ci
 
 // Категории объявлений
 Route::get('/{category}', 'Front\Ad\Category@page')->name('category.page');
-Route::get('/{category}/{sub_category}', 'Front\Ad\Category@page')->name('sub_category.page');
+Route::get('/{category}/{subcategory}', 'Front\Ad\Category@page')->name('sub_category.page');
 
 
 

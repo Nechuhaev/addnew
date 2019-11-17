@@ -61,6 +61,11 @@ class AdCountry extends Model
         }
     }
 
+    public function getUrlAttribute() {
+        return route('country.page', [
+            'country' => $this->slug,
+        ]);
+    }
     /**
      * Связь с областями
      * @return \Illuminate\Database\Eloquent\Relations\HasMany

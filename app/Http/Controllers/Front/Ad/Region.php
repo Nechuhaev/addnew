@@ -14,7 +14,7 @@ class Region extends Controller
     {
         $entity = AdRegion::where('slug', '=', $region)->first();
 
-        $results = Ad::getAds()->where('ad_cities.id', $entity->id)
+        $results = Ad::getAds()->where('ad_regions.id', $entity->id)
             ->paginate(15);
 
         $ads = Ad::getLoopArray($results);

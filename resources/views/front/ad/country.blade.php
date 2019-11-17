@@ -14,7 +14,7 @@
         <div class="children">
             @foreach($children as $child)
                 <div class="child">
-                    <a href="{{ $child->slug }}">{{ $child->name }}</a>
+                    <a href="{{ $child->url }}">{{ $child->name }}</a>
                 </div>
             @endforeach
         </div>
@@ -33,12 +33,12 @@
                             <div class="category-item">
                                 <div class="category-count">{{ $loop->iteration }}</div>
                                 <div class="category-img">
-                                    <a href="{{ route('ad', ['slug' => $ad['slug']]) }}" title="{{ $ad['name'] }}" class="preview" data-rel="{{ $ad['image'] }}">
+                                    <a href="{{ $ad['url'] }}" title="{{ $ad['name'] }}" class="preview" data-rel="{{ $ad['image'] }}">
                                         <img width="250" height="250" src="{{ $ad['image'] }}" class="attachment-ad-medium size-ad-medium" alt="{{ $ad['name'] }}">
                                     </a>
                                 </div>
                                 <div class="category-caption">
-                                    <a href="{{ route('ad', ['slug' => $ad['slug']]) }}">{{ $ad['name'] }}</a>
+                                    <a href="{{ $ad['url'] }}">{{ $ad['name'] }}</a>
                                     <p class="category-description">{{ $ad['content'] }}</p>
                                     <p class="category-meta">
                                         <i class="st-1"><strong>Размещено:</strong><span class="st-1">Август 28, 2019 8:56 дп</span></i>
@@ -80,7 +80,9 @@
                 <div class="banner">
                     <img src="{{ asset('assets/front/img/banners/banner-9.jpg') }}" alt="">
                 </div>
-                @widget('front.adTags', ['tags' => $tags])
+                @if(isset($tags))
+                    @widget('front.adTags', ['tags' => $tags])
+                @endif
             </aside>
         </div>
 

@@ -7,12 +7,7 @@
                 <img src="{{ asset('assets/front/img/banners/banner-7.jpg') }}" alt="">
             </div>
 
-            <ul class="breadcrumb">
-                <li><a href="/">Главная</a></li>
-                <li><a href="https://addnew.biz/biznes-i-uslugi/">Бизнес и услуги</a></li>
-                <li><a href="https://addnew.biz/biznes-i-uslugi/turizm-immigratsiya/">Туризм / иммиграция</a></li>
-                <li><span class="trail-end">Надежное медицинское страхование туристов</span></li>
-            </ul>
+            {{ Breadcrumbs::render('ad.page', $ad) }}
 
             <div class="columns columns-nowrap">
                 <aside class="column-left hidden-xs">
@@ -87,11 +82,11 @@
                     </div>
                     <div class="adv-meta">
                         <ul class="adv-meta-list">
-                            <li><span>Страна:</span><a href="https://addnew.biz/ukraina/">{{ $ad->city->region->country->name }}</a></li>
+                            <li><span>Страна:</span><a href="{{ $ad->city->region->country->url }}">{{ $ad->city->region->country->name }}</a></li>
                             <li><span>Автор:</span>{{ $ad->user->username }}</li>
-                            <li><span>Город:</span><a href="https://addnew.biz/ukraina/kievskaya-obl/kiev/">{{ $ad->city->name }}</a></li>
+                            <li><span>Город:</span><a href="{{ $ad->city->url }}">{{ $ad->city->name }}</a></li>
                             <li><span>Дата создания:</span>{{ $ad->date_start }}</li>
-                            <li><span>Район:</span><a href="https://addnew.biz/ukraina/kievskaya-obl/">{{ $ad->city->region->name }}</a></li>
+                            <li><span>Район:</span><a href="{{ $ad->city->region->url }}">{{ $ad->city->region->name }}</a></li>
                             <li><span>Актуально до:</span>{{ $ad->date_end }}</li>
                         </ul>
                         <div class="adv-contacts">

@@ -203,5 +203,22 @@ Breadcrumbs::for('ad_tag', function ($trail, $tag) {
 
 
 // Главная > Категория объявления
-// Главная > Категория объявления > Дочерняя категория
+Breadcrumbs::for('category.page', function ($trail, $category) {
+    if (!$category->parent()) {
+        $trail->parent('index');
+        $trail->push($category->name, $category->url);
+    } else {
+        $parent_category = $category->parent();
+        $trail->parent('category.page', $parent_category);
+        $trail->push($category->name, $category->url);
+    }
+});
+
+
 // Главная > Категория объявления > Дочерняя категория > Объявление
+Breadcrumbs::for('ad.page', function ($trail, $ad) {
+
+    $trail->parent('category.page', $ad->category);
+    $trail->push($ad->name, route('ad.page', ['slug', $ad->slug]));
+
+});

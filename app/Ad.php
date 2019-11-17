@@ -172,7 +172,7 @@ class Ad extends Model
             $ads[] = [
                 'id' => $ad->id,
                 'name' => $ad->name,
-                'slug' => $ad->slug,
+                'url' => route('ad.page', ['slug' => $ad->slug]),
                 'image' => $ad->image,
                 'price' => AdCurrency::convert($ad->price),
                 'content' => Str::words(strip_tags($ad->content), 20, "..."),
@@ -202,6 +202,7 @@ class Ad extends Model
                 'ad_countries.name AS country',
                 'ad_countries.slug AS country_slug'
             ])
+            ->leftJoin('ad_categories', 'ad_categories.id', '=', 'ads.category_id')
             ->leftJoin('ad_cities', 'ad_cities.id', '=', 'ads.city_id')
             ->leftJoin('ad_regions', 'ad_cities.region_id', '=', 'ad_regions.id')
             ->leftJoin('ad_countries', 'ad_regions.country_id', '=', 'ad_countries.id')

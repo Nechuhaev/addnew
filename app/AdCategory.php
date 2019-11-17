@@ -89,6 +89,26 @@ class AdCategory extends Model
         }
     }
 
+    public function getUrlAttribute() {
+        if ($this->parent()) {
+            $url = route('sub_category.page', [
+                'category' => $this->parent()->slug,
+                'subcategory' => $this->slug
+                ]);
+        } else {
+            $url = route('category.page', ['category' => $this->slug]);
+        }
+        return $url;
+    }
+
+    public function parent() {
+        if ($this->parent_id) {
+            return AdCategory::find($this->parent_id);
+        } else {
+            return false;
+        }
+    }
+
     /**
      * Связь категорий с таблицей объявлений
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
