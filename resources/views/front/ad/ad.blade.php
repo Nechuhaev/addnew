@@ -49,7 +49,7 @@
                     <div class="banner">
                         <img src="{{ asset('assets/front/img/banners/banner-9.jpg') }}" alt="">
                     </div>
-                    @widget('front.adTags', $ad->tags()->get())
+                    @widget('front.adTags', ['tags' => $ad->tags()->get()])
                 </aside>
                 <div class="column-content">
                     <div class="adv-title">
@@ -113,6 +113,7 @@
                     </div>
                     <div class="adv-location">
                         <div class="adv-h">Расположение:</div>
+
                         <div class="map" style="background-image: url('{{ asset('assets/front/img/map.jpg') }}');"></div>
                     </div>
                     <div class="adv-callback">

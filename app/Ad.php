@@ -170,6 +170,7 @@ class Ad extends Model
             $city_url_path = $ad->country_slug . '/' . $ad->region_slug . '/'. $ad->city_slug;
 
             $ads[] = [
+                'id' => $ad->id,
                 'name' => $ad->name,
                 'slug' => $ad->slug,
                 'image' => $ad->image,

@@ -32,23 +32,9 @@ class AdTags extends AbstractWidget
                     'url' => route('tag', ['slug' => $tag->slug]),
                 ];
             }
-        } else {
-            //$tags =
-            //$this->config['tags'] = ['random'];
         }
 
         $this->config['output'] = $tags;
-        //dd($this->config['output']);
-
-//        $categories = AdCategory::where('parent_id', 0)->get();
-//
-//        foreach ($categories as $category) {
-//            $this->config['categories'][] = [
-//                'name' => $category->name,
-//                'url' => $category->slug,
-//                'image' => $category->image
-//            ];
-//        }
 
         return view('widgets.front.ad_tags', [
             'config' => $this->config,

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Front\Ad;
 use App\Ad;
 use App\AdCountry;
 use App\AdRegion;
+use App\AdTag;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -87,6 +88,7 @@ class Country extends Controller
             'ads' => $ads,
             'links' => $results->links('front.widgets.paginate'),
             'children' => $entity->regions,
+            'tags' => AdTag::getAdsTags($ads),
             'breadcrumbs' => 'country.page'
         ]);
     }

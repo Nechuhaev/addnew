@@ -80,7 +80,7 @@
                 <div class="banner">
                     <img src="{{ asset('assets/front/img/banners/banner-9.jpg') }}" alt="">
                 </div>
-                @widget('front.adTags')
+                @widget('front.adTags', ['tags' => $tags])
             </aside>
         </div>
 

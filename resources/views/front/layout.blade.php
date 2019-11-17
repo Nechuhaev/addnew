@@ -276,5 +276,6 @@
 </style>
 <script src="{{ asset('assets/front/js/common.js') }}"></script>
 
+
 </body>
 </html>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Front\Ad;
 
 use App\Ad;
 use App\AdCity;
+use App\AdTag;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -22,6 +23,7 @@ class City extends Controller
             'entity' => $entity,
             'ads' => $ads,
             'links' => $results->links('front.widgets.paginate'),
+            'tags' => AdTag::getAdsTags($ads),
             'breadcrumbs' => 'city.page'
         ]);
     }

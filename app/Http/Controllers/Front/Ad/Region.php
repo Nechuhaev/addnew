@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Front\Ad;
 
 use App\Ad;
 use App\AdRegion;
+use App\AdTag;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -23,6 +24,7 @@ class Region extends Controller
             'ads' => $ads,
             'links' => $results->links('front.widgets.paginate'),
             'children' => $entity->cities,
+            'tags' => AdTag::getAdsTags($ads),
             'breadcrumbs' => 'region.page'
         ]);
     }
