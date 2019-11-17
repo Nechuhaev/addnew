@@ -80,7 +80,7 @@ class AdTag extends Model
         }
 
         $tags = DB::table('ad_tags')
-            ->select('ad_tags.id', 'ad_tags.name', 'ad_tags.slug')
+            ->select(DB::raw("DISTINCT(ad_tags.slug)"), 'ad_tags.id', 'ad_tags.name')
             ->leftJoin('ad_tag', 'ad_tags.id', '=', 'ad_tag.tag_id')
             ->whereIn('ad_tag.ad_id', $ads_ids)->orderBy('ad_tags.slug', 'asc')
             ->take(30)
