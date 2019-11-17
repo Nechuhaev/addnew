@@ -54,6 +54,10 @@ Route::get('/blog/category/{slug}', 'Front\Article\ArticleController@showCategor
 // Объявление
 Route::get('/ads/{slug}', 'Front\Ad\Ad@page')->name('ad');
 
+
+// Теги объявлений
+Route::get('/ad-tags/{slug}', 'Front\Ad\Tag@page')->name('tag');
+
 // Автор объявлений
 Route::get('/author/{id}', 'Front\Article\ArticleController@showArticles')->name('author.index');
 
@@ -64,6 +68,9 @@ Route::get('/regions/{country}', 'Front\Ad\Country@page')->name('country.page');
 Route::get('/regions/{country}/{region}', 'Front\Ad\Region@page')->name('region.page');
 Route::get('/regions/{country}/{region}/{city}', 'Front\Ad\City@page')->name('city.page');
 
+// Категории объявлений
+Route::get('/{category}', 'Front\Ad\Category@page')->name('category.page');
+Route::get('/{category}/{sub_category}', 'Front\Ad\Category@page')->name('sub_category.page');
 
 
 

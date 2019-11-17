@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class AdTag extends Model
 {
@@ -63,5 +64,28 @@ class AdTag extends Model
     public function ads()
     {
         return $this->belongsToMany('App\Ad', 'ad_tag', 'tag_id', 'ad_id');
+    }
+
+
+    /**
+     * Получить список тегов для объявлений
+     * @param $ads
+     * @return \Illuminate\Support\Collection
+     */
+    public static function getAdsTags($ads) {
+
+        $ads_ids = [];
+        foreach ($ads as $ad) {
+            $ads_ids[] = $ad['id'];
+        }
+
+        $tags = DB::table('ad_tags')
+            ->select('ad_tags.id', 'ad_tags.name', 'ad_tags.slug')
+            ->leftJoin('ad_tag', 'ad_tags.id', '=', 'ad_tag.tag_id')
+            ->whereIn('ad_tag.ad_id', $ads_ids)->orderBy('ad_tags.slug', 'asc')
+            ->take(30)
+            ->get();
+
+        return $tags;
     }
 }

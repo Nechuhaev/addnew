@@ -2,6 +2,7 @@
 
 namespace App\Widgets\Front;
 
+use App\AdTag;
 use Arrilot\Widgets\AbstractWidget;
 
 class AdTags extends AbstractWidget
@@ -12,8 +13,9 @@ class AdTags extends AbstractWidget
      * @var array
      */
     protected $config = [
-        'heading' => 'Категории',
-        'tags' => []
+        'heading' => 'Метки объявлений',
+        'tags' => null,
+        'output' => []
     ];
 
     /**
@@ -22,6 +24,21 @@ class AdTags extends AbstractWidget
      */
     public function run()
     {
+        $tags = [];
+        if ($this->config['tags']) {
+            foreach ($this->config['tags'] as $tag) {
+                $tags[] = [
+                    'name' => $tag->name,
+                    'url' => route('tag', ['slug' => $tag->slug]),
+                ];
+            }
+        } else {
+            //$tags =
+            //$this->config['tags'] = ['random'];
+        }
+
+        $this->config['output'] = $tags;
+        //dd($this->config['output']);
 
 //        $categories = AdCategory::where('parent_id', 0)->get();
 //

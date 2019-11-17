@@ -195,6 +195,11 @@ Breadcrumbs::for('city.page', function ($trail, $city = null) {
         'city' => $city->slug
     ]));
 });
+// Главная > Объявление с меткой "..."
+Breadcrumbs::for('ad_tag', function ($trail, $tag) {
+    $trail->parent('index');
+    $trail->push('Объявление с меткой "' . $tag->name . '"', route('tag', ['slug', $tag->slug]));
+});
 
 
 // Главная > Категория объявления
