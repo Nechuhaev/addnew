@@ -136,65 +136,9 @@
             </div>
         </div>
     </div>
-    <div class="header-search">
-        <div class="container">
-            <form class="search">
-                <div class="form-group">
-                    <input type="text" class="form-control" name="s" placeholder="Что ищем?">
-                </div>
-                <div class="search-mob">
-                    <div class="form-group">
-                        <select class="form-control" name="cat_id" id="main_category" style="width: 100%;">
-                            <option value="0">Выберите категорию</option>
-                            <option value="878">Строительство и ремонт</option>
-                            <option value="899">Отдам даром</option>
-                            <option value="900">Оборудование</option>
-                            <option value="8">Детский мир</option>
-                            <option value="19">Транспорт</option>
-                            <option value="32">Бизнес и услуги</option>
-                            <option value="54">Работа</option>
-                            <option value="75">Недвижимость</option>
-                            <option value="91">Животные</option>
-                            <option value="104">Дом и сад</option>
-                            <option value="117">Электроника</option>
-                            <option value="130">Мода и стиль</option>
-                            <option value="138">Хобби, отдых и спорт</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <select class="form-control" class="" name="sub_cat_id" id="hub_sub_category" style="width: 100%;">
-                            <option value="0">Искать во всей категории</option>
-                            <option value="880">Строительные материалы</option>
-                            <option value="881">Отделочные и облицовочные материалы</option>
-                            <option value="882">Окна</option>
-                            <option value="883">Двери</option>
-                            <option value="884">Замки и фурнитура</option>
-                            <option value="885">Балконы</option>
-                            <option value="886">Лестницы</option>
-                            <option value="887">Ворота и заборы</option>
-                            <option value="888">Сантехника</option>
-                            <option value="889">Отопление</option>
-                            <option value="890">Электрика</option>
-                            <option value="892">Насосы</option>
-                            <option value="891">Вентиляционные системы</option>
-                            <option value="893">Готовые конструкции</option>
-                            <option value="894">Металлоконструкции</option>
-                            <option value="895">Инструменты</option>
-                            <option value="896">Другое</option>
-                            <option value="897">Аренда</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <input type="text" class="form-control" id="autocomplete_cities" placeholder="Город для поиска">
-                    </div>
-                </div>
-                <div class="search-button">
-                    <button type="button" class="btn btn-search">Поиск</button>
-                    <a href="#" class="view-more">Уточнить поиск</a>
-                </div>
-            </form>
-        </div>
-    </div>
+
+    @widget('front.search')
+
 </header>
 
 
@@ -275,7 +219,26 @@
     }
 </style>
 <script src="{{ asset('assets/front/js/common.js') }}"></script>
+<script>
+    var options = {
+        url: function(phrase) {
+            if (phrase.length > 2) {
+                return "/api/ad/city/autocomplete/" + phrase;
+            }
+        },
 
+        getValue: "name",
+
+        listLocation: "data",
+        // list: {
+        //     match: {
+        //         enabled: true
+        //     }
+        // }
+    };
+
+    $("#autocomplete_cities").easyAutocomplete(options);
+</script>
 
 </body>
 </html>
