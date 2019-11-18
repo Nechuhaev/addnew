@@ -167,7 +167,7 @@ class Ad extends Model
     {
         $ads = [];
         foreach ($data as $ad) {
-            $city_url_path = $ad->country_slug . '/' . $ad->region_slug . '/'. $ad->city_slug;
+            //$city_url_path = $ad->country_slug . '/' . $ad->region_slug . '/'. $ad->city_slug;
 
             $ads[] = [
                 'id' => $ad->id,
@@ -177,9 +177,9 @@ class Ad extends Model
                 'price' => AdCurrency::convert($ad->price),
                 'content' => Str::words(strip_tags($ad->content), 20, "..."),
                 'city' => $ad->city,
-                'city_url' => route('country.page', ['path' => $city_url_path]),
+                'city_url' => route('country.page', ['country' => $ad->country_slug]),
                 'country' => $ad->country,
-                'country_url' => route('country.page', ['path' => $ad->country_slug])
+                'country_url' => route('country.page', ['country' => $ad->country_slug, 'region' => $ad->region_slug, 'city' => $ad->city_slug])
             ];
         }
 
@@ -206,6 +206,7 @@ class Ad extends Model
             ->leftJoin('ad_cities', 'ad_cities.id', '=', 'ads.city_id')
             ->leftJoin('ad_regions', 'ad_cities.region_id', '=', 'ad_regions.id')
             ->leftJoin('ad_countries', 'ad_regions.country_id', '=', 'ad_countries.id')
+            ->where('status', 1)
             ->orderBy('ads.created_at', 'desc');
     }
 }

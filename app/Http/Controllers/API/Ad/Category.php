@@ -34,4 +34,19 @@ class Category extends Controller
             return response()->json(['error' => 'Категорий не найдено']);
         }
     }
+    public function getChildren($parent_id = null) {
+
+        if ($parent_id) {
+            $categories = AdCategory::where('parent_id', (int)$parent_id)
+                ->orderBy('name', 'asc')
+                ->get();
+
+            if ($categories) {
+                return CategoryResourse::collection($categories);
+            }
+        }
+
+
+        return response()->json(['error' => 'Категорий не найдено']);
+    }
 }

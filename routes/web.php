@@ -61,6 +61,8 @@ Route::get('/ad-tags/{slug}', 'Front\Ad\Tag@page')->name('tag');
 // Автор объявлений
 Route::get('/author/{id}', 'Front\Article\ArticleController@showArticles')->name('author.index');
 
+// Поиск объявлений
+Route::get('/search', 'Front\Ad\Search@page')->name('ad.search');
 
 // Страны
 Route::get('/regions/', 'Front\Ad\Country@getList')->name('countries');
@@ -80,15 +82,6 @@ Route::get('/{category}/{subcategory}', 'Front\Ad\Category@page')->name('sub_cat
  * ******************************* ADMIN PART ************************************
  * *******************************************************************************
  */
-
-//
-Route::get('/category', function () {
-    return view('front.ad.category');
-})->name('category');
-
-Route::get('/search', function () {
-    return view('front.ad.search');
-})->name('search');
 
 //Auth::routes();
 

@@ -3,7 +3,9 @@
 namespace App\Widgets\Front;
 
 use App\AdCategory;
+use App\AdCity;
 use Arrilot\Widgets\AbstractWidget;
+use Illuminate\Support\Facades\Request;
 
 class Search extends AbstractWidget
 {
@@ -13,10 +15,14 @@ class Search extends AbstractWidget
      * @var array
      */
     protected $config = [
-        'search_term' => [],
+        'search_term' => '',
         'categories' => [],
+        'category_id' => [],
         'subcategories' => [],
-        'city' => []
+        'subcategory_id' => 0,
+        'city' => '',
+        'city_id' => 0,
+        'action' => ''
     ];
 
     /**
@@ -25,16 +31,32 @@ class Search extends AbstractWidget
      */
     public function run()
     {
+        $request = request();
 
-        $categories = AdCategory::where('parent_id', '0')->get();
+        $this->config['search_term'] = $request->get('s');
 
-        foreach ($categories as $category) {
-            $this->config['categories'][] = [
-                'id' => $category->id,
-                'name' => $category->name,
-            ];
+        if ($request->get('cat_id')) {
+            $this->config['category_id'] = $request->get('cat_id');
+
+            $this->config['subcategories'] = AdCategory::where('parent_id', $request->get('cat_id'))
+                ->get(['id', 'name'])->toArray();
+
+            $this->config['subcategory_id'] = $request->get('sub_cat_id');
         }
 
+        if ($request->get('city_id')) {
+            $city = AdCity::find($request->get('city_id'));
+            $this->config['city_id'] = $city->id;
+            $this->config['city'] = $city->name;
+        }
+
+        $this->config['categories'] = AdCategory::where('parent_id', '0')
+            ->get(['id', 'name'])->toArray();
+
+
+
+
+        $this->config['action'] = route('ad.search');
 
         return view('widgets.front.search', [
             'config' => $this->config,
