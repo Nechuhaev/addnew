@@ -17,13 +17,6 @@ class AdminPageController extends Controller
         return view('admin.index');
     }
 
-    public function ads() {
-        return view('admin.empty');
-    }
-
-    public function ad() {
-        return view('admin.empty');
-    }
 
 
     public function pages() {

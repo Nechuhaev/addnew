@@ -29,4 +29,24 @@ class Ad extends Controller
             'ad' => $ad
         ]);
     }
+
+    public function create_step_1(Request $request = null) {
+        if ($request) {
+
+        }
+
+        return view();
+    }
+
+    public function  create_step_2() {
+
+    }
+
+    public function  create_step_3() {
+
+    }
+
+    public function  create_step_4() {
+
+    }
 }

@@ -5,6 +5,7 @@ namespace App;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class Ad extends Model
@@ -169,11 +170,18 @@ class Ad extends Model
         foreach ($data as $ad) {
             //$city_url_path = $ad->country_slug . '/' . $ad->region_slug . '/'. $ad->city_slug;
 
+            if (Storage::disk('s3')->exists($ad->image)) {
+                $image = Storage::disk('s3')->url($ad->image);
+            } else {
+                $image = 'http://placehold.it/300x300';
+            }
+
             $ads[] = [
                 'id' => $ad->id,
                 'name' => $ad->name,
                 'url' => route('ad.page', ['slug' => $ad->slug]),
-                'image' => $ad->image,
+                //'image' => Storage::get($ad->image),
+                'image' => $image,
                 'price' => AdCurrency::convert($ad->price),
                 'content' => Str::words(strip_tags($ad->content), 20, "..."),
                 'city' => $ad->city,

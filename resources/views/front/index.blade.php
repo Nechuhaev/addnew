@@ -6,6 +6,29 @@
             <div class="banner">
                 <img src="{{ asset('assets/front/img/banners/banner.jpg') }}" alt="">
             </div>
+            @if($categories)
+                <div class="columns">
+                @foreach($categories as $category)
+                        <div class="col">
+
+                            @foreach($category as $parent_category)
+                                <ul class="catalog">
+                                <li class="first first-64">
+                                    <img src="{{ asset($parent_category->image) }}" alt="" class="catalog-img">
+                                    <a href="https://addnew.biz/transport/">{{ $parent_category->name }}</a>
+                                </li>
+                                @if($parent_category->children->count())
+                                    @foreach($parent_category->children as $child)
+                                    <li><a href="{{ $child->url }}">{{ $child->name }}</a></li>
+                                    @endforeach
+                                @endif
+                                </ul>
+                            @endforeach
+                            </ul>
+                        </div>
+                @endforeach
+                </div>
+            @endif
             <div class="columns">
                 <div class="col">
                     <ul class="catalog">

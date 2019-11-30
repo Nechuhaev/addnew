@@ -90,23 +90,15 @@ class AdCategory extends Model
     }
 
     public function getUrlAttribute() {
-        if ($this->parent()) {
+        if ($this->parent) {
             $url = route('sub_category.page', [
-                'category' => $this->parent()->slug,
+                'category' => $this->parent->slug,
                 'subcategory' => $this->slug
                 ]);
         } else {
             $url = route('category.page', ['category' => $this->slug]);
         }
         return $url;
-    }
-
-    public function parent() {
-        if ($this->parent_id) {
-            return AdCategory::find($this->parent_id);
-        } else {
-            return false;
-        }
     }
 
     /**
@@ -116,5 +108,13 @@ class AdCategory extends Model
     public function ads()
     {
         return $this->hasMany(Ad::class, 'category_id');
+    }
+
+    public function children() {
+        return $this->hasMany(AdCategory::class, 'parent_id');
+    }
+
+    public function parent() {
+        return $this->belongsTo(AdCategory::class, 'parent_id');
     }
 }

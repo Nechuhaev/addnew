@@ -12,10 +12,13 @@ class Category extends Controller
 {
     public function page($category, $subcategory = null) {
 
+
         if ($subcategory) {
             $category = $subcategory;
         }
         $entity = AdCategory::where('slug', $category)->first();
+
+        //dd($category);
 
         $results = Ad::getAds()->where('ad_categories.id', $entity->id)
             ->paginate(15);

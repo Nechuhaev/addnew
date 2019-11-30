@@ -1,5 +1,9 @@
 @extends('front.layout')
 
+@section('load-scripts')
+    <script type="text/javascript" charset="UTF-8" src="https://maps.googleapis.com/maps/api/js?language=ru&region=RU&key=AIzaSyDfdB0wmym_DAbmbgubW-Tm3ivVN_ZCJMw&ver=3.0"></script>
+@endsection
+
 @section('content')
     <main class="adv-page">
         <div class="container">
@@ -109,7 +113,10 @@
                     <div class="adv-location">
                         <div class="adv-h">Расположение:</div>
 
-                        <div class="map" style="background-image: url('{{ asset('assets/front/img/map.jpg') }}');"></div>
+
+                        <div id="map" style="display: block; position: relative; overflow: hidden; min-height: 300px"></div>
+
+
                     </div>
                     <div class="adv-callback">
                         <div class="adv-h">Связь:</div>
@@ -181,4 +188,10 @@
             </div>
         </div> <!-- container -->
     </main>
+@endsection
+
+@section('script')
+    <script>
+        init_google_map('Украина, Киев', '2');
+    </script>
 @endsection

@@ -30,7 +30,7 @@ class AdCategories extends AbstractWidget
             $this->config['categories'][] = [
                 'name' => $category->name,
                 'url' => $category->url,
-                'image' => $category->image
+                'image' => asset($category->image)
             ];
         }
 

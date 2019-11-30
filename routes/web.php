@@ -70,9 +70,7 @@ Route::get('/regions/{country}', 'Front\Ad\Country@page')->name('country.page');
 Route::get('/regions/{country}/{region}', 'Front\Ad\Region@page')->name('region.page');
 Route::get('/regions/{country}/{region}/{city}', 'Front\Ad\City@page')->name('city.page');
 
-// Категории объявлений
-Route::get('/{category}', 'Front\Ad\Category@page')->name('category.page');
-Route::get('/{category}/{subcategory}', 'Front\Ad\Category@page')->name('sub_category.page');
+
 
 
 
@@ -178,3 +176,8 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::get('/adSenseBlocks', 'AdminPageController@adSenseBlocks')->name('admin.adSenseBlocks');
     Route::get('/adSenseBlock', 'AdminPageController@adSenseBlock')->name('admin.adSenseBlock');
 });
+
+
+// Категории объявлений
+Route::get('/{category}', 'Front\Ad\Category@page')->name('category.page');
+Route::get('/{category}/{subcategory}', 'Front\Ad\Category@page')->name('sub_category.page');
