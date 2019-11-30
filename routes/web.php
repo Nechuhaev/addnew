@@ -71,6 +71,21 @@ Route::get('/regions/{country}/{region}', 'Front\Ad\Region@page')->name('region.
 Route::get('/regions/{country}/{region}/{city}', 'Front\Ad\City@page')->name('city.page');
 
 
+// Добавление объявлений
+// step 1
+Route::get('/create-listing/', 'Front\Ad\Ad@create_step_category')->name('ad.step.category');
+Route::post('/create-listing/', 'Front\Ad\Ad@create_step_category')->name('ad.create.step.category');
+
+// step 2
+Route::get('/create-listing/details/', 'Front\Ad\Ad@create_step_details')->name('ad.step.details');
+Route::post('/create-listing/details/', 'Front\Ad\Ad@create_step_details')->name('ad.create.step.details');
+
+// step 3
+Route::get('/create-listing/preview/', 'Front\Ad\Ad@create_step_preview')->name('ad.step.preview');
+Route::post('/create-listing/preview/', 'Front\Ad\Ad@create_step_preview')->name('ad.create.step.preview');
+// step 4
+Route::get('/create-listing/success/', 'Front\Ad\Ad@create_step_success')->name('ad.step.success');
+Route::post('/create-listing/success/', 'Front\Ad\Ad@create_step_success')->name('ad.create.step.success');
 
 
 
