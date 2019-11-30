@@ -1,0 +1,35 @@
+@extends('front.layout')
+
+@section('content')
+    <main class="steps-page">
+        <div class="container">
+            <div class="banner">
+                <img src="img/banners/banner-7.jpg" alt="">
+            </div>
+
+            <ul class="breadcrumb">
+                <li><a href="/">Главная</a></li>
+                <li><span>Подать объявление</span></li>
+            </ul>
+
+            <ul class="steps-row" data-steps="4">
+                <li class="steps-done">Категория</li>
+                <li class="steps-done">Детали</li>
+                <li class="steps-done">Предпросмотр</li>
+                <li class="steps-done">Спасибо</li>
+            </ul>
+            <div class="steps-content" id="step-4">
+                <h2>Объявление принято</h2>
+                <p>Спасибо за то, что пользуетесь нашим сайтом!</p>
+                <div class="buttons">
+                    <a href="#" class="btn btn-step">На главную</a>
+                    <a href="#" class="btn btn-step">К объявлению</a>
+                </div>
+            </div>
+
+
+
+
+        </div> <!-- container -->
+    </main>
+@endsection
