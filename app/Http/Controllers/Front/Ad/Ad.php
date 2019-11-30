@@ -30,23 +30,23 @@ class Ad extends Controller
         ]);
     }
 
-    public function create_step_1(Request $request = null) {
+    public function create_step_category(Request $request = null) {
         if ($request) {
-
+            dd($request);
         }
 
-        return view();
+        return view('front.ad.create_step_1');
     }
 
-    public function  create_step_2() {
-
-    }
-
-    public function  create_step_3() {
+    public function  create_step_details() {
 
     }
 
-    public function  create_step_4() {
+    public function  create_step_preview() {
+
+    }
+
+    public function  create_step_success() {
 
     }
 }
