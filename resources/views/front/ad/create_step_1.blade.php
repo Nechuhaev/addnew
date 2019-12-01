@@ -35,54 +35,48 @@
                         </div>
                     </div>
 
-                    <form class="form-step" action="#" method="post">
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul style="padding: 0 0 0 10px;margin: 0;">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
 
+                    <form class="form-step" action="{{ route('ad.create.step.category') }}" method="post">
+                        @csrf
                         <label>Выберите категорию</label>
-                        <div class="form-group">
-                            <select style="width: 100%;">
-                                <option value="-1">Выберите какую</option>
-                                <option class="level-0" value="878">Строительство и ремонт</option>
-                                <option class="level-0" value="899">Отдам даром</option>
-                                <option class="level-0" value="900">Оборудование</option>
-                                <option class="level-0" value="8">Детский мир</option>
-                                <option class="level-0" value="19">Транспорт</option>
-                                <option class="level-0" value="32">Бизнес и услуги</option>
-                                <option class="level-0" value="54">Работа</option>
-                                <option class="level-0" value="75">Недвижимость</option>
-                                <option class="level-0" value="91">Животные</option>
-                                <option class="level-0" value="104">Дом и сад</option>
-                                <option class="level-0" value="117">Электроника</option>
-                                <option class="level-0" value="130">Мода и стиль</option>
-                                <option class="level-0" value="138">Хобби, отдых и спорт</option>
-                            </select>
-                        </div>
+                        @if ($parent_categories)
+                            <div class="form-group">
+                                <select name="category" style="width: 100%;">
+                                    <option value="0">Выберите какую</option>
+                                    @foreach($parent_categories as $parent_category)
 
-                        <label>Выберите подкатегорию</label>
-                        <div class="form-group">
-                            <select style="width: 100%;">
-                                <option value="-1">Выберите какую</option>
-                                <option class="level-0" value="880">Строительные материалы</option>
-                                <option class="level-0" value="881">Отделочные и облицовочные материалы</option>
-                                <option class="level-0" value="882">Окна</option>
-                                <option class="level-0" value="883">Двери</option>
-                                <option class="level-0" value="884">Замки и фурнитура</option>
-                                <option class="level-0" value="885">Балконы</option>
-                                <option class="level-0" value="886">Лестницы</option>
-                                <option class="level-0" value="887">Ворота и заборы</option>
-                                <option class="level-0" value="888">Сантехника</option>
-                                <option class="level-0" value="889">Отопление</option>
-                                <option class="level-0" value="890">Электрика</option>
-                                <option class="level-0" value="892">Насосы</option>
-                                <option class="level-0" value="891">Вентиляционные системы</option>
-                                <option class="level-0" value="893">Готовые конструкции</option>
-                                <option class="level-0" value="894">Металлоконструкции</option>
-                                <option class="level-0" value="895">Инструменты</option>
-                                <option class="level-0" value="896">Другое</option>
-                                <option class="level-0" value="897">Аренда</option>
-                            </select>
-                        </div>
+                                        <option
+                                                {{ ($selected_parent_id == $parent_category['id']) ? 'selected' : '' }}
+                                                value="{{ $parent_category['id'] }}">{{ $parent_category['name'] }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        @endif
 
-                        <div class="form-action">
+                        <div class="form-group sub-category">
+                            @if($children_categories)
+                                <select name="sub_category" id="ad_sub_category" style="width: 100%" onchange="select_ad_category();">
+                                    <option value="0">Выберите какую</option>
+                                    @foreach($children_categories as $children_category)
+                                        <option {{ ($selected_child_id == $children_category['id']) ? 'selected' : '' }}
+                                                value="{{ $children_category['id'] }}">{{ $children_category['name'] }}</option>
+                                    @endforeach
+                                </select>
+
+                            @endif
+                        </div>
+                        <div class="form-action step-submit {{ (!isset($selected_parent_id)) ? 'hidden' : '' }}">
+                            <input type="hidden" name="category_id" id="ad_category_id" value="{{ $selected_child_id ?? $selected_parent_id  ?? '0'}}">
                             <input type="submit" class="btn btn-step" value="Дальше">
                         </div>
                     </form>
@@ -148,11 +142,44 @@
                 </div>
             </div>
         </div>
-
-
-
-
-
     </div> <!-- container -->
 </main>
+@endsection
+
+@section('script')
+    <script>
+        $('[name=category]').on('change', function(){
+            // Запрос на получение подкатегорий
+            var value = $(this).val();
+
+            var sub_categories = '<select name="sub_category" id="ad_sub_category" onchange="select_ad_category();"><option value="0">Выберите какую</option>';
+
+            $.getJSON("/api/ad/category/children/" + value, function ( data ) {
+
+                if (data.data.length) {
+                    $.each( data.data, function ( key, val ) {
+                        sub_categories += "<option value='" + val.id + "'>" + val.name + "</option>";
+                    } )
+                    sub_categories += "</select>";
+                    $('.sub-category').html(sub_categories);
+
+                    $('.sub-category select').select2({
+                        width: '100%'
+                    })
+                    $('.sub-category').prop('disabled', false);
+                    $('.step-submit').addClass('hidden');
+                    $('#ad_category_id').val(0);
+                } else {
+                    $('.sub-category').html("");
+                    $('#ad_category_id').val(value);
+                    $('.step-submit').removeClass('hidden');
+                }
+            });
+        })
+
+        function select_ad_category() {
+            $('#ad_category_id').val($('#ad_sub_category').val());
+            $('.step-submit').removeClass('hidden');
+        }
+    </script>
 @endsection
