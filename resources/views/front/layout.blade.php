@@ -12,6 +12,8 @@
     <link href="{{ asset('assets/front/css/start.min.css') }}" rel="stylesheet">
     <!-- Styles -->
     <link rel="stylesheet" href="{{ asset('assets/front/css/style.min.css') }}" media="all">
+
+    @yield('style')
 </head>
 <body class=""> <!-- fixed -->
 <div class="debugGrid">
@@ -225,7 +227,6 @@
 @yield('load-scripts')
 
 @yield('script')
-
 
 </body>
 </html>

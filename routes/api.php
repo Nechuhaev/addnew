@@ -27,6 +27,8 @@ Route::get('/user/autocomplete/{search?}', 'API\User@autocomplete');
 Route::get('/ad/countries', 'API\Ad\Country@all');
 Route::get('/ad/country/{id}', 'API\Ad\Country@show')->name('api.country');
 
+Route::get('/ad/region/{id}', 'API\Ad\Region@show');
+
 Route::fallback(function () {
     return response()->json(['message' => 'Query route not found.'], 404);
 });

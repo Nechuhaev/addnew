@@ -16,7 +16,8 @@ class Region extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->name
+            'name' => $this->name,
+            'cities' => City::collection($this->cities)
         ];
     }
 }

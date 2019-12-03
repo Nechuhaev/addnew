@@ -152,7 +152,7 @@ class Ad extends Model
      */
     public function category()
     {
-        return $this->belongsTo(AdCategory::class, 'category_id');
+        return $this->belongsTo(AdCategory::class, 'category_id') ?? null;
     }
 
     /**
