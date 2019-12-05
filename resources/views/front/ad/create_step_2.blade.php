@@ -8,7 +8,7 @@
             </div>
 
             <ul class="breadcrumb">
-                <li><a href="/">Главная</a></li>
+                <li><a href="{{ route('index') }}">Главная</a></li>
                 <li><span>Детали</span></li>
             </ul>
 
