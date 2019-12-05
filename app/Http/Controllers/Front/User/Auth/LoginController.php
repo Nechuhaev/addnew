@@ -27,7 +27,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/profile/ads';
+    //protected $redirectTo = '/profile/ads';
 
     /**
      * Create a new controller instance.
@@ -80,6 +80,19 @@ class LoginController extends Controller
         throw ValidationException::withMessages([
             $this->username() => [trans('user/login.failed')],
         ]);
+    }
+
+    /**
+     * @return string
+     */
+    public function redirectTo() : string
+    {
+        if (session()->has('ad')) {
+            $redirectTo = '/create-listing/preview';
+        } else {
+            $redirectTo = '/profile/ads';
+        }
+        return $redirectTo;
     }
 
 }

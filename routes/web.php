@@ -83,6 +83,7 @@ Route::post('/create-listing/details/', 'Front\Ad\Ad@create_step_details')->name
 // step 3
 Route::get('/create-listing/preview/', 'Front\Ad\Ad@create_step_preview')->name('ad.step.preview');
 Route::post('/create-listing/preview/', 'Front\Ad\Ad@create_step_preview')->name('ad.create.step.preview');
+Route::get('/create-listing/creating/', 'Front\Ad\Ad@add')->name('ad.step.creating');
 // step 4
 Route::get('/create-listing/success/', 'Front\Ad\Ad@create_step_success')->name('ad.step.success');
 Route::post('/create-listing/success/', 'Front\Ad\Ad@create_step_success')->name('ad.create.step.success');

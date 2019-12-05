@@ -7,11 +7,18 @@ use App\AdCity;
 use App\AdCountry;
 use App\AdCurrency;
 use App\AdRegion;
+use App\AdTag;
 use App\Http\Controllers\Controller;
 
+use App\Http\Controllers\Front\User\Auth\RegisterController;
+use App\Mail\UserPasswordDetails;
+use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class Ad extends Controller
 {
@@ -100,7 +107,7 @@ class Ad extends Controller
                 'telephone' => 'required|min:6',
                 'city_id' => 'required|exists:ad_cities,id',
                 'email' => 'sometimes|required|email',
-                'name' => 'required|min:10',
+                'name' => 'required|min:6',
                 'content' => 'required|min:70',
                 'image' => 'required',
                 'image.*' => 'image|max:1024|mimes:jpg,jpeg,bmp,png',
@@ -253,11 +260,173 @@ class Ad extends Controller
         return view('front.ad.create_step_2')->with($data);
     }
 
-    public function  create_step_preview() {
+    public function  create_step_preview(Request $request)
+    {
+        if (!$request->session()->has('ad')) {
+            return redirect(route('ad.step.details'));
+        }
 
+        $ad = $request->session()->get('ad');
+
+        $data['preview']['name'] = $ad['name'];
+        $data['preview']['author'] = (Auth::check()) ? Auth::user()->username : $ad['author'];
+        $data['preview']['telephone'] = $ad['telephone'];
+        $data['preview']['email'] = (Auth::check()) ? Auth::user()->email : $ad['email'];
+        $data['preview']['content'] = $ad['content'];
+        $data['preview']['city'] = AdCity::find($ad['city_id']);
+
+
+        $currencies = AdCurrency::all();
+
+
+        $data['preview']['currencies'] = $currencies;
+
+        $price = 0;
+        if ($ad['price']) {
+            foreach ($currencies as $currency) {
+                if ($currency->id == $ad['currency_id']) {
+                    $price = (float)$ad['price'] * (float)$currency->rate;
+                }
+            }
+        }
+
+
+        $data['preview']['prices'] = [];
+        if ($price) {
+            foreach ($currencies as $currency) {
+                if ($price) {
+                    $data['preview']['prices'][] = [
+                        'currency' => $currency['code'],
+                        'symbol' => $currency['symbol'],
+                        'value' => (int) ($price / $currency['rate']),
+                        'selected' => ($currency->id == $ad['currency_id'])
+                    ];
+                }
+            }
+        }
+
+
+        $data['preview']['image'] = '';
+        $data['preview']['images'] = [];
+
+        foreach ($ad['images'] as $key => $image) {
+            if ($key == 1) {
+                $data['preview']['image'] = asset('storage/' . $image);
+            } else {
+                $data['preview']['images'][] = asset('storage/' . $image);
+            }
+        }
+
+        return view('front.ad.create_step_3')->with($data);
     }
 
     public function  create_step_success() {
-
+        return view('front.ad.create_step_4');
     }
+
+    public function add(Request $request) {
+        if (!$request->session()->has('ad')) {
+            return redirect(route('ad.step.details'));
+        }
+
+
+        $ad = $request->session()->get('ad');
+        $ad['email'] = (Auth::check()) ? Auth::user()->email : $ad['email'];
+        $ad['author'] = (Auth::check()) ? Auth::user()->username : $ad['author'];
+
+        $validator = Validator::make($ad, [
+            'category_id' => 'required|integer|exists:ad_categories,id',
+            'author' => 'sometimes|required|min:3',
+            'telephone' => 'required|min:6',
+            'city_id' => 'required|exists:ad_cities,id',
+            'email' => 'required|required|email',
+            'name' => 'required|min:6',
+            'content' => 'required|min:70',
+            'images' => 'required',
+            'price' => 'required|numeric',
+            'currency_id' => 'required|integer|exists:ad_currencies,id',
+        ]);
+
+        if (!$validator->fails()) {
+            // Зарегистрируем юзера
+            if (!Auth::check()) {
+                $user = User::where('email', $ad['email'])->first();
+                if (!$user) {
+                    // User password
+                    $custom_password = Str::random(8);
+
+                    // Notify user
+                    Mail::to($ad['email'])->send(new UserPasswordDetails($ad['email'], $custom_password));
+
+                    // Register user
+                    $user = User::create([
+                        'email' => $ad['email'],
+                        'password' => Hash::make($custom_password),
+                    ]);
+                } else {
+                    return response()->json([
+                        'auth' => 'required',
+                    ]);
+                }
+            } else {
+                $user = Auth::user();
+            }
+
+            // Добавить объявление
+            $ad['user_id'] = $user->id;
+            $ad['name'] = strip_tags($ad['name']);
+            $ad['slug'] = null;
+            $ad['content'] = strip_tags($ad['content']);
+            $ad['price'] = (float)$ad['price'];
+            $ad['telephone'] = strip_tags($ad['telephone']);
+            $ad['email'] = strip_tags($ad['email']);
+
+            $disk = Storage::disk('s3');
+
+            $images = [];
+            foreach ($ad['images'] as $key => $image) {
+                if ($key == 0) {
+                    $ad['image'] = $image;
+                } else {
+                    $images[] = $image;
+                }
+                if (!$disk->exists($image)) {
+                    $disk->put($image, Storage::get('public/'. $image), 'public');
+                }
+            }
+            $ad['images'] = $images;
+
+            $ad_model = \App\Ad::create($ad);
+
+            // Сохранить теги
+            $all_tags = array_unique(array_map('trim', explode(',', $ad['tags'])));
+            $not_existing_tags = $all_tags;
+            $existing_tags = AdTag::whereIn('name', $all_tags)->get();
+
+            foreach ($existing_tags as $existing_tag) {
+                if (($key = array_search($existing_tag->name, $not_existing_tags)) !== false) {
+                    unset($not_existing_tags[$key]);
+                }
+            }
+
+            foreach ($not_existing_tags as $not_existing_tag) {
+                AdTag::create(['name' => $not_existing_tag, 'slug' => null]);
+            }
+
+            $tags_to_attach = AdTag::whereIn('name', $all_tags)->pluck('id')->toArray();
+
+            if ($tags_to_attach) {
+                $ad_model->tags()->attach($tags_to_attach);
+            }
+
+//            $request->session()->remove('ad');
+
+            return response()->json(['redirect' => route('ad.step.success')]);
+
+            // Перенаправить на шаг 4
+        } else {
+            return response()->json(['errors' => $validator->errors()]);
+        }
+    }
+
 }

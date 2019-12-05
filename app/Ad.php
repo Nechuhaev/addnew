@@ -120,7 +120,7 @@ class Ad extends Model
         }
     }
 
-    public function getSlugAttribute($slug) {
+    public function getUrlAttribute($slug) {
         return 'ads/' . $slug;
     }
 

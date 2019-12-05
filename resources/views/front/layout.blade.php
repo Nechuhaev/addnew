@@ -173,9 +173,10 @@
     </div>
 </footer>
 <div class="toTop"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/arrow-up-alt2.svg') }}" /></div>
-<div id="subscribe-shadow">
-    <div class="subscribe-wrap">
-        <button id="subscribe-close" class="modal-close">
+
+<div id="subscribe-modal" class="modal">
+    <div class="modal-wrap">
+        <button class="close" onclick="modal.close()">
             <img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/no-alt.svg') }}" />
         </button>
 
@@ -193,12 +194,11 @@
                 <label>Ваша электронная почта <span class="star">*</span></label>
                 <input type="text" class="form-control">
             </div>
-            <button class="btn btn-subscribe btn-submit">Подписаться</button>
+            <button class="btn btn-subscribe btn-submit">Авторизоваться</button>
         </div>
-
-
     </div>
 </div>
+
 
 <div class="backdrop"></div>
 

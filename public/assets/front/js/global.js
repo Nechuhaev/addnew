@@ -13,6 +13,21 @@ var options = {
         }
     }
 };
+
+var modal = {
+    el: '',
+    set: function (id) {
+        this.el = $('#' + id);
+        return this;
+    },
+    show: function () {
+        this.el.addClass('displayed');
+    },
+    close: function () {
+        $('.modal').removeClass('displayed');
+    }
+}
+
 $("#autocomplete_c").easyAutocomplete(options);
 
 // Подтягиваем категорию при выборе родительской для поиска
