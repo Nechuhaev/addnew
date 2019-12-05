@@ -419,7 +419,7 @@ class Ad extends Controller
                 $ad_model->tags()->attach($tags_to_attach);
             }
 
-//            $request->session()->remove('ad');
+            $request->session()->remove('ad');
 
             return response()->json(['redirect' => route('ad.step.success')]);
 

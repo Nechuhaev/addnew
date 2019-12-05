@@ -131,7 +131,7 @@
                         <a href="{{ route('register') }}" rel="nofollow" class="header-link link-register">Регистрация</a>
                         <a href="{{ route('login') }}" rel="nofollow" class="header-link link-login">Вход</a>
                     @endif
-                        <a href="/create-advert.html" class="btn btn-advert"><i class="icon icon-plus"></i> Подать объявление</a>
+                        <a href="{{ route('ad.step.category') }}" class="btn btn-advert"><i class="icon icon-plus"></i> Подать объявление</a>
 
                 </div>
 
