@@ -16,9 +16,11 @@ use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class Ad extends Controller
 {
@@ -100,6 +102,22 @@ class Ad extends Controller
             $errors = [
                 'author.required' => 'Введите имя автора объявления',
                 'author.min' => 'Имя автора не может быть короче :min символов',
+                'telephone.required' => 'Введите номер телефона',
+                'telephone.min' => 'Номер телефона не может быть короче :min символов',
+                'city_id.required' => 'Выберите страну, регион и город!',
+                'city_id.exists' => 'Ошибка выбора города.',
+                'email.required' => 'Введите свой email!',
+                'email.email' => 'Введите свой email!',
+                'name.required' => 'Введите название объявления!',
+                'name.min' => 'Минимальная длина названия объявления не может быть короче :min символов',
+                'content.required' => 'Введите описание объявления!',
+                'content.min' => 'Минимальная длина описания не может быть короче :min символов',
+                'image.required' => 'Выберите минимум одно изображение!',
+                'image.*.image' => 'Недопустимый формат изображения!',
+                'image.*.mimes' => 'Недопустимый формат изображения!',
+                'image.*.max' => 'Недопустимый размер файла. Максимально доступный размер :min байт',
+                'price.*' => 'Введите цену товара / услуги или установите 0, если оно бесплатно!',
+                'currency_id.*' => 'Выберите валюту из списка!',
             ];
 
             $request->validate([
@@ -310,7 +328,7 @@ class Ad extends Controller
         $data['preview']['images'] = [];
 
         foreach ($ad['images'] as $key => $image) {
-            if ($key == 1) {
+            if ($key == 0) {
                 $data['preview']['image'] = asset('storage/' . $image);
             } else {
                 $data['preview']['images'][] = asset('storage/' . $image);
@@ -334,6 +352,29 @@ class Ad extends Controller
         $ad['email'] = (Auth::check()) ? Auth::user()->email : $ad['email'];
         $ad['author'] = (Auth::check()) ? Auth::user()->username : $ad['author'];
 
+
+        $errors = [
+            'author.required' => 'Введите имя автора объявления',
+            'author.min' => 'Имя автора не может быть короче :min символов',
+            'telephone.required' => 'Введите номер телефона',
+            'telephone.min' => 'Номер телефона не может быть короче :min символов',
+            'city_id.required' => 'Выберите страну, регион и город!',
+            'city_id.exists' => 'Ошибка выбора города.',
+            'email.required' => 'Введите свой email!',
+            'email.email' => 'Введите свой email!',
+            'name.required' => 'Введите название объявления!',
+            'name.min' => 'Минимальная длина названия объявления не может быть короче :min символов',
+            'content.required' => 'Введите описание объявления!',
+            'content.min' => 'Минимальная длина описания не может быть короче :min символов',
+            'image.required' => 'Выберите минимум одно изображение!',
+            'image.*.image' => 'Недопустимый формат изображения!',
+            'image.*.mimes' => 'Недопустимый формат изображения!',
+            'image.*.max' => 'Недопустимый размер файла. Максимально доступный размер :min байт',
+            'price.*' => 'Введите цену товара / услуги или установите 0, если оно бесплатно!',
+            'currency_id.*' => 'Выберите валюту из списка!',
+        ];
+
+
         $validator = Validator::make($ad, [
             'category_id' => 'required|integer|exists:ad_categories,id',
             'author' => 'sometimes|required|min:3',
@@ -345,7 +386,7 @@ class Ad extends Controller
             'images' => 'required',
             'price' => 'required|numeric',
             'currency_id' => 'required|integer|exists:ad_currencies,id',
-        ]);
+        ], $errors);
 
         if (!$validator->fails()) {
             // Зарегистрируем юзера
@@ -363,6 +404,8 @@ class Ad extends Controller
                         'email' => $ad['email'],
                         'password' => Hash::make($custom_password),
                     ]);
+
+                    Auth::login($user);
                 } else {
                     return response()->json([
                         'auth' => 'required',
@@ -420,6 +463,8 @@ class Ad extends Controller
             }
 
             $request->session()->remove('ad');
+
+            $request->session()->push('ad_id', $ad_model->id);
 
             return response()->json(['redirect' => route('ad.step.success')]);
 
