@@ -15,10 +15,14 @@ class CreateAdsTable extends Migration
     {
         Schema::create('ads', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer('category_id');
-            $table->integer('city_id');
-            $table->integer('user_id');
-            $table->integer('currency_id');
+            $table->unsignedInteger('category_id');
+            $table->foreign('category_id')->references('id')->on('ad_categories');
+            $table->unsignedInteger('city_id');
+            $table->foreign('city_id')->references('id')->on('ad_cities');
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users');
+            $table->unsignedSmallInteger('currency_id');
+            $table->foreign('currency_id')->references('id')->on('ad_currencies');
             $table->string('image');
             $table->string('images')->nullable();
             $table->string('name', 255);
@@ -35,6 +39,10 @@ class CreateAdsTable extends Migration
             $table->integer('bad_rating')->default(0);
             $table->timestamp('date_active')->useCurrent();
             $table->timestamps();
+
+            $table->index(['city_id', 'id'])->unique();
+            $table->index(['category_id', 'id'])->unique();
+
         });
     }
 

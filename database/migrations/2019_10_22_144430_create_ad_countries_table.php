@@ -14,7 +14,7 @@ class CreateAdCountriesTable extends Migration
     public function up()
     {
         Schema::create('ad_countries', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->smallIncrements('id');
             $table->string('name', 255);
             $table->string('image', 255);
             $table->string('slug', 255);

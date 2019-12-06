@@ -58,50 +58,12 @@ class Ad extends Model
     }
 
     /**
-     * Ссылка на основное их
-     */
-    function getImageAttribute() {
-        $s3 = Storage::disk('s3');
-        if ($s3->exists($this->attributes['image'])) {
-            return $s3->url($this->attributes['image']);
-        } else {
-            $local = Storage::disk('local');
-            if ($local->exists($this->attributes['image'])) {
-                return $local->url($this->attributes['image']);
-            } else {
-                return 'http://placehold.it/200x200';
-            }
-        }
-    }
-
-    /**
      * Дополнительные изображения загружаем как массив
      * @param $value
      * @return array
      */
     public function getImagesAttribute($value) {
-        $images = [];
-
-        $s3 = Storage::disk('s3');
-        $local = Storage::disk('local');
-
-        if ($this->attributes['images']) {
-
-            foreach (explode(', ', $this->attributes['images']) as $image) {
-                if ($s3->exists($image)) {
-                    $_image = $s3->url($image);
-                } else {
-                    if ($local->exists($image)) {
-                        $_image = $local->url($image);
-                    } else {
-                        $_image = 'http://placehold.it/200x200';
-                    }
-                }
-                $images[] = $_image;
-            }
-        }
-
-        return $images;
+        return explode(', ', $this->attributes['images']);
 
     }
 

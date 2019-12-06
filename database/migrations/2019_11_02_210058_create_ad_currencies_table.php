@@ -14,7 +14,7 @@ class CreateAdCurrenciesTable extends Migration
     public function up()
     {
         Schema::create('ad_currencies', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->smallIncrements('id');
             $table->string('name', 50);
             $table->float('rate');
             $table->string('code', 3);

@@ -14,8 +14,12 @@ class CreateAdTagTable extends Migration
     public function up()
     {
         Schema::create('ad_tag', function (Blueprint $table) {
-            $table->integer('ad_id');
-            $table->integer('tag_id');
+            $table->unsignedBigInteger('ad_id');
+            $table->foreign('ad_id')->references('id')->on('ads');
+            $table->unsignedBigInteger('tag_id');
+            $table->foreign('tag_id')->references('id')->on('ad_tags');
+
+            $table->index(['tag_id', 'ad_id'])->unique();
         });
     }
 

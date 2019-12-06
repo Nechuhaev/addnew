@@ -14,8 +14,9 @@ class CreateAdRegionsTable extends Migration
     public function up()
     {
         Schema::create('ad_regions', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->integer('country_id')->unsigned();
+            $table->increments('id');
+            $table->unsignedSmallInteger('country_id');
+            $table->foreign('country_id')->references('id')->on('ad_countries');
             $table->string('name', 255);
             $table->string('slug', 255);
             $table->text('content')->nullable();
@@ -23,6 +24,8 @@ class CreateAdRegionsTable extends Migration
             $table->string('meta_description', 255)->nullable();
             $table->integer('sort_order')->default(0)->nullable();
             $table->timestamps();
+
+            $table->index('country_id')->unique();
         });
     }
 

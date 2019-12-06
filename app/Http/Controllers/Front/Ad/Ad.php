@@ -456,15 +456,18 @@ class Ad extends Controller
 
             $images = [];
             foreach ($ad['images'] as $key => $image) {
-                if ($key == 0) {
-                    $ad['image'] = $image;
-                } else {
-                    $images[] = $image;
-                }
+
                 if (!$disk->exists($image)) {
                     $disk->put($image, Storage::get('public/'. $image), 'public');
                 }
+
+                if ($key == 0) {
+                    $ad['image'] = $disk->url($image);
+                } else {
+                    $images[] = $disk->url($image);;
+                }
             }
+
             $ad['images'] = $images;
 
             $ad_model = \App\Ad::create($ad);
