@@ -176,7 +176,7 @@
     <script>
         function create_ad() {
             $('.btn-publish').css('opacity', '0.7');
-            $.getJSON('http://addnew.loc/create-listing/creating/', function(data) {
+            $.getJSON('{{ route('ad.step.creating') }}', function(data) {
                 console.log(data);
                 if (data.auth == "required") {
                     modal.set('login-modal').show();
