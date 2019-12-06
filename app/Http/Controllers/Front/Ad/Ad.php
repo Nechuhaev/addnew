@@ -24,9 +24,13 @@ use Illuminate\Support\Str;
 
 class Ad extends Controller
 {
+    /**
+     * Страница объявления
+     * @param $ad
+     * @return $this
+     */
     public function page($ad) {
         $ad = \App\Ad::where('slug', '=', $ad)->first();
-
 
         // Обновляем счетчик просмотров объявлений
         // Просмотры сегодня
@@ -45,6 +49,11 @@ class Ad extends Controller
         ]);
     }
 
+    /**
+     * Шаг 1 добавления объявления
+     * @param Request $request
+     * @return $this|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
     public function create_step_category(Request $request) {
 
         // Валидация, сохранение данных и переход к следующему шагу
@@ -90,6 +99,11 @@ class Ad extends Controller
         return view('front.ad.create_step_1')->with($data);
     }
 
+    /**
+     * Шаг 2 Добавления объявления
+     * @param Request $request
+     * @return $this
+     */
     public function  create_step_details(Request $request) {
 
         // Значения по умолчанию
@@ -278,6 +292,11 @@ class Ad extends Controller
         return view('front.ad.create_step_2')->with($data);
     }
 
+    /**
+     * Шаг 3 Добавления объявления
+     * @param Request $request
+     * @return $this|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
     public function  create_step_preview(Request $request)
     {
         if (!$request->session()->has('ad')) {
@@ -338,10 +357,19 @@ class Ad extends Controller
         return view('front.ad.create_step_3')->with($data);
     }
 
+    /**
+     * Шаг 4 Добавления объявления
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function  create_step_success() {
         return view('front.ad.create_step_4');
     }
 
+    /**
+     * Обработчик формы создания объявления
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
     public function add(Request $request) {
         if (!$request->session()->has('ad')) {
             return redirect(route('ad.step.details'));
@@ -468,10 +496,8 @@ class Ad extends Controller
 
             return response()->json(['redirect' => route('ad.step.success')]);
 
-            // Перенаправить на шаг 4
         } else {
             return response()->json(['errors' => $validator->errors()]);
         }
     }
-
 }

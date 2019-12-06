@@ -133,15 +133,12 @@ class User extends Authenticatable
 
     public function getUsernameAttribute() {
         if ($this->firstname) {
-            $username = $this->firstname . ' ' . $this->lastname;
+            $username = trim($this->firstname . ' ' . $this->lastname);
+            return $username;
         }
 
-        if (trim($username)) {
-            return $username;
-        } else {
-            $username = explode('@', $this->email);
-            return $username[0];
-        }
+        $username = explode('@', $this->email);
+        return $username[0];
     }
 
     public function ads() {

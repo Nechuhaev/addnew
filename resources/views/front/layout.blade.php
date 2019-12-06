@@ -37,7 +37,7 @@
 <div class="nav-mobile"> <!-- open -->
     <div class="nav-top">
         <div class="header-logo">
-            <a href="/main.html"><img src='{{ asset('assets/front/img/logo.png') }}' alt=""></a>
+            <a href="{{ route('index') }}"><img src='{{ asset('assets/front/img/logo.png') }}' alt=""></a>
         </div>
         <div class="btn-bars">
             <i class="icon-arrow-left">&nbsp;</i>
@@ -46,9 +46,9 @@
     <div class="nav-inner">
         <div class="nav-account">
             <span class="nav-h">Добро пожаловать, <strong>гость</strong>!</span><br>
-            <a href="/create-listing" class="header-link">Подать объявление</a><br>
+            <a href="{{ route('ad.step.category') }}" class="header-link">Подать объявление</a><br>
             <a href="/?s=&scat=0&loc_search=&sa=search" class="header-link">Поиск по объявлениям</a><br>
-            <a href="/register.html" rel="nofollow" class="header-link link-register">Регистрация</a>
+            <a href="{{ route('register') }}" rel="nofollow" class="header-link link-register">Регистрация</a>
         </div>
         <div class="nav-countries">
             <p class="nav-h">Поиск объявлений по странам</p>
@@ -111,7 +111,7 @@
                     <i class="icon-bars">&nbsp;</i>
                 </div>
                 <div class="header-logo">
-                    <a href="/main.html"><img src='{{ asset('assets/front/img/logo.png') }}' alt=""></a>
+                    <a href="{{ route('index') }}"><img src='{{ asset('assets/front/img/logo.png') }}' alt=""></a>
                 </div>
 
                 <div class="header-account">

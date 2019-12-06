@@ -57,20 +57,66 @@ class Ad extends Model
         return date('Y-m-d', strtotime($value));
     }
 
-    public function getImagesAttribute($value) {
-        return explode(', ', $value);
+    /**
+     * Ссылка на основное их
+     */
+    function getImageAttribute() {
+        $s3 = Storage::disk('s3');
+        if ($s3->exists($this->attributes['image'])) {
+            return $s3->url($this->attributes['image']);
+        } else {
+            $local = Storage::disk('local');
+            if ($local->exists($this->attributes['image'])) {
+                return $local->url($this->attributes['image']);
+            } else {
+                return 'http://placehold.it/200x200';
+            }
+        }
     }
 
+    /**
+     * Дополнительные изображения загружаем как массив
+     * @param $value
+     * @return array
+     */
+    public function getImagesAttribute($value) {
+        $images = [];
+
+        $s3 = Storage::disk('s3');
+        $local = Storage::disk('local');
+
+        if ($this->attributes['images']) {
+
+            foreach (explode(', ', $this->attributes['images']) as $image) {
+                if ($s3->exists($image)) {
+                    $_image = $s3->url($image);
+                } else {
+                    if ($local->exists($image)) {
+                        $_image = $local->url($image);
+                    } else {
+                        $_image = 'http://placehold.it/200x200';
+                    }
+                }
+                $images[] = $_image;
+            }
+        }
+
+        return $images;
+
+    }
+
+    /**
+     * Дополнительны изображения сохраняем как строку
+     * С разделителем ,
+     * @param array $value
+     */
     public function setImagesAttribute(array $value) {
 
-        //dd($value);
         $images = array_unique($value);
 
         foreach ($images as $key => $image) {
             if (!$image) unset($images[$key]);
         }
-
-        //dd($images);
 
         $this->attributes['images'] = implode(', ', $images);
     }
@@ -120,8 +166,12 @@ class Ad extends Model
         }
     }
 
-    public function getUrlAttribute($slug) {
-        return 'ads/' . $slug;
+    /**
+     * Ссылка на страницу объявления
+     * @return string
+     */
+    public function getUrlAttribute() {
+        return 'ads/' . $this->attributes['slug'];
     }
 
     /**
@@ -134,16 +184,20 @@ class Ad extends Model
     }
 
     /**
+     * Обратная связь с валютами
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function currency() {
+        return $this->belongsTo(AdCurrency::class, 'currency_id');
+    }
+
+    /**
      * Связь с тегами
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function tags()
     {
         return $this->belongsToMany('App\AdTag', 'ad_tag', 'ad_id', 'tag_id');
-    }
-
-    public function currency() {
-        return $this->belongsTo(AdCurrency::class, 'currency_id');
     }
 
     /**
@@ -164,6 +218,7 @@ class Ad extends Model
         return $this->belongsTo(AdCity::class, 'city_id');
     }
 
+
     public static function getLoopArray($data) : array
     {
         $ads = [];
@@ -180,7 +235,6 @@ class Ad extends Model
                 'id' => $ad->id,
                 'name' => $ad->name,
                 'url' => route('ad.page', ['slug' => $ad->slug]),
-                //'image' => Storage::get($ad->image),
                 'image' => $image,
                 'price' => AdCurrency::convert($ad->price),
                 'content' => Str::words(strip_tags($ad->content), 20, "..."),

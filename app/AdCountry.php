@@ -61,10 +61,16 @@ class AdCountry extends Model
         }
     }
 
+    /**
+     * Ссылка на запись страны
+     * @return string
+     */
     public function getUrlAttribute() {
+
         return route('country.page', [
             'country' => $this->slug,
         ]);
+
     }
     /**
      * Связь с областями
@@ -88,5 +94,4 @@ class AdCountry extends Model
 
         return $total_cities;
     }
-
 }

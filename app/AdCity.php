@@ -61,6 +61,10 @@ class AdCity extends Model
         }
     }
 
+    /**
+     * Ссылка на страницу города
+     * @return string
+     */
     public function getUrlAttribute() {
         return route('city.page', [
             'country' => $this->region->country->slug,
@@ -69,6 +73,10 @@ class AdCity extends Model
         ]);
     }
 
+    /**
+     * Полный путь к городу с разделителем >
+     * @return string
+     */
     public function getPathAttribute() {
         $path = [
             $this->region->country->name,

@@ -204,11 +204,12 @@ Breadcrumbs::for('ad_tag', function ($trail, $tag) {
 
 // Главная > Категория объявления
 Breadcrumbs::for('category.page', function ($trail, $category) {
-    if (!$category->parent()) {
+
+    $parent_category = $category->parent;
+    if (!$parent_category) {
         $trail->parent('index');
         $trail->push($category->name, $category->url);
     } else {
-        $parent_category = $category->parent();
         $trail->parent('category.page', $parent_category);
         $trail->push($category->name, $category->url);
     }

@@ -89,15 +89,19 @@ class AdCategory extends Model
         }
     }
 
+
     public function getUrlAttribute() {
-        if ($this->parent) {
+        $parent = $this->parent;
+
+        if ($parent) {
             $url = route('sub_category.page', [
-                'category' => $this->parent->slug,
+                'category' => $parent->slug,
                 'subcategory' => $this->slug
-                ]);
+            ]);
         } else {
             $url = route('category.page', ['category' => $this->slug]);
         }
+
         return $url;
     }
 
