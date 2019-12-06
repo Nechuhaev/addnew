@@ -4,7 +4,7 @@
     <main class="country-page">
         <div class="container">
             <div class="banner">
-                <img src="{{ asset('assets/front/img/banners/banner.jpg') }}" alt="">
+                @include('front.adsense.top')
             </div>
             <div class="columns">
                 @if($countries)

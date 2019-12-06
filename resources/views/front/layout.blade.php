@@ -223,7 +223,7 @@
 <script src="{{ asset('assets/front/js/common.js') }}"></script>
 <script src="{{ asset('assets/front/js/global.js') }}"></script>
 <script src="{{ asset('assets/front/js/maps.js') }}"></script>
-
+{{ \App\Http\AdSense::script() }}
 @yield('load-scripts')
 
 @yield('script')

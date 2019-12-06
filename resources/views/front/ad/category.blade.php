@@ -4,7 +4,7 @@
     <main class="category-page">
         <div class="container">
             <div class="banner">
-                <img src="img/banners/banner-4.jpg" alt="">
+                @include('front.adsense.top')
             </div>
 
             {{ Breadcrumbs::render($breadcrumbs, $entity) }}
@@ -12,7 +12,7 @@
             <div class="columns columns-nowrap">
                 <div class="column-content">
                     <div class="banner">
-                        <img src="img/banners/banner-5.jpg" alt="">
+                        @include('front.adsense.top-listing')
                     </div>
 
                     @include('front.loop.ads', ['ads' => $ads])
@@ -20,7 +20,7 @@
                     {!!  $links  !!}
 
                     <div class="banner">
-                        <img src="img/banners/banner-6.jpg" alt="">
+                        @include('front.adsense.bottom-listing')
                     </div>
 
 
@@ -77,7 +77,7 @@
 
 
                     <div class="banner">
-                        <img src="{{ asset('assets/front/img/banners/banner-9.jpg') }}" alt="">
+                        @include('front.adsense.category-right')
                     </div>
                     @if(isset($tags))
                         @widget('front.adTags', ['tags' => $tags])

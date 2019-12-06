@@ -4,7 +4,7 @@
     <main class="home-page">
         <div class="container">
             <div class="banner">
-                <img src="{{ asset('assets/front/img/banners/banner.jpg') }}" alt="">
+                @include('front.adsense.top')
             </div>
             @if($categories)
                 <div class="columns">

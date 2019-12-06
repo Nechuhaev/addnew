@@ -8,7 +8,7 @@
     <main class="adv-page">
         <div class="container">
             <div class="banner">
-                <img src="{{ asset('assets/front/img/banners/banner-7.jpg') }}" alt="">
+                @include('front.adsense.top')
             </div>
 
             {{ Breadcrumbs::render('ad.page', $ad) }}
@@ -46,7 +46,7 @@
                         </ul>
                     </div>
                     <div class="banner">
-                        <img src="{{ asset('assets/front/img/banners/banner-9.jpg') }}" alt="">
+                        @include('front.adsense.ad-left')
                     </div>
                     @widget('front.adTags', ['tags' => $ad->tags()->get()])
                 </aside>
@@ -108,7 +108,7 @@
                         <p>{{ $ad->content }}</p>
                     </div>
                     <div class="banner">
-                        <img src="{{ asset('assets/front/img/banners/banner-8.jpg') }}" alt="">
+                        @include('front.adsense.ad-middle')
                     </div>
                     <div class="adv-location">
                         <div class="adv-h">Расположение:</div>

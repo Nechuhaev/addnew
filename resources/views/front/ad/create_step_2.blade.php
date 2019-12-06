@@ -4,7 +4,7 @@
     <main class="steps-page">
         <div class="container">
             <div class="banner">
-                <img src="img/banners/banner-7.jpg" alt="">
+                @include('front.adsense.top')
             </div>
 
             <ul class="breadcrumb">

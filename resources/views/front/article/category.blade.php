@@ -8,7 +8,7 @@
     <main class="blog-page">
         <div class="container">
             <div class="banner">
-                <img src="{{ asset('assets/front/img/banners/banner-4.jpg') }}" alt="">
+                @include('front.adsense.top')
             </div>
 
             <ul class="breadcrumb">
@@ -19,7 +19,7 @@
             <div class="columns columns-nowrap">
                 <div class="column-content">
                     <div class="banner">
-                        <img src="{{ asset('assets/front/img/banners/banner-5.jpg') }}" alt="">
+                        @include('front.adsense.top-listing')
                     </div>
 
                     @if($articles)
@@ -51,7 +51,7 @@
                     <div class="col-6">{{ $articles->links('front.widgets.paginate') }}</div>
 
                     <div class="banner">
-                        <img src="{{ asset('assets/front/img/banners/banner-6.jpg') }}" alt="">
+                        @include('front.adsense.bottom-listing')
                     </div>
 
                     @if($category_object->content ?? null)

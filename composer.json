@@ -43,7 +43,7 @@
             "App\\": "app/"
         },
         "files": [
-            "app/Http/helpers.php"
+            "app/Http/AdSense.php"
         ],
         "classmap": [
             "database/seeds",
