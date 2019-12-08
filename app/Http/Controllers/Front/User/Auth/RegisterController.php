@@ -88,7 +88,7 @@ class RegisterController extends Controller
         $custom_password = Str::random(8);
 
         // Notify user
-        Mail::to('anatolii.koziura@gmail.com')->send(new UserPasswordDetails($data['email'], $custom_password));
+        Mail::to($data['email'])->send(new UserPasswordDetails($data['email'], $custom_password));
 
         // Register user
         return User::create([

@@ -35,8 +35,7 @@
         <div class="col-4">
             <div class="card">
                 <div class="card-body">
-                    <p><code>---ads_count---</code> <span class="float-right">название сайта</span></p>
-                    <p><code>---categories_count---</code> <span class="float-right">название сайта</span></p>
+                    <p><code>---country_name---</code> <span class="float-right">Страна</span></p>
                     <button class="btn btn-success btn-block">Сохранить</button>
                 </div>
             </div>

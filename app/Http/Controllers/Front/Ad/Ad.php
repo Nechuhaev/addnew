@@ -11,7 +11,9 @@ use App\AdTag;
 use App\Http\Controllers\Controller;
 
 use App\Http\Controllers\Front\User\Auth\RegisterController;
+use App\Mail\AdDetails;
 use App\Mail\UserPasswordDetails;
+use App\SeoField;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -44,8 +46,66 @@ class Ad extends Controller
 
         $ad->save();
 
+        // SEO поля
+        $seo_field = SeoField::where('index', 'ad')->first();
+
+        if ($seo_field) {
+            $entity_values = [
+                '---name---'                => $ad->name,
+                '---price---'               => $ad->formatted_price,
+                '---city_name---'           => $ad->city->name,
+                '---region_name---'         => $ad->city->region->name,
+                '---country_name---'        => $ad->city->region->country->name,
+                '---user_name---'           => $ad->user->username,
+                '---user_description---'    => $ad->content,
+                '---user_email---'          => $ad->email,
+                '---user_telephone---'      => $ad->telephone,
+                '---created_at---'          => $ad->created_at->format('d.m.Y H:m'),
+                '---updated_at---'          => $ad->updated_at->format('d.m.Y H:m'),
+            ];
+            $meta = [
+                'meta_title' => $ad->meta_title ?? strtr($seo_field->meta_title, $entity_values),
+                'meta_description' => $ad->meta_description ?? strtr($seo_field->meta_description, $entity_values),
+                'description' => strtr($seo_field->description, $entity_values)
+            ];
+        } else {
+            $meta = [
+                'meta_title' => $ad->meta_title,
+                'meta_description' => $ad->meta_description,
+                'description' => '',
+            ];
+        }
+
+        // Стоимость
+        $currencies = AdCurrency::all();
+        $price = 0;
+        if ($ad['price']) {
+            foreach ($currencies as $currency) {
+                if ($currency->id == $ad['currency_id']) {
+                    $price = (float)$ad['price'] * (float)$currency->rate;
+                }
+            }
+        }
+
+
+        $prices = [];
+        if ($price) {
+            foreach ($currencies as $currency) {
+                if ($price) {
+                    $prices[] = [
+                        'currency' => $currency['code'],
+                        'symbol' => $currency['symbol'],
+                        'value' => (int) ($price / $currency['rate']),
+                        'selected' => ($currency->id == $ad['currency_id'])
+                    ];
+                }
+            }
+        }
+
         return view('front.ad.ad')->with([
-            'ad' => $ad
+            'ad' => $ad,
+            'prices' => $prices,
+            'meta' => $meta
         ]);
     }
 
@@ -502,5 +562,43 @@ class Ad extends Controller
         } else {
             return response()->json(['errors' => $validator->errors()]);
         }
+    }
+
+
+    /**
+     * Обработчик для отправки сообщения пользователю
+     * @param $slug
+     * @param Request $request
+     * @return $this
+     */
+    public function message($slug, Request $request) {
+
+        $errors = [
+            'name.required' => 'Для отправки сообщения автору - введите свое имя.',
+            'name.min' => 'Минимальная длина для поля имени составлеят :min символа',
+            'message.required' => 'Текст сообщения не может быть пустым',
+            'message.min' => 'Минимальная длина для поля сообщения составлеят :min символа',
+            'email.*' => 'Введите email!',
+        ];
+
+        $request->validate([
+            'name' => 'required|min:3',
+            'message' => 'required|min:30',
+            'email' => 'required|email',
+        ], $errors);
+
+        $ad = \App\Ad::where('slug', '=', $slug)->first();
+
+        $data = [
+            'ad_name' => $ad->name,
+            'email' => $request->get('email'),
+            'message' => $request->get('message'),
+            'name' => $request->get('name'),
+        ];
+
+        Mail::to($ad->email)->send(new AdDetails($data));
+
+        return redirect()->back()->with('success', 'Сообщение отправлено автору!');
+
     }
 }

@@ -1,5 +1,9 @@
 @extends('front.layout')
 
+@section('meta_title', $meta['meta_title'] ?? $ad->name)
+
+@section('meta_description', $meta['meta_description'] ?? $ad->content)
+
 @section('load-scripts')
     <script type="text/javascript" charset="UTF-8" src="https://maps.googleapis.com/maps/api/js?language=ru&region=RU&key=AIzaSyDfdB0wmym_DAbmbgubW-Tm3ivVN_ZCJMw&ver=3.0"></script>
 @endsection
@@ -40,9 +44,8 @@
                     <div class="adv-share">
                         <h3>Share &amp; Like</h3>
                         <ul class="share42init social-link">
-                            <li><a href="https://twitter.com/AddnewBiz" class="tw" target="_blank" rel="noreferrer"></a></li>
-                            <li><a href="https://addnewbiz.business.site/" class="plus" target="_blank"></a></li>
-                            <li><a href="https://www.facebook.com/addnew.biz/" class="fb" target="_blank" rel="noreferrer" alt="Доска бесплатных объявлений Addnew.biz в социальной сети Facebook"></a></li>
+                            <li><a href="https://twitter.com/intent/tweet?url={{ $ad->full_url }}&text={{ $ad->name }}" class="tw" target="_blank" rel="noreferrer"></a></li>
+                            <li><a href="https://www.facebook.com/sharer/sharer.php?u={{ $ad->full_url }}" class="fb" target="_blank" rel="noreferrer" alt="Доска бесплатных объявлений Addnew.biz в социальной сети Facebook"></a></li>
                         </ul>
                     </div>
                     <div class="banner">
@@ -69,18 +72,25 @@
                         <div class="adv-price-block">
                             <div class="adv-price-h">
                                 <span>Цена:</span>
-
-                                <div class="adv-currency">
-                                    @foreach($ad->currency->getFormattedPrices() as $price)
-                                        <span {{ ($price['is_default']) ? 'class="active"' : '' }} data-currency="{{ $price['code'] }}">{{ $price['symbol'] }}</span>
-                                    @endforeach
-                                </div>
+                                @if ($prices)
+                                    <div class="adv-currency">
+                                        @foreach($prices as $price)
+                                            <span class="{{ ($price['selected']) ? 'active' : '' }}" data-currency="{{ $price['currency'] }}">{{ $price['currency'] }}</span>
+                                        @endforeach
+                                    </div>
+                                @endif
                             </div>
                             <div class="adv-price">
-                                @foreach($ad->currency->getFormattedPrices() as $price)
-                                    <span class="{{ $price['code'] }} {{ ($price['is_default']) ? 'active' : '' }}">{{ $price['value'] }}</span>
-                                @endforeach
-                                <em class="currency-sign">ГРН</em>
+                                @if ($prices)
+                                    @foreach($prices as $price)
+                                        <span class="{{ $price['currency'] }} {{ ($price['selected']) ? 'active' : '' }}">{{ $price['value'] }}</span>
+                                        @if($price['selected'])
+                                            <em class="currency-sign">{{ $price['currency'] }}</em>
+                                        @endif
+                                    @endforeach
+                                @else
+                                    <span class="active">Бесплатно</span>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -110,19 +120,36 @@
                     <div class="banner">
                         @include('front.adsense.ad-middle')
                     </div>
+
+                    @if(env('APP_ENV') == 'production')
                     <div class="adv-location">
                         <div class="adv-h">Расположение:</div>
 
-
                         <div id="map" style="display: block; position: relative; overflow: hidden; min-height: 300px"></div>
-
-
                     </div>
+                    @endif
+
                     <div class="adv-callback">
                         <div class="adv-h">Связь:</div>
 
-                        <form class="form-contact columns" action="#priceblock2" method="post" enctype="multipart/form-data">
+                        @if(session()->has('success'))
+                            <div class="alert alert-success">
+                                {{ session()->get('success') }}
+                            </div>
+                        @endif
 
+                        @if ($errors->any())
+                            <div class="alert alert-danger">
+                                <ul style="padding: 0 0 0 10px;margin: 0;">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
+                        <form class="form-contact columns" action="{{ action('Front\Ad\Ad@message', ['slug' => $ad->slug]) }}" method="post" enctype="multipart/form-data">
+                            @csrf
                             <div class="form-message">
                                 <i class="icon icon-mail"></i>
                                 <span>Чтобы узнать подробную информацию об этом объявлении, заполните форму ниже и отправьте сообщение автору.</span>
@@ -131,19 +158,19 @@
                             <div class="col-2">
                                 <div class="form-group">
                                     <label>Имя</label>
-                                    <input type="text" value="" class="form-control required" aria-required="true">
+                                    <input type="text" name="name" value="{{ old('name') }}" class="form-control required" aria-required="true">
                                 </div>
                             </div>
                             <div class="col-2">
                                 <div class="form-group">
                                     <label>Почта</label>
-                                    <input type="text" value="" class="form-control required" aria-required="true">
+                                    <input type="text" name="email" value="{{ old('email') }}" class="form-control required" aria-required="true">
                                 </div>
                             </div>
                             <div class="col-1">
                                 <div class="form-group">
                                     <label>Сообщение</label>
-                                    <textarea class="form-control required" aria-required="true"></textarea>
+                                    <textarea class="form-control required" name="message" aria-required="true">{{ old('message') }}</textarea>
                                 </div>
                             </div>
                             <div class="col-1">
@@ -161,27 +188,9 @@
                 </div> <!-- column-content -->
             </div> <!-- columns -->
 
-            <div class="show-more hidden">
+            <div class="show-more">
                 <section class="show-more__text">
-                    <h2>Надежное медицинское страхование туристов, Киев, 100 грн.</h2>
-                    <p>Это объявление автора starsky живущего в стране Украина из города Киев рассказывает о том, что Надежное медицинское страхование туристов актуально на сегодняшний день по цене 100 грн.</p>
-                    <p>Наши посетители могут размещать на сайте самые различные объявления под названием Надежное медицинское страхование туристов. Стоимость своих услуг, товаров, предложений они выставляют самостоятельно, например 100 грн. USD. эта стоимость может быть в гривне, долларах или евро, по коммерческому курсу Национального банка.</p>
-                    <p>
-                        На нашей доске бесплатных объявлений Addnew.biz - 151 категория в 106 странах мира.</p>
-                    <p>
-                        При размещении объявления Надежное медицинское страхование туристов пользователь starsky получает возможность разместить свое объявление на карте Google Maps с позиционированием по стране Украина и городу Киев.</p>
-                    <p> Также наши посетители получают абсолютно бесплатную возможность размещать неограниченное количество объявлений различной тематики и направлений.</p>
-                    <p>
-                        Одним из ключевых преимуществ нашей доски объявлений является абсолютное отсутствие каких либо платежей для наших посетителей.</p>
-                    <p>
-                        Разместив объявление как зарегистрированный пользователь вы имеете возможность управлять объявлениями, изменять, дополнять, удалять и продлевать объявления через личный кабинет. Мы не заставляем своих посетителей регистрироваться, вы можете размещать объявления анонимно без каких либо обязательств.</p>
-                    <p>Разместив на нашей доске объявление вы напрямую общаетесь с покупателем ваших услуг или товаров, без посредников и скрытых платежей по всем странам и городам.</p>
-                    <p>Объявления наших пользователей размещаются на других досках через наш автоматизированный сервис рассылки.</p>
-                    <p>Доска объявлений создана не только для размещения объявлений, но и для поиска. Помимо основного поиска по любым словам, мы предоставляем возможность фильтровать объявления по Меткам, Странам, Городам, Категориям и Подкатегориям.</p>
-                    <p>Получив простую возможность размещения объявлений ВЫ останетесь с нами навсегда.</p>
-                    <p>Самые разнообразные категории доски объявлений дают вам обширную аудиторию спроса и активных продаж.</p>
-                    <p>Итак подытожим: ваше объявление на тему Надежное медицинское страхование туристов было размещено автором starsky  живущим в стране Украина из города Киев по цене 100 грн., абсолютно бесплатно на срок 90 дней. По истечении срока не забудьте его продлить, удалить или изменить.</p>
-                    <p>На нашей доске продается все не только без регистрации, но и без платежей и скрытых комиссий!</p>
+                    {!! $meta['description']  !!}
                 </section>
                 <div class="show-more__shadow"></div>
                 <span class="show-more__btn btn-show">Показать</span>
@@ -191,7 +200,9 @@
 @endsection
 
 @section('script')
+    @if (env('APP_ENV') == 'production')
     <script>
-        init_google_map('Украина, Киев', '2');
+        init_google_map('{{ $ad->city->region->country->name }}', '{{ $ad->city->name }}', '{{ $ad->name }}');
     </script>
+    @endif
 @endsection

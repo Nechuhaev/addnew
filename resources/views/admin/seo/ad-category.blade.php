@@ -35,8 +35,8 @@
         <div class="col-4">
             <div class="card">
                 <div class="card-body">
-                    <p><code>---ads_count---</code> <span class="float-right">название сайта</span></p>
-                    <p><code>---categories_count---</code> <span class="float-right">название сайта</span></p>
+                    <p><code>---category_name---</code> <span class="float-right">Категория</span></p>
+                    <p><code>---parent_name---</code> <span class="float-right">Родительская</span></p>
                     <button class="btn btn-success btn-block">Сохранить</button>
                 </div>
             </div>

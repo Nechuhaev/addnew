@@ -31,51 +31,118 @@ class Seo extends Controller
             'action' => route('admin.seo.index')
         ];
 
+
+        $seo_field = SeoField::where('index', 'ad')->first();
+        if ($seo_field) {
+            $meta_title = (bool)$seo_field->meta_title;
+            $meta_description = (bool)$seo_field->meta_description;
+            $description = (bool)$seo_field->description;
+        } else {
+            $meta_title = false;
+            $meta_description = false;
+            $description = false;
+        }
+
         $items[] = [
             'name' => 'Объявление',
-            'description' => false,
-            'meta_title' => false,
-            'meta_description' => false,
+            'description' => $description,
+            'meta_title' => $meta_title,
+            'meta_description' => $meta_description,
             'action' => route('admin.seo.ad')
         ];
 
+
+        $seo_field = SeoField::where('index', 'ad-category')->first();
+        if ($seo_field) {
+            $meta_title = (bool)$seo_field->meta_title;
+            $meta_description = (bool)$seo_field->meta_description;
+            $description = (bool)$seo_field->description;
+        } else {
+            $meta_title = false;
+            $meta_description = false;
+            $description = false;
+        }
         $items[] = [
             'name' => 'Категория объявления',
-            'description' => false,
-            'meta_title' => false,
-            'meta_description' => false,
+            'description' => $description,
+            'meta_title' => $meta_title,
+            'meta_description' => $meta_description,
             'action' => route('admin.seo.ad-category')
         ];
 
+
+        $seo_field = SeoField::where('index', 'ad-tag')->first();
+        if ($seo_field) {
+            $meta_title = (bool)$seo_field->meta_title;
+            $meta_description = (bool)$seo_field->meta_description;
+            $description = (bool)$seo_field->description;
+        } else {
+            $meta_title = false;
+            $meta_description = false;
+            $description = false;
+        }
         $items[] = [
             'name' => 'Тег',
-            'description' => false,
-            'meta_title' => false,
-            'meta_description' => false,
+            'description' => $description,
+            'meta_title' => $meta_title,
+            'meta_description' => $meta_description,
             'action' => route('admin.seo.ad-tag')
         ];
 
+
+        $seo_field = SeoField::where('index', 'ad-country')->first();
+        if ($seo_field) {
+            $meta_title = (bool)$seo_field->meta_title;
+            $meta_description = (bool)$seo_field->meta_description;
+            $description = (bool)$seo_field->description;
+        } else {
+            $meta_title = false;
+            $meta_description = false;
+            $description = false;
+        }
         $items[] = [
             'name' => 'Страна',
-            'description' => false,
-            'meta_title' => false,
-            'meta_description' => false,
+            'description' => $description,
+            'meta_title' => $meta_title,
+            'meta_description' => $meta_description,
             'action' => route('admin.seo.ad-country')
         ];
 
+
+        $seo_field = SeoField::where('index', 'ad-region')->first();
+        if ($seo_field) {
+            $meta_title = (bool)$seo_field->meta_title;
+            $meta_description = (bool)$seo_field->meta_description;
+            $description = (bool)$seo_field->description;
+        } else {
+            $meta_title = false;
+            $meta_description = false;
+            $description = false;
+        }
         $items[] = [
             'name' => 'Область',
-            'description' => false,
-            'meta_title' => false,
-            'meta_description' => false,
+            'description' => $description,
+            'meta_title' => $meta_title,
+            'meta_description' => $meta_description,
             'action' => route('admin.seo.ad-region')
         ];
 
+
+        $seo_field = SeoField::where('index', 'ad-city')->first();
+        if ($seo_field) {
+            $meta_title = (bool)$seo_field->meta_title;
+            $meta_description = (bool)$seo_field->meta_description;
+            $description = (bool)$seo_field->description;
+        } else {
+            $meta_title = false;
+            $meta_description = false;
+            $description = false;
+        }
         $items[] = [
             'name' => 'Город',
-            'description' => false,
-            'meta_title' => true,
-            'meta_description' => false,
+            'description' => $description,
+            'meta_title' => $meta_title,
+            'meta_description' => $meta_description,
             'action' => route('admin.seo.ad-city')
         ];
 

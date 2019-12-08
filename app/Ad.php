@@ -133,8 +133,8 @@ class Ad extends Model
      * @return string
      */
     public function getFormattedPriceAttribute() {
-        $currency = AdCurrency::find($this->attributes['currency_id'])->first();
-        return $this->attributes['price'] . ' ' . $currency['symbol'];
+        $_currency = AdCurrency::whereId((int)$this->attributes['currency_id'])->first();
+        return $this->attributes['price'] . ' ' . $_currency['symbol'];
     }
 
     /**
@@ -142,7 +142,11 @@ class Ad extends Model
      * @return string
      */
     public function getUrlAttribute() {
-        return 'ads/' . $this->attributes['slug'];
+        return '/ads/' . $this->attributes['slug'];
+    }
+
+    public function getFullUrlAttribute() {
+        return env('APP_URL') . $this->url;
     }
 
     /**
