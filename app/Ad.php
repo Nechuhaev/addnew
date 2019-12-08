@@ -129,6 +129,15 @@ class Ad extends Model
     }
 
     /**
+     * Стоимость в формате цена + символ валюты
+     * @return string
+     */
+    public function getFormattedPriceAttribute() {
+        $currency = AdCurrency::find($this->attributes['currency_id'])->first();
+        return $this->attributes['price'] . ' ' . $currency['symbol'];
+    }
+
+    /**
      * Ссылка на страницу объявления
      * @return string
      */

@@ -189,8 +189,15 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::post('/articleCategory/add', 'Admin\Article\CategoryController@create')->name('admin.article.category.create');
     Route::post('/articleCategory/update/{id}', 'Admin\Article\CategoryController@update')->name('admin.article.category.update');
 
-    Route::get('/adSenseBlocks', 'AdminPageController@adSenseBlocks')->name('admin.adSenseBlocks');
-    Route::get('/adSenseBlock', 'AdminPageController@adSenseBlock')->name('admin.adSenseBlock');
+    Route::get('/seo', 'Admin\Seo\Seo@page')->name('admin.seo');
+    Route::post('/seo/update', 'Admin\Seo\Seo@update')->name('admin.seo.update');
+    Route::get('/seo/index', 'Admin\Seo\Index@form')->name('admin.seo.index');
+    Route::get('/seo/ad', 'Admin\Seo\AdTag@form')->name('admin.seo.ad');
+    Route::get('/seo/ad-tag', 'Admin\Seo\AdTag@form')->name('admin.seo.ad-tag');
+    Route::get('/seo/ad-category', 'Admin\Seo\AdCategory@form')->name('admin.seo.ad-category');
+    Route::get('/seo/ad-country', 'Admin\Seo\AdCountry@form')->name('admin.seo.ad-country');
+    Route::get('/seo/ad-region', 'Admin\Seo\AdRegion@form')->name('admin.seo.ad-region');
+    Route::get('/seo/ad-city', 'Admin\Seo\AdCity@form')->name('admin.seo.ad-city');
 });
 
 

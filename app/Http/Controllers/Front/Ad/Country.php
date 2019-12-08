@@ -19,8 +19,6 @@ class Country extends Controller
     public function getList()
     {
 
-
-
         $data['countries'] = Cache::remember('countries_info', 50000, function () {
             $countries = AdCountry::all();
 

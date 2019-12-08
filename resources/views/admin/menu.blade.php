@@ -91,9 +91,9 @@
         </ul>
     </li>
     <li class="sidebar-item">
-        <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{{ route('admin.adSenseBlocks') }}" aria-expanded="false">
-            <i class="mdi mdi-sitemap"></i>
-            <span class="hide-menu">Рекламные блоки</span>
+        <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{{ route('admin.seo') }}" aria-expanded="false">
+            <i class="mdi mdi-textbox"></i>
+            <span class="hide-menu">SEO тексты</span>
         </a>
     </li>
 
