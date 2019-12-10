@@ -7,6 +7,7 @@ use App\AdCountry;
 use App\AdRegion;
 use App\AdTag;
 use App\Http\Controllers\Controller;
+use App\SeoField;
 use Illuminate\Http\Request;
 
 use Debugbar;
@@ -74,7 +75,24 @@ class Country extends Controller
 
         $entity = AdCountry::where('slug', '=', $country)->first();
 
-        //dd($children);
+        $seo_field = SeoField::where('index', 'ad-country')->first();
+
+        if ($seo_field) {
+            $entity_values = [
+                '---country_name---'  => $entity->name,
+            ];
+            $meta = [
+                'meta_title' => $entity->meta_title ?? strtr($seo_field->meta_title, $entity_values),
+                'meta_description' => $entity->meta_description ?? strtr($seo_field->meta_description, $entity_values),
+                'description' => $entity->content ?? strtr($seo_field->description, $entity_values)
+            ];
+        } else {
+            $meta = [
+                'meta_title' => $entity->meta_title,
+                'meta_description' => $entity->meta_description,
+                'description' => $entity->content,
+            ];
+        }
 
         $results = Ad::getAds()->where('ad_countries.id', $entity->id)
             ->paginate(15);
@@ -87,7 +105,8 @@ class Country extends Controller
             'links' => $results->links('front.widgets.paginate'),
             'children' => $entity->regions,
             'tags' => AdTag::getAdsTags($ads),
-            'breadcrumbs' => 'country.page'
+            'breadcrumbs' => 'country.page',
+            'meta' => $meta
         ]);
     }
 

@@ -1,5 +1,9 @@
 @extends('front.layout')
 
+@section('meta_title', $meta['meta_title'] ?? $entity->name)
+
+@section('meta_description', $meta['meta_description'] ?? $entity->content)
+
 @section('content')
 
 <main class="category-page">
@@ -36,9 +40,9 @@
                 </div>
 
 
-                <div class="show-more hidden">
+                <div class="show-more">
                     <section class="show-more__text">
-                        {!! $entity->content !!}
+                        {!! $meta['description']  !!}
                     </section>
                     <div class="show-more__shadow"></div>
                     <span class="show-more__btn btn-show">Показать</span>
