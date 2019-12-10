@@ -23,23 +23,26 @@
 @endsection
 
 @section('content')
-    <div class="row">
-        <div class="col-8">
-            <div class="card">
-                <div class="card-body">
-                    @include('admin.form-widgets.seo-form')
+    <form action="{{ action('Admin\Seo\Seo@update', ['index' => 'ad-category']) }}" method="post">
+        @csrf
+        <div class="row">
+            <div class="col-8">
+                <div class="card">
+                    <div class="card-body">
+                        @include('admin.form-widgets.seo-form')
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="col-4">
-            <div class="card">
-                <div class="card-body">
-                    <p><code>---category_name---</code> <span class="float-right">Категория</span></p>
-                    <p><code>---parent_name---</code> <span class="float-right">Родительская</span></p>
-                    <button class="btn btn-success btn-block">Сохранить</button>
+            <div class="col-4">
+                <div class="card">
+                    <div class="card-body">
+                        <p><span class="text-danger" style="background: #eee">---category_name---</span> <span class="float-right">Категория</span></p>
+                        <p><span class="text-danger" style="background: #eee">---parent_name---</span> <span class="float-right">Родительская</span></p>
+                        <button class="btn btn-success btn-block">Сохранить</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </form>
 @endsection

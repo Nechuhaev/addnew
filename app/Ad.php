@@ -200,12 +200,12 @@ class Ad extends Model
         foreach ($data as $ad) {
             //$city_url_path = $ad->country_slug . '/' . $ad->region_slug . '/'. $ad->city_slug;
 
-            if (Storage::disk('s3')->exists($ad->image)) {
-                $image = Storage::disk('s3')->url($ad->image);
-            } else {
-                $image = 'http://placehold.it/300x300';
-            }
-
+//            if (is_file($ad->image)) {
+//                $image = $ad->image;
+//            } else {
+//                $image = 'http://placehold.it/300x300';
+//            }
+            $image = $ad->image;
             $ads[] = [
                 'id' => $ad->id,
                 'name' => $ad->name,
