@@ -1,8 +1,8 @@
 @extends('front.layout')
 
-@section('meta_title', $meta['meta_title'] ?? $ad->name)
+@section('meta_title', $meta['meta_title'] ?? $entity->name)
 
-@section('meta_description', $meta['meta_description'] ?? $ad->content)
+@section('meta_description', $meta['meta_description'] ?? $entity->content)
 
 @section('content')
     <main class="category-page">
