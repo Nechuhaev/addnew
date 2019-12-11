@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\Seo;
 
 use App\Http\Controllers\Controller;
+use App\SeoField;
 use Illuminate\Http\Request;
 
 class AdRegion extends Controller
