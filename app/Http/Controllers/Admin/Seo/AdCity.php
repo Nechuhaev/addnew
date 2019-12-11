@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\Admin\Seo;
 
 use App\Http\Controllers\Controller;
+use App\SeoField;
 use Illuminate\Http\Request;
 
 class AdCity extends Controller
 {
     public function form() {
 
-        $seo_field = SeoField::where('index', 'ad-country')->first();
+        $seo_field = SeoField::where('index', 'ad-city')->first();
 
         if ($seo_field) {
             $default['meta_title'] = $seo_field->meta_title;
@@ -22,6 +23,6 @@ class AdCity extends Controller
         }
 
 
-        return view('admin.seo.ad-region')->with($default);
+        return view('admin.seo.ad-city')->with($default);
     }
 }
