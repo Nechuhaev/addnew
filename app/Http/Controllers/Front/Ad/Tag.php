@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Front\Ad;
 use App\Ad;
 use App\AdTag;
 use App\Http\Controllers\Controller;
+use App\SeoField;
 use Illuminate\Http\Request;
 
 class Tag extends Controller
@@ -12,7 +13,24 @@ class Tag extends Controller
     public function page($tag) {
         $entity = AdTag::where('slug', '=', $tag)->first();
 
-        //dd($children);
+        $seo_field = SeoField::where('index', 'ad-tag')->first();
+
+        if ($seo_field) {
+            $entity_values = [
+                '---tag_name---'  => $entity->name,
+            ];
+            $meta = [
+                'meta_title' => $entity->meta_title ?? strtr($seo_field->meta_title, $entity_values),
+                'meta_description' => $entity->meta_description ?? strtr($seo_field->meta_description, $entity_values),
+                'description' => $entity->content ?? strtr($seo_field->description, $entity_values)
+            ];
+        } else {
+            $meta = [
+                'meta_title' => $entity->meta_title,
+                'meta_description' => $entity->meta_description,
+                'description' => $entity->content,
+            ];
+        }
 
         $results = Ad::getAds()
             ->leftJoin('ad_tag', 'ad_tag.ad_id', '=', 'ads.id')
@@ -27,7 +45,8 @@ class Tag extends Controller
             'links' => $results->links('front.widgets.paginate'),
             'children' => $entity->regions,
             'tags' => AdTag::getAdsTags($ads),
-            'breadcrumbs' => 'ad_tag'
+            'breadcrumbs' => 'ad_tag',
+            'meta' => $meta
         ]);
     }
 }

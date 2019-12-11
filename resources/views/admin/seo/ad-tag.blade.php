@@ -23,22 +23,25 @@
 @endsection
 
 @section('content')
-    <div class="row">
-        <div class="col-8">
-            <div class="card">
-                <div class="card-body">
-                    @include('admin.form-widgets.seo-form')
+    <form action="{{ action('Admin\Seo\Seo@update', ['index' => 'ad-tag']) }}" method="post">
+        @csrf
+        <div class="row">
+            <div class="col-8">
+                <div class="card">
+                    <div class="card-body">
+                        @include('admin.form-widgets.seo-form')
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="col-4">
-            <div class="card">
-                <div class="card-body">
-                    <p><code>---tag_name---</code> <span class="float-right">Название тега</span></p>
-                    <button class="btn btn-success btn-block">Сохранить</button>
+            <div class="col-4">
+                <div class="card">
+                    <div class="card-body">
+                        <p><span class="text-danger" style="background: #eee">---tag_name---</span> <span class="float-right">Название тега</span></p>
+                        <button class="btn btn-success btn-block">Сохранить</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </form>
 @endsection
