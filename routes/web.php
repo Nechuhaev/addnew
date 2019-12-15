@@ -207,6 +207,6 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
 
 
 // Категории объявлений
-Route::get('/{page}', 'Front\Page\PageController@page')->name('page');
+Route::get('/page/{slug}', 'Front\Page\PageController@page')->name('page');
 Route::get('/{category}', 'Front\Ad\Category@page')->name('category.page');
 Route::get('/{category}/{subcategory}', 'Front\Ad\Category@page')->name('sub_category.page');

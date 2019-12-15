@@ -155,8 +155,12 @@
                 <li><a href="/">Главная</a></li>
                 <li><a href="{{ route('blog.index') }}">Блог</a></li>
                 <li><a href="{{ route('countries') }}">Страны</a></li>
-                <li><a href="#">Контакты</a></li>
-                <li><a href="#">Confide</a></li>
+                @if($pages)
+                    @foreach($pages as $page)
+                        <li><a href="{{ $page->url }}">{{ $page->name }}</a></li>
+                    @endforeach
+                @endif
+
             </ul>
             <div class="btn btn-subscribe modal" data-modal="modal-subscribe">Подписаться</div>
             <ul class="footer-social">
