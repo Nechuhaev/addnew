@@ -170,12 +170,16 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
 
 
 
-    Route::get('/adCategory', 'AdminPageController@adCategory')->name('admin.adCategory');
-    Route::get('/country', 'AdminPageController@country')->name('admin.country');
-    Route::get('/city', 'AdminPageController@city')->name('admin.city');
+//    Route::get('/adCategory', 'AdminPageController@adCategory')->name('admin.adCategory');
+//    Route::get('/country', 'AdminPageController@country')->name('admin.country');
+//    Route::get('/city', 'AdminPageController@city')->name('admin.city');
 
-    Route::get('/pages', 'AdminPageController@pages')->name('admin.pages');
-    Route::get('/page', 'AdminPageController@page')->name('admin.page');
+    Route::get('/pages', 'Admin\Page\PageController@showPages')->name('admin.pages');
+    Route::get('/pages/add', 'Admin\Page\PageController@showForm')->name('admin.page.new');
+    Route::get('/page/{id}', 'Admin\Page\PageController@showForm')->name('admin.page.edit');
+    Route::post('/page/create', 'Admin\Page\PageController@create')->name('admin.page.create');
+    Route::post('/page/update', 'Admin\Page\PageController@update')->name('admin.page.update');
+    Route::post('/page/delete', 'Admin\Page\PageController@delete')->name('admin.page.delete');
 
     Route::get('/articles', 'Admin\Article\ArticleController@showArticles')->name('admin.articles');
     Route::get('/article/add', 'Admin\Article\ArticleController@showArticleAddForm')->name('admin.article.add');
@@ -203,5 +207,6 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
 
 
 // Категории объявлений
+Route::get('/{page}', 'Front\Page\PageController@page')->name('page');
 Route::get('/{category}', 'Front\Ad\Category@page')->name('category.page');
 Route::get('/{category}/{subcategory}', 'Front\Ad\Category@page')->name('sub_category.page');
