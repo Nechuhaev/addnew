@@ -1,5 +1,8 @@
 @extends('front.layout')
 
+@section('meta_title', "Мои объявления | Доска объявлений addnew.biz")
+@section('meta_description', "Мои объявления | Доска объявлений addnew.biz")
+
 @section('content')
     <main class="account-page">
         <div class="container">

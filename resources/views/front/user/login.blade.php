@@ -1,5 +1,8 @@
 @extends('front.layout')
 
+@section('meta_title', "Вход в личный кабинет | Доска объявлений addnew.biz")
+@section('meta_description', "Вход в личный кабинет | Доска объявлений addnew.biz")
+
 @section('content')
     <main class="login-page">
         <div class="container">
