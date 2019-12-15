@@ -1,7 +1,7 @@
 @extends('front.layout')
 
-@section('meta_title', $category_object->meta_title ?? 'Блог | Доска объявлений AddNew.Biz');
-@section('meta_description', $category_object->meta_description ?? '☑️ Блог доски объявлений addnew.biz - новости, статьи, полезные материалы как сделать ваше объявление эффективным.');
+@section('meta_title', $category->meta_title ?? 'Блог | Доска объявлений AddNew.Biz');
+@section('meta_description', $category->meta_description ?? '☑️ Блог доски объявлений addnew.biz - новости, статьи, полезные материалы как сделать ваше объявление эффективным.');
 
 
 @section('content')
@@ -11,8 +11,8 @@
                 @include('front.adsense.top')
             </div>
 
-            @if(isset($category_object))
-                {{ Breadcrumbs::render('blog.category', $category_object) }}
+            @if(isset($category))
+                {{ Breadcrumbs::render('blog.category', $category) }}
             @else
                 {{ Breadcrumbs::render('blog') }}
             @endif
@@ -55,9 +55,9 @@
                         @include('front.adsense.bottom-listing')
                     </div>
 
-                    @if($category_object->content ?? null)
+                    @if($category->content ?? null)
                     <div class="category-content">
-                        {!! $category_object->content !!}
+                        {!! $category->content !!}
                     </div>
                     <br>
                     @endif
