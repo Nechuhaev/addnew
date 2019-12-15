@@ -91,11 +91,19 @@
                                         <a title="Удалить объявление" href="{{ route('ad.delete', ['id' => $ad->id]) }}" onclick="return confirm('Вы дейсвительно хотите удалить объявление? Отменить это действие будет невозможно.');" class="delete">
                                             <img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/trash.svg') }}" />
                                         </a>
-                                        <a title="Возобновить объявление" href="https://addnew.biz/dashboard/?aid=202151&amp;action=restart" class="restart">
+                                        @if ($ad->status == 'active')
+                                        <a title="Приостановить объявление" href="{{ route('ad.changeStatus', ['ad_id' => $ad->id, 'status_id' => 0]) }}" class="restart">
                                             <img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/controls-pause.svg') }}" />
                                         </a>
+                                        @else
+                                        <a title="Возобновить объявление" href="{{ route('ad.changeStatus', ['ad_id' => $ad->id, 'status_id' => 1]) }}" class="restart">
+                                            <img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/update.svg') }}" />
+                                        </a>
+                                        @endif
                                     </li>
-                                    <li><a title="Отметить как устаревшее" href="https://addnew.biz/dashboard/?aid=202151&amp;action=setSold">Отметить как устаревшее</a></li>
+                                    @if ($ad->status != 'archive')
+                                        <li><a title="Отметить как устаревшее" href="{{ route('ad.changeStatus', ['ad_id' => $ad->id, 'status_id' => 2]) }}">Отметить как устаревшее</a></li>
+                                    @endif
                                 </ul>
                             </td>
                         </tr>

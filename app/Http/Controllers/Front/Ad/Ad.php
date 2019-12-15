@@ -601,6 +601,26 @@ class Ad extends Controller
         return redirect()->back()->with('success', 'Сообщение отправлено автору!');
     }
 
+    public function changeStatus($ad_id, $status_id) {
+        //dd($ad_id);
+        if ($ad_id) {
+            $ad = Auth::user()->ads()->whereId($ad_id)->first();
+            if ($ad) {
+                $ad->date_active = date('Y-m-d H:i:s');
+                $ad->status = (int)$status_id;
+                $ad->save();
+                return redirect()->back()->with('success', 'Статус объявления изменен.');
+            }
+        }
+
+        return redirect()->back()->with('error', 'Не удалось изменить статус :(');
+    }
+
+    /**
+     * Удаление объявления
+     * @param null $id
+     * @return $this
+     */
     public function delete($id = null) {
         if ($id) {
             $ad = Auth::user()->ads()->whereId($id)->first();

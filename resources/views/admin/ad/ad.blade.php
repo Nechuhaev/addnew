@@ -205,14 +205,17 @@
                                 <div class="col-7">
                                     <select name="status" class="form-control" id="">
                                         @if(isset($ad))
+                                            <option value="0" {{ ($ad->status == 0) ? 'selected' : '' }}>Остановлено</option>
                                             <option value="1" {{ ($ad->status == 1) ? 'selected' : '' }}>Активно</option>
-                                            <option value="0" {{ ($ad->status == 0) ? 'selected' : '' }}>В архиве</option>
+                                            <option value="2" {{ ($ad->status == 2) ? 'selected' : '' }}>В архиве</option>
                                         @elseif (old('status') || old('status') === '0')
+                                            <option value="0" {{ (old('status') == 0) ? 'selected' : '' }}>Остановлено</option>
                                             <option value="1" {{ (old('status') == 1) ? 'selected' : '' }}>Активно</option>
-                                            <option value="0" {{ (old('status') == 0) ? 'selected' : '' }}>В архиве</option>
+                                            <option value="2" {{ (old('status') == 2) ? 'selected' : '' }}>В архиве</option>
                                         @else
+                                            <option value="0">Остановлено</option>
                                             <option value="1" selected>Активно</option>
-                                            <option value="0">В архиве</option>
+                                            <option value="2">В архиве</option>
                                         @endif
 
                                     </select>

@@ -21,7 +21,7 @@ class UserController extends Controller
 
     public function ads()
     {
-        $data['ads'] = Auth::user()->ads()->orderBy('date_active')->paginate(15);
+        $data['ads'] = Auth::user()->ads()->orderBy('created_at')->paginate(15);
         return view('front.user.profile.ads')->with($data);
     }
     public function edit()

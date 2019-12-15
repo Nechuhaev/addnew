@@ -2,6 +2,6 @@
 
 return [
     'status_active' => 'Активно',
-    'status_disabled' => 'Неактивно',
+    'status_archive' => 'В Архиве',
     'status_suspend' => 'Приостановлено',
 ];

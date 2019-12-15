@@ -249,7 +249,7 @@ class Ad extends Model
 
     public function getStatusAttribute() {
         if ($this->attributes['status'] == 0) {
-            $status = 'disabled';
+            $status = 'suspend';
         }
 
         if ($this->attributes['status'] == 1) {
@@ -257,7 +257,7 @@ class Ad extends Model
         }
 
         if ($this->attributes['status'] == 2) {
-            $status = 'suspend';
+            $status = 'archive';
         }
 
         return $status;

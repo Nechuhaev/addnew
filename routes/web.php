@@ -55,6 +55,7 @@ Route::get('/blog/category/{slug}', 'Front\Article\CategoryController@page')->na
 Route::get('/ads/{slug}', 'Front\Ad\Ad@page')->name('ad.page');
 Route::post('/ads/{slug}', 'Front\Ad\Ad@message');
 Route::get('/ads/delete/{id}', 'Front\Ad\Ad@delete')->name('ad.delete');
+Route::get('/ads/status/{ad_id}/{status_id}', 'Front\Ad\Ad@changeStatus')->name('ad.changeStatus');
 
 
 // Теги объявлений

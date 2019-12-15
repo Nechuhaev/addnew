@@ -17,6 +17,12 @@
 
             {{ Breadcrumbs::render('ad.page', $ad) }}
 
+            @if($ad->status == 'suspend')
+            <div class="alert alert-success">
+                Обратите внимание, объявление приостановлено автором!
+            </div>
+            @endif
+
             <div class="columns columns-nowrap">
                 <aside class="column-left hidden-xs">
                     <div class="adv-img">
@@ -103,15 +109,18 @@
                             <li><span>Район:</span><a href="{{ $ad->city->region->url }}">{{ $ad->city->region->name }}</a></li>
                             <li><span>Актуально до:</span>{{ $ad->date_end }}</li>
                         </ul>
-                        <div class="adv-contacts">
-                            <div class="adv-contacts-inner">
-                                <ul class="adv-contacts-list">
-                                    <li><span>Телефон:</span> <a href="tel:{{ $ad->telephone }}">{{ $ad->telephone }}</a></li>
-                                    <li><span>Электронная почта:</span> <a href="mailto:{{ $ad->email }}">{{ $ad->email }}</a></li>
-                                </ul>
-                                <span class="btn-notice">Показать контакты</span>
+                        @if($ad->status == 'active')
+                            <div class="adv-contacts">
+                                <div class="adv-contacts-inner">
+                                    <ul class="adv-contacts-list">
+                                        <li><span>Телефон:</span> <a href="tel:{{ $ad->telephone }}">{{ $ad->telephone }}</a></li>
+                                        <li><span>Электронная почта:</span> <a href="mailto:{{ $ad->email }}">{{ $ad->email }}</a></li>
+                                    </ul>
+                                    <span class="btn-notice">Показать контакты</span>
+                                </div>
                             </div>
-                        </div>
+                        @endif
+
                     </div>
                     <div class="adv-description">
                         <div class="adv-h">Описание</div>
