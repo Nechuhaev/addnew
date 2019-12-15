@@ -47,7 +47,7 @@ Route::post('profile/password/update', 'Front\User\UserController@updatePassword
 
 // Блог
 Route::get('/blog/', 'Front\Article\ArticleController@showArticles')->name('blog.index');
-Route::get('/blog/{slug}', 'Front\Article\ArticleController@showArticle')->name('blog.article');
+Route::get('/blog/{slug}', 'Front\Article\Article@article')->name('blog.article');
 Route::get('/blog/category/{slug}', 'Front\Article\ArticleController@showCategory')->name('blog.category');
 
 

@@ -15,7 +15,6 @@ class HomeController extends Controller
 
     public function index()
     {
-
         $categories = Cache::remember('home_categories', 43200, function () {
             $parents = AdCategory::where('parent_id', 0)
                 ->orderBy('sort_order', 'ASC')->get();
@@ -67,11 +66,6 @@ class HomeController extends Controller
             }
             return $categories;
         });
-
-        //dd($categories);
-
-
-
 
         // SEO поля
         $seo_field = SeoField::where('index', 'index')->first();

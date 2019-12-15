@@ -1,7 +1,7 @@
 @extends('front.layout')
 
-@section('meta_title', $category_object->meta_title ?? 'Блог');
-@section('meta_description', $category_object->meta_description ?? 'Описание блога');
+@section('meta_title', $category_object->meta_title ?? 'Блог | Доска объявлений AddNew.Biz');
+@section('meta_description', $category_object->meta_description ?? '☑️ Блог доски объявлений addnew.biz - новости, статьи, полезные материалы как сделать ваше объявление эффективным.');
 
 
 @section('content')
@@ -11,10 +11,11 @@
                 @include('front.adsense.top')
             </div>
 
-            <ul class="breadcrumb">
-                <li><a href="/">Главная</a></li>
-                <li><span>Блог</span></li>
-            </ul>
+            @if(isset($category_object))
+                {{ Breadcrumbs::render('blog.category', $category_object) }}
+            @else
+                {{ Breadcrumbs::render('blog') }}
+            @endif
 
             <div class="columns columns-nowrap">
                 <div class="column-content">
@@ -25,11 +26,11 @@
                     @if($articles)
                         @foreach($articles as $article)
                             <div class="blog-item">
-                                <h3><a href="{{ $article->href }}">{{ $article->name }}</a></h3>
+                                <h3><a href="{{ $article->url }}">{{ $article->name }}</a></h3>
                                 <div class="blog-meta">
                                     <span><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/editor-ul.svg') }}" />
                                         @foreach($article->categories()->get() as $category)
-                                            <a href="{{ $category->href }}" rel="category tag">{{ $category->name }}</a> |
+                                            <a href="{{ $category->url }}" rel="category tag">{{ $category->name }}</a> |
                                         @endforeach
                                     </span>
                                     <span><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/clock.svg') }}" /> <span>{{ $article->created_at }}</span></span>

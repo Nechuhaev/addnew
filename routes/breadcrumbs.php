@@ -167,6 +167,28 @@ Breadcrumbs::for('profile.ads', function ($trail) {
     $trail->push('Мои объявления', route('profile.ads'));
 });
 
+/**
+ * ******************************* Блог *******************************
+ */
+// Главная > Блог
+Breadcrumbs::for('blog', function ($trail) {
+    $trail->parent('index');
+    $trail->push('Блог', route('blog.index'));
+});
+// Главная > Блог > Категория
+Breadcrumbs::for('blog.category', function ($trail, \App\ArticleCategory $category) {
+    $trail->parent('blog');
+    $trail->push($category->name, $category->url);
+});
+// Главная > Блог > Категория > Статья
+Breadcrumbs::for('blog.category.article', function ($trail, \App\Article $article) {
+    $trail->parent('blog.category', $article->categories()->first());
+    $trail->push($article->name, $article->url);
+});
+
+/**
+ * ******************************* Страны *******************************
+ */
 // Главная > Страны
 Breadcrumbs::for('countries', function ($trail) {
     $trail->parent('index');
@@ -195,6 +217,10 @@ Breadcrumbs::for('city.page', function ($trail, $city = null) {
         'city' => $city->slug
     ]));
 });
+
+/**
+ * ******************************* Теги *******************************
+ */
 // Главная > Объявление с меткой "..."
 Breadcrumbs::for('ad_tag', function ($trail, $tag) {
     $trail->parent('index');

@@ -83,7 +83,8 @@ class ArticleCategory extends Model
         }
     }
 
-    public function getHrefAttribute() {
+
+    public function getUrlAttribute() {
         return route('blog.category', ['slug' => $this->slug]);
     }
 }

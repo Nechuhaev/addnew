@@ -97,7 +97,7 @@ class Article extends Model
         return $date->format('d.m.Y H:m');
     }
 
-    public function getHrefAttribute() {
+    public function getUrlAttribute() {
         return route('blog.article', ['slug' => $this->slug]);
     }
 }

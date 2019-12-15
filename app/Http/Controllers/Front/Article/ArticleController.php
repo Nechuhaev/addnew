@@ -19,12 +19,12 @@ class ArticleController extends Controller
         ]);
     }
 
-    public function showArticle($slug) {
-
-        $article = Article::where('slug', $slug)->first();
-
-        return view('front.article.article', ['article' => $article]);
-    }
+//    public function showArticle($slug) {
+//
+//        $article = Article::where('slug', $slug)->first();
+//
+//        return view('front.article.article', ['article' => $article]);
+//    }
 
     public function showCategory($slug) {
 

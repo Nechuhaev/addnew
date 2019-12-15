@@ -28,7 +28,7 @@ class ArticleCategory extends AbstractWidget
         foreach ($categories as $category) {
             $this->config['categories'][] = [
                 'name' => $category->name,
-                'href' => $category->href,
+                'href' => $category->url,
                 'id' => $category->id,
                 'posts_count' => $category->articles()->count()
             ];
