@@ -54,6 +54,7 @@ Route::get('/blog/category/{slug}', 'Front\Article\CategoryController@page')->na
 // Объявление
 Route::get('/ads/{slug}', 'Front\Ad\Ad@page')->name('ad.page');
 Route::post('/ads/{slug}', 'Front\Ad\Ad@message');
+Route::get('/ads/delete/{id}', 'Front\Ad\Ad@delete')->name('ad.delete');
 
 
 // Теги объявлений

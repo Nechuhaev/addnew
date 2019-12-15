@@ -599,6 +599,17 @@ class Ad extends Controller
         Mail::to($ad->email)->send(new AdDetails($data));
 
         return redirect()->back()->with('success', 'Сообщение отправлено автору!');
+    }
 
+    public function delete($id = null) {
+        if ($id) {
+            $ad = Auth::user()->ads()->whereId($id)->first();
+            if ($ad) {
+                $ad->delete();
+                return redirect()->back()->with('success', 'Объявление удалено.');
+            }
+        }
+
+        return redirect()->back()->with('error', 'Ошибка удаления объявления!');
     }
 }

@@ -243,7 +243,24 @@ class Ad extends Model
             ->leftJoin('ad_cities', 'ad_cities.id', '=', 'ads.city_id')
             ->leftJoin('ad_regions', 'ad_cities.region_id', '=', 'ad_regions.id')
             ->leftJoin('ad_countries', 'ad_regions.country_id', '=', 'ad_countries.id')
-            ->where('status', 1)
-            ->orderBy('ads.created_at', 'desc');
+            ->whereIn('status', [1, 2])
+            ->orderBy('ads.date_active', 'desc');
     }
+
+    public function getStatusAttribute() {
+        if ($this->attributes['status'] == 0) {
+            $status = 'disabled';
+        }
+
+        if ($this->attributes['status'] == 1) {
+            $status = 'active';
+        }
+
+        if ($this->attributes['status'] == 2) {
+            $status = 'suspend';
+        }
+
+        return $status;
+    }
+
 }

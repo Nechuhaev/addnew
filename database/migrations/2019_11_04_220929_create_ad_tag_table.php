@@ -15,7 +15,7 @@ class CreateAdTagTable extends Migration
     {
         Schema::create('ad_tag', function (Blueprint $table) {
             $table->unsignedBigInteger('ad_id');
-            $table->foreign('ad_id')->references('id')->on('ads');
+            $table->foreign('ad_id')->references('id')->on('ads')->onDelete('cascade');
             $table->unsignedBigInteger('tag_id');
             $table->foreign('tag_id')->references('id')->on('ad_tags');
 

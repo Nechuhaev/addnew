@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Front\User;
 
+use App\Ad;
 use App\Http\Controllers\Controller;
 use App\User;
 use Illuminate\Http\Request;
@@ -20,7 +21,8 @@ class UserController extends Controller
 
     public function ads()
     {
-        return view('front.user.profile.ads');
+        $data['ads'] = Auth::user()->ads()->orderBy('date_active')->paginate(15);
+        return view('front.user.profile.ads')->with($data);
     }
     public function edit()
     {
