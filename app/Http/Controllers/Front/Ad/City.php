@@ -15,6 +15,8 @@ class City extends Controller
     {
         $entity = AdCity::where('slug', '=', $city)->first();
 
+        if (!$entity) abort(404);
+
         $seo_field = SeoField::where('index', 'ad-city')->first();
 
         if ($seo_field) {
