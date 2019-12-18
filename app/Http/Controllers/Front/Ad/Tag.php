@@ -13,6 +13,8 @@ class Tag extends Controller
     public function page($tag) {
         $entity = AdTag::where('slug', '=', $tag)->first();
 
+        if (!$entity) abort(404);
+
         $seo_field = SeoField::where('index', 'ad-tag')->first();
 
         if ($seo_field) {
