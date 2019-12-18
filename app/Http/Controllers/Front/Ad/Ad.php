@@ -34,6 +34,8 @@ class Ad extends Controller
     public function page($ad) {
         $ad = \App\Ad::where('slug', '=', $ad)->first();
 
+        if (!$ad) abort(404);
+
         // Обновляем счетчик просмотров объявлений
         // Просмотры сегодня
         if(!Carbon::now()->isSameAs('d.m.Y', $ad->updated_at)) {
