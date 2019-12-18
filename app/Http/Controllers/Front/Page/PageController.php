@@ -9,8 +9,15 @@ use Illuminate\Http\Request;
 class PageController extends Controller
 {
     public function page($slug) {
-        $data['page'] = Page::where('slug', $slug)->first();
+        $page = Page::where('slug', $slug)->first();
 
-        return view('front.page.page')->with($data);
+        if ($page) {
+
+            $data['page'] = $page;
+
+            return view('front.page.page')->with($data);
+        }
+
     }
+
 }
