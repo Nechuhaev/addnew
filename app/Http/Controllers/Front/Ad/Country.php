@@ -75,6 +75,8 @@ class Country extends Controller
 
         $entity = AdCountry::where('slug', '=', $country)->first();
 
+        if (!$entity) abort(404);
+
         $seo_field = SeoField::where('index', 'ad-country')->first();
 
         if ($seo_field) {
