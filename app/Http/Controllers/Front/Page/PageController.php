@@ -18,6 +18,7 @@ class PageController extends Controller
             return view('front.page.page')->with($data);
         }
 
+        abort(404);
     }
 
 }
