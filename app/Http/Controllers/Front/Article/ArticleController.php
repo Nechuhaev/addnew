@@ -17,9 +17,16 @@ class ArticleController extends Controller
      */
     public function page($slug)
     {
-        $data['article'] = Article::where('slug', $slug)->first();
+        $article = Article::where('slug', $slug)->first();
 
-        return view('front.article.article')->with($data);
+        if ($article) {
+
+            $data['article'] = $article;
+
+            return view('front.article.article')->with($data);
+        }
+
+        abort(404);
     }
 
 }

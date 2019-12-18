@@ -17,9 +17,9 @@ class CategoryController extends Controller
      */
     public function page($category_slug = null) {
         if ($category_slug) {
-
             $category = ArticleCategory::where('slug', $category_slug)->first();
 
+            if (!$category) abort(404);
             $data['articles'] = $category->articles()->paginate(15);
             $data['category'] = $category;
         } else {
