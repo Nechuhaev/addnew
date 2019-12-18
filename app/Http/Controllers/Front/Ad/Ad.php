@@ -601,6 +601,12 @@ class Ad extends Controller
         return redirect()->back()->with('success', 'Сообщение отправлено автору!');
     }
 
+    /**
+     * Изменить статус объявления
+     * @param $ad_id
+     * @param $status_id
+     * @return $this
+     */
     public function changeStatus($ad_id, $status_id) {
         //dd($ad_id);
         if ($ad_id) {
@@ -614,6 +620,136 @@ class Ad extends Controller
         }
 
         return redirect()->back()->with('error', 'Не удалось изменить статус :(');
+    }
+
+    public function edit($id) {
+        $ad = Auth::user()->ads()->where('id', $id)->first();
+        if (!$ad) return redirect()->back()->with('error', 'Не удалось найти объявление. Повторите попытку позже!');
+
+        $tags = (old('tags')) ? json_encode(explode(',', old('tags'))) : json_encode($ad->tags()->pluck('name'));
+
+        $data['id'] = $ad->id;
+        $data['name'] = old('name') ?? $ad->name;
+        $data['email'] = old('email') ?? $ad->email;
+        $data['telephone'] = old('telephon') ?? $ad->telephone;
+        $data['tags'] = $tags;
+        $data['content'] = old('content') ?? $ad->content;
+        $data['price'] = old('price') ?? $ad->price;
+        $data['currency_id'] = old('currency_id') ?? $ad->currency_id;
+
+
+        $data['currencies'] = AdCurrency::select(['id', 'code'])->get()->toArray();
+
+        return view('front.ad.ad-edit')->with($data);
+    }
+
+    public function update($ad_id, Request $request) {
+
+        $errors = [
+            'telephone.required' => 'Введите номер телефона',
+            'telephone.min' => 'Номер телефона не может быть короче :min символов',
+            'email.required' => 'Введите свой email!',
+            'email.email' => 'Введите свой email!',
+            'name.required' => 'Введите название объявления!',
+            'name.min' => 'Минимальная длина названия объявления не может быть короче :min символов',
+            'content.required' => 'Введите описание объявления!',
+            'content.min' => 'Минимальная длина описания не может быть короче :min символов',
+            'image.*.image' => 'Недопустимый формат изображения!',
+            'image.*.mimes' => 'Недопустимый формат изображения!',
+            'image.*.max' => 'Недопустимый размер файла. Максимально доступный размер :min байт',
+            'price.*' => 'Введите цену товара / услуги или установите 0, если оно бесплатно!',
+            'currency_id.*' => 'Выберите валюту из списка!',
+        ];
+
+        $request->validate([
+            'telephone' => 'required|min:6',
+            'email' => 'required|email',
+            'name' => 'required|min:6',
+            'content' => 'required|min:70',
+            'image.*' => 'nullable|sometimes|image|max:1024|mimes:jpg,jpeg,bmp,png',
+            'price' => 'required|numeric',
+            'currency_id' => 'required|integer|exists:ad_currencies,id',
+        ], $errors);
+
+
+
+        $ad = Auth::user()->ads()->where('id', $ad_id)->first();
+
+        if (!$ad) return redirect()->back()->with('error', 'Не удалось найти объявление. Повторите попытку позже!');
+
+        $ad->name = $request->get('name');
+        $ad->telephone = $request->get('telephone');
+        $ad->email = $request->get('email');
+        $ad->content = $request->get('content');
+        $ad->price = $request->get('price');
+        $ad->currency_id = $request->get('currency_id');
+
+
+        $ad->tags()->detach();
+        $all_tags = array_unique(array_map('trim', explode(',', $request->get('tags'))));
+        //dd($all_tags);
+        $not_existing_tags = $all_tags;
+        $existing_tags = AdTag::whereIn('name', $all_tags)->get();
+
+        foreach ($existing_tags as $existing_tag) {
+            if (($key = array_search($existing_tag->name, $not_existing_tags)) !== false) {
+                unset($not_existing_tags[$key]);
+            }
+        }
+
+        foreach ($not_existing_tags as $not_existing_tag) {
+            AdTag::create(['name' => $not_existing_tag, 'slug' => null]);
+        }
+
+        $tags_to_attach = AdTag::whereIn('name', $all_tags)->pluck('id')->toArray();
+
+
+        if ($tags_to_attach) {
+            $ad->tags()->attach($tags_to_attach);
+        }
+
+
+        // Сохраняем изображения
+        if ($request->hasFile('image')) {
+            $disk = Storage::disk('s3');
+
+            if ($disk->exists(parse_url($ad->image)['path'])) {
+                $disk->delete(parse_url($ad->image)['path']);
+            }
+
+
+            foreach ($ad->images as $_image) {
+                if ($disk->exists(parse_url($_image)['path'])) {
+                    $disk->delete(parse_url($_image)['path']);
+                }
+            }
+
+            $images = [];
+
+            $dir = 'ads/' . time();
+            foreach ($request->file('image') as $key => $image) {
+
+                if (!$disk->exists($image)) {
+                    $filename = $key . '.' . $image->getClientOriginalExtension();
+                    $filepath = $dir.'/'.$filename;
+
+                    $disk->putFileAs($dir, $image, $filename, 'public');
+                }
+
+                if ($key == 0) {
+                    $ad->image = $disk->url($filepath);
+                } else {
+                    $images[] = $disk->url($filepath);;
+                }
+            }
+
+            $ad->images = $images;
+
+        }
+
+        $ad->save();
+
+        return redirect(route('profile.ads'))->with('success', 'Объявление отредактировано!');
     }
 
     /**

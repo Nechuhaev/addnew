@@ -12,8 +12,8 @@
             <img alt="" src="{{ Auth::user()->image ?? 'https://secure.gravatar.com/avatar/f17c59914122f91f742418889e41b124?s=250&amp;d=mm&amp;r=g' }}" class="author-avatar" height="250" width="250">
         </div>
         <ul class="author-info">
-            <li><strong><a href="{{ route('author.index', ['id', Auth::id()]) }}">{{ Auth()->user()->email }}</a></strong></li>
-            <li><strong>Дата регистрации:</strong> Апрель 19, 2016 2:34 пп</li>
+            <li><strong>{{ Auth()->user()->email }}</strong></li>
+            <li><strong>Дата регистрации:</strong> {{ Auth()->user()->created_at->format('d.m.Y H:m') }}</li>
         </ul>
     </div>
 
@@ -21,10 +21,10 @@
 
     <h2 class="account-h2">Статистика учётной записи</h2>
     <ul class="account-info">
-        <li>Активный объявлений: <strong>0</strong></li>
-        <li>Объявлений в ожидании: <strong>0</strong></li>
-        <li>Неактивных объявлений: <strong>2</strong></li>
-        <li>Всего объявлений: <strong>2</strong></li>
+        <li>Активный объявлений: <strong>{{ Auth()->user()->ads()->where('status', '1')->count() }}</strong></li>
+        <li>Объявлений в ожидании: <strong>{{ Auth()->user()->ads()->where('status', '0')->count() }}</strong></li>
+        <li>Неактивных объявлений: <strong>{{ Auth()->user()->ads()->where('status', '2')->count() }}</strong></li>
+        <li>Всего объявлений: <strong>{{ Auth()->user()->ads()->count() }}</strong></li>
     </ul>
 
 </aside>

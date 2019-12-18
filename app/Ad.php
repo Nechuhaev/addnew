@@ -57,6 +57,11 @@ class Ad extends Model
         return date('Y-m-d', strtotime($value));
     }
 
+    public function getDateCreatedAttribute() {
+        $date = Carbon::createFromFormat($this->getDateFormat(), $this->getOriginal('created_at'));
+        return date('d.m.Y', strtotime($date));
+    }
+
     /**
      * Дополнительные изображения загружаем как массив
      * @param $value

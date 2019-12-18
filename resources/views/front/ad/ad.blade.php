@@ -105,9 +105,11 @@
                             <li><span>Страна:</span><a href="{{ $ad->city->region->country->url }}">{{ $ad->city->region->country->name }}</a></li>
                             <li><span>Автор:</span>{{ $ad->user->username }}</li>
                             <li><span>Город:</span><a href="{{ $ad->city->url }}">{{ $ad->city->name }}</a></li>
-                            <li><span>Дата создания:</span>{{ $ad->date_start }}</li>
+                            <li><span>Дата создания:</span>{{ $ad->date_created}}</li>
                             <li><span>Район:</span><a href="{{ $ad->city->region->url }}">{{ $ad->city->region->name }}</a></li>
-                            <li><span>Актуально до:</span>{{ $ad->date_end }}</li>
+                            @if($ad->status == 'active')
+                                <li><span>Актуально до:</span>{{ $ad->date_end }}</li>
+                            @endif
                         </ul>
                         @if($ad->status == 'active')
                             <div class="adv-contacts">

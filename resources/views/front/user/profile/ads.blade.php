@@ -85,7 +85,7 @@
                             <td class="hidden-xs">
                                 <ul class="td-actions">
                                     <li>
-                                        <a title="Редактировать объявление" href="https://addnew.biz/edit-listing/?listing_edit=202151" class="edit">
+                                        <a title="Редактировать объявление" href="{{ route('ad.edit', ['id' => $ad->id]) }}" class="edit">
                                             <img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/edit.svg') }}" />
                                         </a>
                                         <a title="Удалить объявление" href="{{ route('ad.delete', ['id' => $ad->id]) }}" onclick="return confirm('Вы дейсвительно хотите удалить объявление? Отменить это действие будет невозможно.');" class="delete">

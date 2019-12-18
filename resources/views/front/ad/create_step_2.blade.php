@@ -50,7 +50,7 @@
                         </ul>
                     </div>
                 @endif
-                <form class="form-step" action="{{ route('ad.create.step.details') }}" method="post" enctype="multipart/form-data" >
+                <form class="form-step" action="{{ route('ad.create.step.details') }}" method="post" enctype="multipart/form-data">
                     @csrf
                     <div class="columns">
                         <div class="col-2">
