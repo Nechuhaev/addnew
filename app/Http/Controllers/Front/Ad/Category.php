@@ -19,7 +19,7 @@ class Category extends Controller
         }
         $entity = AdCategory::where('slug', $category)->first();
 
-        //dd($category);
+        if (!$entity) abort(404);
 
         $results = Ad::getAds()->where('ad_categories.id', $entity->id)
             ->paginate(15);
