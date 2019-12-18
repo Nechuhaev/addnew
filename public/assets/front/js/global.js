@@ -48,3 +48,25 @@ $('#search_category').on('change', function () {
         $('#search_sub_category').prop('disabled', false);
     });
 })
+
+$('.btn-subscribe-trigger').on('click', function () {
+    var btn = $(this);
+    btn.css('z-index', '-1');
+    btn.css('opacity', '0.7');
+    $('.error-holder').text("");
+    $.getJSON("http://addnew.loc/subscribe?email=" + $('#subscriber_email').val(), function ( data ) {
+        if (data.error) {
+            $('.error-holder').text(data.error);
+            btn.css('z-index', 'initial');
+            btn.css('opacity', 'initial');
+        }
+        if (data.success) {
+            $('.form-subscribe').html("<div>\n" +
+                "            Спасибо!<br><br>\n" +
+                "            Проверьте свою почту для подтверждения подписки.\n" +
+                "        </div>");
+        }
+
+        console.log(data);
+    });
+})

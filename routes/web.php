@@ -18,6 +18,7 @@
  */
 // Главная
 Route::get('/', "Front\HomeController@index")->name('index');
+Route::get('/subscribe', "Front\HomeController@subscribe")->name('subscribe');
 
 // Авторизация
 Route::get('/login', 'Front\User\Auth\LoginController@showLoginForm')->name('login');

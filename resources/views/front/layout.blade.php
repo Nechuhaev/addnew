@@ -162,7 +162,7 @@
                 @endif
 
             </ul>
-            <div class="btn btn-subscribe modal" data-modal="modal-subscribe">Подписаться</div>
+            <div class="btn btn-subscribe" onclick="modal.set('subscribe-modal').show();">Подписаться</div>
             <ul class="footer-social">
                 <li><a href="https://vk.com/public131156262" class="vk" target="_blank" rel="noreferrer" alt="Доска бесплатных объявлений Addnew.biz в социальной сети Вконтакте"></a></li>
                 <li><a href="https://www.facebook.com/addnew.biz/" class="fb" target="_blank" rel="noreferrer" alt="Доска бесплатных объявлений Addnew.biz в социальной сети Facebook"></a></li>
@@ -184,21 +184,13 @@
             <img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/no-alt.svg') }}" />
         </button>
 
-        <div class="thanks">
-            Спасибо!<br><br>
-            Проверьте свою почту для подтверждения подписки.
-            <button class="btn btn-subscribe modal-close">Закрыть</button>
-        </div>
         <div class="form-subscribe">
             <div class="form-group">
-                <label>Ваше имя <span class="star">*</span></label>
-                <input type="text" class="form-control">
-            </div>
-            <div class="form-group">
                 <label>Ваша электронная почта <span class="star">*</span></label>
-                <input type="text" class="form-control">
+                <input type="text" name="subscriber_email" id="subscriber_email" class="form-control">
             </div>
-            <button class="btn btn-subscribe btn-submit">Авторизоваться</button>
+            <p class="error-holder"></p>
+            <button class="btn btn-subscribe btn-subscribe-trigger">Подписаться</button>
         </div>
     </div>
 </div>
