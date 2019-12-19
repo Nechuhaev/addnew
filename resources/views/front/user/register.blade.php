@@ -62,14 +62,15 @@
                         </div>
                         <div class="form-group">
                             <label>{{ __('user/register.text_social_login') }}</label>
-                            <div class="form-social">
-                                <a href="#" class="form-social-link"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/vk.svg') }}" /></a>
-                                <a href="#" class="form-social-link"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/facebook-alt.svg') }}" /></a>
-                                <a href="#" class="form-social-link"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/twitter.svg') }}" /></a>
-                                <a href="#" class="form-social-link"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/at.svg') }}" /></a>
-                                <a href="#" class="form-social-link"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/google-plus.svg') }}" /></a>
-                                <a href="#" class="form-social-link"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/ok.svg') }}" /></a>
-                            </div>
+                            @include('front.widgets.social')
+                            {{--<div class="form-social">--}}
+                                {{--<a href="#" class="form-social-link"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/vk.svg') }}" /></a>--}}
+                                {{--<a href="#" class="form-social-link"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/facebook-alt.svg') }}" /></a>--}}
+                                {{--<a href="#" class="form-social-link"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/twitter.svg') }}" /></a>--}}
+                                {{--<a href="#" class="form-social-link"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/at.svg') }}" /></a>--}}
+                                {{--<a href="#" class="form-social-link"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/google-plus.svg') }}" /></a>--}}
+                                {{--<a href="#" class="form-social-link"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/ok.svg') }}" /></a>--}}
+                            {{--</div>--}}
 
                         </div>
                     </form>
