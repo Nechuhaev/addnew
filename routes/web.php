@@ -20,7 +20,7 @@
 Route::get('/', "Front\HomeController@index")->name('index');
 Route::get('/subscribe', "Front\HomeController@subscribe")->name('subscribe');
 Route::get('/error-404', "Front\Page\PageController@page404")->name('404');
-Route::post('ulogin', 'UloginController@login');
+Route::post('ulogin', 'ULoginController@login');
 
 // Авторизация
 Route::get('/login', 'Front\User\Auth\LoginController@showLoginForm')->name('login');
