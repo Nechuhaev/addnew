@@ -5,6 +5,7 @@ namespace App\Http;
 class AdSense {
     public static function block($position) {
         if (env('APP_ENV') == 'production') {
+            echo '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>';
             switch ($position) {
                 case 'top':
                     echo '<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1409649052535600" data-ad-slot="8755878337" data-ad-format="auto" data-full-width-responsive="true"></ins>';
@@ -31,12 +32,13 @@ class AdSense {
                     echo '<ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-1409649052535600" data-ad-slot="2159424362"></ins>';
                     break;
             }
+            echo '<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>';
         }
     }
     public static function script() {
         if (env('APP_ENV') == 'production') {
-            echo '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>';
-            echo '<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>';
+
+
         }
     }
 }
