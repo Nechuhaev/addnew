@@ -13,15 +13,24 @@ class Category extends Controller
 {
     public function page($category, $subcategory = null) {
 
+        $categories_in = [];
 
         if ($subcategory) {
             $category = $subcategory;
         }
         $entity = AdCategory::where('slug', $category)->first();
 
+        $categories_in[] = $entity->id;
+        if ($entity->children()) {
+            foreach ($entity->children()->pluck('id') as $category_in) {
+                $categories_in[] = $category_in;
+            }
+        }
+        //dd($categories_in);
+
         if (!$entity) abort(404);
 
-        $results = Ad::getAds()->where('ad_categories.id', $entity->id)
+        $results = Ad::getAds()->whereIn('ad_categories.id', $categories_in)
             ->paginate(15);
         $ads = Ad::getLoopArray($results);
 

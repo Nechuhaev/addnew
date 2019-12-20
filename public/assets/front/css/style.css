@@ -3583,7 +3583,10 @@ hr {
 }
 
 .country-page .country-name img {
-    max-width: 56px
+    max-width: 56px;
+    border-radius: 100%;
+    height: 35px;
+    width: 35px;
 }
 
 .confid-content {

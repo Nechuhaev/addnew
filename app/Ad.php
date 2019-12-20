@@ -205,12 +205,19 @@ class Ad extends Model
         foreach ($data as $ad) {
             //$city_url_path = $ad->country_slug . '/' . $ad->region_slug . '/'. $ad->city_slug;
 
+            if (!$ad->image) {
+                $image = 'http://placehold.it/300x300';
+            } else {
+                $image = $ad->image;
+            }
 //            if (is_file($ad->image)) {
 //                $image = $ad->image;
 //            } else {
 //                $image = 'http://placehold.it/300x300';
 //            }
-            $image = $ad->image;
+            //$image = $ad->image;
+
+
             $ads[] = [
                 'id' => $ad->id,
                 'name' => $ad->name,
@@ -219,9 +226,9 @@ class Ad extends Model
                 'price' => AdCurrency::convert($ad->price),
                 'content' => Str::words(strip_tags($ad->content), 20, "..."),
                 'city' => $ad->city,
-                'city_url' => route('country.page', ['country' => $ad->country_slug]),
+                'city_url' => route('city.page', ['country' => $ad->country_slug, 'region' => $ad->region_slug, 'city' => $ad->city_slug]),
                 'country' => $ad->country,
-                'country_url' => route('country.page', ['country' => $ad->country_slug, 'region' => $ad->region_slug, 'city' => $ad->city_slug])
+                'country_url' => route('country.page', ['country' => $ad->country_slug])
             ];
         }
 
