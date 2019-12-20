@@ -24,7 +24,7 @@
                         <div class="card-body">
                             <div class="row align-items-center">
                                 <div class="col-1">
-                                    <img src="{{ $article->image ?? 'http://placehold.it/200x150' }}" class="img-fluid" alt="">
+                                    <img src="{{ $article->image ?? asset('assets/front/img/placeholder.png') }}" class="img-fluid" alt="">
                                 </div>
                                 <div class="col-3">
                                     <div><small class="text-muted">Название статьи</small></div>

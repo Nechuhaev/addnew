@@ -268,7 +268,7 @@
                             <div class="col-12">
                                 <div class="ad-image">
                                     <i class="mdi mdi-24px mdi-delete text-danger"></i>
-                                    <img src="{{ old('image') ?? $ad->image ?? 'http://placehold.it/300x200' }}" class="img-fluid filepicker">
+                                    <img src="{{ old('image') ?? $ad->image ?? asset('assets/front/img/placeholder.png') }}" class="img-fluid filepicker">
                                     <input type="hidden" name="image" value="{{ old('image') ?? $ad->image ?? '' }}">
                                 </div>
                             </div>
@@ -287,7 +287,7 @@
                                             <img src="{{ $ad->images[$i] }}" class="img-fluid filepicker">
                                             <input type="hidden" name="images[{{ $i }}]" value="{{ $ad->images[$i]}}">
                                         @else
-                                            <img src="{{ 'http://placehold.it/300x200' }}" class="img-fluid filepicker">
+                                            <img src="{{ asset('assets/front/img/placeholder.png') }}" class="img-fluid filepicker">
                                             <input type="hidden" name="images[{{ $i }}]" value="">
                                         @endif
                                     </div>

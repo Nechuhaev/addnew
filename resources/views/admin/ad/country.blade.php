@@ -105,7 +105,7 @@
                                     </span>
                                     <input id="thumbnail" value="{{ old('image') ?? $country->image ?? '' }}" class="form-control" type="text" name="image">
                                 </div>
-                                <img id="holder" class="img-fluid" style="margin-top: 20px" src="{{ old('image') ?? $country->image ?? 'http://placehold.it/400x250' }}">
+                                <img id="holder" class="img-fluid" style="margin-top: 20px" src="{{ old('image') ?? $country->image ?? asset('assets/front/img/placeholder.png') }}">
                             </div>
                         </div>
 

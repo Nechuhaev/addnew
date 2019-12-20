@@ -206,7 +206,7 @@ class Ad extends Model
             //$city_url_path = $ad->country_slug . '/' . $ad->region_slug . '/'. $ad->city_slug;
 
             if (!$ad->image) {
-                $image = 'http://placehold.it/300x300';
+                $image = asset('assets/front/img/placeholder.png');
             } else {
                 $image = $ad->image;
             }
