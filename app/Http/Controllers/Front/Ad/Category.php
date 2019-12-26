@@ -20,6 +20,8 @@ class Category extends Controller
         }
         $entity = AdCategory::where('slug', $category)->first();
 
+        if (!$entity) abort(404);
+
         $categories_in[] = $entity->id;
         if ($entity->children()) {
             foreach ($entity->children()->pluck('id') as $category_in) {
@@ -28,7 +30,7 @@ class Category extends Controller
         }
         //dd($categories_in);
 
-        if (!$entity) abort(404);
+
 
         $results = Ad::getAds()->whereIn('ad_categories.id', $categories_in)
             ->paginate(15);
