@@ -17,6 +17,7 @@
         "laravel/tinker": "^1.0",
         "laravel/ui": "^1.0",
         "league/flysystem-aws-s3-v3": "^1.0",
+        "spatie/laravel-sitemap": "^5.5",
         "unisharp/laravel-filemanager": "~1.8"
     },
     "require-dev": {

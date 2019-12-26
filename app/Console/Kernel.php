@@ -31,9 +31,9 @@ class Kernel extends ConsoleKernel
                     Storage::deleteDirectory($directory);
                 }
             }
-        })->everyMinute();
-        // $schedule->command('inspire')
-        //          ->hourly();
+        })->mondays()->at('17:00');
+
+        $schedule->command('sitemap:generate')->fridays()->at('17:00')->runInBackground();
     }
 
     /**
