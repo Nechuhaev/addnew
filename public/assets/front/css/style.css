@@ -143,32 +143,32 @@ summary {
     display: none
 }
 
-@font-face {
-    font-family: firasans;
-    font-display: fallback;
-    font-weight: 300;
-    font-style: normal;
-    src: url(../fonts/FiraSansLight.eot);
-    src: url(../fonts/FiraSansLight.eot?#iefix) format("embedded-opentype"), url(../fonts/FiraSansLight.woff) format("woff"), url(../fonts/FiraSansLight.ttf) format("truetype")
-}
+/*@font-face {*/
+    /*font-family: firasans;*/
+    /*font-display: fallback;*/
+    /*font-weight: 300;*/
+    /*font-style: normal;*/
+    /*src: url(../fonts/FiraSansLight.eot);*/
+    /*src: url(../fonts/FiraSansLight.eot?#iefix) format("embedded-opentype"), url(../fonts/FiraSansLight.woff) format("woff"), url(../fonts/FiraSansLight.ttf) format("truetype")*/
+/*}*/
 
-@font-face {
-    font-family: firasans;
-    font-display: fallback;
-    font-weight: 400;
-    font-style: normal;
-    src: url(../fonts/FiraSans.eot);
-    src: url(../fonts/FiraSans.eot?#iefix) format("embedded-opentype"), url(../fonts/FiraSans.woff) format("woff"), url(../fonts/FiraSans.ttf) format("truetype")
-}
+/*@font-face {*/
+    /*font-family: firasans;*/
+    /*font-display: fallback;*/
+    /*font-weight: 400;*/
+    /*font-style: normal;*/
+    /*src: url(../fonts/FiraSans.eot);*/
+    /*src: url(../fonts/FiraSans.eot?#iefix) format("embedded-opentype"), url(../fonts/FiraSans.woff) format("woff"), url(../fonts/FiraSans.ttf) format("truetype")*/
+/*}*/
 
-@font-face {
-    font-family: firasans;
-    font-display: fallback;
-    font-weight: 700;
-    font-style: normal;
-    src: url(../fonts/FiraSansBold.eot);
-    src: url(../fonts/FiraSansBold.eot?#iefix) format("embedded-opentype"), url(../fonts/FiraSansBold.woff) format("woff"), url(../fonts/FiraSansBold.ttf) format("truetype")
-}
+/*@font-face {*/
+    /*font-family: firasans;*/
+    /*font-display: fallback;*/
+    /*font-weight: 700;*/
+    /*font-style: normal;*/
+    /*src: url(../fonts/FiraSansBold.eot);*/
+    /*src: url(../fonts/FiraSansBold.eot?#iefix) format("embedded-opentype"), url(../fonts/FiraSansBold.woff) format("woff"), url(../fonts/FiraSansBold.ttf) format("truetype")*/
+/*}*/
 
 :focus, a:active, a:focus, button:active, button:focus, input, input:active, textarea, textarea:active {
     outline: 0

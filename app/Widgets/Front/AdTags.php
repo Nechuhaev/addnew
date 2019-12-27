@@ -27,10 +27,12 @@ class AdTags extends AbstractWidget
         $tags = [];
         if ($this->config['tags']) {
             foreach ($this->config['tags'] as $tag) {
-                $tags[] = [
-                    'name' => $tag->name,
-                    'url' => route('tag', ['slug' => $tag->slug]),
-                ];
+                if (isset($tag->slug)) {
+                    $tags[] = [
+                        'name' => $tag->name,
+                        'url' => route('tag', ['slug' => $tag->slug]),
+                    ];
+                }
             }
         }
 
