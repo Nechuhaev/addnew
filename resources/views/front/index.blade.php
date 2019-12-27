@@ -27,7 +27,9 @@
                                 @endif
                                 </ul>
                             @endforeach
-                            </ul>
+                            @if($loop->iteration == 3)
+                                {{ $adsense::block('home-vertical') }}
+                            @endif
                         </div>
                 @endforeach
                 </div>

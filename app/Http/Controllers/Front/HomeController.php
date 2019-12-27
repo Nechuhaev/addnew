@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Front;
 use App\Ad;
 use App\AdCategory;
 use App\AdCity;
+use App\Http\AdSense;
 use App\Http\Controllers\Controller;
 use App\SeoField;
 
@@ -125,7 +126,8 @@ class HomeController extends Controller
             'categories' => $categories,
             'meta' => $meta,
             'ads' => $ads,
-            'cities' => $cities
+            'cities' => $cities,
+            'adsense' => new AdSense()
         ]);
     }
 
