@@ -12,7 +12,7 @@
                     <a href="{{ $ad['url'] }}">{{ $ad['name'] }}</a>
                     <p class="category-description">{{ $ad['content'] }}</p>
                     <p class="category-meta">
-                        <i class="st-1"><strong>Размещено:</strong><span class="st-1">Август 28, 2019 8:56 дп</span></i>
+                        <i class="st-1"><strong>Размещено:</strong><span class="st-1">{{ $ad['date_active'] }}</span></i>
                         <i class="st-1"><strong>Страна:</strong><span class="st-1"><a href="{{ $ad['country_url'] }}">{{ $ad['country'] }}</a></span></i>
                         <i class="st-1"><strong>Город:</strong><span class="st-1"><a href="{{ $ad['city_url'] }}">{{ $ad['city'] }}</a></span></i>
                     </p>

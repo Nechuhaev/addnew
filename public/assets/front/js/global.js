@@ -54,7 +54,7 @@ $('.btn-subscribe-trigger').on('click', function () {
     btn.css('z-index', '-1');
     btn.css('opacity', '0.7');
     $('.error-holder').text("");
-    $.getJSON("http://addnew.loc/subscribe?email=" + $('#subscriber_email').val(), function ( data ) {
+    $.getJSON("https://addnew.biz/subscribe?email=" + $('#subscriber_email').val(), function ( data ) {
         if (data.error) {
             $('.error-holder').text(data.error);
             btn.css('z-index', 'initial');

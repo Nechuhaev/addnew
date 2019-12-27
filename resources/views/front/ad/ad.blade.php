@@ -30,7 +30,7 @@
                             <img class="img-responsive" src="{{ $ad->image }}" title="velosiped" alt="velosiped" style="opacity: 1;">
                         </a>
 
-                        @if($ad->images)
+                        @if($ad->images && !empty($ad->images[0]))
                             <div class="adv-imgs">
                             @foreach($ad->images as $image)
                                     <a href="{{ $image }}" id="thumb{{ $loop->iteration }}" class="colorbox group1" data-rel="colorbox" title="{{ $ad->name }} - Изображение {{ $loop->iteration }}">

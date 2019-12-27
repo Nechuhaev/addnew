@@ -21,4 +21,8 @@ class PageController extends Controller
         abort(404);
     }
 
+    function contacts() {
+        return view('front.page.contacts');
+    }
+
 }

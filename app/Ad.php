@@ -221,6 +221,7 @@ class Ad extends Model
             $ads[] = [
                 'id' => $ad->id,
                 'name' => $ad->name,
+                'date_active' => date ("Y-m-d H:i", strtotime($ad->date_active)),
                 'url' => route('ad.page', ['slug' => $ad->slug]),
                 'image' => $image,
                 'price' => AdCurrency::convert($ad->price),
@@ -240,6 +241,7 @@ class Ad extends Model
         return DB::table('ads')
             ->select(['ads.id',
                 'ads.slug',
+                'ads.date_active',
                 'ads.name',
                 'ads.image',
                 'ads.content',

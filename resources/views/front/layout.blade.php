@@ -21,6 +21,9 @@
     <link rel="stylesheet" href="{{ asset('assets/front/css/style.min.css') }}" media="all">
 
     @yield('style')
+
+    <link rel="icon" type="image/png" href="/favicon.png" />
+
 </head>
 <body class=""> <!-- fixed -->
 <!-- Google Tag Manager (noscript) -->
