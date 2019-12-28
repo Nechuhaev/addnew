@@ -63,7 +63,7 @@ $('.btn-subscribe-trigger').on('click', function () {
         if (data.success) {
             $('.form-subscribe').html("<div>\n" +
                 "            Спасибо!<br><br>\n" +
-                "            Проверьте свою почту для подтверждения подписки.\n" +
+                "            Вы успешно подписались на нашу email рассылку новостей.\n" +
                 "        </div>");
         }
 
