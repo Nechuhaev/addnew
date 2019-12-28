@@ -492,6 +492,7 @@ class Ad extends Controller
                     // Register user
                     $user = User::create([
                         'email' => $ad['email'],
+                        'username' => $ad['author'],
                         'password' => Hash::make($custom_password),
                     ]);
 

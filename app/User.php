@@ -82,15 +82,6 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the user's full name.
-     *
-     * @return string
-     */
-    public function getFullnameAttribute() {
-        return ucfirst($this->firstname) . ' ' . ucfirst($this->lastname);
-    }
-
-    /**
      * Get user's registration date
      *
      * @return false|string
@@ -133,7 +124,7 @@ class User extends Authenticatable
 
     public function getUsernameAttribute() {
         if ($this->firstname) {
-            $username = trim($this->firstname . ' ' . $this->lastname);
+            $username = trim(ucfirst($this->firstname) . ' ' . ucfirst($this->lastname));
             return $username;
         }
 

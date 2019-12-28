@@ -33,7 +33,7 @@
                                 </div>
                                 <div class="col-3">
                                     <div><small class="text-muted">ФИО</small></div>
-                                    {{ $user->fullname }}
+                                    {{ $user->username }}
                                 </div>
                                 <div class="col-3">
                                     <div><small class="text-muted">email</small></div>
@@ -45,7 +45,7 @@
                                 </div>
                                 <div class="col-2">
                                     <div><small class="text-muted">Объявлений</small></div>
-                                    2
+                                    {{ $user->ads()->count() }}
                                 </div>
                                 <div class="col-1 text-right">
                                     <a href="{{ route('admin.user', $user->id) }}"><i class="mdi mdi-24px mdi-account-edit"></i></a>

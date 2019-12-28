@@ -4,7 +4,7 @@
     <div class="page-breadcrumb">
         <div class="row">
             <div class="col-5 align-self-center">
-                <h4 class="page-title">Пользователь {{ $user->fullname }}</h4>
+                <h4 class="page-title">Пользователь {{ $user->username }}</h4>
             </div>
             <div class="col-7 align-self-center">
                 <div class="d-flex align-items-center justify-content-end">
@@ -27,7 +27,7 @@
                                 {{ $user->avatar_text }}
                             </div>
                         </div>
-                        <h4 class="card-title m-t-10">{{ $user->fullname }}</h4>
+                        <h4 class="card-title m-t-10">{{ $user->username}}</h4>
                         <h6 class="card-subtitle">{{ $user->email }}</h6>
                     </center>
                 </div>

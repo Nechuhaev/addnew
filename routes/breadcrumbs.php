@@ -28,7 +28,7 @@ Breadcrumbs::for('admin.users', function ($trail) {
 Breadcrumbs::for('admin.user', function ($trail, $user) {
     $trail->parent('admin.users');
 
-    $title = "Пользователь " . $user->fullname;
+    $title = "Пользователь " . $user->username;
     $trail->push($title , route('admin.users', $user->id));
 });
 
