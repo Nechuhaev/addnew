@@ -1721,7 +1721,8 @@ hr {
     display: flex;
     text-align: left;
     height: 60px;
-    overflow: hidden
+    overflow: hidden;
+    align-items: center;
 }
 
 .last-advs .last-adv-title img {

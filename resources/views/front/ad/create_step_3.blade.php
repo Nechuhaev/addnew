@@ -37,14 +37,14 @@
                     <aside class="column-left hidden-xs">
                         <div class="adv-img">
                             <a href="{{ $preview['image'] }}" data-rel="colorbox" class="colorbox group1" title="{{ $preview['name'] }}">
-                                <img class="img-responsive" src="{{ $preview['image'] }}" title="velosiped" alt="velosiped" style="opacity: 1;">
+                                <img class="img-responsive" src="{{ $preview['image'] }}" title="{{ $preview['name'] }}" alt="{{ $preview['name'] }}" style="opacity: 1;">
                             </a>
 
                             @if($preview['images'])
                                 <div class="adv-imgs">
                                     @foreach($preview['images'] as $image)
                                         <a href="{{ $image }}" id="thumb{{ $loop->iteration }}" class="colorbox group1" data-rel="colorbox" title="{{ $preview['name'] }} - Изображение {{ $loop->iteration }}">
-                                            <img src="{{ $image }}" alt="velik2" title="velik2" width="50" height="50" style="opacity: 1;">
+                                            <img src="{{ $image }}" alt="{{ $preview['name'] }}" title="{{ $preview['name'] }}" width="50" height="50" style="opacity: 1;">
                                         </a>
                                     @endforeach
                                 </div>
@@ -58,12 +58,12 @@
 
                             <div class="adv-img visible-xs">
                                 <a href="{{ $preview['image'] }}" data-rel="colorbox" class="colorbox group1" title="{{ $preview['name'] }}">
-                                    <img class="img-responsive" src="{{ $preview['image'] }}" title="velosiped" alt="velosiped" style="opacity: 1;">
+                                    <img class="img-responsive" src="{{ $preview['image'] }}" title="{{ $preview['name'] }}" alt="{{ $preview['name'] }}" style="opacity: 1;">
                                 </a>
                                 @if($preview['images'])
                                     <div class="adv-imgs">
                                         @foreach($preview['images'] as $image)
-                                            <a href="{{ $preview['image'] }}" id="thumb{{ $loop->iteration }}" class="colorbox group1" data-rel="colorbox" title="{{ $preview['name'] }} - Изображение {{ $loop->iteration }}"><img src="{{ $preview['image'] }}" alt="velik2" title="velik2" width="50" height="50" style="opacity: 1;"></a>
+                                            <a href="{{ $preview['image'] }}" id="thumb{{ $loop->iteration }}" class="colorbox group1" data-rel="colorbox" title="{{ $preview['name'] }} - Изображение {{ $loop->iteration }}"><img src="{{ $preview['image'] }}" alt="{{ $preview['name'] }}" title="{{ $preview['name'] }}" width="50" height="50" style="opacity: 1;"></a>
                                         @endforeach
                                     </div>
                                 @endif
