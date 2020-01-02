@@ -67,6 +67,25 @@ class Country extends Controller
 
 //        Debugbar::info($data['countries']));
 
+        // SEO поля
+        $seo_field = SeoField::where('index', 'countries')->first();
+        if ($seo_field) {
+            $data['meta'] = [
+                'meta_title' => $seo_field->meta_title,
+                'meta_description' => $seo_field->meta_description,
+                'description' => $seo_field->description
+            ];
+        } else {
+            $data['meta'] = [
+                'meta_title' => false,
+                'meta_description' => false,
+                'description' => false
+            ];
+        }
+
+
+
+
         return view('front.ad.countries')->with($data);
     }
 

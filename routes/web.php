@@ -205,6 +205,8 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::get('/seo', 'Admin\Seo\Seo@page')->name('admin.seo');
     Route::post('/seo/update', 'Admin\Seo\Seo@update')->name('admin.seo.update');
     Route::get('/seo/index', 'Admin\Seo\Index@form')->name('admin.seo.index');
+    Route::get('/seo/contacts', 'Admin\Seo\Contacts@form')->name('admin.seo.contacts');
+    Route::get('/seo/countries', 'Admin\Seo\Countries@form')->name('admin.seo.countries');
     Route::get('/seo/ad', 'Admin\Seo\Ad@form')->name('admin.seo.ad');
     Route::get('/seo/ad-tag', 'Admin\Seo\AdTag@form')->name('admin.seo.ad-tag');
     Route::get('/seo/ad-category', 'Admin\Seo\AdCategory@form')->name('admin.seo.ad-category');

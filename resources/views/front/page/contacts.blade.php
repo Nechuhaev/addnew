@@ -1,7 +1,8 @@
 @extends('front.layout')
 
-@section('meta_title', "Контактная информация addnew.biz");
-@section('meta_description', "Контактная информация addnew.biz");
+@section('meta_title', $meta['meta_title'] ?? "Контактная информация")
+
+@section('meta_description', $meta['meta_description'] ?? "Контактная информация addnew.biz")
 
 @section('content')
     <main class="contact-page">
@@ -77,7 +78,13 @@
 
                 </div>
             </div>
-
+            <div class="show-more">
+                <section class="show-more__text">
+                    {!! $meta['description']  !!}
+                </section>
+                <div class="show-more__shadow"></div>
+                <span class="show-more__btn btn-show">Показать</span>
+            </div>
         </div>
 
     </main>
