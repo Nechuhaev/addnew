@@ -1,2 +1,5 @@
 User-agent: *
-Disallow:
+Disallow: /admin
+Allow: /
+Host: https://addnew.biz
+Sitemap: https://addnew.biz/sitemap.xml
