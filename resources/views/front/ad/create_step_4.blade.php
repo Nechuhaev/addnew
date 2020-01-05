@@ -22,14 +22,10 @@
                 <h2>Объявление принято</h2>
                 <p>Спасибо за то, что пользуетесь нашим сайтом!</p>
                 <div class="buttons">
-                    <a href="#" class="btn btn-step">На главную</a>
-                    <a href="#" class="btn btn-step">К объявлению</a>
+                    <a href="{{ route('index') }}" class="btn btn-step">На главную</a>
+                    <a href="{{ route('ad.page', ['slug', $ad->slug] }}" class="btn btn-step">К объявлению</a>
                 </div>
             </div>
-
-
-
-
         </div> <!-- container -->
     </main>
 @endsection

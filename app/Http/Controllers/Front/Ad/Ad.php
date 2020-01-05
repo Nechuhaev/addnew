@@ -423,8 +423,9 @@ class Ad extends Controller
      * Шаг 4 Добавления объявления
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function  create_step_success() {
-        return view('front.ad.create_step_4');
+    public function  create_step_success(Request $request) {
+        $data['ad'] = \App\Ad::find($request->session()->get('ad_id'))->first();
+        return view('front.ad.create_step_4')->with($data);
     }
 
     /**
