@@ -122,7 +122,7 @@
             <div class="col-6">
                 <div class="card">
                     <div class="card-body">
-                        <h4 class="card-title">Топ 10 стран</h4>
+                        <h4 class="card-title">Топ 10 категорий</h4>
                     </div>
                     <div class="table-responsive">
 
