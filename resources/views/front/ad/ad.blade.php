@@ -213,7 +213,7 @@
 @section('script')
     @if (env('APP_ENV') == 'production')
     <script>
-        init_google_map('{{ $ad->city->region->country->name }}', '{{ $ad->city->name }}', '{{ $ad->name }}');
+        init_google_map('{{ $ad->city->region->country->name }}, {{ $ad->city->name }}', '{{ $ad->name }}');
     </script>
     @endif
 @endsection

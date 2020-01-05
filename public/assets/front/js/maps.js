@@ -10,8 +10,8 @@ function init_google_map(title, address) {
         var marker = null;
         var infowindow = null;
         var geocoder = null;
-        var redFlag = "https://addnew.biz/wp-content/themes/classipress-child/images/red-flag.png";
-        var noLuck = "https://addnew.biz/wp-content/themes/classipress-child/images/gmaps-no-result.gif";
+        var redFlag = "https://addnew.biz/images/red-flag.png";
+        var noLuck = "https://addnew.biz/images/gmaps-no-result.gif";
         var adTitle = "Частный кредит без предоплаты для серьезных людей";
         var contentString = '<div id="mcwrap"><span>' + a + '</span><br />' + address + '</div>';
 

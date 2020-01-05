@@ -17,7 +17,7 @@
                             @foreach($category as $parent_category)
                                 <ul class="catalog">
                                 <li class="first first-64">
-                                    <img src="{{ asset($parent_category['image']) }}" alt="" class="catalog-img">
+                                    <img src="{{ asset($parent_category['image']) }}" alt="{{ $parent_category['name'] }}" class="catalog-img">
                                     <a href="{{ $parent_category['url'] }}">{{ $parent_category['name'] }}</a>
                                 </li>
                                 @if($parent_category['children'])
