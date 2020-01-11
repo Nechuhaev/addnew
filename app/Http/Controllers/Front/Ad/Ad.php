@@ -51,25 +51,27 @@ class Ad extends Controller
         // SEO поля
         $seo_field = SeoField::where('index', 'ad')->first();
 
+
         if ($seo_field) {
             $entity_values = [
-                '---name---'                => $ad->name,
-                '---price---'               => $ad->formatted_price,
-                '---city_name---'           => $ad->city->name,
-                '---region_name---'         => $ad->city->region->name,
-                '---country_name---'        => $ad->city->region->country->name,
-                '---user_name---'           => $ad->user->username,
-                '---user_description---'    => $ad->content,
-                '---user_email---'          => $ad->email,
-                '---user_telephone---'      => $ad->telephone,
-                '---created_at---'          => $ad->created_at->format('d.m.Y H:m'),
-                '---updated_at---'          => $ad->updated_at->format('d.m.Y H:m'),
+                '---name---'                => $ad->name ?? '',
+                '---price---'               => $ad->formatted_price ?? '',
+                '---city_name---'           => $ad->city->name ?? '',
+                '---region_name---'         => $ad->city->region->name ?? '',
+                '---country_name---'        => $ad->city->region->country->name ?? '',
+                '---user_name---'           => $ad->user->username ?? '',
+                '---user_description---'    => $ad->content ?? '',
+                '---user_email---'          => $ad->email ?? '',
+                '---user_telephone---'      => $ad->telephone ?? '',
+                '---created_at---'          => $ad->created_at->format('d.m.Y H:m') ?? '',
+                '---updated_at---'          => $ad->updated_at->format('d.m.Y H:m') ?? '',
             ];
             $meta = [
-                'meta_title' => $ad->meta_title ?? strtr($seo_field->meta_title, $entity_values),
-                'meta_description' => $ad->meta_description ?? strtr($seo_field->meta_description, $entity_values),
+                'meta_title' => ((bool)$ad->meta_title) ? $ad->meta_title : strtr($seo_field->meta_title, $entity_values),
+                'meta_description' => ((bool)$ad->meta_description) ? $ad->meta_description : strtr($seo_field->meta_description, $entity_values),
                 'description' => strtr($seo_field->description, $entity_values)
             ];
+
         } else {
             $meta = [
                 'meta_title' => $ad->meta_title,
