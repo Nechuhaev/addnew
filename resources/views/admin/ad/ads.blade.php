@@ -51,23 +51,38 @@
                             <div class="col-2">
                                 <img src="{{ $ad->image }}" class="img-fluid">
                             </div>
-                            <div class="col-3">
-                                <b>{{ $ad->name }}</b>
-                                <div><small class="text-muted">Категория</small></div>
-                                {{ $ad->category->path }}
-                            </div>
-                            <div class="col-3">
-                                <div><small class="text-muted">Добавлено</small></div>
-                                {{ $ad->created_date }}
-                                <div><small class="text-muted">Автор</small></div>
-                                {{ $ad->user->email }}
-                            </div>
-                            <div class="col-3">
-                                <div><small class="text-muted">Город</small></div>
-                                {{ $ad->city->path }}
+                            <div class="col-9">
+                                <div class="row">
+                                    <div class="col-12"><h4 style="font-weight: 900">{{ $ad->name }}</h4></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-7">
+                                        <div><small class="text-muted">Категория</small></div>
+                                        {{ $ad->category->path }}
+
+                                        <div><small class="text-muted">Автор</small></div>
+                                        {{ $ad->user->email }}
+
+                                        <div><small class="text-muted">Город</small></div>
+                                        {{ $ad->city->path }}
+                                    </div>
+                                    <div class="col-5">
+                                        <div><small class="text-muted">Добавлено</small></div>
+                                        {{ $ad->created_at }}
+
+                                        <div><small class="text-muted">Дата публикации</small></div>
+                                        {{ $ad->date_start }}
+
+                                        <div><small class="text-muted">Дата истечения</small></div>
+                                        {{ $ad->date_end }}
+                                    </div>
+                                </div>
+
+
                             </div>
                             <div class="col-1 text-right">
-                                <a href="{{ route('admin.ad.edit', ['id' => $ad->id]) }}"><i class="mdi mdi-24px mdi-account-edit"></i></a>
+                                <a style="display: block" href="{{ route('admin.ad.edit', ['id' => $ad->id]) }}"><i class="mdi mdi-24px mdi-account-edit"></i></a>
+                                <a style="display: block; color: #09d1b5;" href="{{ route('ad.page', ['slug' => $ad->slug]) }}" target="_blank"><i class="mdi mdi-24px mdi-link"></i></a>
                             </div>
                         </div>
                     </div>

@@ -20,10 +20,10 @@ class Ad extends Controller
                 ->orWhere('content', 'like', '%' . $request->get('search') . '%')
                 ->orWhere('email', 'like', '%' . $request->get('search') . '%')
                 ->orWhere('telephone', 'like', '%' . $request->get('search') . '%')
-                ->orderBy('created_at', 'asc')
+                ->orderBy('created_at', 'desc')
                 ->paginate(15);
         } else {
-            $ads = AdModel::orderBy('created_at', 'asc')
+            $ads = AdModel::orderBy('created_at', 'desc')
                 ->paginate(15);
         }
 
