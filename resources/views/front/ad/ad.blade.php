@@ -61,7 +61,8 @@
                 </aside>
                 <div class="column-content">
                     <div class="adv-title">
-                        <h1><span>{{ $ad->name }}</span> <a href="#" class="adv-bookmark" title="Добавить в избранное"></a></h1>
+                        <h1><span>{{ $ad->name }}</span></h1>
+                        {{--<a href="#" class="adv-bookmark" title="Добавить в избранное"></a>--}}
 
                         <div class="adv-img visible-xs">
                             <a href="{{ $ad->image }}" data-rel="colorbox" class="colorbox group1" title="{{ $ad->name }}">
@@ -140,6 +141,7 @@
                     </div>
                     @endif
 
+                    @if ($ad->email)
                     <div class="adv-callback">
                         <div class="adv-h">Связь:</div>
 
@@ -192,9 +194,10 @@
                                     </button>
                                 </div>
                             </div>
-
                         </form>
+
                     </div>
+                    @endif
 
                 </div> <!-- column-content -->
             </div> <!-- columns -->
