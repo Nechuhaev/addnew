@@ -32,7 +32,7 @@
                         </div>
                     @endif
 
-                    <form class="form-account" action="{{ $action }}" method="post" enctype="multipart/form-data" >
+                    <form class="form-account" action="{{ $action }}" method="post">
                         @csrf
 
                         <div class="account-author author-edit">

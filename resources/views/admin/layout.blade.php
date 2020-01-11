@@ -111,7 +111,7 @@
                     <!-- ============================================================== -->
 
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark pro-pic" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="{{ asset('assets/admin/assets/images/users/1.jpg') }}" alt="user" class="rounded-circle" width="31"></a>
+                        <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark pro-pic" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="{{ Auth::user()->image ?? asset('assets/front/img/placeholder.png') }}" alt="user" class="" width="31"></a>
                         <div class="dropdown-menu dropdown-menu-right user-dd animated">
                             <a href="{{ route('admin.user', ['id' => Auth::user()->id]) }}" class="dropdown-item"><i class="mdi mdi-face-profile m-r-5 m-l-5"></i> Редактировать профиль</a>
                             <a class="dropdown-item" href="{{ route('logout') }}"

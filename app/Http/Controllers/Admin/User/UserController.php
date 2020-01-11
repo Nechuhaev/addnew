@@ -84,6 +84,11 @@ class UserController extends Controller
             $user->is_admin = (int)$request->post('is_admin');
         }
 
+
+        if ($request->has('image')) {
+            $user->image = $request->get('image');
+        }
+
         if ($request->post('password')) {
 
             $validator = Validator::make($request->all(), ['password' => 'required|confirmed|min:6']);

@@ -67,11 +67,7 @@
                         <div class="card-body">
                             <div class="row align-items-center">
                                 <div class="col-1">
-                                    <div class="user-avatar" style="{{ $user->avatar_gradient }}">
-                                        <div class="inner">
-                                            {{ $user->avatar_text }}
-                                        </div>
-                                    </div>
+                                    <img src="{{ $user->image ?? asset('assets/front/img/placeholder.png') }}" alt="user" width="60">
                                 </div>
                                 <div class="col-2">
                                     <div><small class="text-muted">ФИО</small></div>
