@@ -14,9 +14,59 @@ class UserController extends Controller
         return view('admin.users.user', ['user' => $user]);
     }
 
-    public function showUsersList() {
-        $users = User::orderBy('created_at', 'desc')->paginate(15);
-        return view('admin.users.list', ['users' => $users]);
+    public function showUsersList(Request $request) {
+        if ($request->has('order')) {
+            $order = $request->get('order');
+        } else {
+            $order = 'created_at';
+        }
+        $direction = $request->get('direction') ?? 'desc';
+
+        // Сортировка по username
+        if ($order == 'username') {
+            $users = User::withCount('ads')->orderBy('firstname', $direction)->orderBy('email', $direction)->paginate(15);
+        } else {
+            $users = User::withCount('ads')->orderBy($order, $direction)->paginate(15);
+        }
+
+        return view('admin.users.list', [
+            'users' => $users,
+            'order' => $order,
+            'direction' => $direction,
+            'action_search' => route('admin.users.search'),
+        ]);
+    }
+
+    public function search(Request $request)
+    {
+        $s = $request->name;
+
+        $users = User::where('email', 'like', '%' . $s . '%')
+            ->orWhere('firstname', 'like', '%' . $s . '%')
+            ->orWhere('lastname', 'like', '%' . $s . '%');
+
+
+        if ($request->has('order')) {
+            $order = $request->get('order');
+        } else {
+            $order = 'created_at';
+        }
+        $direction = $request->get('direction') ?? 'desc';
+
+        // Сортировка по username
+        if ($order == 'username') {
+            $users = $users->orderBy('firstname', $direction)->orderBy('email', $direction)->paginate(15);
+        } else {
+            $users = $users->orderBy($order, $direction)->paginate(15);
+        }
+
+        return view('admin.users.list', [
+            'users' => $users,
+            'order' => $order,
+            'direction' => $direction,
+            's' => $s,
+            'action_search' => route('admin.users.search'),
+        ]);
     }
 
     public function update(Request $request) {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\UserPasswordDetails;
 use App\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -25,6 +26,9 @@ class ULoginController extends Controller
 
         // Check exist user.
         if (isset($userData->id)) {
+
+            $userData->updated_at = Carbon::now()->toDateTimeString();
+            $userData->save();
             Auth::loginUsingId($userData->id, TRUE);
 
             return redirect(route('profile.ads'));

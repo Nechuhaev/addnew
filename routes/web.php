@@ -115,6 +115,7 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
 
     // Пользователи
     Route::get('/users', 'Admin\User\UserController@showUsersList')->name('admin.users');
+    Route::get('/users/search', 'Admin\User\UserController@search')->name('admin.users.search');
     Route::get('/user/{id}', 'Admin\User\UserController@showUserInformation')->name('admin.user');
     Route::post('/user/update', 'Admin\User\UserController@update')->name('admin.user.update');
 

@@ -26,6 +26,8 @@ class AdminPageController extends Controller
         $data['ads_count_today'] = Ad::whereDate('created_at', Carbon::today())->count();
         $data['ads_count_week'] = Ad::whereDate('created_at', '>', Carbon::today()->subDays(30))->count();
 
+        $data['recent_ads'] = Ad::orderBy('created_at', 'desc')->take(10)->get();
+
         $data['top_countries'] = DB::table('ad_countries')
             ->selectRaw('ad_countries.name, COUNT(ads.id) as ads_count, MAX(ads.created_at) as last_created_at')
             ->leftJoin('ad_regions', 'ad_regions.country_id', '=', 'ad_countries.id')

@@ -29,14 +29,42 @@
     <!-- Email campaign chart -->
     <!-- ============================================================== -->
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Объявления за последние 7 дней</h4>
-                    <div class="sales ct-charts mt-3"></div>
+                    <h4 class="card-title">Последние 10 объявлений</h4>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th class="border-top-0" style="font-size: 10px; font-weight: 900">№</th>
+                                    <th class="border-top-0" style="font-size: 10px; font-weight: 900">НАЗВАНИЕ</th>
+                                    <th class="border-top-0 text-center" style="font-size: 10px; font-weight: 900">АВТОР</th>
+                                    <th class="border-top-0 text-center" style="font-size: 10px; font-weight: 900">ДАТА</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @foreach($recent_ads as $recent_ad)
+                                    <tr>
+                                        <td class="txt-oflo">{{ $loop->iteration}}</td>
+                                        <td class="txt-oflo" style="font-size: 12px">{{ $recent_ad->name }}</td>
+                                        <td class="text-center"><span class="label label-info label-rounded">{{ $recent_ad->user->username }}</span> </td>
+                                        <td class="txt-oflo text-center" style="font-size: 10px">{{ date('d-m-Y H:s', strtotime($recent_ad->created_at)) }}</td>
+                                    </tr>
+                                @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {{--<div class="sales ct-charts mt-3"></div>--}}
                 </div>
             </div>
         </div>
+
+    </div>
+
+    <div class="row">
         <div class="col-md-4">
             <div class="card">
                 <div class="card-body">
@@ -56,9 +84,31 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="col-md-4">
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title m-b-0">Пользователи</h4>
+                    <h2 class="font-light">{{ $customers_count }}</h2>
+                    <div class="m-t-30">
+                        <div class="row text-center">
+                            <div class="col-6 border-right">
+                                <h4 class="m-b-0">{{ $customers_count_today }}</h4>
+                                <span class="font-14 text-muted">Сегодня</span>
+                            </div>
+                            <div class="col-6">
+                                <h4 class="m-b-0">{{ $customers_count_week }}</h4>
+                                <span class="font-14 text-muted">за 30 дней</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title m-b-0">Просмотры</h4>
                     <h2 class="font-light">{{ $customers_count }}</h2>
                     <div class="m-t-30">
                         <div class="row text-center">
@@ -85,7 +135,7 @@
     <div class="row">
         <!-- column -->
         @if($top_countries)
-        <div class="col-6">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-5">
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Топ 10 стран</h4>
@@ -95,19 +145,19 @@
                     <table class="table table-hover">
                         <thead>
                         <tr>
-                            <th class="border-top-0">№</th>
-                            <th class="border-top-0">СТРАНА</th>
-                            <th class="border-top-0 text-center">ВСЕГО ОБЪЯВЛЕНИЙ</th>
-                            <th class="border-top-0 text-center">ПОСЛЕДНЕЕ</th>
+                            <th class="border-top-0" style="font-size: 10px; font-weight: 900">№</th>
+                            <th class="border-top-0" style="font-size: 10px; font-weight: 900">СТРАНА</th>
+                            <th class="border-top-0 text-center" style="font-size: 10px; font-weight: 900">ВСЕГО ОБЪЯВЛЕНИЙ</th>
+                            <th class="border-top-0 text-center" style="font-size: 10px; font-weight: 900">ПОСЛЕДНЕЕ</th>
                         </tr>
                         </thead>
                         <tbody>
                         @foreach($top_countries as $top_country)
                             <tr>
                                 <td class="txt-oflo">{{ $loop->iteration}}</td>
-                                <td class="txt-oflo">{{ $top_country->name }}</td>
+                                <td class="txt-oflo" style="font-size: 12px">{{ $top_country->name }}</td>
                                 <td class="text-center"><span class="label label-success label-rounded">{{ $top_country->ads_count }}</span> </td>
-                                <td class="txt-oflo text-center">{{ date('d-m-Y H:s', strtotime($top_country->last_created_at)) }}</td>
+                                <td class="txt-oflo text-center" style="font-size: 10px">{{ date('d-m-Y H:s', strtotime($top_country->last_created_at)) }}</td>
                             </tr>
                         @endforeach
                         </tbody>
@@ -119,29 +169,28 @@
 
 
         @if($top_categories)
-            <div class="col-6">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-7">
                 <div class="card">
                     <div class="card-body">
                         <h4 class="card-title">Топ 10 категорий</h4>
                     </div>
                     <div class="table-responsive">
-
                         <table class="table table-hover">
                             <thead>
                             <tr>
-                                <th class="border-top-0">№</th>
-                                <th class="border-top-0">СТРАНА</th>
-                                <th class="border-top-0 text-center">ВСЕГО ОБЪЯВЛЕНИЙ</th>
-                                <th class="border-top-0 text-center">ПОСЛЕДНЕЕ</th>
+                                <th class="border-top-0" style="font-size: 10px; font-weight: 900">№</th>
+                                <th class="border-top-0" style="font-size: 10px; font-weight: 900">Категория</th>
+                                <th class="border-top-0 text-center" style="font-size: 10px; font-weight: 900">ВСЕГО ОБЪЯВЛЕНИЙ</th>
+                                <th class="border-top-0 text-center" style="font-size: 10px; font-weight: 900">ПОСЛЕДНЕЕ</th>
                             </tr>
                             </thead>
                             <tbody>
                             @foreach($top_categories as $top_category)
                                 <tr>
                                     <td class="txt-oflo">{{ $loop->iteration}}</td>
-                                    <td class="txt-oflo">{{ $top_category->name }}</td>
+                                    <td class="txt-oflo" style="font-size: 12px">{{ $top_category->name }}</td>
                                     <td class="text-center"><span class="label label-info label-rounded">{{ $top_category->ads_count }}</span> </td>
-                                    <td class="txt-oflo text-center">{{ date('d-m-Y H:s', strtotime($top_category->last_created_at)) }}</td>
+                                    <td class="txt-oflo text-center" style="font-size: 10px">{{ date('d-m-Y H:s', strtotime($top_category->last_created_at)) }}</td>
                                 </tr>
                             @endforeach
                             </tbody>
