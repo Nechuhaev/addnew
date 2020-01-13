@@ -174,6 +174,24 @@ class GenerateSitemap extends Command
         $this->line('ads.xml создано');
 
         $sitemap_index->writeToFile(public_path('sitemap.xml'));
+
+        // tags
+        $sitemap_tags = Sitemap::create();
+
+        DB::table('ad_tags')->select("slug")->get()->each(function ($item) use ($sitemap_tags) {
+            if ($item->slug) {
+                $sitemap_tags->add(route('tag', ['slug' => $item->slug]));
+            }
+        });
+
+        $sitemap_tags->writeToFile(public_path('tags.xml'));
+        unset($sitemap_tags);
+        $sitemap_index->add('/tags.xml');
+        $this->line('tags.xml создано');
+
+        $sitemap_index->writeToFile(public_path('sitemap.xml'));
+
         $this->line('sitemap.xml завершен.');
+
     }
 }
