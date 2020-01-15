@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Front\Page;
 
 use App\Http\Controllers\Controller;
+use App\Mail\ContactForm;
 use App\Page;
 use App\SeoField;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class PageController extends Controller
 {
@@ -22,7 +24,31 @@ class PageController extends Controller
         abort(404);
     }
 
-    function contacts() {
+    public function contacts(Request $request) {
+
+        if ($request->isMethod('post')) {
+            $errors = [
+                'name.*' => 'Введите Ваше имя!',
+                'email.*' => 'Введите email!',
+                'subject.*' => 'Выберите раздел обращения!',
+                'description.required' => 'Текст обращения не может быть пустым',
+                'description.min' => 'Минимальная длина текста обращения :min символов',
+                'images.image' => 'Вы можете загружать только изображения',
+                'images.max' => 'Максимальный размер загружаемого файла превышает :max',
+                'images.mimes' => 'Для загрузки доступны только форматы :mimes',
+            ];
+
+            $request->validate([
+                'name' => 'required|max:255',
+                'email' => 'required|email',
+                'subject' => 'required|not_in:0',
+                'description' => 'required|min:10',
+                'images.*' => 'image|max:1024|mimes:jpg,jpeg,bmp,png'
+            ], $errors);
+
+            Mail::send(new ContactForm($request->get('name'), $request->get('email'), $request->get('subject'), $request->get('description'), $request->allFiles()));
+            dd($request->all());
+        }
         // SEO поля
         $seo_field = SeoField::where('index', 'contacts')->first();
         if ($seo_field) {

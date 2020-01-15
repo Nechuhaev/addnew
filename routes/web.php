@@ -21,6 +21,7 @@ Route::get('/', "Front\HomeController@index")->name('index');
 Route::get('/subscribe', "Front\HomeController@subscribe")->name('subscribe');
 
 Route::get('/contacts', "Front\Page\PageController@contacts")->name('contacts');
+Route::post('/contacts', "Front\Page\PageController@contacts")->name('contacts.submit');
 Route::post('ulogin', 'ULoginController@login');
 
 // Авторизация

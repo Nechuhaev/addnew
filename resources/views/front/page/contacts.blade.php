@@ -18,6 +18,7 @@
 
             <h1>Контакты</h1>
 
+
             <div class="columns columns-nowrap">
                 <aside class="column-left hidden-xs">
                     <div class="notice-wrap">
@@ -40,33 +41,43 @@
                         </div>
                     </div>
 
-                    <form class="form-contact" action="#" method="post" enctype="multipart/form-data" >
+                    <form class="form-contact" action="{{ route('contacts.submit') }}" method="post" enctype="multipart/form-data" >
+                        @csrf
+                        @if ($errors->any())
+                            <div class="alert alert-danger">
+                                <ul style="padding: 0 0 0 10px;margin: 0;">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
                         <div class="form-group">
                             <label>Ваше имя <span class="star">*</span>:</label>
-                            <input type="text" class="form-control">
+                            <input type="text" name="name" class="form-control" value="{{ old('name') }}">
                         </div>
                         <div class="form-group">
                             <label>Введите ваш адрес электронной почты <span class="star">*</span>:</label>
-                            <input type="mail" class="form-control" >
+                            <input type="email" name="email" class="form-control" value="{{ old('email') }}">
                         </div>
                         <div class="form-group">
                             <label>Выберите интересующий вас раздел <span class="star">*</span>:</label>
-                            <select class="form-control" style="width: 100%;">
-                                <option value="">-- Выберите --</option>
-                                <option value="4">Проблемы регистрации и входа</option>
-                                <option value="63">Объявление на модерации</option>
-                                <option value="81">У меня не работает...</option>
-                                <option value="173">Профиль, управление объявлениями</option>
+                            <select name="subject" class="form-control" style="width: 100%;">
+                                <option value="0">-- Выберите --</option>
+                                <option value="Проблемы регистрации и входа">Проблемы регистрации и входа</option>
+                                <option value="Объявление на модерации">Объявление на модерации</option>
+                                <option value="У меня не работает...">У меня не работает...</option>
+                                <option value="Профиль, управление объявлениями">Профиль, управление объявлениями</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label>Описание <span class="star">*</span></label>
-                            <textarea rows="8" class="form-control"></textarea>
+                            <textarea name="description" rows="8" class="form-control">{{ old('description') }}</textarea>
                         </div>
 
                         <div class="form-group">
                             <label>Изображения</label>
-                            <input type="file">
+                            <input type="file" multiple name="images">
                             <p class="help">Допустимое количество загружаемых файлов: 5. Максимальный размер файла: 1024 KB.</p>
                         </div>
 
