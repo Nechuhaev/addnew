@@ -51,17 +51,7 @@ class GenerateSitemap extends Command
     public function handle()
     {
 
-        //DB::raw("SELECT c.slug as country, r.slug as region FROM ad_regions r LEFT JOIN ad_countries c ON r.country_id = c.id")->getValue();
-//        DB::table('ad_regions')
-//            ->selectRaw('ad_countries.slug as country, ad_regions.slug as region')
-//            ->leftJoin('ad_countries', 'ad_regions.id', '=', 'ad_countries.id')
-//            ->get()->each(function ($item) {
-//                $this->line($item->country);
-//            });
-//        $this->line(DB::table('ad_cities')
-//            ->selectRaw('ad_countries.slug as country, ad_regions.slug as region, ad_cities.slug as city')
-//            ->leftJoin('ad_regions', 'ad_cities.region_id', '=', 'ad_regions.id')
-//            ->leftJoin('ad_countries', 'ad_regions.country_id', '=', 'ad_countries.id')->toSql());
+        ini_set('memory_limit', '-1');
 
         $sitemap_index = SitemapIndex::create();
 
