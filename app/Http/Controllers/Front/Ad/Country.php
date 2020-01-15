@@ -21,7 +21,16 @@ class Country extends Controller
     {
 
         $data['countries'] = Cache::remember('countries_info', 50000, function () {
-            $countries = AdCountry::all();
+            $countries = DB::table('ad_countries')
+                ->selectRaw('ad_countries.id, ad_countries.name, ad_countries.slug, ad_countries.image, count(DISTINCT ads.id) as ads_count')
+                ->leftJoin('ad_regions', 'ad_countries.id', '=', 'ad_regions.country_id')
+                ->leftJoin('ad_cities', 'ad_regions.id', '=', 'ad_cities.region_id')
+                ->leftJoin('ads', 'ads.city_id', '=', 'ad_cities.id')
+                ->where('ad_countries.image', '<>', '')
+                ->groupBy('ad_countries.id')
+                ->having('ads_count', '>', '0')
+                ->orderBy('ads_count', 'DESC')
+                ->get();
 
             $countries_array = [];
             foreach ($countries as $country) {
@@ -34,6 +43,7 @@ class Country extends Controller
                     ->where('ad_countries.id', $country->id)
                     ->orderBy('ads_count', 'desc')
                     ->groupBy("ad_cities.id")
+                    ->having('ads_count', '>', '0')
                     ->limit('10')
                     ->get();
 
