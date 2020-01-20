@@ -43,7 +43,10 @@ class ContactForm extends Mailable
             ->subject($this->_subject);
         if ($this->_images) {
             foreach ($this->_images as $image) {
-                $this->attach($image);
+                $this->attach($image->getRealPath(), [
+                    'as' => $image->getClientOriginalName(),
+                    'mime' => $image->getMimeType()
+                ]);
             }
         }
         return $this->view('mail.contact')->with([

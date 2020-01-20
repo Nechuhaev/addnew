@@ -52,6 +52,12 @@
                                 </ul>
                             </div>
                         @endif
+
+                        @if(session()->has('success'))
+                            <div class="alert alert-success">
+                                {{ session()->get('success') }}
+                            </div>
+                        @endif
                         <div class="form-group">
                             <label>Ваше имя <span class="star">*</span>:</label>
                             <input type="text" name="name" class="form-control" value="{{ old('name') }}">

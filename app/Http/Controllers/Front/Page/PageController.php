@@ -47,7 +47,8 @@ class PageController extends Controller
             ], $errors);
 
             Mail::send(new ContactForm($request->get('name'), $request->get('email'), $request->get('subject'), $request->get('description'), $request->allFiles()));
-            dd($request->all());
+
+            return redirect(route('contacts'))->with('success', 'Форма отправлена!');
         }
         // SEO поля
         $seo_field = SeoField::where('index', 'contacts')->first();
