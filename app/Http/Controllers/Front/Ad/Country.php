@@ -125,6 +125,10 @@ class Country extends Controller
             ];
         }
 
+        if (request()->get('page')) {
+            $meta['description'] = false;
+        }
+
         $results = Ad::getAds()->where('ad_countries.id', $entity->id)
             ->paginate(15);
 

@@ -28,6 +28,7 @@
                     </div>
 
 
+                    @if($meta['description'])
                     <div class="show-more">
                         <section class="show-more__text">
                             {!! $meta['description']  !!}
@@ -35,6 +36,7 @@
                         <div class="show-more__shadow"></div>
                         <span class="show-more__btn btn-show">Показать</span>
                     </div>
+                    @endif
 
                 </div>
                 <aside class="column-right">

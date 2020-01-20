@@ -1,5 +1,9 @@
 @extends('front.layout')
 
+@section('meta_title', "Шаг 2. Подать бесплатное объявление | Доска объявлений AddNew.Biz Украина")
+
+@section('meta_description', "Доска объявлений AddNew.biz предлагает разместить бесплатное объявление любой тематики в нашем каталоге. Подать объявление могут зарегистрированные и незарегистрированные пользователи")
+
 @section('content')
     <main class="steps-page">
         <div class="container">

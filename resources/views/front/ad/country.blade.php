@@ -40,13 +40,15 @@
                 </div>
 
 
-                <div class="show-more">
-                    <section class="show-more__text">
-                        {!! $meta['description']  !!}
-                    </section>
-                    <div class="show-more__shadow"></div>
-                    <span class="show-more__btn btn-show">Показать</span>
-                </div>
+                @if($meta['description'])
+                    <div class="show-more">
+                        <section class="show-more__text">
+                            {!! $meta['description']  !!}
+                        </section>
+                        <div class="show-more__shadow"></div>
+                        <span class="show-more__btn btn-show">Показать</span>
+                    </div>
+                @endif
 
             </div>
 

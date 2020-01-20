@@ -35,6 +35,10 @@ class Region extends Controller
             ];
         }
 
+        if (request()->get('page')) {
+            $meta['description'] = false;
+        }
+
         $results = Ad::getAds()->where('ad_regions.id', $entity->id)
             ->paginate(15);
 

@@ -1647,7 +1647,9 @@ hr {
     margin-bottom: 30px;
     overflow: hidden
 }
-
+.show-more.visible .show-more__shadow {
+    position: initial;
+}
 .show-more__btn {
     position: absolute;
     bottom: 0;

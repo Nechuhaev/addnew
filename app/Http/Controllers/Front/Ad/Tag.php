@@ -34,6 +34,10 @@ class Tag extends Controller
             ];
         }
 
+        if (request()->get('page')) {
+            $meta['description'] = false;
+        }
+
         $results = Ad::getAds()
             ->leftJoin('ad_tag', 'ad_tag.ad_id', '=', 'ads.id')
             ->where('ad_tag.tag_id', $entity->id)

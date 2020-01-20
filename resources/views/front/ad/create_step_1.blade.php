@@ -1,5 +1,9 @@
 @extends('front.layout')
 
+@section('meta_title', "Подать бесплатное объявление | Доска объявлений AddNew.Biz Украина")
+
+@section('meta_description', "Доска объявлений AddNew.biz предлагает разместить бесплатное объявление любой тематики в нашем каталоге. Подать объявление могут зарегистрированные и незарегистрированные пользователи")
+
 @section('content')
 
 <main class="steps-page">
@@ -12,6 +16,7 @@
             <li><a href="{{ route('index') }}">Главная</a></li>
             <li><span>Выбор категории</span></li>
         </ul>
+        <h1>Подать бесплатное объявление на addnew.biz</h1>
 
         <ul class="steps-row" data-steps="4">
             <li class="steps-done">Категория</li>

@@ -57,6 +57,10 @@ class Category extends Controller
             ];
         }
 
+        if (request()->get('page')) {
+            $meta['description'] = false;
+        }
+
         return view('front.ad.category')->with([
             'entity' => $entity,
             'ads' => $ads,

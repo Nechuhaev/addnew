@@ -18,7 +18,7 @@
                     @if ($page == $paginator->currentPage())
                         <span aria-current="page" class="pagination-item current">{{ $page }}</span>
                     @else
-                        <a class="pagination-item cp-fixed-color btn_orange" rel="nofollow" href="{{ $url }}">{{ $page }}</a>
+                        <a class="pagination-item cp-fixed-color btn_orange" href="{{ $url }}">{{ $page }}</a>
                     @endif
                 @endforeach
             @endif
