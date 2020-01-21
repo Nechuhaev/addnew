@@ -8,6 +8,7 @@ use App\AdTag;
 use App\Http\Controllers\Controller;
 use App\SeoField;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class Category extends Controller
 {
@@ -61,12 +62,20 @@ class Category extends Controller
             $meta['description'] = false;
         }
 
+        $microdata_info = DB::table('ad_categories')
+            ->selectRaw('min(ads.price) as min, max(ads.price) as max, count(ads.id) as ads_count')
+            ->leftJoin('ads', 'ad_categories.id', '=', 'ads.category_id')
+            ->whereIn('ad_categories.id', $categories_in)
+            ->where('ads.price', '>', 0)
+            ->first();
+
         return view('front.ad.category')->with([
             'entity' => $entity,
             'ads' => $ads,
             'links' => $results->links('front.widgets.paginate'),
             'tags' => AdTag::getAdsTags($ads),
             'breadcrumbs' => 'category.page',
+            'microdata' => $microdata_info,
             'meta' => $meta
         ]);
     }

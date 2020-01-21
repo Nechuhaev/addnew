@@ -28,6 +28,21 @@
     <link rel="canonical" href="{{ url()->current() }}" />
     @endif
 
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "url": "https://addnew.biz",
+      "email": "info@addnew.biz",
+      "name": "ADDNEW.BIZ",
+      "logo": "https://addnew.biz/assets/front/img/logo.png",
+      "potentialAction": [{
+          "@type": "SearchAction",
+          "target": "https://addnew.biz//search?s={search_term_string}&cat_id=0&sub_cat_id=0&city_id=0",
+          "query-input": "required name=search_term_string"
+      }]
+    }
+    </script>
 
 </head>
 <body class=""> <!-- fixed -->

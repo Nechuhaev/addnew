@@ -7,6 +7,7 @@ use App\AdTag;
 use App\Http\Controllers\Controller;
 use App\SeoField;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class Tag extends Controller
 {
@@ -45,12 +46,22 @@ class Tag extends Controller
 
         $ads = Ad::getLoopArray($results);
 
+        $microdata_info = DB::table('ad_tags')
+            ->selectRaw('min(ads.price) as min, max(ads.price) as max, count(ads.id) as ads_count')
+            ->leftJoin('ad_tag', 'ad_tag.tag_id', '=', 'ad_tags.id')
+            ->leftJoin('ads', 'ads.id', '=', 'ad_tag.ad_id')
+            ->where('ad_tags.id', $entity->id)
+            ->where('ads.price', '>', 0)
+            ->first();
+
+
         return view('front.ad.country')->with([
             'entity' => $entity,
             'ads' => $ads,
             'links' => $results->links('front.widgets.paginate'),
             'children' => $entity->regions,
             'tags' => AdTag::getAdsTags($ads),
+            'microdata' => $microdata_info,
             'breadcrumbs' => 'ad_tag',
             'meta' => $meta
         ]);

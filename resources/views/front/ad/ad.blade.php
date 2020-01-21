@@ -23,7 +23,27 @@
             </div>
             @endif
 
-            <div class="columns columns-nowrap">
+            <div class="columns columns-nowrap" itemtype="http://schema.org/Product">
+                <meta itemprop="name" content="{{ $ad->name }}" />
+                <link itemprop="image" href="{{ $ad->image }}" />
+                @if($ad->images && !empty($ad->images[0]))
+                    <link itemprop="image" href="{{ $image }}" />
+                @endif
+                <meta itemprop="description" content="{{ $ad->content }}" />
+                <div itemprop="offers" itemtype="http://schema.org/Offer" itemscope>
+                    <link itemprop="url" href="{{ $ad->url }}" />
+                    <meta itemprop="availability" content="https://schema.org/InStock" />
+                    @foreach($prices as $price)
+                        @if($price['selected'])
+                            <meta itemprop="priceCurrency" content="{{ $price['currency'] }}" />
+                            <meta itemprop="price" content="{{ $price['value'] }}" />
+                        @endif
+                    @endforeach
+                    <div itemprop="seller" itemtype="http://schema.org/Organization" itemscope>
+                        <meta itemprop="name" content="{{ $ad->user->username }}" />
+                    </div>
+                </div>
+
                 <aside class="column-left hidden-xs">
                     <div class="adv-img">
                         <a href="{{ $ad->image }}" data-rel="colorbox" class="colorbox group1" title="{{ $ad->name }}">

@@ -134,12 +134,23 @@ class Country extends Controller
 
         $ads = Ad::getLoopArray($results);
 
+        $microdata_info = DB::table('ad_countries')
+            ->selectRaw('min(ads.price) as min, max(ads.price) as max, count(ads.id) as ads_count')
+            ->leftJoin('ad_regions', 'ad_regions.country_id', '=', 'ad_countries.id')
+            ->leftJoin('ad_cities', 'ad_cities.region_id', '=', 'ad_regions.id')
+            ->leftJoin('ads', 'ads.city_id', '=', 'ad_cities.id')
+            ->where('ad_countries.id', $entity->id)
+            ->where('ads.price', '>', 0)
+            ->first();
+        
+
         return view('front.ad.country')->with([
             'entity' => $entity,
             'ads' => $ads,
             'links' => $results->links('front.widgets.paginate'),
             'children' => $entity->regions,
             'tags' => AdTag::getAdsTags($ads),
+            'microdata' => $microdata_info,
             'breadcrumbs' => 'country.page',
             'meta' => $meta
         ]);

@@ -1,12 +1,5 @@
 @if (count($breadcrumbs))
 
-
-
-        <a itemprop="item" href="https://example.com/books">
-            <span itemprop="name">Books</span></a>
-        <meta itemprop="position" content="1" />
-
-
     <ol class="breadcrumb" itemscope itemtype="https://schema.org/BreadcrumbList">
         @foreach ($breadcrumbs as $breadcrumb)
 

@@ -26,6 +26,14 @@
 
 
         <div class="columns columns-nowrap">
+            @if($microdata)
+                <div itemtype="http://schema.org/AggregateOffer" itemscope itemprop="offers">
+                    <meta content="{{ $microdata->ads_count }}" itemprop="offerCount">
+                    <meta content="{{ $microdata->max }}" itemprop="highPrice">
+                    <meta content="{{ $microdata->min }}" itemprop="lowPrice">
+                    <meta content="UAH" itemprop="priceCurrency">
+                </div>
+            @endif
             <div class="column-content">
                 <div class="banner">
                     @include('front.adsense.top-listing')

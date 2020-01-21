@@ -28,7 +28,7 @@ class CreateAdsTable extends Migration
             $table->string('name', 255);
             $table->string('slug', 255);
             $table->text('content');
-            $table->string('price')->nullable();
+            $table->integer('price')->nullable();
             $table->string('telephone');
             $table->string('email');
             $table->string('meta_title', 255)->nullable();
