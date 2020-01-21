@@ -166,18 +166,25 @@ class GenerateSitemap extends Command
         $sitemap_index->writeToFile(public_path('sitemap.xml'));
 
         // tags
-        $sitemap_tags = Sitemap::create();
+        $tags_collection = DB::table('ad_tags')->select("slug", 'id')->get();
 
-        DB::table('ad_tags')->select("slug")->get()->each(function ($item) use ($sitemap_tags) {
-            if ($item->slug) {
-                $sitemap_tags->add(route('tag', ['slug' => $item->slug]));
-            }
-        });
+        $tags_parts = $tags_collection->chunk(3000);
 
-        $sitemap_tags->writeToFile(public_path('tags.xml'));
-        unset($sitemap_tags);
-        $sitemap_index->add('/tags.xml');
-        $this->line('tags.xml создано');
+        foreach ($tags_parts as $tags_part_key => $tags_part) {
+            $sitemap_tags = Sitemap::create();
+
+            $tags_part->each(function ($item) use ($sitemap_tags) {
+                if ($item->slug) {
+                    $sitemap_tags->add(route('tag', ['slug' => $item->slug]));
+                }
+            });
+
+            $file_name = 'tags' . $tags_part_key . '.xml';
+            $sitemap_tags->writeToFile(public_path($file_name));
+            unset($sitemap_tags);
+            $sitemap_index->add('/'.$file_name);
+            $this->line($file_name. ' создано');
+        }
 
         $sitemap_index->writeToFile(public_path('sitemap.xml'));
 
