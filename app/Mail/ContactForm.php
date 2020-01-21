@@ -38,7 +38,7 @@ class ContactForm extends Mailable
      */
     public function build()
     {
-        $this->to('info@addnew.biz')
+        $this->to('a.nechuhaev@gmail.com')
             ->replyTo($this->_email, $this->_name)
             ->subject($this->_subject);
         if ($this->_images) {
