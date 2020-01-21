@@ -88,7 +88,7 @@
                         </div>
 
                         <div class="form-action">
-                            <input type="submit" class="btn btn-contact" value="Обновить профиль">
+                            <input type="submit" class="btn btn-contact" value="Отправить">
                         </div>
 
                     </form>
