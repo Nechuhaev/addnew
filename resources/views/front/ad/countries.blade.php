@@ -16,7 +16,7 @@
                 @foreach($countries as $country)
                     <div class="col">
                         <div class="country-wrap">
-                            <a href="{{ $country['url'] }}" class="country-name"><img src="{{ $country['image'] }}"> <span>{{ $country['name'] }}</span> </a>
+                            <a href="{{ $country['url'] }}" class="country-name"><img src="{{ $country['image'] }}" alt="{{ $country['name'] }}"> <span>{{ $country['name'] }}</span> </a>
                             @if($country['cities'])
                                 <ul class="cities-list cities-list-visible">
                                 @foreach($country['cities'] as $city)
