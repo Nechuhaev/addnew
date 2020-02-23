@@ -1,5 +1,9 @@
 @extends('front.layout')
 
+@section('meta_title', $meta['meta_title'] ?? $entity->name)
+
+@section('meta_description', $meta['meta_description'] ?? $entity->content)
+
 @section('content')
     <main class="category-page">
         <div class="container">
@@ -25,6 +29,16 @@
                     <div class="banner">
                         @include('front.adsense.bottom-listing')
                     </div>
+
+                    @if($meta['description'])
+                        <div class="show-more">
+                            <section class="show-more__text">
+                                {!! $meta['description']  !!}
+                            </section>
+                            <div class="show-more__shadow"></div>
+                            <span class="show-more__btn btn-show">Показать</span>
+                        </div>
+                    @endif
 
                 </div>
                 <aside class="column-right">

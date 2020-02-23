@@ -215,6 +215,7 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::get('/seo/ad-country', 'Admin\Seo\AdCountry@form')->name('admin.seo.ad-country');
     Route::get('/seo/ad-region', 'Admin\Seo\AdRegion@form')->name('admin.seo.ad-region');
     Route::get('/seo/ad-city', 'Admin\Seo\AdCity@form')->name('admin.seo.ad-city');
+    Route::get('/seo/search', 'Admin\Seo\Search@form')->name('admin.seo.search');
 });
 
 

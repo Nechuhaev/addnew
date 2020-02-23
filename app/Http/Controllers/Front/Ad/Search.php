@@ -6,6 +6,7 @@ use App\Ad;
 use App\AdCategory;
 use App\AdTag;
 use App\Http\Controllers\Controller;
+use App\SeoField;
 use Illuminate\Http\Request;
 
 class Search extends Controller
@@ -61,13 +62,39 @@ class Search extends Controller
         $ads = Ad::getLoopArray($results);
 
 
+        // seo data
+        $seo_field = SeoField::where('index', 'search')->first();
+
+        if ($seo_field) {
+            $entity_values = [
+                '---searched_term---'  => $request->get('s'),
+                '---results_count---'  => $results->total(),
+            ];
+            $meta = [
+                'meta_title' => strtr($seo_field->meta_title, $entity_values),
+                'meta_description' => strtr($seo_field->meta_description, $entity_values),
+                'description' => strtr($seo_field->description, $entity_values)
+            ];
+        } else {
+            $meta = [
+                'meta_title' => "Результаты поиска на доске объевлений ADDNEW.BIZ",
+                'meta_description' => "Результаты поиска на доске объевлений ADDNEW.BIZ",
+                'description' => false,
+            ];
+        }
+
+        if (request()->get('page')) {
+            $meta['description'] = false;
+        }
+
 
         return view('front.ad.search')->with([
             'ads' => $ads,
             'links' => $results->onEachSide(1)->links('front.widgets.paginate'),
             'tags' => AdTag::getAdsTags($ads),
             'breadcrumbs' => 'region.page',
-            'total' => $results->total()
+            'total' => $results->total(),
+            'meta' => $meta
         ]);
     }
 }
