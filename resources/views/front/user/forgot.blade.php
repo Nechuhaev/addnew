@@ -52,9 +52,9 @@
                             </div>
                         @endif
 
-                        @if (session('success'))
+                        @if (session('status'))
                             <div class="alert alert-success" role="alert">
-                                {{ session('success') }}
+                                {{ session('status') }}
                             </div>
                         @endif
 
