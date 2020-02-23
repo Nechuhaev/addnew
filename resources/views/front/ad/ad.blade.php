@@ -27,7 +27,9 @@
                 <meta itemprop="name" content="{{ $ad->name }}" />
                 <link itemprop="image" href="{{ $ad->image }}" />
                 @if($ad->images && !empty($ad->images[0]))
-                    <link itemprop="image" href="{{ $image }}" />
+                    @foreach($ad->images as $image)
+                        <link itemprop="image" href="{{ $image }}" />
+                    @endforeach
                 @endif
                 <meta itemprop="description" content="{{ $ad->content }}" />
                 <div itemprop="offers" itemtype="http://schema.org/Offer" itemscope>
