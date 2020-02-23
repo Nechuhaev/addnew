@@ -72,7 +72,7 @@ class Category extends Controller
         return view('front.ad.category')->with([
             'entity' => $entity,
             'ads' => $ads,
-            'links' => $results->links('front.widgets.paginate'),
+            'links' => $results->onEachSide(1)->links('front.widgets.paginate'),
             'tags' => AdTag::getAdsTags($ads),
             'breadcrumbs' => 'category.page',
             'microdata' => $microdata_info,

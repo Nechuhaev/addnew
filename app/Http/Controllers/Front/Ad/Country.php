@@ -147,7 +147,7 @@ class Country extends Controller
         return view('front.ad.country')->with([
             'entity' => $entity,
             'ads' => $ads,
-            'links' => $results->links('front.widgets.paginate'),
+            'links' => $results->onEachSide(1)->links('front.widgets.paginate'),
             'children' => $entity->regions,
             'tags' => AdTag::getAdsTags($ads),
             'microdata' => $microdata_info,

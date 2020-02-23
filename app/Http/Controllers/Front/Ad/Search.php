@@ -64,7 +64,7 @@ class Search extends Controller
 
         return view('front.ad.search')->with([
             'ads' => $ads,
-            'links' => $results->links('front.widgets.paginate'),
+            'links' => $results->onEachSide(1)->links('front.widgets.paginate'),
             'tags' => AdTag::getAdsTags($ads),
             'breadcrumbs' => 'region.page',
             'total' => $results->total()
