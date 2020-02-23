@@ -87,21 +87,23 @@ class HomeController extends Controller
         }
 
         // Последние объявления
-        $ads = Cache::remember('home_ads', 120, function () {
-            $_ads = Ad::distinct('user_id')->orderBy('created_at', 'desc')->take(5)->get();
-            $ads = [];
-            if ($_ads) {
-                foreach ($_ads as $ad) {
-                    $ads[] = [
+
+        $ads_groups = Cache::remember('home_ads', 120, function () {
+            $_ads_groups = Ad::distinct('user_id')->orderBy('created_at', 'desc')->take(20)->get()->chunk(5);
+
+            $ads_groups = [];
+            foreach ($_ads_groups as $key => $group) {
+                foreach ($group as $ad) {
+                    $ads_groups[$key][] = [
                         'name' => $ad->name,
                         'url' => $ad->url,
                         'price' => $ad->formetted_price,
                         'image' => $ad->image
                     ];
                 }
-
-                return $ads;
             }
+
+            return $ads_groups;
         });
 
 
@@ -125,7 +127,7 @@ class HomeController extends Controller
         return view('front.index')->with([
             'categories' => $categories,
             'meta' => $meta,
-            'ads' => $ads,
+            'ads_groups' => $ads_groups,
             'cities' => $cities,
             'adsense' => new AdSense()
         ]);

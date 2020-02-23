@@ -47,10 +47,11 @@
                 @include('front.adsense.bottom')
             </div>
 
-            @if ($ads)
+            @if ($ads_groups)
                 <h2 class="last-advs-header">Последние объявления</h2>
-                <div class="last-advs">
-                    @foreach($ads as $ad)
+                    @foreach($ads_groups as $group)
+                    <div class="last-advs" {!!  ($loop->iteration != 1) ? 'style="border:none;"' : ''  !!}>
+                        @foreach($group as $ad)
                         <a href="{{ $ad['url'] }}">
                         <span class="last-adv-title">
                             <img src="{{ $ad['image'] }}" alt="{{ $ad['name'] }}">
@@ -58,8 +59,10 @@
                         </span>
                             <span class="last-adv-price"> {{ $ad['price'] }} </span>
                         </a>
+                        @endforeach
+                    </div>
                     @endforeach
-                </div>
+
             @endif
 
             @if($cities)
