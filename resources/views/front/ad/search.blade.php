@@ -9,7 +9,7 @@
 
             <ul class="breadcrumb">
                 <li><a href="/">Главная</a></li>
-                <li><span>Поиск - "доставка цветов"</span></li>
+                <li><span>Поиск - "{{ request()->get('s') }}"</span></li>
             </ul>
 
             <div class="columns columns-nowrap">
