@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\User;
 use App\Http\Controllers\Controller;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
@@ -96,6 +97,8 @@ class UserController extends Controller
 
             if (count($validator->errors())) {
                 return redirect()->back()->withErrors($validator)->withInput();
+            } else {
+                $user->password = Hash::make($request->post('password'));
             }
 
         }
