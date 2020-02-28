@@ -88,8 +88,9 @@ class HomeController extends Controller
 
         // Последние объявления
 
+
         $ads_groups = Cache::remember('home_ads', 120, function () {
-            $_ads_groups = Ad::distinct('user_id')->orderBy('created_at', 'desc')->take(20)->get()->chunk(5);
+            $_ads_groups = Ad::orderBy('created_at', 'desc')->groupBy('user_id')->take(20)->get()->chunk(5);
 
             $ads_groups = [];
             foreach ($_ads_groups as $key => $group) {
