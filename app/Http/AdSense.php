@@ -5,7 +5,7 @@ namespace App\Http;
 class AdSense {
     public static function block($position) {
         if (env('APP_ENV') == 'production') {
-            echo '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>';
+            echo '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?v='.time().'"></script>';
             switch ($position) {
                 case 'top':
                     echo '<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1409649052535600" data-ad-slot="8755878337" data-ad-format="auto" data-full-width-responsive="true"></ins>';
