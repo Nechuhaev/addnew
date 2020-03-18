@@ -29,6 +29,14 @@ Route::get('/ad/country/{id}', 'API\Ad\Country@show')->name('api.country');
 
 Route::get('/ad/region/{id}', 'API\Ad\Region@show');
 
+
+// V2
+Route::post('v2/ad-create', 'API\Ad\Ad@store');
+
 Route::fallback(function () {
-    return response()->json(['message' => 'Query route not found.'], 404);
+    return response()->json(['message' => 'Not Found.'], 404);
 });
+
+
+
+
