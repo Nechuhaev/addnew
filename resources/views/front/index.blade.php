@@ -73,6 +73,14 @@
                 </div>
             @endif
 
+            @if($tags)
+                <div class="random-cities widget-tag-cloud" style="padding-top: 25px; height: initial">
+                    @foreach($tags as $tag)
+                        <a href="{{ $tag['url'] }}">{{ $tag['name'] }}</a>
+                    @endforeach
+                </div>
+            @endif
+
         </div>
 
     </main>

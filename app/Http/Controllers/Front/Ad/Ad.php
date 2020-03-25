@@ -106,8 +106,11 @@ class Ad extends Controller
             }
         }
 
+        $related_ads = \App\Ad::where('category_id', $ad->category_id)->where('id', '<', $ad->id)->orderBy('created_at', 'desc')->groupBy('user_id')->take(5)->get();
+
         return view('front.ad.ad')->with([
             'ad' => $ad,
+            'related' => $related_ads,
             'prices' => $prices,
             'meta' => $meta
         ]);

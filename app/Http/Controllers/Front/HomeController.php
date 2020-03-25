@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Front;
 use App\Ad;
 use App\AdCategory;
 use App\AdCity;
+use App\AdTag;
 use App\Http\AdSense;
 use App\Http\Controllers\Controller;
 use App\SeoField;
@@ -125,11 +126,30 @@ class HomeController extends Controller
             }
         });
 
+        // Рандомные теги
+        $tags = Cache::remember('home_tags', 2280, function () {
+            $_tags = AdTag::all()->random(20);
+
+            if ($_tags) {
+                $tags = [];
+                foreach ($_tags as $tag) {
+                    $tags[] = [
+                        'name' => $tag->name,
+                        'url' => $tag->url
+                    ];
+                }
+
+                return $tags;
+            }
+        });
+        //Cache::forget('home_tags');
+
         return view('front.index')->with([
             'categories' => $categories,
             'meta' => $meta,
             'ads_groups' => $ads_groups,
             'cities' => $cities,
+            'tags' => $tags,
             'adsense' => new AdSense()
         ]);
     }

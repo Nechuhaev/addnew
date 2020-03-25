@@ -231,6 +231,25 @@
                 <div class="show-more__shadow"></div>
                 <span class="show-more__btn btn-show">Показать</span>
             </div>
+
+            @if($related)
+                <section>
+                    <p class="section-heading">Похожие объявления</p>
+                    <div class="related-ads">
+                        @foreach($related as $related_ad)
+                        <div class="related-ad">
+                            <div class="image">
+                                <a href="{{ $related_ad->url }}" title="{{ $related_ad->name }}">
+                                    <img src="{{ $related_ad->image }}" alt="{{ $related_ad->name }}" class="img-responsive">
+                                </a>
+                            </div>
+                            <div class="price">100 грн <span class="city">Днепропетровск</span></div>
+                            <a href="{{ $related_ad->url }}" title="{{ $related_ad->name }}" class="ad-heading">{{ $related_ad->name }}</a>
+                        </div>
+                        @endforeach
+                    </div>
+                </section>
+            @endif
         </div> <!-- container -->
     </main>
 @endsection

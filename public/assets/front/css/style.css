@@ -4115,7 +4115,45 @@ main {
 .hidden {
     display: none;
 }
-
+.related-ads {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+}
+.related-ads .related-ad {
+    flex: 1;
+    margin: 10px;
+    padding: 10px;
+    background: #f9f9f9;
+    border: 1px solid #eee;
+}
+.related-ads .related-ad .image {
+    min-height: 195px;
+}
+.related-ads .related-ad .price {
+    color: #000;
+    font-weight: 900;
+    font-size: 14px;
+    padding-top: 10px;
+}
+.related-ads .related-ad .city {
+    float: right;
+    font-weight: 300;
+    color: #4a4a4a;
+}
+.related-ads .related-ad .ad-heading {
+    color: #000;
+    font-size: 12px;
+    padding-top: 10px;
+    display: block;
+}
+.section-heading {
+    text-align: center;
+    font-size: 24px;
+    font-weight: 900;
+}
 @media screen and (min-width: 343px) {
     .footer .btn.btn-subscribe {
         margin-right: 0

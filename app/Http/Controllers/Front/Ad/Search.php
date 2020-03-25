@@ -57,6 +57,17 @@ class Search extends Controller
             }
         }
 
+        if ($results->count() >= 1 && mb_strlen(trim($request->get('s'))) >= 5) {
+            $tag = AdTag::where('name', trim($request->get('s')))->first();
+            if (!$tag) {
+                $tag = AdTag::create(['name' => trim($request->get('s')), 'slug' => null]);
+                $ads_ids = $results->pluck('ads.id')->toArray();
+                if (count($ads_ids)) {
+                    $tag->ads()->attach($ads_ids);
+                }
+            }
+        }
+
         $results = $results->paginate(15);
 
         $ads = Ad::getLoopArray($results);
