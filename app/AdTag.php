@@ -61,6 +61,10 @@ class AdTag extends Model
         }
     }
 
+    public function getUrlAttribute() {
+        return route('tag', ['slug' => $this->slug]);
+    }
+
     public function ads()
     {
         return $this->belongsToMany('App\Ad', 'ad_tag', 'tag_id', 'ad_id');

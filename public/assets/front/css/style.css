@@ -4116,11 +4116,11 @@ main {
     display: none;
 }
 .related-ads {
-    display: -webkit-box;
-    display: -moz-box;
-    display: -ms-flexbox;
-    display: -webkit-flex;
-    display: flex;
+    display: grid;
+    grid-template-columns: 50% 50%;
+}
+.related-ads .related-ad:last-child {
+    display: none;
 }
 .related-ads .related-ad {
     flex: 1;
@@ -4130,7 +4130,19 @@ main {
     border: 1px solid #eee;
 }
 .related-ads .related-ad .image {
-    min-height: 195px;
+    min-height: 150px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    align-self: center;
+    align-content: center;
+}
+.related-ads .related-ad .image a {
+    margin: 0 auto;
+}
+.related-ads .related-ad .image img {
+    max-height: 140px;
+    margin: 0 auto;
 }
 .related-ads .related-ad .price {
     color: #000;
@@ -4461,6 +4473,9 @@ main {
     .visible-xs {
         display: none
     }
+    .related-ads {
+        grid-template-columns: 25% 25% 25% 25%;
+    }
 }
 
 @media screen and (min-width: 800px) {
@@ -4596,6 +4611,12 @@ main {
 
     main {
         padding-top: 116px
+    }
+    .related-ads {
+        grid-template-columns: 20% 20% 20% 20% 20%;
+    }
+    .related-ads .related-ad:last-child {
+        display: block;
     }
 }
 
