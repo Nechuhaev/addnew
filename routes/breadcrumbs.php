@@ -7,6 +7,10 @@
  */
 
 // Главная
+use App\AdCity;
+use App\AdCountry;
+use App\AdRegion;
+
 Breadcrumbs::for('admin.index', function ($trail) {
     $trail->push('Главная', route('admin.index'));
 });
@@ -239,6 +243,41 @@ Breadcrumbs::for('category.page', function ($trail, $category) {
         $trail->parent('category.page', $parent_category);
         $trail->push($category->name, $category->url);
     }
+});
+
+// Главная > Категория объявления > фильтр
+Breadcrumbs::for('filtered.category.page', function ($trail, $category, $filter) {
+
+
+    if ($filter) {
+        $filter_entity = AdCountry::whereSlug($filter)->first();
+        if (!$filter_entity) {
+            $filter_entity = AdRegion::whereSlug($filter)->first();
+            if (!$filter_entity) {
+                $filter_entity = AdCity::whereSlug($filter)->first();
+            }
+        }
+    }
+    $name = $category->name . ' ' . $filter_entity->name;
+
+    if (!$category->parent) {
+
+        $url = route('filtered_category.page', [
+            'filter' => $filter,
+            'category' => $category->slug,
+        ]);
+
+    } else {
+
+        $url = route('filtered_subcategory.page', [
+            'filter' => $filter,
+            'category' => $category->parent->slug,
+            'subcategory' => $category->slug
+        ]);
+
+    }
+    $trail->parent('category.page', $category);
+    $trail->push($name, $url);
 });
 
 

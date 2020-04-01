@@ -62,7 +62,7 @@
 
 
             <aside class="column-right">
-                @widget('front.adCategories', ['heading' => $entity->name])
+                @widget('front.adCategories', ['heading' => $entity->name, 'filter' => $entity->slug])
                 <div class="banner">
                     @include('front.adsense.category-right')
                 </div>

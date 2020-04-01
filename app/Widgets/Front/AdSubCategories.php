@@ -15,7 +15,8 @@ class AdSubCategories extends AbstractWidget
     protected $config = [
         'heading' => 'Категории',
         'categories' => [],
-        'parent' => null
+        'parent' => null,
+        'filter' => null
     ];
 
     /**
@@ -28,9 +29,27 @@ class AdSubCategories extends AbstractWidget
         $categories = AdCategory::where('parent_id', $this->config['parent']->id)->get();
 
         foreach ($categories as $category) {
+
+            if ($this->config['filter']) {
+                if ($category->parent_id) {
+                    $url = route('filtered_subcategory.page', [
+                        'filter' => $this->config['filter'],
+                        'category' => $category->parent->slug,
+                        'subcategory' => $category->slug
+                    ]);
+                } else {
+                    $url = route('filtered_category.page', [
+                        'filter' => $this->config['filter'],
+                        'category' => $category->slug,
+                    ]);
+                }
+            } else {
+                $url = $category->url;
+            }
+
             $this->config['categories'][] = [
                 'name' => $category->name,
-                'url' => $category->url,
+                'url' => $url,
             ];
         }
 

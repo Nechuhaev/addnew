@@ -61,6 +61,14 @@ class AdRegion extends Model
         }
     }
 
+    /**
+     * Полный адресс
+     * @return string
+     */
+    public function getAddressFormatAttribute() {
+        return $this->name . ', ' . $this->country->name;
+    }
+
     public function getUrlAttribute() {
         return route('region.page', [
             'country' => $this->country->slug,

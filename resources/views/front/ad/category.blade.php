@@ -11,7 +11,26 @@
                 @include('front.adsense.top')
             </div>
 
-            {{ Breadcrumbs::render($breadcrumbs, $entity) }}
+            {{ Breadcrumbs::render($breadcrumbs, $entity, $filter) }}
+
+            @if ($filters)
+                <div class="columns filter">
+                    @foreach($filters as $_filter)
+                    <div class="col">
+                        <div class="filter-wrap">
+                            <a href="{{ $_filter['url'] }}" class="filter-name">
+                                @if($_filter['image'])
+                                    <img src="{{ $_filter['image'] }}" alt="{{ $_filter['name'] }}"> <span>{{ $_filter['name'] }} ({{ $_filter['ads_count'] }})</span>
+                                @else
+                                    <span>{{ $_filter['name'] }} ({{ $_filter['ads_count'] }})</span>
+                                @endif
+
+                            </a>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            @endif
 
             <div class="columns columns-nowrap">
                 @if($microdata)
@@ -47,11 +66,12 @@
                     @endif
 
                 </div>
+
                 <aside class="column-right">
                     @if($entity->parent_id)
-                        @widget('front.adCategories', ['heading' => $entity->name])
+                        @widget('front.adCategories', ['heading' => $entity->name, 'filter' => $filter])
                     @else
-                        @widget('front.adSubCategories', ['parent' => $entity])
+                        @widget('front.adSubCategories', ['parent' => $entity, 'filter' => $filter])
                     @endif
 
 

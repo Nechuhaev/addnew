@@ -247,9 +247,12 @@ class Ad extends Model
                 'ads.content',
                 'ads.price',
                 'ads.currency_id',
+                'ad_cities.id AS city_id',
                 'ad_cities.name AS city',
                 'ad_cities.slug AS city_slug',
+                'ad_regions.id AS region_id',
                 'ad_regions.slug AS region_slug',
+                'ad_countries.id AS country_id',
                 'ad_countries.name AS country',
                 'ad_countries.slug AS country_slug'
             ])

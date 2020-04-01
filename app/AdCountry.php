@@ -61,6 +61,22 @@ class AdCountry extends Model
         }
     }
 
+    public function getImageAttribute() {
+        if (env('APP_ENV') == 'local') {
+            return 'http://placehold.it/100x100';
+        } else {
+            return $this->attributes['image'];
+        }
+    }
+
+    /**
+     * Полный адресс
+     * @return string
+     */
+    public function getAddressFormatAttribute() {
+        return $this->name;
+    }
+
     /**
      * Ссылка на запись страны
      * @return string
@@ -94,4 +110,6 @@ class AdCountry extends Model
 
         return $total_cities;
     }
+
+
 }

@@ -62,6 +62,14 @@ class AdCity extends Model
     }
 
     /**
+     * Полный адресс
+     * @return string
+     */
+    public function getAddressFormatAttribute() {
+        return $this->name . ', ' . $this->region->name . ', ' . $this->region->country->name;
+    }
+
+    /**
      * Ссылка на страницу города
      * @return string
      */
