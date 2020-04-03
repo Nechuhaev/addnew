@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Spatie\Sitemap\Sitemap;
 use Spatie\Sitemap\SitemapIndex;
 
 class GenerateFilterSitemap extends Command
@@ -80,7 +81,7 @@ class GenerateFilterSitemap extends Command
         $file_index = 1;
         $filename = "filtered-city-$file_index.xml";
 
-        $sitemap = SitemapIndex::create();
+        $sitemap = Sitemap::create();
         foreach ($locations as $location) {
 
             foreach ($this->categories as $category) {
@@ -96,7 +97,7 @@ class GenerateFilterSitemap extends Command
 
                         unset($sitemap);
 
-                        $sitemap = SitemapIndex::create();
+                        $sitemap = Sitemap::create();
                     }
 
                     // Добавим сайтмап в карту сайтмапов
@@ -147,7 +148,7 @@ class GenerateFilterSitemap extends Command
         $file_index = 1;
         $filename = "filtered-region-$file_index.xml";
 
-        $sitemap = SitemapIndex::create();
+        $sitemap = Sitemap::create();
         foreach ($locations as $location) {
 
             foreach ($this->categories as $category) {
@@ -163,7 +164,7 @@ class GenerateFilterSitemap extends Command
 
                         unset($sitemap);
 
-                        $sitemap = SitemapIndex::create();
+                        $sitemap = Sitemap::create();
                     }
 
                     // Добавим сайтмап в карту сайтмапов
@@ -214,7 +215,7 @@ class GenerateFilterSitemap extends Command
         $file_index = 1;
         $filename = "filtered-country-$file_index.xml";
 
-        $sitemap = SitemapIndex::create();
+        $sitemap = Sitemap::create();
         foreach ($locations as $location) {
 
             foreach ($this->categories as $category) {
@@ -230,7 +231,7 @@ class GenerateFilterSitemap extends Command
 
                         unset($sitemap);
 
-                        $sitemap = SitemapIndex::create();
+                        $sitemap = Sitemap::create();
                     }
 
                     // Добавим сайтмап в карту сайтмапов
