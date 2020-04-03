@@ -100,7 +100,7 @@ class GenerateFilterSitemap extends Command
                     }
 
                     // Добавим сайтмап в карту сайтмапов
-                    $this->sitemapIndex->add(public_path($filename));
+                    $this->sitemapIndex->add('/' . $filename);
 
                     $i = 0;
                     $file_index++;
@@ -167,7 +167,7 @@ class GenerateFilterSitemap extends Command
                     }
 
                     // Добавим сайтмап в карту сайтмапов
-                    $this->sitemapIndex->add(public_path($filename));
+                    $this->sitemapIndex->add('/' . $filename);
 
                     $i = 0;
                     $file_index++;
@@ -234,7 +234,7 @@ class GenerateFilterSitemap extends Command
                     }
 
                     // Добавим сайтмап в карту сайтмапов
-                    $this->sitemapIndex->add(public_path($filename));
+                    $this->sitemapIndex->add('/' . $filename);
 
                     $i = 0;
                     $file_index++;
