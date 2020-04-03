@@ -40,7 +40,7 @@ class ContactForm extends Mailable
     {
         $this->to('a.nechuhaev@gmail.com')
             ->replyTo($this->_email, $this->_name)
-            ->subject(utf8_encode($this->_subject));
+            ->subject($this->_subject);
         if ($this->_images) {
             foreach ($this->_images as $image) {
                 $this->attach($image->getRealPath(), [

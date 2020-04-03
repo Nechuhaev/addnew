@@ -26,6 +26,8 @@ class PageController extends Controller
 
     public function contacts(Request $request) {
 
+        mb_internal_encoding('UTF-8');
+
         if ($request->isMethod('post')) {
             $errors = [
                 'name.*' => 'Введите Ваше имя!',
