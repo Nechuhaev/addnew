@@ -62,7 +62,7 @@ class GenerateFilterSitemap extends Command
         $this->createCitiesSitemap();
 
 
-        $this->sitemapIndex->writeToFile(public_path('sitemap-filter.xml'));
+        $this->sitemapIndex->writeToFile(public_path('sitemapf.xml'));
 
         $this->line('Карта создана');
 
@@ -79,7 +79,7 @@ class GenerateFilterSitemap extends Command
 
         // Текущий файл
         $file_index = 1;
-        $filename = "filtered-city-$file_index.xml";
+        $filename = "fc$file_index.xml";
 
         $sitemap = Sitemap::create();
         foreach ($locations as $location) {
@@ -108,7 +108,7 @@ class GenerateFilterSitemap extends Command
                 }
 
                 if ($i == 0) {
-                    $filename = "filtered-city-$file_index.xml";
+                    $filename = "fc$file_index.xml";
                 }
 
                 if (!file_exists(public_path($filename))) {
@@ -146,7 +146,7 @@ class GenerateFilterSitemap extends Command
 
         // Текущий файл
         $file_index = 1;
-        $filename = "filtered-region-$file_index.xml";
+        $filename = "fr$file_index.xml";
 
         $sitemap = Sitemap::create();
         foreach ($locations as $location) {
@@ -175,7 +175,7 @@ class GenerateFilterSitemap extends Command
                 }
 
                 if ($i == 0) {
-                    $filename = "filtered-region-$file_index.xml";
+                    $filename = "fr$file_index.xml";
                 }
 
                 if (!file_exists(public_path($filename))) {
@@ -213,7 +213,7 @@ class GenerateFilterSitemap extends Command
 
         // Текущий файл
         $file_index = 1;
-        $filename = "filtered-country-$file_index.xml";
+        $filename = "fco$file_index.xml";
 
         $sitemap = Sitemap::create();
         foreach ($locations as $location) {
@@ -242,7 +242,7 @@ class GenerateFilterSitemap extends Command
                 }
 
                 if ($i == 0) {
-                    $filename = "filtered-country-$file_index.xml";
+                    $filename = "fco$file_index.xml";
                 }
 
                 if (!file_exists(public_path($filename))) {
