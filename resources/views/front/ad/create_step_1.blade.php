@@ -8,9 +8,9 @@
 
 <main class="steps-page">
     <div class="container">
-        <div class="banner">
-            @include('front.adsense.top')
-        </div>
+        {{--<div class="banner">--}}
+            {{--@include('front.adsense.top')--}}
+        {{--</div>--}}
 
         <ul class="breadcrumb">
             <li><a href="{{ route('index') }}">Главная</a></li>
