@@ -324,12 +324,12 @@ class Ad extends Controller
         $city_id = 0;
 
         if ($request->session()->get('ad.city_id') || old('city_id')) {
-            $city_id = $request->session()->get('ad.city_id') ?? old('city_id');
+            $city_id = $request->session()->get('ad.city_id') ?? old('city_id') ?? 9474; // по умолчанию - киев
             $city = AdCity::find($city_id);
             //dd($city);
             $country_id = $city->region->country->id;
         } else {
-            $country_id = old('country_id') ?? 0;
+            $country_id = old('country_id') ?? 62; // По умолчанию - украина
         }
 
         $data['country_id'] = $country_id;
@@ -343,7 +343,7 @@ class Ad extends Controller
         if ($city) {
             $region_id = $city->region->id;
         } else {
-            $region_id = old('region_id') ?? 0;
+            $region_id = old('region_id') ?? 642; // по умолчанию - киевская обл
         }
 
         $data['region_id'] = $region_id;
