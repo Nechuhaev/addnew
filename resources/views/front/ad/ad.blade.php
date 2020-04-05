@@ -126,7 +126,7 @@
                     <div class="adv-meta">
                         <ul class="adv-meta-list">
                             <li><span>Страна:</span><a href="{{ $ad->city->region->country->url }}">{{ $ad->city->region->country->name }}</a></li>
-                            <li><span>Автор:</span>{{ $ad->user->username }}</li>
+                            <li><span>Автор:</span><a href="{{ route('author', ['id'=>$ad->user->id]) }}">{{ $ad->user->username }}</a></li>
                             <li><span>Город:</span><a href="{{ $ad->city->url }}">{{ $ad->city->name }}</a></li>
                             <li><span>Дата создания:</span>{{ $ad->date_created}}</li>
                             <li><span>Район:</span><a href="{{ $ad->city->region->url }}">{{ $ad->city->region->name }}</a></li>
