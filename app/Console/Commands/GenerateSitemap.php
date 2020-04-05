@@ -55,6 +55,23 @@ class GenerateSitemap extends Command
 
         $sitemap_index = SitemapIndex::create();
 
+        // Users
+        $sitemap_users = Sitemap::create();
+
+        DB::table('users')
+            ->selectRaw('users.id as user_id')
+            ->get()->each(function ($item) use ($sitemap_users) {
+                if ($item->user_id) {
+                    $sitemap_users->add(route('author', ['id' => $item->user_id]));
+                }
+            });
+
+        $sitemap_users->writeToFile(public_path('users.xml'));
+        unset($sitemap_users);
+        $sitemap_index->add('/users.xml');
+        $this->line('users.xml создано');
+
+
         // pages
 
         $sitemap_pages = Sitemap::create();

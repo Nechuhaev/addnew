@@ -68,9 +68,6 @@ Route::get('/ads/status/{ad_id}/{status_id}', 'Front\Ad\Ad@changeStatus')->name(
 // Теги объявлений
 Route::get('/ad-tag/{slug}', 'Front\Ad\Tag@page')->name('tag');
 
-// Автор объявлений
-Route::get('/author/{id}', 'Front\Article\ArticleController@showArticles')->name('author.index');
-
 // Поиск объявлений
 Route::get('/search', 'Front\Ad\Search@page')->name('ad.search');
 
@@ -210,6 +207,7 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::get('/seo/contacts', 'Admin\Seo\Contacts@form')->name('admin.seo.contacts');
     Route::get('/seo/countries', 'Admin\Seo\Countries@form')->name('admin.seo.countries');
     Route::get('/seo/ad', 'Admin\Seo\Ad@form')->name('admin.seo.ad');
+    Route::get('/seo/ad-user', 'Admin\Seo\AdUser@form')->name('admin.seo.ad-user');
     Route::get('/seo/ad-tag', 'Admin\Seo\AdTag@form')->name('admin.seo.ad-tag');
     Route::get('/seo/ad-category', 'Admin\Seo\AdCategory@form')->name('admin.seo.ad-category');
     Route::get('/seo/ad-country', 'Admin\Seo\AdCountry@form')->name('admin.seo.ad-country');
@@ -218,6 +216,9 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::get('/seo/search', 'Admin\Seo\Search@form')->name('admin.seo.search');
 });
 
+
+// Автор объявлений
+Route::get('/author/{id}', 'Front\Ad\UserController@page')->name('author');
 
 // Категории объявлений
 Route::get('/r/{filter}/{category}', 'Front\Ad\Category@filter')->name('filtered_category.page');

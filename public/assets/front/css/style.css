@@ -3312,7 +3312,9 @@ hr {
     box-shadow: 2px 2px 4px rgba(0, 0, 0, .5);
     border-radius: 3px
 }
-
+.author-info {
+    margin-bottom: 7px
+}
 .account-page .author-info li {
     margin-bottom: 7px
 }
@@ -3993,7 +3995,9 @@ hr {
 }
 
 .author {
-    font-size: 13px
+    font-size: 13px;
+    display: inline-block;
+    width: 100%
 }
 
 .author-photo {

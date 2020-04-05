@@ -204,6 +204,24 @@ class Seo extends Controller
             'action' => route('admin.seo.search')
         ];
 
+        $seo_field = SeoField::where('index', 'ad-user')->first();
+        if ($seo_field) {
+            $meta_title = (bool)$seo_field->meta_title;
+            $meta_description = (bool)$seo_field->meta_description;
+            $description = (bool)$seo_field->description;
+        } else {
+            $meta_title = false;
+            $meta_description = false;
+            $description = false;
+        }
+        $items[] = [
+            'name' => 'Список объявлений пользователя',
+            'description' => $description,
+            'meta_title' => $meta_title,
+            'meta_description' => $meta_description,
+            'action' => route('admin.seo.ad-user')
+        ];
+
         return view('admin.seo.list')->with(['items' => $items]);
     }
 

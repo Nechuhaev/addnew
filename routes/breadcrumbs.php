@@ -231,6 +231,15 @@ Breadcrumbs::for('ad_tag', function ($trail, $tag) {
     $trail->push('Объявление с меткой "' . $tag->name . '"', route('tag', ['slug', $tag->slug]));
 });
 
+/**
+ * ******************************* Юзер *******************************
+ */
+// Главная > Объявления пользователя "..."
+Breadcrumbs::for('ad_user', function ($trail, $entity) {
+    $trail->parent('index');
+    $trail->push('Объявления пользователя ' . $entity->username, route('author', ['id', $entity->id]));
+});
+
 
 // Главная > Категория объявления
 Breadcrumbs::for('category.page', function ($trail, $category) {
