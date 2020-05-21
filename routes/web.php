@@ -67,6 +67,9 @@ Route::get('/ads/status/{ad_id}/{status_id}', 'Front\Ad\Ad@changeStatus')->name(
 
 // Теги объявлений
 Route::get('/ad-tag/{slug}', 'Front\Ad\Tag@page')->name('tag');
+Route::get('/ad-tags/{slug}', function ($slug) {
+    return redirect(route('tag', $slug), 301);
+});
 
 // Поиск объявлений
 Route::get('/search', 'Front\Ad\Search@page')->name('ad.search');

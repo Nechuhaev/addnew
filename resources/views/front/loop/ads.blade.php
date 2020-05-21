@@ -23,6 +23,6 @@
             </div>
         @endforeach
     @else
-        <p>Объявлений не найдено</p>
+        @widget('AdsNotFoundWidget')
     @endif
 </div>

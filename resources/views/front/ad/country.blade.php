@@ -62,7 +62,11 @@
 
 
             <aside class="column-right">
-                @widget('front.adCategories', ['heading' => $entity->name, 'filter' => $entity->slug])
+                @if(get_class($entity) == 'App\AdTag')
+                    @widget('front.adCategories', ['heading' => $entity->name])
+                @else
+                    @widget('front.adCategories', ['heading' => $entity->name, 'filter' => $entity->slug])
+                @endif
                 <div class="banner">
                     @include('front.adsense.category-right')
                 </div>

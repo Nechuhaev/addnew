@@ -4206,7 +4206,51 @@ main {
 .columns.filter .col {
     width: calc((100% / 5) - 30px);
 }
-
+.empty-category .column-left {
+    text-align: center;
+}
+.empty-category img {
+    max-width: 172px !important;
+}
+.empty-category .column-content .heading {
+    font-size: 26px;
+    font-weight: 900;
+    color: #000;
+}
+.recent-products {
+    margin: 25px 0 0;
+    padding: 10px 10px 20px;
+    text-align: center;
+}
+.recent-products .last-advs a {
+    width: calc((100% / 3) - 6px);
+}
+.recent-products .last-advs {
+    border-top: none;
+}
+.popular-tags {
+    background: #eee;
+    margin: 25px 0 0;
+    padding: 10px 10px 20px;
+    text-align: center;
+}
+.popular-tags h2, .recent-products h2 {
+    font-size: 24px;
+}
+.popular-tags p, .recent-products p {
+    color: #959595;
+    font-size: 12px;
+}
+.popular-tags a {
+    background: #fff;
+    padding: 4px;
+    font-size: 12px;
+    border-radius: 5px;
+    color: #000;
+    font-weight: 900;
+    margin: 4px;
+    display: inline-block;
+}
 @media screen and (min-width: 343px) {
     .footer .btn.btn-subscribe {
         margin-right: 0
