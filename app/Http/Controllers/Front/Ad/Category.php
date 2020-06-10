@@ -40,9 +40,11 @@ class Category extends Controller
 
         $entity = AdCategory::where('slug', $category)->first();
 
+        if (!$entity) abort(404);
+
         $this->category_id = $entity->id;
 
-        if (!$entity) abort(404);
+
 
         $this->included_categories[] = $entity->id;
         if ($entity->children()) {
@@ -154,6 +156,7 @@ class Category extends Controller
         //dd($this->filter);
         $results = Ad::getAds()->whereIn('ad_categories.id', $this->included_categories);
         if ($this->filter) {
+            if (!$entity) abort(404);
             $results->where($condition, $entity->id);
         }
 
