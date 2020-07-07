@@ -96,5 +96,11 @@
             <span class="hide-menu">SEO тексты</span>
         </a>
     </li>
+    <li class="sidebar-item">
+        <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{{ route('admin.ad.uploader') }}" aria-expanded="false">
+            <i class="mdi mdi-textbox"></i>
+            <span class="hide-menu">Импорт файлов</span>
+        </a>
+    </li>
 
 </ul>
