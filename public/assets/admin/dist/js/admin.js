@@ -172,5 +172,122 @@ jQuery(function () {
             },
         }
     });
+
+
+
+    $( "#cityname" ).autocomplete({
+        minLength: 0,
+        source: function (request, response) {
+            $.getJSON("/api/ad/city/autocomplete/" + encodeURIComponent(request.term), function (json) {
+
+                response($.map(json.data, function(item){
+                    return {
+                        id: item.id,
+                        label: item.path,
+                        value: item.name
+                    }
+                }));
+                console.log(json.data);
+            });
+
+        },
+        select: function (elem, item) {
+
+            $( "#cityname" ).val(item.item['label']);
+            $( "#city_id" ).val(item.item['id']);
+        }
+    }).focus(function () {
+        $(this).autocomplete('search', '');
+    });
+
+    $( "#username" ).autocomplete({
+        minLength: 0,
+        source: function (request, response) {
+            $.getJSON("/api/user/autocomplete/" + encodeURIComponent(request.term), function (json) {
+
+                response($.map(json.data, function(item){
+                    return {
+                        id: item.id,
+                        label: item.email,
+                        value: item.email
+                    }
+                }));
+                console.log(json.data);
+            });
+
+        },
+        select: function (elem, item) {
+
+            $( "#username" ).val(item.item['label']);
+            $( "#user_id" ).val(item.item['id']);
+        }
+    }).focus(function () {
+        $(this).autocomplete('search', '');
+    });
+
+
+    $( "#ad_category" ).autocomplete({
+        minLength: 0,
+        source: function (request, response) {
+            $.getJSON("/api/ad/category/autocomplete/" + encodeURIComponent(request.term), function (json) {
+
+                response($.map(json.data, function(item){
+                    return {
+                        id: item.id,
+                        label: item.path,
+                        value: item.name
+                    }
+                }));
+                console.log(json.data);
+            });
+
+        },
+        select: function (elem, item) {
+
+            $( "#ad_category" ).val(item.item['label']);
+            $( "#ad_category_id" ).val(item.item['id']);
+        }
+    }).focus(function () {
+        $(this).autocomplete('search', '');
+    });
+
 });
+
+
+var uploader = {
+    check: function (e) {
+        jQuery(e).find('.form-check').trigger('click');
+    },
+
+    checkAll: function (e) {
+        jQuery(document).find('.form-check').trigger('click');
+    },
+
+    remove_checked: function (action) {
+        var confirmation = confirm("Are u sure?")
+
+        if (confirmation) {
+            jQuery('#uploader-form').prop('action', action);
+            jQuery('#uploader-form').submit();
+        }
+    },
+
+
+    publish: function (action) {
+        var category_id = jQuery('#ad_category_id').val();
+
+        if (category_id > 1) {
+            action = action + '?category_id='+category_id;
+            jQuery('#uploader-form').prop('action', action);
+            jQuery('#uploader-form').submit();
+        } else {
+            alert('Выберите категорию!')
+        }
+
+        //jQuery('#uploader-form').prop('action', action);
+        //jQuery('#uploader-form').submit();
+    }
+}
+
+
 

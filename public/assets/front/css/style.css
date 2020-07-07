@@ -4251,6 +4251,26 @@ main {
     margin: 4px;
     display: inline-block;
 }
+.seller div {
+    flex: 1;
+}
+.seller:first-child {
+    background: #eee;
+    font-weight: 900;
+    margin-top: 10px;
+}
+.seller {
+    display: flex;
+    border-bottom: 1px solid #eee;
+    align-items: center;
+    padding: 10px;
+}
+.seller .product-name {
+    margin-right: 20px;
+}
+.text-right {
+    text-align: right;
+}
 @media screen and (min-width: 343px) {
     .footer .btn.btn-subscribe {
         margin-right: 0

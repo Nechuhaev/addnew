@@ -126,6 +126,9 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::get('/ads/{search}', 'Admin\Ad\Ad@showList')->name('admin.ads.search');
     Route::get('/ad', 'Admin\Ad\Ad@show')->name('admin.ad');
     Route::get('/ad/uploader', 'Admin\Ad\Uploader@index')->name('admin.ad.uploader');
+    Route::post('/ad/uploader', 'Admin\Ad\Uploader@uploadFile')->name('admin.ad.uploader.init');
+    Route::post('/ad/uploader/delete', 'Admin\Ad\Uploader@deleteSelected')->name('admin.ad.uploader.delete');
+    Route::post('/ad/uploader/publish', 'Admin\Ad\Uploader@publish')->name('admin.ad.uploader.publish');
     Route::get('/ad/{id}', 'Admin\Ad\Ad@edit')->name('admin.ad.edit');
     Route::post('/ad/create', 'Admin\Ad\Ad@create')->name('admin.ad.create');
     Route::post('/ad/update', 'Admin\Ad\Ad@update')->name('admin.ad.update');

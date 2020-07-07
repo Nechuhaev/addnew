@@ -106,10 +106,20 @@ class Ad extends Controller
             }
         }
 
-        $related_ads = \App\Ad::where('category_id', $ad->category_id)->where('id', '<', $ad->id)->orderBy('created_at', 'desc')->groupBy('user_id')->take(5)->get();
+        $related_ads = \App\Ad::with(['user', 'currency'])->where('category_id', $ad->category_id)->where('id', '<', $ad->id)->orderBy('created_at', 'desc')->groupBy('user_id')->take(5)->get();
 
+        if ($ad->is_product && !empty($ad->code) && !empty($ad->brand)) {
+            $same_products = \App\Ad::where([
+                'code' => $ad->code,
+                'brand' => $ad->brand,
+                ])->get();
+        } else {
+            $same_products = collect([]);
+
+        }
         return view('front.ad.ad')->with([
             'ad' => $ad,
+            'same_products' => $same_products,
             'related' => $related_ads,
             'prices' => $prices,
             'meta' => $meta

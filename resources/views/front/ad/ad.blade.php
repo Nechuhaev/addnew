@@ -147,10 +147,63 @@
                         @endif
 
                     </div>
+
+                    @if( $ad->is_product )
+                        <div class="shop_product">
+                            <h2 class="display-inline-block">Купить <b>{{ $ad->name }}</b> в интернет-магазине</h2>
+                            <a href="{{ $ad->url }}" target="_blank" rel="nofollow noopener" class="btn btn-success pull-right">Перейти в интернет-магазин</a>
+
+
+                            <p style="padding-top: 20px">Другие продавцы <b>{{ $ad->name }}</b></p>
+
+                            @if($same_products->isNotEmpty())
+                                <div class="other-sellers" style="margin-bottom: 30px">
+                                    <div class="seller">
+                                        <div class="product-name">
+                                            Товар
+                                        </div>
+                                        <div class="seller-name">
+                                            Продавец
+                                        </div>
+                                        <div class="product-price">
+                                            Цена
+                                        </div>
+                                        <div class="product-view text-right">
+                                            Просмотр
+                                        </div>
+                                    </div>
+                                    @foreach($same_products as $same_product)
+                                        <div class="seller">
+                                            <div class="product-name">
+                                                {{ $same_product->name }}
+                                            </div>
+                                            <div class="seller-name">
+                                                {{ $same_product->user->username }}
+                                            </div>
+                                            <div class="product-price">
+                                                {{ $same_product->price }} {{ $same_product->currency->symbol }}
+                                            </div>
+                                            <div class="product-view text-right">
+                                                <a href="{{ route('ad.page', ['slug' => $same_product->slug]) }}" class="btn btn-success">Просмотреть</a>
+                                            </div>
+                                        </div>
+                                    @endforeach
+
+                                </div>
+                            @endif
+
+
+                        </div>
+                    @endif
+
+
                     <div class="adv-description">
                         <div class="adv-h">Описание</div>
                         <p>{{ $ad->content }}</p>
                     </div>
+
+
+
                     <div class="banner">
                         @include('front.adsense.ad-middle')
                     </div>
