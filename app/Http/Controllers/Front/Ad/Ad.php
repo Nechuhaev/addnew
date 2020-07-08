@@ -49,8 +49,11 @@ class Ad extends Controller
         $ad->save();
 
         // SEO поля
-        $seo_field = SeoField::where('index', 'ad')->first();
-
+        if ($ad->is_product) {
+            $seo_field = SeoField::where('index', 'ad-product')->first();
+        } else {
+            $seo_field = SeoField::where('index', 'ad')->first();
+        }
 
         if ($seo_field) {
             $entity_values = [

@@ -187,6 +187,7 @@
                                                 <a href="{{ route('ad.page', ['slug' => $same_product->slug]) }}" class="btn btn-success">Просмотреть</a>
                                             </div>
                                         </div>
+                                        @include('front.adsense.ad-after-product')
                                     @endforeach
 
                                 </div>

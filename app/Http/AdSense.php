@@ -32,6 +32,9 @@ class AdSense {
                 case 'ad-middle':
                     echo '<ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-1409649052535600" data-ad-slot="2159424362"></ins>';
                     break;
+                case 'ad-after-product':
+                    echo '<ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-1409649052535600" data-ad-slot="2159424362"></ins>';
+                    break;
             }
             echo '<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>';
         }

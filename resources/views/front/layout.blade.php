@@ -25,7 +25,11 @@
     <link rel="icon" type="image/png" href="/favicon.png" />
 
     @if(request()->get('page'))
-    <link rel="canonical" href="{{ url()->current() }}" />
+        <link rel="canonical" href="{{ url()->current() }}" />
+    @elseif(starts_with(request()->path(), 'r/ukraina/'))
+        <link rel="canonical" href="{{ url(str_replace('r/ukraina/', '', request()->path())) }}" />
+    @else
+        <link rel="canonical" href="{{ url()->current() }}" />
     @endif
 
     <script type="application/ld+json">

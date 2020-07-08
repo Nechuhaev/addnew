@@ -214,6 +214,7 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::get('/seo/contacts', 'Admin\Seo\Contacts@form')->name('admin.seo.contacts');
     Route::get('/seo/countries', 'Admin\Seo\Countries@form')->name('admin.seo.countries');
     Route::get('/seo/ad', 'Admin\Seo\Ad@form')->name('admin.seo.ad');
+    Route::get('/seo/ad-product', 'Admin\Seo\AdProduct@form')->name('admin.seo.ad-product');
     Route::get('/seo/ad-user', 'Admin\Seo\AdUser@form')->name('admin.seo.ad-user');
     Route::get('/seo/ad-tag', 'Admin\Seo\AdTag@form')->name('admin.seo.ad-tag');
     Route::get('/seo/ad-category', 'Admin\Seo\AdCategory@form')->name('admin.seo.ad-category');
