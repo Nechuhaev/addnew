@@ -18,6 +18,7 @@ class Ad extends Model
         'image',
         'images',
         'name',
+        'code',
         'slug',
         'content',
         'is_product',
