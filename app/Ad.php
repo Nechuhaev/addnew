@@ -15,6 +15,7 @@ class Ad extends Model
         'city_id',
         'user_id',
         'currency_id',
+        'source_id',
         'image',
         'images',
         'name',

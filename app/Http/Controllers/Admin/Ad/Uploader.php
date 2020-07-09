@@ -194,6 +194,7 @@ class Uploader extends Controller
                 'category_id' => $category_id,
                 'city_id' => $product->city_id,
                 'currency_id' => $product->currency_id,
+                //'source_id' => $product->source_id,
                 'code' => $product->code,
                 'slug' => str_slug($product->name),
             ];
@@ -212,18 +213,22 @@ class Uploader extends Controller
                 'email' => $product->user->email,
             ];
 
+            try {
+                //dd($ad_data);
+                $ad = \App\Ad::updateOrCreate($ad_identify_data, $ad_data);
 
-            //dd($ad_data);
-            $ad = \App\Ad::updateOrCreate($ad_identify_data, $ad_data);
+                // Создание тегов для объявления
+                $tag = AdTag::updateOrCreate(['name' => $product->brand, 'slug' => str_slug($product->brand)]);
 
-            // Создание тегов для объявления
-            $tag = AdTag::updateOrCreate(['name' => $product->brand, 'slug' => str_slug($product->brand)]);
+                //dd($tag->id);
+                $ad->tags()->attach($tag->id);
 
-            //dd($tag->id);
-            $ad->tags()->attach($tag->id);
+                // Удаление временного объявления
+                $product->delete();
+            } catch (\Exception $exception) {
+                return redirect()->back()->withErrors(["Ошибка загрузки товара {$product->name}: {$exception->getMessage()}"]);
+            }
 
-            // Удаление временного объявления
-            $product->delete();
         });
 
 
