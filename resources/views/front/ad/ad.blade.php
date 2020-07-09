@@ -151,7 +151,7 @@
                     @if( $ad->is_product )
                         <div class="shop_product">
                             <h2 class="display-inline-block">Купить <b>{{ $ad->name }}</b> в интернет-магазине</h2>
-                            <a href="{{ $ad->url }}" target="_blank" rel="nofollow noopener" class="btn btn-success pull-right">Перейти в интернет-магазин</a>
+                            <a href="{{ $ad->source_url }}" target="_blank" rel="nofollow noopener" class="btn btn-success pull-right">Перейти в интернет-магазин</a>
 
 
                             <p style="padding-top: 20px">Другие продавцы <b>{{ $ad->name }}</b></p>

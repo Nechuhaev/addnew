@@ -158,8 +158,12 @@ class Ad extends Model
         return '/ads/' . $this->attributes['slug'];
     }
 
+    public function getSourceUrlAttribute() {
+        return $this->attributes['url'];
+    }
+
     public function getFullUrlAttribute() {
-        return env('APP_URL') . $this->url;
+        return env('APP_URL') . $this->getUrlAttribute();
     }
 
     /**
