@@ -15,7 +15,7 @@ class Uploader extends Controller
 {
     public function index() {
         return view('admin.ad.uploader')->with([
-            'ads' => TempProduct::with('currency')->paginate(30)
+            'ads' => TempProduct::with('currency')->paginate(50)
         ]);
     }
 
@@ -169,22 +169,26 @@ class Uploader extends Controller
 
             $images = [];
 
-            if ($product->images) {
-                $disk = Storage::disk('s3');
-                foreach ($product->images as $key => $image) {
-                    if (filter_var($image, FILTER_VALIDATE_URL)) {
-                        $filename = basename($image);
+            try {
+                if ($product->images) {
+                    $disk = Storage::disk('s3');
+                    foreach ($product->images as $key => $image) {
+                        if (filter_var($image, FILTER_VALIDATE_URL)) {
+                            $filename = basename($image);
 
-                        $storage_path = 'public/user-'.$product->user_id . '/' . $filename;
+                            $storage_path = 'public/user-'.$product->user_id . '/' . $filename;
 
-                        if (!$disk->exists($storage_path)) {
-                            $disk->put($storage_path, file_get_contents($image), 'public');
+                            if (!$disk->exists($storage_path)) {
+                                $disk->put($storage_path, file_get_contents($image), 'public');
+                            }
+
+                            $images[] = $disk->url($storage_path);
                         }
 
-                        $images[] = $disk->url($storage_path);
                     }
-
                 }
+            } catch (\Exception $exception) {
+                $product->delete();
             }
 
 
@@ -226,7 +230,7 @@ class Uploader extends Controller
                 // Удаление временного объявления
                 $product->delete();
             } catch (\Exception $exception) {
-                return redirect()->back()->withErrors(["Ошибка загрузки товара {$product->name}: {$exception->getMessage()}"]);
+                $product->delete();
             }
 
         });
