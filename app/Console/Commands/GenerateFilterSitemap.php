@@ -85,8 +85,9 @@ class GenerateFilterSitemap extends Command
 
             // Активные города в категории
             $active_cities = AdCity::with('ads')
-                ->whereHas('ads', function ($query) use ($category_children) {
-                    $query->whereIn('category_id', $category_children->pluck('id')->toArray());
+                ->whereHas('ads', function ($query) use ($category_children, $category) {
+                    $query->whereIn('category_id', $category_children->pluck('id')->toArray())
+                    ->orWhere('category_id', $category->id);
                 })
                 ->get();
 
