@@ -2,6 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\AdCategory;
+use App\AdCity;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Spatie\Sitemap\Sitemap;
@@ -56,15 +58,70 @@ class GenerateFilterSitemap extends Command
 
         ini_set('memory_limit', '-1');
 
-
-        $this->createCountriesSitemap();
-        $this->createRegionsSitemap();
-        $this->createCitiesSitemap();
+        $this->cities();
+        //$this->createCountriesSitemap();
+        //$this->createRegionsSitemap();
+        //$this->createCitiesSitemap();
 
 
         $this->sitemapIndex->writeToFile(public_path('sitemapf.xml'));
 
         $this->line('Карта создана');
+
+    }
+
+    private function cities() {
+
+        $filename = 'cities.xml';
+
+        // все города, где есть объявления
+        //$active_cities = AdCity::with('ads')->whereHas('ads')->get()->pluck('id');
+
+
+        AdCategory::where('parent_id', 0)->get()->each(function ($category) {
+            // Дочерние категории
+            $category_children = $category->children;
+            $sitemap = Sitemap::create();
+            // Активные города в категории
+            $active_cities = AdCity::with('ads')
+                ->whereHas('ads', function ($query) use ($category_children) {
+                    $query->whereIn('category_id', $category_children->pluck('id')->toArray());
+                })
+                ->get();
+
+            $active_cities->each(function ($city) use ($category, $sitemap) {
+                $sitemap->add(route('filtered_category.page', [
+                    'filter' => $city->slug,
+                    'category' => $category->slug
+                ]));
+            });
+
+            $category_children->each(function ($category) use ($sitemap) {
+                AdCity::with('ads')
+                    ->whereHas('ads', function ($query) use ($category) {
+                        $query->where('category_id', $category->id);
+                    })
+                    ->get()->each(function ($city) use ($category, $sitemap) {
+                        $sitemap->add(route('filtered_category.page', [
+                            'filter' => $city->slug,
+                            'category' => $category->slug
+                        ]));
+                    });
+            });
+
+            $filename = "f_{$category->slug}.xml";
+            $sitemap->writeToFile(public_path($filename));
+            $this->sitemapIndex->add('/' . $filename);
+
+
+        });
+//        AdCity::with('ads')->whereHas('ads')->get()->pluck('id')->each(function ($id) {
+//            AdCategory::where('parent_id', 0)->get()->each(function ($category) use ($id) {
+//                dump($category);
+//            });
+//        });
+
+
 
     }
 
