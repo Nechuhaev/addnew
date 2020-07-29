@@ -4,8 +4,11 @@ namespace App\Console\Commands;
 
 use App\AdCategory;
 use App\AdCity;
+use App\AdCountry;
+use App\AdRegion;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Spatie\Sitemap\Sitemap;
 use Spatie\Sitemap\SitemapIndex;
 
@@ -72,16 +75,14 @@ class GenerateFilterSitemap extends Command
 
     private function cities() {
 
-        $filename = 'cities.xml';
-
-        // все города, где есть объявления
-        //$active_cities = AdCity::with('ads')->whereHas('ads')->get()->pluck('id');
 
 
         AdCategory::where('parent_id', 0)->get()->each(function ($category) {
             // Дочерние категории
             $category_children = $category->children;
             $sitemap = Sitemap::create();
+
+
             // Активные города в категории
             $active_cities = AdCity::with('ads')
                 ->whereHas('ads', function ($query) use ($category_children) {
@@ -96,33 +97,74 @@ class GenerateFilterSitemap extends Command
                 ]));
             });
 
-            $category_children->each(function ($category) use ($sitemap) {
-                AdCity::with('ads')
-                    ->whereHas('ads', function ($query) use ($category) {
-                        $query->where('category_id', $category->id);
-                    })
-                    ->get()->each(function ($city) use ($category, $sitemap) {
-                        $sitemap->add(route('filtered_category.page', [
-                            'filter' => $city->slug,
-                            'category' => $category->slug
-                        ]));
-                    });
+            // Активные области
+            $active_regions = AdRegion::whereIn('id', $active_cities->pluck('region_id')->unique()->toArray())->get();
+            $active_regions->each(function ($region) use ($category, $sitemap) {
+                $sitemap->add(route('filtered_category.page', [
+                    'filter' => $region->slug,
+                    'category' => $category->slug
+                ]));
             });
 
-            $filename = "f_{$category->slug}.xml";
+            // Активные страны
+            $active_countries = AdCountry::whereIn('id', $active_regions->pluck('country_id')->unique()->toArray());
+            $active_countries->each(function ($country) use ($category, $sitemap) {
+                $sitemap->add(route('filtered_category.page', [
+                    'filter' => $country->slug,
+                    'category' => $category->slug
+                ]));
+            });
+
+
+            $category_children->each(function ($subcategory) use ($sitemap, $category) {
+
+                // Города
+                $active_cities = AdCity::with('ads')
+                    ->whereHas('ads', function ($query) use ($subcategory) {
+                        $query->where('category_id', $subcategory->id);
+                    })
+                    ->get();
+                $active_cities->each(function ($city) use ($subcategory, $category, $sitemap) {
+                        $sitemap->add(route('filtered_subcategory.page', [
+                            'filter' => $city->slug,
+                            'category' => $category->slug,
+                            'subcategory' => $subcategory->slug
+                        ]));
+                    });
+
+                // Области
+                $active_regions = $active_regions = AdRegion::whereIn('id', $active_cities->pluck('region_id')->unique()->toArray())->get();
+                $active_regions->each(function ($region) use ($subcategory, $category, $sitemap) {
+                    $sitemap->add(route('filtered_subcategory.page', [
+                        'filter' => $region->slug,
+                        'category' => $category->slug,
+                        'subcategory' => $subcategory->slug
+                    ]));
+                });
+
+                // Страны
+                $active_countries = AdCountry::whereIn('id', $active_regions->pluck('country_id')->unique()->toArray());
+                $active_countries->each(function ($country) use ($subcategory, $category, $sitemap) {
+                    $sitemap->add(route('filtered_subcategory.page', [
+                        'filter' => $country->slug,
+                        'category' => $category->slug,
+                        'subcategory' => $subcategory->slug
+                    ]));
+                });
+
+            });
+
+            if (Str::length($category->slug) > 13) {
+                $filename = "f_{$category->id}.xml";
+            } else {
+                $filename = "f_{$category->slug}.xml";
+            }
+            $this->line("$filename - сохранение...");
             $sitemap->writeToFile(public_path($filename));
             $this->sitemapIndex->add('/' . $filename);
 
 
         });
-//        AdCity::with('ads')->whereHas('ads')->get()->pluck('id')->each(function ($id) {
-//            AdCategory::where('parent_id', 0)->get()->each(function ($category) use ($id) {
-//                dump($category);
-//            });
-//        });
-
-
-
     }
 
 
