@@ -16,9 +16,23 @@
 
             <p style="font-size: 20px;font-weight: 900;">Все объявления пользователя {{ $entity->username }}</p>
             <div class="author">
-                <div class="author-photo"><img alt="Пользователь {{ $entity->username }}" src="{{ $entity->image ?? 'https://secure.gravatar.com/avatar/f17c59914122f91f742418889e41b124?s=250&amp;d=mm&amp;r=g' }}" class="author-avatar" height="250" width="250"></div>
+                <div class="author-photo"><img alt="Пользователь {{ $entity->username }}" src="{{ $entity->image ?? asset('assets/front/img/placeholder.png') }}" class="author-avatar" height="250" width="250"></div>
+                @if($is_shop)
+                    <div class="author-info"><strong>Количество предложений: </strong> {{ $entity->ads()->count() }}</div>
+                    @if($entity->telephone)
+                    <div class="author-info"><strong>Телефон: </strong> {{ $entity->telephone }}</div>
+                    @endif
+                    @if($entity->email)
+                        <div class="author-info"><strong>Email :</strong> {{ $entity->email }}</div>
+                    @endif
+                    @if($entity->site_url)
+                        <div class="author-info"><strong>Сайт: </strong> {{ $entity->site_url }}</div>
+                    @endif
+
+                @else
                 <div class="author-info"><strong>Дата регистрации:</strong> {{ $entity->created_at }}</div>
                 <div class="author-info"><strong>Всего объявлений автора:</strong> {{ $entity->ads()->count() }}</div>
+                @endif
                 @if ($entity->info)
                     <div class="author-description">
                         <h3>Описание</h3>

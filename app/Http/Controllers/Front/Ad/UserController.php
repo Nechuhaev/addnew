@@ -54,9 +54,11 @@ class UserController extends Controller
             ->where('ads.price', '>', 0)
             ->first();
 
+        $is_shop = $user->ads()->where('is_product', 1)->count();
 
         return view('front.ad.user')->with([
             'entity' => $user,
+            'is_shop' => $is_shop,
             'ads' => $ads,
             'links' => $results->onEachSide(1)->links('front.widgets.paginate'),
             'tags' => AdTag::getAdsTags($ads),

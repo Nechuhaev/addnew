@@ -29,22 +29,25 @@ class AdCategories extends AbstractWidget
 
         foreach ($categories as $category) {
 
-            if ($this->config['filter']) {
-                if ($category->parent_id) {
-                    $url = route('filtered_subcategory.page', [
-                        'filter' => $this->config['filter'],
-                        'category' => $category->parent->slug,
-                        'subcategory' => $category->slug
-                    ]);
-                } else {
-                    $url = route('filtered_category.page', [
-                        'filter' => $this->config['filter'],
-                        'category' => $category->slug,
-                    ]);
-                }
-            } else {
-                $url = $category->url;
-            }
+//            if ($this->config['filter']) {
+//
+//                if ($category->parent_id) {
+//                    $url = route('filtered_subcategory.page', [
+//                        'filter' => $this->config['filter'],
+//                        'category' => $category->parent->slug,
+//                        'subcategory' => $category->slug
+//                    ]);
+//                } else {
+//                    $url = route('filtered_category.page', [
+//                        'filter' => $this->config['filter'],
+//                        'category' => $category->slug,
+//                    ]);
+//                }
+//            } else {
+//                $url = $category->url;
+//            }
+
+            $url = $category->url;
 
             $this->config['categories'][] = [
                 'name' => $category->name,

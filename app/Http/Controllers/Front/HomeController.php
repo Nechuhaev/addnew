@@ -10,6 +10,7 @@ use App\Http\AdSense;
 use App\Http\Controllers\Controller;
 use App\SeoField;
 
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
@@ -144,12 +145,18 @@ class HomeController extends Controller
         });
         //Cache::forget('home_tags');
 
+        $shop_users = User::withCount('ads')->whereHas('ads', function ($query) {
+            $query->where('is_product', 1);
+        })->take(5)->get();
+
+
         return view('front.index')->with([
             'categories' => $categories,
             'meta' => $meta,
             'ads_groups' => $ads_groups,
             'cities' => $cities,
             'tags' => $tags,
+            'shop_users' => $shop_users,
             'adsense' => new AdSense()
         ]);
     }
