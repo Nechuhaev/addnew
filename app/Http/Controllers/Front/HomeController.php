@@ -145,9 +145,13 @@ class HomeController extends Controller
         });
         //Cache::forget('home_tags');
 
-        $shop_users = User::withCount('ads')->whereHas('ads', function ($query) {
-            $query->where('is_product', 1);
-        })->take(5)->get();
+        $shop_users = User::withCount('ads')
+            ->whereHas('ads', function ($query) {
+                $query->where('is_product', 1);
+            })
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
 
 
         return view('front.index')->with([

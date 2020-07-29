@@ -138,7 +138,11 @@
                             <div class="adv-contacts">
                                 <div class="adv-contacts-inner">
                                     <ul class="adv-contacts-list">
+                                        @if($ad->is_product)
+                                            <li><span>Телефон:</span> <a href="tel:{{ $ad->user->telephone }}">{{ $ad->user->telephone }}</a></li>
+                                        @else
                                         <li><span>Телефон:</span> <a href="tel:{{ $ad->telephone }}">{{ $ad->telephone }}</a></li>
+                                        @endif
                                         <li><span>Электронная почта:</span> <a href="mailto:{{ $ad->email }}">{{ $ad->email }}</a></li>
                                     </ul>
                                     <span class="btn-notice">Показать контакты</span>
