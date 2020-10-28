@@ -96,6 +96,10 @@ class AdCountry extends Model
         return $this->hasMany(AdRegion::class, 'country_id');
     }
 
+    public function cities() {
+        return $this->hasManyThrough(AdCity::class, AdRegion::class, 'country_id', 'region_id');
+    }
+
     /**
      * Количество городов, которые отнесены к стране
      * @return int

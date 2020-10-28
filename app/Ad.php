@@ -3,6 +3,7 @@
 namespace App;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -290,6 +291,10 @@ class Ad extends Model
         }
 
         return $status;
+    }
+
+    public function scopeProducts(Builder $query) {
+        return $query->where('is_product', 1);
     }
 
 }

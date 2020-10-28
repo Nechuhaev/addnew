@@ -87,12 +87,12 @@
                     @foreach($shop_users as $user)
                         <div class="related-ad">
                             <div class="image">
-                                <a href="{{ route('author', $user->id)  }}" title="модная блузка для девочки">
+                                <a href="{{ route('author', $user->id)  }}" title="Продавец {{ $user->username }} на сайте addnew.biz">
                                     <img src="{{ $user->image ?? asset('assets/front/img/placeholder.png') }}" alt="Страница магазина {{ $user->username }} на сайте addnew.biz" class="img-responsive">
                                 </a>
                             </div>
                             <div class="price">{{ $user->ads_count }} предложений</div>
-                            <a href="{{ route('author', $user->id) }}" title="модная блузка для девочки" class="ad-heading">{{ $user->username }}</a>
+                            <a href="{{ route('author', $user->id) }}" title="Продавец {{ $user->username }} на сайте addnew.biz" class="ad-heading">{{ $user->username }}</a>
                         </div>
                     @endforeach
                 </div>

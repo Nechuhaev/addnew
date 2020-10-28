@@ -227,6 +227,7 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
 
 // Автор объявлений
 Route::get('/author/{id}', 'Front\Ad\UserController@page')->name('author');
+Route::get('/stores', 'Front\User\StoreController@index')->name('stores');
 
 // Категории объявлений
 Route::get('/r/{filter}/{category}', 'Front\Ad\Category@filter')->name('filtered_category.page');

@@ -4271,6 +4271,56 @@ main {
 .text-right {
     text-align: right;
 }
+.stores__list {
+    /*display: flex;*/
+    /*padding: 10px;*/
+    /*border: 1px solid #eee;*/
+    /*margin-bottom: 20px;*/
+    /*align-items: center;*/
+}
+.stores__list__item {
+    display: flex;
+    padding: 10px;
+    border: 1px solid #eee;
+    margin-bottom: 20px;
+    align-items: center;
+}
+.stores__list__item-logo {
+    flex: 2;
+    padding-right: 15px;
+}
+.stores__list__item-content {
+    flex: 5;
+}
+.stores__list__item-offers {
+    text-align: center;
+    flex: 1;
+}
+.stores__list__item-name {
+    font-weight: 700;
+    font-size: 22px;
+    padding-bottom: 20px;
+}
+.offer__count {
+    text-align: center;
+    font-size: 40px;
+    font-weight: 300;
+}
+.filter__item {
+    display: inline-block;
+    padding: 10px 15px;
+    margin-bottom: 20px;
+    border: 1px solid #d0d0d0;
+    margin-right: 10px;
+    border-radius: 5px;
+}
+.filter__item a {
+    color: #737373;
+}
+.filter__item.active a {
+    font-weight: 900;
+    color: #000;
+}
 @media screen and (min-width: 343px) {
     .footer .btn.btn-subscribe {
         margin-right: 0
