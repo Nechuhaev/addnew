@@ -4134,7 +4134,7 @@ main {
     border: 1px solid #eee;
 }
 .related-ads .related-ad .image {
-    min-height: 150px;
+    min-height: 110px;
     text-align: center;
     display: flex;
     align-items: center;
@@ -4288,6 +4288,11 @@ main {
 .stores__list__item-logo {
     flex: 2;
     padding-right: 15px;
+    text-align: center;
+    display: none;
+}
+.stores__list__item-logo img {
+    max-height: 170px;
 }
 .stores__list__item-content {
     flex: 5;
@@ -4320,6 +4325,9 @@ main {
 .filter__item.active a {
     font-weight: 900;
     color: #000;
+}
+.text-center {
+    text-align: center;
 }
 @media screen and (min-width: 343px) {
     .footer .btn.btn-subscribe {
@@ -4631,6 +4639,9 @@ main {
     .related-ads {
         grid-template-columns: 25% 25% 25% 25%;
     }
+    .stores__list__item-logo {
+        display: block;
+    }
 }
 
 @media screen and (min-width: 800px) {
@@ -4768,7 +4779,7 @@ main {
         padding-top: 116px
     }
     .related-ads {
-        grid-template-columns: 20% 20% 20% 20% 20%;
+        grid-template-columns: 16.66% 16.66% 16.66% 16.66% 16.66%;
     }
     .related-ads .related-ad:last-child {
         display: block;

@@ -83,6 +83,7 @@
 
             <section>
                 <p class="section-heading">Популярные магазины</p>
+                <p class="text-center"><a class="btn" href="{{ route('stores') }}">Перейти к списку всех магазинов</a></p>
                 <div class="related-ads">
                     @foreach($shop_users as $user)
                         <div class="related-ad">

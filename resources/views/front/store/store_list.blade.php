@@ -10,7 +10,7 @@
                 @include('front.adsense.top')
             </div>
 
-            {{ Breadcrumbs::render('profile.ads') }}
+            {{ Breadcrumbs::render('user.store_list') }}
 
 
                     <h1>Список магазинов</h1>
@@ -37,7 +37,7 @@
                                     </div>
                                     <div class="stores__list__item-content">
                                         <div class="stores__list__item-name">{{ $shop_user->username }}</div>
-                                        <p>{{ $shop_user->info }}</p>
+                                        <p>{{ \Illuminate\Support\Str::words($shop_user->info, 29) }}</p>
                                         <a title="Продавец {{ $shop_user->username }} на сайте addnew.biz" href="{{ route('author', $shop_user->id) }}" class="btn btn-success">Перейти к товарам</a>
                                     </div>
                                     <div class="stores__list__item-offers">
@@ -45,6 +45,10 @@
                                         <div class="offer_text">Предложений</div>
                                     </div>
                                 </div>
+
+                                @if($loop % 6 == 0)
+                                    @include('front.adsense.top')
+                                @endif
                             @endforeach
 
                         </div>

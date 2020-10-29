@@ -171,6 +171,12 @@ Breadcrumbs::for('profile.ads', function ($trail) {
     $trail->push('Мои объявления', route('profile.ads'));
 });
 
+// Главная > Список магазинов
+Breadcrumbs::for('user.store_list', function ($trail) {
+    $trail->parent('index');
+    $trail->push('Список магазинов', route('stores'));
+});
+
 /**
  * ******************************* Блог *******************************
  */

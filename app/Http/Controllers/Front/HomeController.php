@@ -150,7 +150,7 @@ class HomeController extends Controller
                 $query->where('is_product', 1);
             })
             ->orderBy('created_at', 'desc')
-            ->take(5)
+            ->take(12)
             ->get();
 
 
