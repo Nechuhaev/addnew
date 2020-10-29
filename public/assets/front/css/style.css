@@ -4123,9 +4123,9 @@ main {
     display: grid;
     grid-template-columns: 50% 50%;
 }
-.related-ads .related-ad:last-child {
-    display: none;
-}
+/*.related-ads .related-ad:last-child {*/
+    /*display: none;*/
+/*}*/
 .related-ads .related-ad {
     flex: 1;
     margin: 10px;
@@ -4779,11 +4779,11 @@ main {
         padding-top: 116px
     }
     .related-ads {
-        grid-template-columns: 16.66% 16.66% 16.66% 16.66% 16.66%;
+        grid-template-columns: 16.66% 16.66% 16.66% 16.66% 16.66% 16.66%;
     }
-    .related-ads .related-ad:last-child {
-        display: block;
-    }
+    /*.related-ads .related-ad:last-child {*/
+        /*display: block;*/
+    /*}*/
 }
 
 @media screen and (min-width: 992px) {
