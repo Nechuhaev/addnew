@@ -46,7 +46,7 @@
                                     </div>
                                 </div>
 
-                                @if($loop % 6 == 0)
+                                @if($loop->iteration % 6 == 0)
                                     @include('front.adsense.top')
                                 @endif
                             @endforeach
