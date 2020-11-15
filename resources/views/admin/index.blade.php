@@ -108,17 +108,17 @@
         <div class="col-md-4">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title m-b-0">Просмотры</h4>
-                    <h2 class="font-light">{{ $customers_count }}</h2>
+                    <h4 class="card-title m-b-0">Магазины</h4>
+                    <h2 class="font-light">{{ $shops_count }}</h2>
                     <div class="m-t-30">
                         <div class="row text-center">
                             <div class="col-6 border-right">
-                                <h4 class="m-b-0">{{ $customers_count_today }}</h4>
-                                <span class="font-14 text-muted">Сегодня</span>
+                                <h4 class="m-b-0">{{ $shops_ads_count }}</h4>
+                                <span class="font-14 text-muted">Товаров</span>
                             </div>
                             <div class="col-6">
-                                <h4 class="m-b-0">{{ $customers_count_week }}</h4>
-                                <span class="font-14 text-muted">за 30 дней</span>
+                                <h4 class="m-b-0">{{ $shops_ads_views }}</h4>
+                                <span class="font-14 text-muted">Просмотров</span>
                             </div>
                         </div>
                     </div>

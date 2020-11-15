@@ -26,6 +26,15 @@ class AdminPageController extends Controller
         $data['ads_count_today'] = Ad::whereDate('created_at', Carbon::today())->count();
         $data['ads_count_week'] = Ad::whereDate('created_at', '>', Carbon::today()->subDays(30))->count();
 
+        $data['shops_count'] = User::withCount('ads')
+            ->whereHas('ads', function ($query) {
+                $query->where('is_product', 1);
+            })->count();
+        $data['shops_ads_count'] = Ad::products()->count();
+        $data['shops_ads_views'] = Ad::products()->sum('total_views');
+
+
+
         $data['recent_ads'] = Ad::orderBy('created_at', 'desc')->take(10)->get();
 
         $data['top_countries'] = DB::table('ad_countries')
