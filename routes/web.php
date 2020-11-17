@@ -114,6 +114,10 @@ Route::post('/create-listing/success/', 'Front\Ad\Ad@create_step_success')->name
 Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::get('/', 'AdminPageController@index')->name('admin.index');
 
+    Route::prefix('stat')->group(function () {
+        Route::get('/ads', 'Admin\Stat\AdStatController@index')->name('admin.stat.ads');
+    });
+
     // Пользователи
     Route::get('/users', 'Admin\User\UserController@showUsersList')->name('admin.users');
     Route::get('/users/search', 'Admin\User\UserController@search')->name('admin.users.search');
