@@ -34,6 +34,9 @@ Route::get('/password/reset', 'Front\User\Auth\ForgotPasswordController@showLink
 Route::get('/password/reset/{token}', 'Front\User\Auth\ResetPasswordController@showResetForm')->name('password.reset');
 Route::post('register', 'Front\User\Auth\RegisterController@register');
 Route::get('/register', 'Front\User\Auth\RegisterController@showRegistrationForm')->name('register');
+// Роут регистрации маркетплейсов
+Route::post('/business-register', 'Front\User\Auth\BusinessRegisterController@register');
+Route::get('/business-register', 'Front\User\Auth\BusinessRegisterController@showRegistrationForm')->name('business-register');
 
 // Категории объявлений
 //Route::get('/{category}', 'Front\User\Auth\RegisterController@showRegistrationForm')->name('register');
