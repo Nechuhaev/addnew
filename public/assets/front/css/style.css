@@ -4329,6 +4329,14 @@ main {
 .text-center {
     text-align: center;
 }
+.shop-profile-widget {
+    padding: 15px;
+    border: 2px dashed #eee;
+    background: #fbfbfb;
+    font-size: 12px;
+    line-height: 18px;
+    margin-bottom: 20px;
+}
 @media screen and (min-width: 343px) {
     .footer .btn.btn-subscribe {
         margin-right: 0
