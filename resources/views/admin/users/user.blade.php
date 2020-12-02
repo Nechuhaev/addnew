@@ -129,6 +129,28 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        <label for="facebook_url" class="col-md-12">Telegram ссылка</label>
+                        <div class="col-md-12">
+                            <input type="text"
+                                   id="telegram_url"
+                                   name="telegram_url"
+                                   placeholder="https://t.me/..."
+                                   value="{{ old('telegram_url') ?? $user->telegram_url }}"
+                                   class="form-control form-control-line">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="instagram_url" class="col-md-12">Instagram ссылка</label>
+                        <div class="col-md-12">
+                            <input type="text"
+                                   id="instagram_url"
+                                   name="instagram_url"
+                                   placeholder="https://instagram.com/..."
+                                   value="{{ old('instagram_url') ?? $user->instagram_url }}"
+                                   class="form-control form-control-line">
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <label for="facebook_url" class="col-md-12">Facebook ссылка</label>
                         <div class="col-md-12">
                             <input type="text"

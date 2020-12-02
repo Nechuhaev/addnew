@@ -82,6 +82,14 @@
                                            class="form-control">
                                 </div>
                                 <div class="form-group">
+                                    <label for="telegram_url">Telegram</label>
+                                    <input type="text"
+                                           id="telegram_url"
+                                           name="telegram_url"
+                                           value="{{ $user->telegram_url ?? old('telegram_url') }}"
+                                           class="form-control">
+                                </div>
+                                <div class="form-group">
                                     <label for="twitter_url">Twitter:</label>
                                     <input type="text"
                                            id="twitter_url"
@@ -116,6 +124,14 @@
                                            name="telephone"
                                            id="telephone"
                                            value="{{ $user->telephone ?? old('telephone') }}"
+                                           class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="instagram_url">Instagram</label>
+                                    <input type="text"
+                                           name="instagram_url"
+                                           id="instagram_url"
+                                           value="{{ $user->instagram_url ?? old('instagram_url') }}"
                                            class="form-control">
                                 </div>
                                 <div class="form-group">
