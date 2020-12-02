@@ -1,7 +1,7 @@
 <aside class="column-right">
     <h2 class="account-h2">Личный кабинет</h2>
     <ul class="account-menu">
-        @if(Auth()->user()->is_shop_owner)
+        @is_shop_owner
             <li><a href="{{ route('profile.shop') }}">Мой магазин</a></li>
             <li><a href="{{ route('profile.shop') }}">Загрузить прайс-лист</a></li>
             <li><a href="{{ route('profile.shop') }}">Импорт/экспорт товаров</a></li>
@@ -11,7 +11,7 @@
             <li><a href="{{ route('profile.ads') }}">Мои объявления</a></li>
             <li><a href="{{ route('profile.index') }}">Редактировать профиль</a></li>
             <li><a href="{{ route('profile.password') }}">Изменить пароль</a></li>
-        @endif
+        @endis_shop_owner
 
         <li><a href="#">Выход</a></li>
     </ul>
