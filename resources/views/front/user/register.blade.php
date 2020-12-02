@@ -60,6 +60,17 @@
                                 <span class="btn-text">{{ __('user/register.button') }}</span>
                             </button>
                         </div>
+
+                        <div class="form-group">
+                            <h2>Для интернет-магазинов</h2>
+                            <label for="#">Желаете опубликовать и управлять товарами имеющегося интернет-магазина?</label>
+                            <p style="font-size: 12px;">
+                                Восспользуйтесь кнопкой регистрации интернет магазина для публикации своих товаров на addnew.biz.
+                                <br>
+                                Регистрация не займет много времени, а для добавления товаров достаточно предоставить список товаров <b>в любом формате</b>
+                            </p>
+                            <a class="business-register-link" href="{{ route('business-register') }}">Регистрация интернет-магазина</a>
+                        </div>
                         <div class="form-group">
                             <label>{{ __('user/register.text_social_login') }}</label>
                             @include('front.widgets.social')

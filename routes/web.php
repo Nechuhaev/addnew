@@ -35,7 +35,7 @@ Route::get('/password/reset/{token}', 'Front\User\Auth\ResetPasswordController@s
 Route::post('register', 'Front\User\Auth\RegisterController@register');
 Route::get('/register', 'Front\User\Auth\RegisterController@showRegistrationForm')->name('register');
 // Роут регистрации маркетплейсов
-Route::post('/business-register', 'Front\User\Auth\BusinessRegisterController@register');
+Route::post('/business-register', 'Front\User\Auth\BusinessRegisterController@register')->name('post-business-register');
 Route::get('/business-register', 'Front\User\Auth\BusinessRegisterController@showRegistrationForm')->name('business-register');
 
 // Категории объявлений
@@ -51,6 +51,10 @@ Route::post('profile/update', 'Front\User\UserController@updateUser')->name('pro
 Route::get('/profile/ads', 'Front\User\UserController@ads')->name('profile.ads');
 Route::get('/profile/password', 'Front\User\UserController@password')->name('profile.password');
 Route::post('profile/password/update', 'Front\User\UserController@updatePassword')->name('profile.password.update');
+
+Route::get('/profile/type', 'Front\User\ProfileTypeController@index');
+Route::post('/profile/type', 'Front\User\ProfileTypeController@switchIsShopOwner')->name('switch-profile-type');
+Route::get('/profile/shop', 'Front\User\Shop\AllActionsController@index')->name('profile.shop');
 
 
 // Блог
