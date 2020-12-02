@@ -53,7 +53,8 @@ Route::get('/profile/password', 'Front\User\UserController@password')->name('pro
 Route::post('profile/password/update', 'Front\User\UserController@updatePassword')->name('profile.password.update');
 
 Route::get('/profile/type', 'Front\User\ProfileTypeController@index');
-Route::post('/profile/type', 'Front\User\ProfileTypeController@switch');
+Route::post('/profile/type', 'Front\User\ProfileTypeController@switchIsShopOwner')->name('switch-profile-type');
+Route::post('/profile/shop', 'Front\User\ProfileTypeController@switch')->name('profile.shop');
 
 
 // Блог

@@ -4337,6 +4337,29 @@ main {
     line-height: 18px;
     margin-bottom: 20px;
 }
+.business-register-link {
+    background-color: #19346c;
+    padding: 10px;
+    border-radius: 4px;
+    color: #fff;
+    font-weight: 900;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+.profile-item {
+    border: 1px solid #eee;
+    padding: 0 15px;
+    box-shadow: 3px 3px 9px rgba(0,0,0,0.1);
+}
+.disabled {
+    opacity: 0.5;
+    z-index: -1;
+}
+.profile-type-form {
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+}
 @media screen and (min-width: 343px) {
     .footer .btn.btn-subscribe {
         margin-right: 0

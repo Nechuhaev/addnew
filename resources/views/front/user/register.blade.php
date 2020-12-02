@@ -69,7 +69,7 @@
                                 <br>
                                 Регистрация не займет много времени, а для добавления товаров достаточно предоставить список товаров <b>в любом формате</b>
                             </p>
-                            <a href="{{ route('business-register') }}">Регистрация интернет-магазина</a>
+                            <a class="business-register-link" href="{{ route('business-register') }}">Регистрация интернет-магазина</a>
                         </div>
                         <div class="form-group">
                             <label>{{ __('user/register.text_social_login') }}</label>

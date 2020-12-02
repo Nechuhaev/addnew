@@ -188,6 +188,15 @@
                             </select>
                         </div>
                     </div>
+                        <div class="form-group">
+                        <label id="is_admin" class="col-md-12">Тип профиля</label>
+                        <div class="col-md-12">
+                            <select name="is_admin" class="form-control" id="is_shop_owner">
+                                <option value="0" {{ ($user->is_shop_owner == 0) ? 'selected' : '' }}>Физ. лицо</option>
+                                <option value="1" {{ ($user->is_shop_owner == 1) ? 'selected' : '' }}>Интернет-магазин</option>
+                            </select>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <div class="col-sm-12">
                             <button class="btn btn-success">Обновить профиль пользователя</button>

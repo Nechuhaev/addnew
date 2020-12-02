@@ -83,6 +83,7 @@ class UserController extends Controller
             $user->twitter_url = $request->post('twitter_url');
             $user->info = $request->post('info');
             $user->is_admin = (int)$request->post('is_admin');
+            $user->is_shop_owner = (int)$request->post('is_shop_owner');
         }
 
 
