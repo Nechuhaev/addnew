@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -140,5 +141,9 @@ class User extends Authenticatable
         $this->update([
             'is_shop_owner' => (int)$status
         ]);
+    }
+
+    public function scopeShopOwner(Builder $query) {
+        return $query->where('is_shop_owner', 1);
     }
 }

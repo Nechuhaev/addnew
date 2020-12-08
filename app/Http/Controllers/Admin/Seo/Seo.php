@@ -8,6 +8,10 @@ use Illuminate\Http\Request;
 
 class Seo extends Controller
 {
+    /**
+     * Отрефакторить, много вызовов и дублирования кода
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function page() {
 
         $items = [];
@@ -240,6 +244,24 @@ class Seo extends Controller
             'meta_title' => $meta_title,
             'meta_description' => $meta_description,
             'action' => route('admin.seo.ad-user')
+        ];
+
+        $seo_field = SeoField::where('index', 'shop-list')->first();
+        if ($seo_field) {
+            $meta_title = (bool)$seo_field->meta_title;
+            $meta_description = (bool)$seo_field->meta_description;
+            $description = (bool)$seo_field->description;
+        } else {
+            $meta_title = false;
+            $meta_description = false;
+            $description = false;
+        }
+        $items[] = [
+            'name' => 'Список магазинов',
+            'description' => $description,
+            'meta_title' => $meta_title,
+            'meta_description' => $meta_description,
+            'action' => route('admin.seo.shop-list')
         ];
 
         return view('admin.seo.list')->with(['items' => $items]);
