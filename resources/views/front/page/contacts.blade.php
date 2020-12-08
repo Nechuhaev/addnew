@@ -4,6 +4,15 @@
 
 @section('meta_description', $meta['meta_description'] ?? "Контактная информация addnew.biz")
 
+@section('style')
+    <script src="https://www.google.com/recaptcha/api.js"></script>
+    <script>
+        function onSubmit(token) {
+            document.getElementById("contact-form").submit();
+        }
+    </script>
+@endsection
+
 @section('content')
     <main class="contact-page">
         <div class="container">
@@ -41,7 +50,11 @@
                         </div>
                     </div>
 
-                    <form class="form-contact" action="{{ route('contacts.submit') }}" method="post" enctype="multipart/form-data" >
+                    <form class="form-contact"
+                          id="contact-form"
+                          action="{{ route('contacts.submit') }}"
+                          method="post"
+                          enctype="multipart/form-data" >
                         @csrf
                         @if ($errors->any())
                             <div class="alert alert-danger">
@@ -70,6 +83,7 @@
                             <label>Выберите интересующий вас раздел <span class="star">*</span>:</label>
                             <select name="subject" class="form-control" style="width: 100%;">
                                 <option value="0">-- Выберите --</option>
+                                <option value="Подключение магазина">Подключение магазина</option>
                                 <option value="Проблемы регистрации и входа">Проблемы регистрации и входа</option>
                                 <option value="Объявление на модерации">Объявление на модерации</option>
                                 <option value="У меня не работает...">У меня не работает...</option>
@@ -88,7 +102,11 @@
                         </div>
 
                         <div class="form-action">
-                            <input type="submit" class="btn btn-contact" value="Отправить">
+                            <input type="submit" class="btn btn-contact g-recaptcha"
+                                   data-sitekey="6LcqmP4ZAAAAAOoQscpUmczUD25MFl3tk_CT2C_i"
+                                   data-callback='onSubmit'
+                                   data-action='submit'
+                                   value="Отправить">
                         </div>
 
                     </form>
