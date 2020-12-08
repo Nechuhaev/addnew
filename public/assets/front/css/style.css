@@ -4367,6 +4367,9 @@ main {
     font-size: 20px;
     color: #777;
 }
+li.active {
+    font-weight: 900;
+}
 @media screen and (min-width: 343px) {
     .footer .btn.btn-subscribe {
         margin-right: 0
