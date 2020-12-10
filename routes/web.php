@@ -34,6 +34,9 @@ Route::get('/password/reset', 'Front\User\Auth\ForgotPasswordController@showLink
 Route::get('/password/reset/{token}', 'Front\User\Auth\ResetPasswordController@showResetForm')->name('password.reset');
 Route::post('register', 'Front\User\Auth\RegisterController@register');
 Route::get('/register', 'Front\User\Auth\RegisterController@showRegistrationForm')->name('register');
+// Роут регистрации маркетплейсов
+Route::post('/business-register', 'Front\User\Auth\BusinessRegisterController@register')->name('post-business-register');
+Route::get('/business-register', 'Front\User\Auth\BusinessRegisterController@showRegistrationForm')->name('business-register');
 
 // Категории объявлений
 //Route::get('/{category}', 'Front\User\Auth\RegisterController@showRegistrationForm')->name('register');
@@ -48,6 +51,10 @@ Route::post('profile/update', 'Front\User\UserController@updateUser')->name('pro
 Route::get('/profile/ads', 'Front\User\UserController@ads')->name('profile.ads');
 Route::get('/profile/password', 'Front\User\UserController@password')->name('profile.password');
 Route::post('profile/password/update', 'Front\User\UserController@updatePassword')->name('profile.password.update');
+
+Route::get('/profile/type', 'Front\User\ProfileTypeController@index');
+Route::post('/profile/type', 'Front\User\ProfileTypeController@switchIsShopOwner')->name('switch-profile-type');
+Route::get('/profile/shop', 'Front\User\Shop\AllActionsController@index')->name('profile.shop');
 
 
 // Блог
@@ -226,6 +233,7 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::get('/seo/ad-region', 'Admin\Seo\AdRegion@form')->name('admin.seo.ad-region');
     Route::get('/seo/ad-city', 'Admin\Seo\AdCity@form')->name('admin.seo.ad-city');
     Route::get('/seo/search', 'Admin\Seo\Search@form')->name('admin.seo.search');
+    Route::get('/seo/shop-list', 'Admin\Seo\ShopList@form')->name('admin.seo.shop-list');
 });
 
 

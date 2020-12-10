@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Front\User;
 use App\AdCountry;
 use App\Http\Controllers\Admin\Seo\AdCity;
 use App\Http\Controllers\Controller;
+use App\SeoField;
 use App\User;
 use Illuminate\Http\Request;
 
@@ -17,6 +18,9 @@ class StoreController extends Controller
      */
     public function index(Request $request)
     {
+
+
+
         // Список стран где есть товары магазинов
         $countries = AdCountry::whereHas('regions', function ($query) {
             $query->whereHas('cities', function ($query) {
@@ -30,8 +34,6 @@ class StoreController extends Controller
         $selected_country = AdCountry::with('cities')
             ->where('slug', $request->get('country'))
             ->first();
-
-//        dd($selected_country->cities->pluck('id')->toArray());
 
         // Пользователи
         if ($selected_country) {
@@ -49,11 +51,30 @@ class StoreController extends Controller
             })
             ->orderBy('created_at', 'desc')->paginate(15);
 
+        $seo_field = SeoField::where('index', 'shop-list')->first();
+
+        if ($seo_field) {
+            $entity_values = [
+                '---shop_count---'  => User::shopOwner()->count(),
+            ];
+            $meta = [
+                'meta_title' => strtr($seo_field->meta_title, $entity_values),
+                'meta_description' => strtr($seo_field->meta_description, $entity_values),
+                'description' => strtr($seo_field->description, $entity_values)
+            ];
+        } else {
+            $meta = [
+                'meta_title' => "Интернет-магазины на доске объявлений addnew.biz",
+                'meta_description' => "Интернет-магазины на доске объявлений addnew.biz",
+                'description' => "Интернет-магазины на доске объявлений addnew.biz",
+            ];
+        }
 
         return view('front.store.store_list')->with([
             'countries' => $countries,
             'shop_users' => $shop_users,
-            'selected_country' => $selected_country
+            'selected_country' => $selected_country,
+            'meta' => $meta
         ]);
     }
 

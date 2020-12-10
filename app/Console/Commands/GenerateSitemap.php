@@ -169,16 +169,32 @@ class GenerateSitemap extends Command
         $this->line('cities.xml создано');
 
         // ads
-        $sitemap_ads = Sitemap::create();
+        DB::table('ads')->select("slug")->orderBy('created_at')->chunk(5000, function ($ads, $iteration) use ($sitemap_index) {
+            $sitemap_ads = Sitemap::create();
 
-        DB::table('ads')->select("slug")->get()->each(function ($item) use ($sitemap_ads) {
-            $sitemap_ads->add(route('ad.page', ['slug' => $item->slug]));
+            $ads->each(function ($item) use ($sitemap_ads) {
+                $sitemap_ads->add(route('ad.page', ['slug' => $item->slug]));
+            });
+
+            $filename = "ads-{$iteration}.xml";
+            $sitemap_ads->writeToFile(public_path($filename));
+            $sitemap_index->add($filename);
+            $this->line("{$filename} создано");
+            unset($sitemap_ads);
         });
 
-        $sitemap_ads->writeToFile(public_path('ads.xml'));
-        unset($sitemap_ads);
-        $sitemap_index->add('/ads.xml');
-        $this->line('ads.xml создано');
+
+        // old sitemap
+//        $sitemap_ads = Sitemap::create();
+//
+//        DB::table('ads')->select("slug")->get()->each(function ($item) use ($sitemap_ads) {
+//            $sitemap_ads->add(route('ad.page', ['slug' => $item->slug]));
+//        });
+//
+//        $sitemap_ads->writeToFile(public_path('ads.xml'));
+//        unset($sitemap_ads);
+//        $sitemap_index->add('/ads.xml');
+//        $this->line('ads.xml создано');
 
         $sitemap_index->writeToFile(public_path('sitemap.xml'));
 

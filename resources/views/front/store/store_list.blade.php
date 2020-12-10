@@ -1,7 +1,7 @@
 @extends('front.layout')
 
-@section('meta_title', "Мои объявления | Доска объявлений addnew.biz")
-@section('meta_description', "Мои объявления | Доска объявлений addnew.biz")
+@section('meta_title', $meta['meta_title'])
+@section('meta_description', $meta['meta_description'])
 
 @section('content')
     <main class="account-page">
@@ -47,9 +47,22 @@
                                 </div>
 
                                 @if($loop->iteration % 6 == 0)
-                                    @include('front.adsense.top')
+                                    <div class="banner">
+                                        @include('front.adsense.top')
+                                    </div>
+
                                 @endif
                             @endforeach
+
+                                @if($meta['description'])
+                                    <div class="show-more">
+                                        <section class="show-more__text">
+                                            {!! $meta['description']  !!}
+                                        </section>
+                                        <div class="show-more__shadow"></div>
+                                        <span class="show-more__btn btn-show">Показать</span>
+                                    </div>
+                                @endif
 
                         </div>
                         {{ $shop_users->links('front.widgets.paginate') }}

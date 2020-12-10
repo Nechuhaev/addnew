@@ -69,7 +69,12 @@
 
                 <aside class="column-right">
                     @if($entity->parent_id)
-                        @widget('front.adCategories', ['heading' => $entity->name, 'filter' => $filter])
+{{--                        @widget('front.adCategories', ['heading' => $entity->name, 'filter' => $filter])--}}
+                        @widget('front.adSubCategories', [
+                            'parent' => $entity->parent,
+                            'filter' => $filter,
+                            'active_category' => $entity
+                        ])
                     @else
                         @widget('front.adSubCategories', ['parent' => $entity, 'filter' => $filter])
                     @endif

@@ -205,7 +205,7 @@
 
                     <div class="adv-description">
                         <div class="adv-h">Описание</div>
-                        <p>{{ $ad->content }}</p>
+                        <p>{!! nl2br($ad->content)  !!}</p>
                     </div>
 
 

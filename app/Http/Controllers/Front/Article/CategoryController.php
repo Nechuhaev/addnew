@@ -20,10 +20,15 @@ class CategoryController extends Controller
             $category = ArticleCategory::where('slug', $category_slug)->first();
 
             if (!$category) abort(404);
-            $data['articles'] = $category->articles()->paginate(15);
+            $data['articles'] = $category
+                ->articles()
+                ->orderBy('created_at', 'desc')
+                ->paginate(15);
             $data['category'] = $category;
         } else {
-            $data['articles'] = Article::with('categories')->paginate(15);
+            $data['articles'] = Article::with('categories')
+                ->orderBy('created_at', 'desc')
+                ->paginate(15);
             $data['category'] = null;
         }
 

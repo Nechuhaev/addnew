@@ -129,6 +129,28 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        <label for="facebook_url" class="col-md-12">Telegram ссылка</label>
+                        <div class="col-md-12">
+                            <input type="text"
+                                   id="telegram_url"
+                                   name="telegram_url"
+                                   placeholder="https://t.me/..."
+                                   value="{{ old('telegram_url') ?? $user->telegram_url }}"
+                                   class="form-control form-control-line">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="instagram_url" class="col-md-12">Instagram ссылка</label>
+                        <div class="col-md-12">
+                            <input type="text"
+                                   id="instagram_url"
+                                   name="instagram_url"
+                                   placeholder="https://instagram.com/..."
+                                   value="{{ old('instagram_url') ?? $user->instagram_url }}"
+                                   class="form-control form-control-line">
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <label for="facebook_url" class="col-md-12">Facebook ссылка</label>
                         <div class="col-md-12">
                             <input type="text"
@@ -185,6 +207,15 @@
                             <select name="is_admin" class="form-control" id="is_admin">
                                 <option value="0" {{ ($user->is_admin == 0) ? 'selected' : '' }}>Пользователь</option>
                                 <option value="1" {{ ($user->is_admin == 1) ? 'selected' : '' }}>Администратор</option>
+                            </select>
+                        </div>
+                    </div>
+                        <div class="form-group">
+                        <label id="is_admin" class="col-md-12">Тип профиля</label>
+                        <div class="col-md-12">
+                            <select name="is_admin" class="form-control" id="is_shop_owner">
+                                <option value="0" {{ ($user->is_shop_owner == 0) ? 'selected' : '' }}>Физ. лицо</option>
+                                <option value="1" {{ ($user->is_shop_owner == 1) ? 'selected' : '' }}>Интернет-магазин</option>
                             </select>
                         </div>
                     </div>
