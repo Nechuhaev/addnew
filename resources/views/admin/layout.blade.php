@@ -248,6 +248,8 @@
 <!--This page JavaScript -->
 <script src="{{ asset('assets/admin/dist/js/admin.js') }}"></script>
 
+@yield('footer-scripts')
+
 
 </body>
 

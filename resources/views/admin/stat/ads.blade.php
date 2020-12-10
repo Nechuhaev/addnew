@@ -22,6 +22,14 @@
 
                 <div class="card">
                     <div class="card-body">
+
+                        @foreach($filters as $filter)
+                            <h3>{{ $filter['heading'] }}</h3>
+                            @foreach($filter['values'] as $filter_value)
+                                <a href="{{ $filter_value['value'] }}" class="chartlist--filter--item {{ $filter_value['is_active'] ? 'active' : null }}">{{ $filter_value['name'] }}</a>
+                            @endforeach
+                        @endforeach
+
                         <div class="sales"></div>
                     </div>
                 </div>
@@ -29,30 +37,28 @@
 
         </div>
     </div>
+@endsection
 
+@section('footer-scripts')
     <script>
         $(function () {
             var chart = new Chartist.Line('.sales', {
-                labels: [1, 2, 3, 4, 5, 6, 7],
+                labels: [{{ implode(', ', $chartlist_labels) }}],
                 series: [
-                    [24.5, 0, 0, 0, 34.9, 48.6, 40],
-                    [8.9, 5.8, 21.9, 5.8, 16.5, 6.5, 14.5]
+@foreach($chartlist_lines as $chartlist_line)
+                    [{{ implode(', ', $chartlist_line['x']) }}],
+@endforeach
                 ]
             }, {
                 low: 0,
-                high: 48,
+                // high: 3000,
                 showArea: true,
-                fullWidth: true,
+                // fullWidth: true,
                 plugins: [
                     Chartist.plugins.tooltip()
                 ],
                 axisY: {
                     onlyInteger: true,
-                    scaleMinSpace: 40,
-                    offset: 20,
-                    labelInterpolationFnc: function(value) {
-                        return (value / 10) + 'k';
-                    }
                 },
 
             });

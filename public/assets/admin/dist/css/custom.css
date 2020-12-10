@@ -114,3 +114,17 @@ jQuery autocomplete
     width: 0;
     overflow: hidden;
 }
+a.chartlist--filter--item {
+    border: 1px solid #adadad;
+    font-size: 13px;
+    color: #777;
+    padding: 5px 10px;
+    margin-bottom: 10px;
+    display: inline-block;
+    border-radius: 5px;
+    margin-right: 5px;
+}
+.chartlist--filter--item.active {
+    background: #8affe4;
+    color: #000;
+}
