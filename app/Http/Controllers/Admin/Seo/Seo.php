@@ -8,261 +8,50 @@ use Illuminate\Http\Request;
 
 class Seo extends Controller
 {
+
     /**
-     * Отрефакторить, много вызовов и дублирования кода
+     * Список типов СЕО полей
+     * key = код, совпадает с index в БД и роутом admin.seo.{key}
+     * @var string[]
+     */
+    public $fieldTypes = [
+        'index' => 'Главная',
+        'countries' => 'Список стран',
+        'contacts' => 'Контактная информация',
+        'ad' => 'Объявление',
+        'ad-product' => 'Товар',
+        'ad-category' => 'Категория объявления',
+        'ad-tag' => 'Тег',
+        'ad-country' => 'Страна',
+        'ad-region' => 'Область',
+        'ad-city' => 'Город',
+        'search' => 'Поиск',
+        'ad-user' => 'Список объявлений пользователя',
+        'shop-list' => 'Список интернет-магазинов',
+
+    ];
+
+    /**
+     * Типы страниц с СЕО полями по умолчанию
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function page() {
 
         $items = [];
 
-        $seo_field = SeoField::where('index', 'index')->first();
-        if ($seo_field) {
-            $meta_title = (bool)$seo_field->meta_title;
-            $meta_description = (bool)$seo_field->meta_description;
-            $description = (bool)$seo_field->description;
-        } else {
-            $meta_title = false;
-            $meta_description = false;
-            $description = false;
-        }
-
-        $items[] = [
-            'name' => 'Главная',
-            'description' => $description,
-            'meta_title' => $meta_title,
-            'meta_description' => $meta_description,
-            'action' => route('admin.seo.index')
-        ];
-
-
-        $seo_field = SeoField::where('index', 'countries')->first();
-        if ($seo_field) {
-            $meta_title = (bool)$seo_field->meta_title;
-            $meta_description = (bool)$seo_field->meta_description;
-            $description = (bool)$seo_field->description;
-        } else {
-            $meta_title = false;
-            $meta_description = false;
-            $description = false;
-        }
-
-        $items[] = [
-            'name' => 'Список стран',
-            'description' => $description,
-            'meta_title' => $meta_title,
-            'meta_description' => $meta_description,
-            'action' => route('admin.seo.countries')
-        ];
-
-
-        $seo_field = SeoField::where('index', 'contacts')->first();
-        if ($seo_field) {
-            $meta_title = (bool)$seo_field->meta_title;
-            $meta_description = (bool)$seo_field->meta_description;
-            $description = (bool)$seo_field->description;
-        } else {
-            $meta_title = false;
-            $meta_description = false;
-            $description = false;
-        }
-
-        $items[] = [
-            'name' => 'Контактная информация',
-            'description' => $description,
-            'meta_title' => $meta_title,
-            'meta_description' => $meta_description,
-            'action' => route('admin.seo.contacts')
-        ];
-
-
-        $seo_field = SeoField::where('index', 'ad')->first();
-        if ($seo_field) {
-            $meta_title = (bool)$seo_field->meta_title;
-            $meta_description = (bool)$seo_field->meta_description;
-            $description = (bool)$seo_field->description;
-        } else {
-            $meta_title = false;
-            $meta_description = false;
-            $description = false;
-        }
-
-        $items[] = [
-            'name' => 'Объявление',
-            'description' => $description,
-            'meta_title' => $meta_title,
-            'meta_description' => $meta_description,
-            'action' => route('admin.seo.ad')
-        ];
-
-
-        $seo_field = SeoField::where('index', 'ad-product')->first();
-        if ($seo_field) {
-            $meta_title = (bool)$seo_field->meta_title;
-            $meta_description = (bool)$seo_field->meta_description;
-            $description = (bool)$seo_field->description;
-        } else {
-            $meta_title = false;
-            $meta_description = false;
-            $description = false;
-        }
-
-        $items[] = [
-            'name' => 'Товар',
-            'description' => $description,
-            'meta_title' => $meta_title,
-            'meta_description' => $meta_description,
-            'action' => route('admin.seo.ad-product')
-        ];
-
-
-        $seo_field = SeoField::where('index', 'ad-category')->first();
-        if ($seo_field) {
-            $meta_title = (bool)$seo_field->meta_title;
-            $meta_description = (bool)$seo_field->meta_description;
-            $description = (bool)$seo_field->description;
-        } else {
-            $meta_title = false;
-            $meta_description = false;
-            $description = false;
-        }
-        $items[] = [
-            'name' => 'Категория объявления',
-            'description' => $description,
-            'meta_title' => $meta_title,
-            'meta_description' => $meta_description,
-            'action' => route('admin.seo.ad-category')
-        ];
-
-
-        $seo_field = SeoField::where('index', 'ad-tag')->first();
-        if ($seo_field) {
-            $meta_title = (bool)$seo_field->meta_title;
-            $meta_description = (bool)$seo_field->meta_description;
-            $description = (bool)$seo_field->description;
-        } else {
-            $meta_title = false;
-            $meta_description = false;
-            $description = false;
-        }
-        $items[] = [
-            'name' => 'Тег',
-            'description' => $description,
-            'meta_title' => $meta_title,
-            'meta_description' => $meta_description,
-            'action' => route('admin.seo.ad-tag')
-        ];
-
-
-        $seo_field = SeoField::where('index', 'ad-country')->first();
-        if ($seo_field) {
-            $meta_title = (bool)$seo_field->meta_title;
-            $meta_description = (bool)$seo_field->meta_description;
-            $description = (bool)$seo_field->description;
-        } else {
-            $meta_title = false;
-            $meta_description = false;
-            $description = false;
-        }
-        $items[] = [
-            'name' => 'Страна',
-            'description' => $description,
-            'meta_title' => $meta_title,
-            'meta_description' => $meta_description,
-            'action' => route('admin.seo.ad-country')
-        ];
-
-
-        $seo_field = SeoField::where('index', 'ad-region')->first();
-        if ($seo_field) {
-            $meta_title = (bool)$seo_field->meta_title;
-            $meta_description = (bool)$seo_field->meta_description;
-            $description = (bool)$seo_field->description;
-        } else {
-            $meta_title = false;
-            $meta_description = false;
-            $description = false;
-        }
-        $items[] = [
-            'name' => 'Область',
-            'description' => $description,
-            'meta_title' => $meta_title,
-            'meta_description' => $meta_description,
-            'action' => route('admin.seo.ad-region')
-        ];
-
-
-        $seo_field = SeoField::where('index', 'ad-city')->first();
-        if ($seo_field) {
-            $meta_title = (bool)$seo_field->meta_title;
-            $meta_description = (bool)$seo_field->meta_description;
-            $description = (bool)$seo_field->description;
-        } else {
-            $meta_title = false;
-            $meta_description = false;
-            $description = false;
-        }
-        $items[] = [
-            'name' => 'Город',
-            'description' => $description,
-            'meta_title' => $meta_title,
-            'meta_description' => $meta_description,
-            'action' => route('admin.seo.ad-city')
-        ];
-
-        $seo_field = SeoField::where('index', 'search')->first();
-        if ($seo_field) {
-            $meta_title = (bool)$seo_field->meta_title;
-            $meta_description = (bool)$seo_field->meta_description;
-            $description = (bool)$seo_field->description;
-        } else {
-            $meta_title = false;
-            $meta_description = false;
-            $description = false;
-        }
-        $items[] = [
-            'name' => 'Поиск',
-            'description' => $description,
-            'meta_title' => $meta_title,
-            'meta_description' => $meta_description,
-            'action' => route('admin.seo.search')
-        ];
-
-        $seo_field = SeoField::where('index', 'ad-user')->first();
-        if ($seo_field) {
-            $meta_title = (bool)$seo_field->meta_title;
-            $meta_description = (bool)$seo_field->meta_description;
-            $description = (bool)$seo_field->description;
-        } else {
-            $meta_title = false;
-            $meta_description = false;
-            $description = false;
-        }
-        $items[] = [
-            'name' => 'Список объявлений пользователя',
-            'description' => $description,
-            'meta_title' => $meta_title,
-            'meta_description' => $meta_description,
-            'action' => route('admin.seo.ad-user')
-        ];
-
-        $seo_field = SeoField::where('index', 'shop-list')->first();
-        if ($seo_field) {
-            $meta_title = (bool)$seo_field->meta_title;
-            $meta_description = (bool)$seo_field->meta_description;
-            $description = (bool)$seo_field->description;
-        } else {
-            $meta_title = false;
-            $meta_description = false;
-            $description = false;
-        }
-        $items[] = [
-            'name' => 'Список магазинов',
-            'description' => $description,
-            'meta_title' => $meta_title,
-            'meta_description' => $meta_description,
-            'action' => route('admin.seo.shop-list')
-        ];
+        /**
+         * С
+         */
+        $items = SeoField::get()->map(function ($seo_field) {
+            $index = $seo_field->index;
+            return [
+                'name' => $this->fieldTypes[$index] ?? null,
+                'description' => (bool)$seo_field->description,
+                'meta_title' => (bool)$seo_field->meta_title,
+                'meta_description' => (bool)$seo_field->meta_description,
+                'action' => route("admin.seo.{$index}")
+            ];
+        });
 
         return view('admin.seo.list')->with(['items' => $items]);
     }
