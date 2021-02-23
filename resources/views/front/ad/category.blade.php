@@ -4,6 +4,13 @@
 
 @section('meta_description', $meta['meta_description'] ?? $entity->content)
 
+
+@section('style')
+    @if(empty($ads))
+        <meta name="robots" content="noindex, follow" />
+    @endif
+@endsection
+
 @section('content')
     <main class="category-page">
         <div class="container">

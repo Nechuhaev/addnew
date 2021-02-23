@@ -25,7 +25,11 @@
     <link rel="icon" type="image/png" href="/favicon.png" />
 
     @if(request()->get('page'))
-        <link rel="canonical" href="{{ url()->current() }}" />
+        @if(starts_with(request()->path(), 'r/ukraina/'))
+            <link rel="canonical" href="{{ url(str_replace('r/ukraina/', '', request()->path())) }}" />
+        @else
+            <link rel="canonical" href="{{ url()->current() }}" />
+        @endif
     @elseif(starts_with(request()->path(), 'r/ukraina/'))
         <link rel="canonical" href="{{ url(str_replace('r/ukraina/', '', request()->path())) }}" />
     @else
@@ -91,7 +95,7 @@
         <div class="nav-countries">
             <p class="nav-h">Поиск объявлений по странам</p>
             <div class="country-wrap">
-                <a href="https://addnew.biz/regions/ukraina/" class="country-name"><img src="{{ asset('assets/front/img/flags/ukrane.png') }}"> <span>Украина</span> <span class="btn-toggle"><i class="icon icon-plus"></i></span></a>
+                <a href="https://addnew.biz/regions/ukraina" class="country-name"><img src="{{ asset('assets/front/img/flags/ukrane.png') }}"> <span>Украина</span> <span class="btn-toggle"><i class="icon icon-plus"></i></span></a>
                 <ul class="cities-list">
                     <li><a href="https://addnew.biz/regions/ukraina/kievskaya-obl/kiev">Киев <span class="city-rate">2384</span></a></li>
                     <li><a href="https://addnew.biz/regions/ukraina/harkovskaya-obl/harkov">Харьков <span class="city-rate">959</span></a></li>
@@ -106,7 +110,7 @@
                 </ul>
             </div>
             <div class="country-wrap">
-                <a href="https://addnew.biz/regions/rossiya/" class="country-name"> <!-- active -->
+                <a href="https://addnew.biz/regions/rossiya" class="country-name"> <!-- active -->
                     <img src="{{ asset('assets/front/img/flags/russia.png') }}">
                     <span>Россия</span>
                     <span class="btn-toggle"><i class="icon icon-plus"></i></span>
@@ -125,7 +129,7 @@
                 </ul>
             </div>
             <div class="country-wrap">
-                <a href="https://addnew.biz/regions/kitaj/" class="country-name">
+                <a href="https://addnew.biz/regions/kitaj" class="country-name">
                     <img src="{{ asset('assets/front/img/flags/china.png') }}">
                     <span>Китай</span>
                     <span class="btn-toggle"><i class="icon icon-plus"></i></span>
@@ -211,7 +215,7 @@
                 <li><a href="https://ok.ru/group/54246475890813/" class="ok" target="_blank" rel="noreferrer"></a></li>
             </ul>
         </div>
-        <div class="copyright">© 2019 Доска объявлений AddNew.Biz. Все права защищены.</div>
+        <div class="copyright">© {{ date("Y") }} Доска объявлений AddNew.Biz. Все права защищены.</div>
     </div>
 </footer>
 <div class="toTop"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/arrow-up-alt2.svg') }}" /></div>

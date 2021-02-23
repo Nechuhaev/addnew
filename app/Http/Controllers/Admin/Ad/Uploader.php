@@ -107,8 +107,8 @@ class Uploader extends Controller
 
 
 
-                    if (isset($record['additional_​​​image_​​​link'])) {
-                        $additional_images = explode(',', $record['additional_​​​image_​​​link']);
+                    if (isset($record['additional_image_link'])) {
+                        $additional_images = explode(',', $record['additional_image_link']);
                         if (count($additional_images) >= 1) {
                             foreach ($additional_images as $additional_image) {
                                 $images[] = trim($additional_image);

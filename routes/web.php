@@ -241,6 +241,9 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
 Route::get('/author/{id}', 'Front\Ad\UserController@page')->name('author');
 Route::get('/stores', 'Front\User\StoreController@index')->name('stores');
 
+// Бренды
+Route::get('/brands', 'Front\Brand\BrandController@index')->name('brands');
+
 // Категории объявлений
 Route::get('/r/{filter}/{category}', 'Front\Ad\Category@filter')->name('filtered_category.page');
 Route::get('/r/{filter}/{category}/{subcategory}', 'Front\Ad\Category@filter')->name('filtered_subcategory.page');
