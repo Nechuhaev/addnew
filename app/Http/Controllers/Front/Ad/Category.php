@@ -60,7 +60,12 @@ class Category extends Controller
         $seo_field = SeoField::where('index', 'ad-category')->first();
 
         if ($this->filter) {
-            $filter_entity = AdCountry::whereSlug($this->filter)->first() ?? AdRegion::whereSlug($this->filter)->first() ?? AdCity::whereSlug($this->filter)->first();
+//            $filter_entity = AdCountry::whereSlug($this->filter)->first() ?? AdRegion::whereSlug($this->filter)->first() ?? AdCity::whereSlug($this->filter)->first();
+            $filter_entity = AdRegion::whereSlug($this->filter)->first() ?? AdCity::whereSlug($this->filter)->first();
+
+            if (!$filter_entity) {
+                return redirect('/', 301);
+            }
         }
 
         if ($seo_field) {
@@ -172,50 +177,42 @@ class Category extends Controller
 
         $filters = null;
         if ($this->filter) {
-            // Фильтр по областям
-            $entity = AdCountry::whereSlug($this->filter)->first();
+
+            // Фильтр по городам
+            $entity = AdRegion::whereSlug($this->filter)->first();
 
             if ($entity) {
                 $results = Ad::getAds()
                     ->selectRaw('COUNT(ads.id) as ads_count')
                     ->whereIn('ad_categories.id', $this->included_categories)
-                    ->where('country_id', $entity->id)
-                    ->groupBy('region_id')
+                    ->where('region_id', $entity->id)
+                    ->groupBy('city_id')
                     ->get()->toArray();
 
-                $ids = array_column($results, 'region_id');
-                $ads_counts = array_column($results, 'ads_count', 'region_id');
-                $filters = AdRegion::find($ids);
-            } else {
-                // Фильтр по городам
-                $entity = AdRegion::whereSlug($this->filter)->first();
+                //dd($results);
+                $ids = array_column($results, 'city_id');
+                $ads_counts = array_column($results, 'ads_count', 'city_id');
 
-                if ($entity) {
-                    $results = Ad::getAds()
-                        ->selectRaw('COUNT(ads.id) as ads_count')
-                        ->whereIn('ad_categories.id', $this->included_categories)
-                        ->where('region_id', $entity->id)
-                        ->groupBy('city_id')
-                        ->get()->toArray();
-
-                    //dd($results);
-                    $ids = array_column($results, 'city_id');
-                    $ads_counts = array_column($results, 'ads_count', 'city_id');
-
-                    $filters = AdCity::find($ids);
-                }
+                $filters = AdCity::find($ids);
             }
+
         } else {
-            // Фильтр по странам по умолчанию
+
+            // Фильтр по областям
+            $entity = AdCountry::getCurrentCountry();
+
+
             $results = Ad::getAds()
                 ->selectRaw('COUNT(ads.id) as ads_count')
                 ->whereIn('ad_categories.id', $this->included_categories)
-                ->groupBy('country_id')
+                ->where('country_id', $entity->id)
+                ->groupBy('region_id')
                 ->get()->toArray();
 
-            $ids = array_column($results, 'country_id');
-            $ads_counts = array_column($results, 'ads_count', 'country_id');
-            $filters = AdCountry::find($ids);
+            $ids = array_column($results, 'region_id');
+            $ads_counts = array_column($results, 'ads_count', 'region_id');
+            $filters = AdRegion::find($ids);
+
         }
 
 

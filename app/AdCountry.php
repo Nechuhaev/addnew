@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Http\Controllers\Front\Ad\Country;
 use Illuminate\Database\Eloquent\Model;
 
 class AdCountry extends Model
@@ -115,5 +116,8 @@ class AdCountry extends Model
         return $total_cities;
     }
 
+    public static function getCurrentCountry() {
+        return AdCountry::where('id', 62)->first(); // пока-что украина, но дальше...
+    }
 
 }

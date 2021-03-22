@@ -105,6 +105,26 @@ class AdCategory extends Model
         return $url;
     }
 
+    public function getFilteredUrl($filter)
+    {
+        $parent = $this->parent;
+
+        if ($parent) {
+            $url = route('filtered_subcategory.page', [
+                'filter' => $filter,
+                'category' => $parent->slug,
+                'subcategory' => $this->slug
+            ]);
+        } else {
+            $url = route('filtered_category.page', [
+                'filter' => $filter,
+                'category' => $this->slug
+            ]);
+        }
+
+        return $url;
+    }
+
     /**
      * Связь категорий с таблицей объявлений
      * @return \Illuminate\Database\Eloquent\Relations\HasMany

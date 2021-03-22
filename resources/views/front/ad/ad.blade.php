@@ -125,11 +125,11 @@
                     </div>
                     <div class="adv-meta">
                         <ul class="adv-meta-list">
-                            <li><span>Страна:</span><a href="{{ $ad->city->region->country->url }}">{{ $ad->city->region->country->name }}</a></li>
+                            <li><span>Страна:</span><a href="{{ $ad->category->getFilteredUrl($ad->city->region->country->slug) }}">{{ $ad->city->region->country->name }}</a></li>
                             <li><span>Автор:</span><a href="{{ route('author', ['id'=>$ad->user->id]) }}">{{ $ad->user->username }}</a></li>
-                            <li><span>Город:</span><a href="{{ $ad->city->url }}">{{ $ad->city->name }}</a></li>
+                            <li><span>Город:</span><a href="{{ $ad->category->getFilteredUrl($ad->city->slug) }}">{{ $ad->city->name }}</a></li>
                             <li><span>Дата создания:</span>{{ $ad->date_created}}</li>
-                            <li><span>Район:</span><a href="{{ $ad->city->region->url }}">{{ $ad->city->region->name }}</a></li>
+                            <li><span>Район:</span><a href="{{ $ad->category->getFilteredUrl($ad->city->region->slug) }}">{{ $ad->city->region->name }}</a></li>
                             @if($ad->status == 'active')
                                 <li><span>Актуально до:</span>{{ $ad->date_end }}</li>
                             @endif

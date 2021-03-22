@@ -82,10 +82,23 @@ Route::get('/ad-tags/{slug}', function ($slug) {
 Route::get('/search', 'Front\Ad\Search@page')->name('ad.search');
 
 // Страны
-Route::get('/regions/', 'Front\Ad\Country@getList')->name('countries');
-Route::get('/regions/{country}', 'Front\Ad\Country@page')->name('country.page');
-Route::get('/regions/{country}/{region}', 'Front\Ad\Region@page')->name('region.page');
-Route::get('/regions/{country}/{region}/{city}', 'Front\Ad\City@page')->name('city.page');
+//Route::get('/regions/', 'Front\Ad\Country@getList')->name('countries');
+//Route::get('/regions/{country}', 'Front\Ad\Country@page')->name('country.page');
+//Route::get('/regions/{country}/{region}', 'Front\Ad\Region@page')->name('region.page');
+//Route::get('/regions/{country}/{region}/{city}', 'Front\Ad\City@page')->name('city.page');
+
+Route::get('/regions/', function () {
+    return redirect( '/', 301);
+})->name('countries');
+Route::get('/regions/{country}', function () {
+    return redirect( '/', 301);
+})->name('country.page');
+Route::get('/regions/{country}/{region}', function () {
+    return redirect( '/', 301);
+})->name('region.page');
+Route::get('/regions/{country}/{region}/{city}', function () {
+    return redirect( '/', 301);
+})->name('city.page');
 
 
 // Добавление объявлений

@@ -34,6 +34,12 @@ class Ad extends Controller
     public function page($ad) {
         $ad = \App\Ad::where('slug', '=', $ad)->first();
 
+        $allowed_country_ids = [62];
+        if (!in_array($ad->city->region->country->id, $allowed_country_ids)) {
+            return redirect('/', 301);
+        }
+
+//        dd($ad->category->slug);
         if (!$ad) abort(404);
 
         // Обновляем счетчик просмотров объявлений

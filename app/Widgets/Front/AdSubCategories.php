@@ -31,8 +31,11 @@ class AdSubCategories extends AbstractWidget
 
         foreach ($categories as $category) {
 
-
-            $url = $category->url;
+            if (isset($this->config['filter'])) {
+                $url = $category->getFilteredUrl($this->config['filter']);
+            } else {
+                $url = $category->url;
+            }
 
             $this->config['categories'][] = [
                 'active' => ($this->config['active_category'] && $category->id == $this->config['active_category']->id),
