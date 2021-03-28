@@ -176,6 +176,7 @@ return [
         App\Providers\RouteServiceProvider::class,
 
         \App\Providers\BladeDirectivesServiceProvider::class,
+        \App\Providers\LocalizationServiceProvider::class,
 
         /*
          * Dev

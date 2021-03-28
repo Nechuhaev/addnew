@@ -102,6 +102,19 @@ class AdCountry extends Model
     }
 
     /**
+     * Получает все объявления внутри страны
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function ads()
+    {
+        $cities_ids = $this->cities->map(function ($city) {
+            return $city->id;
+        });
+
+        return Ad::query()->whereIn('city_id', $cities_ids);
+    }
+
+    /**
      * Количество городов, которые отнесены к стране
      * @return int
      */

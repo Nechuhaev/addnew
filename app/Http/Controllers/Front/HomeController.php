@@ -8,6 +8,7 @@ use App\AdCity;
 use App\AdTag;
 use App\Http\AdSense;
 use App\Http\Controllers\Controller;
+use App\Localization\Localization;
 use App\SeoField;
 
 use App\User;
@@ -18,7 +19,7 @@ use Illuminate\Support\Facades\Validator;
 class HomeController extends Controller
 {
 
-    public function index()
+    public function index(Localization $localization)
     {
         $categories = Cache::remember('home_categories', 43200, function () {
             $parents = AdCategory::where('parent_id', 0)
@@ -90,9 +91,9 @@ class HomeController extends Controller
 
         // Последние объявления
 
-
-        $ads_groups = Cache::remember('home_ads', 120, function () {
-            $_ads_groups = Ad::orderBy('created_at', 'desc')->groupBy('user_id')->take(20)->get()->chunk(5);
+        $ads_cache_key = sprintf('home_ads_%s', $localization->getCountry()->id);
+        $ads_groups = Cache::remember($ads_cache_key, 120, function () use ($localization) {
+            $_ads_groups = $localization->ads()->orderBy('created_at', 'desc')->groupBy('user_id')->take(20)->get()->chunk(5);
 
             $ads_groups = [];
             foreach ($_ads_groups as $key => $group) {
@@ -111,8 +112,9 @@ class HomeController extends Controller
 
 
         // Рандомные города
-        $cities = Cache::remember('home_cities', 2280, function () {
-            $_cities = AdCity::all()->random(10);
+        $cities_cache_key = sprintf('home_cities_%s', $localization->getCountry()->id);
+        $cities = Cache::remember($cities_cache_key, 2280, function () use ($localization) {
+            $_cities = $localization->cities()->get()->random(10);
 
             if ($_cities) {
                 $cities = [];
@@ -128,8 +130,13 @@ class HomeController extends Controller
         });
 
         // Рандомные теги
-        $tags = Cache::remember('home_tags', 2280, function () {
-            $_tags = AdTag::all()->random(20);
+        $tags_cache_key = sprintf('home_tags_%s', $localization->getCountry()->id);
+        $tags = Cache::remember($tags_cache_key, 2280, function () use ($localization) {
+            $_tags = AdTag::withCount([
+                'ads' => function ($query) use ($localization) {
+                    return $query->whereIn('city_id', $localization->citiesIds());
+                }
+            ])->having('ads_count', '>', 15)->get()->random(20);
 
             if ($_tags) {
                 $tags = [];
@@ -143,11 +150,11 @@ class HomeController extends Controller
                 return $tags;
             }
         });
-        //Cache::forget('home_tags');
+//        Cache::forget('home_tags');
 
         $shop_users = User::withCount('ads')
-            ->whereHas('ads', function ($query) {
-                $query->where('is_product', 1);
+            ->whereHas('ads', function ($query) use ($localization) {
+                $query->where('is_product', 1)->whereIn('city_id', $localization->citiesIds());
             })
             ->orderBy('created_at', 'desc')
             ->take(12)

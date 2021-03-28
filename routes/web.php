@@ -16,27 +16,30 @@
  * ******************************* FRONT PART ************************************
  * *******************************************************************************
  */
-// Главная
-Route::get('/', "Front\HomeController@index")->name('index');
-Route::get('/subscribe', "Front\HomeController@subscribe")->name('subscribe');
 
-Route::get('/contacts', "Front\Page\PageController@contacts")->name('contacts');
-Route::post('/contacts', "Front\Page\PageController@contacts")->name('contacts.submit');
-Route::post('ulogin', 'ULoginController@login');
+
+Route::middleware(['localized'])->group(function () {
+    // Главная
+    Route::get('/', "Front\HomeController@index")->name('index');
+    Route::get('/subscribe', "Front\HomeController@subscribe")->name('subscribe');
+
+    Route::get('/contacts', "Front\Page\PageController@contacts")->name('contacts');
+    Route::post('/contacts', "Front\Page\PageController@contacts")->name('contacts.submit');
+    Route::post('ulogin', 'ULoginController@login');
 
 // Авторизация
-Route::get('/login', 'Front\User\Auth\LoginController@showLoginForm')->name('login');
-Route::post('login', 'Front\User\Auth\LoginController@login');
-Route::post('logout', 'Front\User\Auth\LoginController@logout')->name('logout');
-Route::post('password/email', 'Front\User\Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
-Route::post('password/reset', 'Front\User\Auth\ResetPasswordController@reset')->name('password.update');
-Route::get('/password/reset', 'Front\User\Auth\ForgotPasswordController@showLinkRequestForm')->name('password.request');
-Route::get('/password/reset/{token}', 'Front\User\Auth\ResetPasswordController@showResetForm')->name('password.reset');
-Route::post('register', 'Front\User\Auth\RegisterController@register');
-Route::get('/register', 'Front\User\Auth\RegisterController@showRegistrationForm')->name('register');
+    Route::get('/login', 'Front\User\Auth\LoginController@showLoginForm')->name('login');
+    Route::post('login', 'Front\User\Auth\LoginController@login');
+    Route::post('logout', 'Front\User\Auth\LoginController@logout')->name('logout');
+    Route::post('password/email', 'Front\User\Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
+    Route::post('password/reset', 'Front\User\Auth\ResetPasswordController@reset')->name('password.update');
+    Route::get('/password/reset', 'Front\User\Auth\ForgotPasswordController@showLinkRequestForm')->name('password.request');
+    Route::get('/password/reset/{token}', 'Front\User\Auth\ResetPasswordController@showResetForm')->name('password.reset');
+    Route::post('register', 'Front\User\Auth\RegisterController@register');
+    Route::get('/register', 'Front\User\Auth\RegisterController@showRegistrationForm')->name('register');
 // Роут регистрации маркетплейсов
-Route::post('/business-register', 'Front\User\Auth\BusinessRegisterController@register')->name('post-business-register');
-Route::get('/business-register', 'Front\User\Auth\BusinessRegisterController@showRegistrationForm')->name('business-register');
+    Route::post('/business-register', 'Front\User\Auth\BusinessRegisterController@register')->name('post-business-register');
+    Route::get('/business-register', 'Front\User\Auth\BusinessRegisterController@showRegistrationForm')->name('business-register');
 
 // Категории объявлений
 //Route::get('/{category}', 'Front\User\Auth\RegisterController@showRegistrationForm')->name('register');
@@ -46,79 +49,88 @@ Route::get('/business-register', 'Front\User\Auth\BusinessRegisterController@sho
 
 
 // Профиль
-Route::get('/profile/', 'Front\User\UserController@edit')->name('profile.index');
-Route::post('profile/update', 'Front\User\UserController@updateUser')->name('profile.update');
-Route::get('/profile/ads', 'Front\User\UserController@ads')->name('profile.ads');
-Route::get('/profile/password', 'Front\User\UserController@password')->name('profile.password');
-Route::post('profile/password/update', 'Front\User\UserController@updatePassword')->name('profile.password.update');
+    Route::get('/profile/', 'Front\User\UserController@edit')->name('profile.index');
+    Route::post('profile/update', 'Front\User\UserController@updateUser')->name('profile.update');
+    Route::get('/profile/ads', 'Front\User\UserController@ads')->name('profile.ads');
+    Route::get('/profile/password', 'Front\User\UserController@password')->name('profile.password');
+    Route::post('profile/password/update', 'Front\User\UserController@updatePassword')->name('profile.password.update');
 
-Route::get('/profile/type', 'Front\User\ProfileTypeController@index');
-Route::post('/profile/type', 'Front\User\ProfileTypeController@switchIsShopOwner')->name('switch-profile-type');
-Route::get('/profile/shop', 'Front\User\Shop\AllActionsController@index')->name('profile.shop');
+    Route::get('/profile/type', 'Front\User\ProfileTypeController@index');
+    Route::post('/profile/type', 'Front\User\ProfileTypeController@switchIsShopOwner')->name('switch-profile-type');
+    Route::get('/profile/shop', 'Front\User\Shop\AllActionsController@index')->name('profile.shop');
 
 
 // Блог
-Route::get('/blog/', 'Front\Article\CategoryController@page')->name('blog.index');
-Route::get('/blog/{slug}', 'Front\Article\ArticleController@page')->name('blog.article');
-Route::get('/blog/category/{slug}', 'Front\Article\CategoryController@page')->name('blog.category');
+    Route::get('/blog/', 'Front\Article\CategoryController@page')->name('blog.index');
+    Route::get('/blog/{slug}', 'Front\Article\ArticleController@page')->name('blog.article');
+    Route::get('/blog/category/{slug}', 'Front\Article\CategoryController@page')->name('blog.category');
 
 
 // Объявление
-Route::get('/ads/{slug}', 'Front\Ad\Ad@page')->name('ad.page');
-Route::post('/ads/{slug}', 'Front\Ad\Ad@message');
-Route::get('/ad/edit/{id}', 'Front\Ad\Ad@edit')->name('ad.edit');
-Route::post('/ad/edit/{id}', 'Front\Ad\Ad@update')->name('ad.update');
-Route::get('/ads/delete/{id}', 'Front\Ad\Ad@delete')->name('ad.delete');
-Route::get('/ads/status/{ad_id}/{status_id}', 'Front\Ad\Ad@changeStatus')->name('ad.changeStatus');
+    Route::get('/ads/{slug}', 'Front\Ad\Ad@page')->name('ad.page');
+    Route::post('/ads/{slug}', 'Front\Ad\Ad@message');
+    Route::get('/ad/edit/{id}', 'Front\Ad\Ad@edit')->name('ad.edit');
+    Route::post('/ad/edit/{id}', 'Front\Ad\Ad@update')->name('ad.update');
+    Route::get('/ads/delete/{id}', 'Front\Ad\Ad@delete')->name('ad.delete');
+    Route::get('/ads/status/{ad_id}/{status_id}', 'Front\Ad\Ad@changeStatus')->name('ad.changeStatus');
 
 
 // Теги объявлений
-Route::get('/ad-tag/{slug}', 'Front\Ad\Tag@page')->name('tag');
-Route::get('/ad-tags/{slug}', function ($slug) {
-    return redirect(route('tag', $slug), 301);
-});
+    Route::get('/ad-tag/{slug}', 'Front\Ad\Tag@page')->name('tag');
+    Route::get('/ad-tags/{slug}', function ($slug) {
+        return redirect(route('tag', $slug), 301);
+    });
 
 // Поиск объявлений
-Route::get('/search', 'Front\Ad\Search@page')->name('ad.search');
+    Route::get('/search', 'Front\Ad\Search@page')->name('ad.search');
 
 // Страны
 //Route::get('/regions/', 'Front\Ad\Country@getList')->name('countries');
 //Route::get('/regions/{country}', 'Front\Ad\Country@page')->name('country.page');
-//Route::get('/regions/{country}/{region}', 'Front\Ad\Region@page')->name('region.page');
-//Route::get('/regions/{country}/{region}/{city}', 'Front\Ad\City@page')->name('city.page');
 
-Route::get('/regions/', function () {
-    return redirect( '/', 301);
-})->name('countries');
-Route::get('/regions/{country}', function () {
-    return redirect( '/', 301);
-})->name('country.page');
-Route::get('/regions/{country}/{region}', function () {
-    return redirect( '/', 301);
-})->name('region.page');
-Route::get('/regions/{country}/{region}/{city}', function () {
-    return redirect( '/', 301);
-})->name('city.page');
 
+    Route::get('/regions/', function () {
+        return redirect( '/', 301);
+    })->name('countries');
+    Route::get('/regions/{country}', function () {
+        return redirect( '/', 301);
+    })->name('country.page');
+
+    Route::get('/regions/{country}/{region}', 'Front\Ad\Region@page')->name('region.page');
+    Route::get('/regions/{country}/{region}/{city}', 'Front\Ad\City@page')->name('city.page');
 
 // Добавление объявлений
 // step 1
-Route::get('/create-listing/', 'Front\Ad\Ad@create_step_category')->name('ad.step.category');
-Route::post('/create-listing/', 'Front\Ad\Ad@create_step_category')->name('ad.create.step.category');
+    Route::get('/create-listing/', 'Front\Ad\Ad@create_step_category')->name('ad.step.category');
+    Route::post('/create-listing/', 'Front\Ad\Ad@create_step_category')->name('ad.create.step.category');
 
 // step 2
-Route::get('/create-listing/details/', 'Front\Ad\Ad@create_step_details')->name('ad.step.details');
-Route::post('/create-listing/details/', 'Front\Ad\Ad@create_step_details')->name('ad.create.step.details');
+    Route::get('/create-listing/details/', 'Front\Ad\Ad@create_step_details')->name('ad.step.details');
+    Route::post('/create-listing/details/', 'Front\Ad\Ad@create_step_details')->name('ad.create.step.details');
 
 // step 3
-Route::get('/create-listing/preview/', 'Front\Ad\Ad@create_step_preview')->name('ad.step.preview');
-Route::post('/create-listing/preview/', 'Front\Ad\Ad@create_step_preview')->name('ad.create.step.preview');
-Route::get('/create-listing/creating/', 'Front\Ad\Ad@add')->name('ad.step.creating');
+    Route::get('/create-listing/preview/', 'Front\Ad\Ad@create_step_preview')->name('ad.step.preview');
+    Route::post('/create-listing/preview/', 'Front\Ad\Ad@create_step_preview')->name('ad.create.step.preview');
+    Route::get('/create-listing/creating/', 'Front\Ad\Ad@add')->name('ad.step.creating');
 // step 4
-Route::get('/create-listing/success/', 'Front\Ad\Ad@create_step_success')->name('ad.step.success');
-Route::post('/create-listing/success/', 'Front\Ad\Ad@create_step_success')->name('ad.create.step.success');
+    Route::get('/create-listing/success/', 'Front\Ad\Ad@create_step_success')->name('ad.step.success');
+    Route::post('/create-listing/success/', 'Front\Ad\Ad@create_step_success')->name('ad.create.step.success');
 
+// Автор объявлений
+    Route::get('/author/{id}', 'Front\Ad\UserController@page')->name('author');
+    Route::get('/stores', 'Front\User\StoreController@index')->name('stores');
 
+// Бренды
+    Route::get('/brands', 'Front\Brand\BrandController@index')->name('brands');
+
+// Категории объявлений
+    Route::get('/r/{filter}/{category}', 'Front\Ad\Category@filter')->name('filtered_category.page');
+    Route::get('/r/{filter}/{category}/{subcategory}', 'Front\Ad\Category@filter')->name('filtered_subcategory.page');
+
+    Route::get('/page/{slug}', 'Front\Page\PageController@page')->name('page');
+    Route::get('/{category}', 'Front\Ad\Category@page')->name('category.page');
+    Route::get('/{category}/{subcategory}', 'Front\Ad\Category@page')->name('sub_category.page');
+});
 
 
 /**
@@ -249,19 +261,4 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::get('/seo/shop-list', 'Admin\Seo\ShopList@form')->name('admin.seo.shop-list');
 });
 
-
-// Автор объявлений
-Route::get('/author/{id}', 'Front\Ad\UserController@page')->name('author');
-Route::get('/stores', 'Front\User\StoreController@index')->name('stores');
-
-// Бренды
-Route::get('/brands', 'Front\Brand\BrandController@index')->name('brands');
-
-// Категории объявлений
-Route::get('/r/{filter}/{category}', 'Front\Ad\Category@filter')->name('filtered_category.page');
-Route::get('/r/{filter}/{category}/{subcategory}', 'Front\Ad\Category@filter')->name('filtered_subcategory.page');
-
-Route::get('/page/{slug}', 'Front\Page\PageController@page')->name('page');
-Route::get('/{category}', 'Front\Ad\Category@page')->name('category.page');
-Route::get('/{category}/{subcategory}', 'Front\Ad\Category@page')->name('sub_category.page');
 

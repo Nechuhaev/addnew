@@ -65,6 +65,7 @@ class AdTag extends Model
         return route('tag', ['slug' => $this->slug]);
     }
 
+
     public function ads()
     {
         return $this->belongsToMany('App\Ad', 'ad_tag', 'tag_id', 'ad_id');

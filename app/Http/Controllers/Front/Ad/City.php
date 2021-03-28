@@ -3,18 +3,76 @@
 namespace App\Http\Controllers\Front\Ad;
 
 use App\Ad;
+use App\AdCategory;
 use App\AdCity;
 use App\AdTag;
+use App\Http\AdSense;
 use App\Http\Controllers\Controller;
 use App\SeoField;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class City extends Controller
 {
+    // todo избавиться от всех дублирований такого кода для городов / стран / главной
     public function page($country, $region, $city)
     {
         $entity = AdCity::where('slug', '=', $city)->first();
+
+        // Эту штуку потом хорошо бы переписать, тк она дублируется и кеш в перспективе может вызвать проблем
+        $cache_key = sprintf('city_categories_%s', $entity->id);
+        $categories = Cache::remember($cache_key, 43200, function () use ($entity) {
+            $parents = AdCategory::where('parent_id', 0)
+                ->orderBy('sort_order', 'ASC')->get();
+
+            $_category_list = [];
+            foreach ($parents as $parent) {
+                $key = 0;
+
+                // В зависимости от порядка сортировки помещаем в колонку
+                if (in_array($parent['sort_order'], range(0, 99))) {
+                    $key = 0;
+                }
+                if (in_array($parent['sort_order'], range(100, 199))) {
+                    $key = 1;
+                }
+                if (in_array($parent['sort_order'], range(200, 299))) {
+                    $key = 2;
+                }
+                if (in_array($parent['sort_order'], range(300, 399))) {
+                    $key = 3;
+                }
+
+                $_category_list[$key][] = $parent;
+            }
+
+            $categories = [];
+            foreach ($_category_list as $list_item_key => $list_item_value) {
+                foreach ($list_item_value as $parent_category) {
+
+                    $_children = $parent_category->children;
+
+                    $children = [];
+                    if ($_children->count()) {
+                        foreach ($_children as $child) {
+                            $children[] = [
+                                'name' => $child->name,
+                                'url' => $child->getFilteredUrl($entity->slug),
+                            ];
+                        }
+                    }
+
+                    $categories[$list_item_key][] = [
+                        'name' => $parent_category->name,
+                        'url' => $parent_category->getFilteredUrl($entity->slug),
+                        'image' => $parent_category->image,
+                        'children' => $children
+                    ];
+                }
+            }
+            return $categories;
+        });
 
         if (!$entity) abort(404);
 
@@ -43,28 +101,12 @@ class City extends Controller
             $meta['description'] = false;
         }
 
-        $results = Ad::getAds()->where('ad_cities.id', $entity->id)
-            ->paginate(15);
-
-        $ads = Ad::getLoopArray($results);
-
-        $microdata_info = DB::table('ad_countries')
-            ->selectRaw('min(ads.price) as min, max(ads.price) as max, count(ads.id) as ads_count')
-            ->leftJoin('ad_regions', 'ad_regions.country_id', '=', 'ad_countries.id')
-            ->leftJoin('ad_cities', 'ad_cities.region_id', '=', 'ad_regions.id')
-            ->leftJoin('ads', 'ads.city_id', '=', 'ad_cities.id')
-            ->where('ad_cities.id', $entity->id)
-            ->where('ads.price', '>', 0)
-            ->first();
-
-        return view('front.ad.country')->with([
+        return view('front.ad.filtered-categories')->with([
             'entity' => $entity,
-            'ads' => $ads,
-            'links' => $results->onEachSide(1)->links('front.widgets.paginate'),
-            'tags' => AdTag::getAdsTags($ads),
             'breadcrumbs' => 'city.page',
-            'microdata' => $microdata_info,
-            'meta' => $meta
+            'meta' => $meta,
+            'categories' => $categories,
+            'adsense' => new AdSense()
         ]);
     }
 }
