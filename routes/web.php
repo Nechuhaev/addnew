@@ -17,6 +17,124 @@
  * *******************************************************************************
  */
 
+Route::middleware(['admin'])->prefix('admin')->group(function () {
+    Route::get('/', 'AdminPageController@index')->name('admin.index');
+
+    Route::prefix('stat')->group(function () {
+        Route::get('/ads', 'Admin\Stat\AdStatController@index')->name('admin.stat.ads');
+    });
+
+    // Пользователи
+    Route::get('/users', 'Admin\User\UserController@showUsersList')->name('admin.users');
+    Route::get('/users/search', 'Admin\User\UserController@search')->name('admin.users.search');
+    Route::get('/user/{id}', 'Admin\User\UserController@showUserInformation')->name('admin.user');
+    Route::post('/user/update', 'Admin\User\UserController@update')->name('admin.user.update');
+
+
+    // Объявления
+    Route::get('/ads', 'Admin\Ad\Ad@showList')->name('admin.ads');
+    Route::get('/ads/{search}', 'Admin\Ad\Ad@showList')->name('admin.ads.search');
+    Route::get('/ad', 'Admin\Ad\Ad@show')->name('admin.ad');
+    Route::get('/ad/uploader', 'Admin\Ad\Uploader@index')->name('admin.ad.uploader');
+    Route::post('/ad/uploader', 'Admin\Ad\Uploader@uploadFile')->name('admin.ad.uploader.init');
+    Route::post('/ad/uploader/delete', 'Admin\Ad\Uploader@deleteSelected')->name('admin.ad.uploader.delete');
+    Route::post('/ad/uploader/publish', 'Admin\Ad\Uploader@publish')->name('admin.ad.uploader.publish');
+    Route::get('/ad/{id}', 'Admin\Ad\Ad@edit')->name('admin.ad.edit');
+    Route::post('/ad/create', 'Admin\Ad\Ad@create')->name('admin.ad.create');
+    Route::post('/ad/update', 'Admin\Ad\Ad@update')->name('admin.ad.update');
+    Route::post('/ad/delete', 'Admin\Ad\Ad@delete')->name('admin.ad.delete');
+    Route::post('/ad/archive', 'Admin\Ad\Ad@archive')->name('admin.ad.archive');
+
+    // Объявления > Категории
+    Route::get('/adCategories', 'Admin\Ad\Category@showForm')->name('admin.adCategories');
+    Route::get('/adCategories/{id}', 'Admin\Ad\Category@showForm')->name('admin.adCategories.edit');
+    Route::post('/adCategories/create', 'Admin\Ad\Category@create')->name('admin.adCategories.create');
+    Route::post('/adCategories/update', 'Admin\Ad\Category@update')->name('admin.adCategories.update');
+    Route::get('/adCategories/delete/{id}', 'Admin\Ad\Category@delete')->name('admin.adCategories.delete');
+
+    // Объявления > Теги
+    Route::get('/adTags', 'Admin\Ad\Tag@showForm')->name('admin.adTags');
+    Route::get('/adTags/search', 'Admin\Ad\Tag@search')->name('admin.adTags.search');
+    Route::get('/adTags/{id}', 'Admin\Ad\Tag@showForm')->name('admin.adTags.edit');
+    Route::post('/adTags/create', 'Admin\Ad\Tag@create')->name('admin.adTags.create');
+    Route::post('/adTags/update', 'Admin\Ad\Tag@update')->name('admin.adTags.update');
+    Route::get('/adTags/delete/{id}', 'Admin\Ad\Tag@delete')->name('admin.adTags.delete');
+
+    // Объявления > Страны
+    Route::get('/countries', 'Admin\Ad\Country@showForm')->name('admin.adCountries');
+    Route::get('/countries/search', 'Admin\Ad\Country@search')->name('admin.adCountries.search');
+    Route::get('/countries/{id}', 'Admin\Ad\Country@showForm')->name('admin.adCountries.edit');
+    Route::post('/countries/create', 'Admin\Ad\Country@create')->name('admin.adCountries.create');
+    Route::post('/countries/update', 'Admin\Ad\Country@update')->name('admin.adCountries.update');
+    Route::get('/countries/delete/{id}', 'Admin\Ad\Country@delete')->name('admin.adCountries.delete');
+
+    // Объявления > Области / Регионы
+    Route::get('/regions', 'Admin\Ad\Region@showForm')->name('admin.adRegions');
+    Route::get('/regions/search', 'Admin\Ad\Region@search')->name('admin.adRegions.search');
+    Route::get('/regions/{id}', 'Admin\Ad\Region@showForm')->name('admin.adRegions.edit');
+    Route::post('/regions/create', 'Admin\Ad\Region@create')->name('admin.adRegions.create');
+    Route::post('/regions/update', 'Admin\Ad\Region@update')->name('admin.adRegions.update');
+    Route::get('/regions/delete/{id}', 'Admin\Ad\Region@delete')->name('admin.adRegions.delete');
+
+    // Объявления > Города
+    Route::get('/cities', 'Admin\Ad\City@showForm')->name('admin.adCities');
+    Route::get('/cities/search', 'Admin\Ad\City@search')->name('admin.adCities.search');
+    Route::get('/cities/{id}', 'Admin\Ad\City@showForm')->name('admin.adCities.edit');
+    Route::post('/cities/create', 'Admin\Ad\City@create')->name('admin.adCities.create');
+    Route::post('/cities/update', 'Admin\Ad\City@update')->name('admin.adCities.update');
+    Route::get('/cities/delete/{id}', 'Admin\Ad\City@delete')->name('admin.adCities.delete');
+
+    // Объявления > Валюты
+    Route::get('/currencies', 'Admin\Ad\Currency@showForm')->name('admin.adCurrencies');
+    Route::get('/currencies/search', 'Admin\Ad\Currency@search')->name('admin.adCurrencies.search');
+    Route::get('/currencies/{id}', 'Admin\Ad\Currency@showForm')->name('admin.adCurrencies.edit');
+    Route::post('/currencies/create', 'Admin\Ad\Currency@create')->name('admin.adCurrencies.create');
+    Route::post('/currencies/update', 'Admin\Ad\Currency@update')->name('admin.adCurrencies.update');
+    Route::get('/currencies/delete/{id}', 'Admin\Ad\Currency@delete')->name('admin.adCurrencies.delete');
+
+
+
+//    Route::get('/adCategory', 'AdminPageController@adCategory')->name('admin.adCategory');
+//    Route::get('/country', 'AdminPageController@country')->name('admin.country');
+//    Route::get('/city', 'AdminPageController@city')->name('admin.city');
+
+    Route::get('/pages', 'Admin\Page\PageController@showPages')->name('admin.pages');
+    Route::get('/pages/add', 'Admin\Page\PageController@showForm')->name('admin.page.new');
+    Route::get('/page/{id}', 'Admin\Page\PageController@showForm')->name('admin.page.edit');
+    Route::post('/page/create', 'Admin\Page\PageController@create')->name('admin.page.create');
+    Route::post('/page/update', 'Admin\Page\PageController@update')->name('admin.page.update');
+    Route::post('/page/delete', 'Admin\Page\PageController@delete')->name('admin.page.delete');
+
+    Route::get('/articles', 'Admin\Article\ArticleController@showArticles')->name('admin.articles');
+    Route::get('/article/add', 'Admin\Article\ArticleController@showArticleAddForm')->name('admin.article.add');
+    Route::post('/article/add', 'Admin\Article\ArticleController@add')->name('admin.article.create');
+    Route::get('/article/edit/{id}', 'Admin\Article\ArticleController@showArticleEditForm')->name('admin.article.edit');
+    Route::post('/article/update', 'Admin\Article\ArticleController@update')->name('admin.article.update');
+    Route::post('/article/delete', 'Admin\Article\ArticleController@delete')->name('admin.article.delete');
+
+    Route::get('/articleCategories', 'Admin\Article\CategoryController@index')->name('admin.article.category.index');
+    Route::get('/articleCategory', 'Admin\Article\CategoryController@add')->name('admin.article.category.add');
+    Route::get('/articleCategory/{id}', 'Admin\Article\CategoryController@show')->name('admin.article.category.show');
+    Route::post('/articleCategory/add', 'Admin\Article\CategoryController@create')->name('admin.article.category.create');
+    Route::post('/articleCategory/update/{id}', 'Admin\Article\CategoryController@update')->name('admin.article.category.update');
+
+    Route::get('/seo', 'Admin\Seo\Seo@page')->name('admin.seo');
+    Route::post('/seo/update', 'Admin\Seo\Seo@update')->name('admin.seo.update');
+    Route::get('/seo/index', 'Admin\Seo\Index@form')->name('admin.seo.index');
+    Route::get('/seo/contacts', 'Admin\Seo\Contacts@form')->name('admin.seo.contacts');
+    Route::get('/seo/countries', 'Admin\Seo\Countries@form')->name('admin.seo.countries');
+    Route::get('/seo/ad', 'Admin\Seo\Ad@form')->name('admin.seo.ad');
+    Route::get('/seo/ad-product', 'Admin\Seo\AdProduct@form')->name('admin.seo.ad-product');
+    Route::get('/seo/ad-user', 'Admin\Seo\AdUser@form')->name('admin.seo.ad-user');
+    Route::get('/seo/ad-tag', 'Admin\Seo\AdTag@form')->name('admin.seo.ad-tag');
+    Route::get('/seo/ad-category', 'Admin\Seo\AdCategory@form')->name('admin.seo.ad-category');
+    Route::get('/seo/ad-country', 'Admin\Seo\AdCountry@form')->name('admin.seo.ad-country');
+    Route::get('/seo/ad-region', 'Admin\Seo\AdRegion@form')->name('admin.seo.ad-region');
+    Route::get('/seo/ad-city', 'Admin\Seo\AdCity@form')->name('admin.seo.ad-city');
+    Route::get('/seo/search', 'Admin\Seo\Search@form')->name('admin.seo.search');
+    Route::get('/seo/shop-list', 'Admin\Seo\ShopList@form')->name('admin.seo.shop-list');
+});
+
 
 Route::middleware(['localized'])->group(function () {
     // Главная
@@ -143,122 +261,5 @@ Route::middleware(['localized'])->group(function () {
 
 //Route::get('/home', 'HomeController@index')->name('home');
 
-Route::middleware(['admin'])->prefix('admin')->group(function () {
-    Route::get('/', 'AdminPageController@index')->name('admin.index');
-
-    Route::prefix('stat')->group(function () {
-        Route::get('/ads', 'Admin\Stat\AdStatController@index')->name('admin.stat.ads');
-    });
-
-    // Пользователи
-    Route::get('/users', 'Admin\User\UserController@showUsersList')->name('admin.users');
-    Route::get('/users/search', 'Admin\User\UserController@search')->name('admin.users.search');
-    Route::get('/user/{id}', 'Admin\User\UserController@showUserInformation')->name('admin.user');
-    Route::post('/user/update', 'Admin\User\UserController@update')->name('admin.user.update');
-
-
-    // Объявления
-    Route::get('/ads', 'Admin\Ad\Ad@showList')->name('admin.ads');
-    Route::get('/ads/{search}', 'Admin\Ad\Ad@showList')->name('admin.ads.search');
-    Route::get('/ad', 'Admin\Ad\Ad@show')->name('admin.ad');
-    Route::get('/ad/uploader', 'Admin\Ad\Uploader@index')->name('admin.ad.uploader');
-    Route::post('/ad/uploader', 'Admin\Ad\Uploader@uploadFile')->name('admin.ad.uploader.init');
-    Route::post('/ad/uploader/delete', 'Admin\Ad\Uploader@deleteSelected')->name('admin.ad.uploader.delete');
-    Route::post('/ad/uploader/publish', 'Admin\Ad\Uploader@publish')->name('admin.ad.uploader.publish');
-    Route::get('/ad/{id}', 'Admin\Ad\Ad@edit')->name('admin.ad.edit');
-    Route::post('/ad/create', 'Admin\Ad\Ad@create')->name('admin.ad.create');
-    Route::post('/ad/update', 'Admin\Ad\Ad@update')->name('admin.ad.update');
-    Route::post('/ad/delete', 'Admin\Ad\Ad@delete')->name('admin.ad.delete');
-    Route::post('/ad/archive', 'Admin\Ad\Ad@archive')->name('admin.ad.archive');
-
-    // Объявления > Категории
-    Route::get('/adCategories', 'Admin\Ad\Category@showForm')->name('admin.adCategories');
-    Route::get('/adCategories/{id}', 'Admin\Ad\Category@showForm')->name('admin.adCategories.edit');
-    Route::post('/adCategories/create', 'Admin\Ad\Category@create')->name('admin.adCategories.create');
-    Route::post('/adCategories/update', 'Admin\Ad\Category@update')->name('admin.adCategories.update');
-    Route::get('/adCategories/delete/{id}', 'Admin\Ad\Category@delete')->name('admin.adCategories.delete');
-
-    // Объявления > Теги
-    Route::get('/adTags', 'Admin\Ad\Tag@showForm')->name('admin.adTags');
-    Route::get('/adTags/search', 'Admin\Ad\Tag@search')->name('admin.adTags.search');
-    Route::get('/adTags/{id}', 'Admin\Ad\Tag@showForm')->name('admin.adTags.edit');
-    Route::post('/adTags/create', 'Admin\Ad\Tag@create')->name('admin.adTags.create');
-    Route::post('/adTags/update', 'Admin\Ad\Tag@update')->name('admin.adTags.update');
-    Route::get('/adTags/delete/{id}', 'Admin\Ad\Tag@delete')->name('admin.adTags.delete');
-
-    // Объявления > Страны
-    Route::get('/countries', 'Admin\Ad\Country@showForm')->name('admin.adCountries');
-    Route::get('/countries/search', 'Admin\Ad\Country@search')->name('admin.adCountries.search');
-    Route::get('/countries/{id}', 'Admin\Ad\Country@showForm')->name('admin.adCountries.edit');
-    Route::post('/countries/create', 'Admin\Ad\Country@create')->name('admin.adCountries.create');
-    Route::post('/countries/update', 'Admin\Ad\Country@update')->name('admin.adCountries.update');
-    Route::get('/countries/delete/{id}', 'Admin\Ad\Country@delete')->name('admin.adCountries.delete');
-
-    // Объявления > Области / Регионы
-    Route::get('/regions', 'Admin\Ad\Region@showForm')->name('admin.adRegions');
-    Route::get('/regions/search', 'Admin\Ad\Region@search')->name('admin.adRegions.search');
-    Route::get('/regions/{id}', 'Admin\Ad\Region@showForm')->name('admin.adRegions.edit');
-    Route::post('/regions/create', 'Admin\Ad\Region@create')->name('admin.adRegions.create');
-    Route::post('/regions/update', 'Admin\Ad\Region@update')->name('admin.adRegions.update');
-    Route::get('/regions/delete/{id}', 'Admin\Ad\Region@delete')->name('admin.adRegions.delete');
-
-    // Объявления > Города
-    Route::get('/cities', 'Admin\Ad\City@showForm')->name('admin.adCities');
-    Route::get('/cities/search', 'Admin\Ad\City@search')->name('admin.adCities.search');
-    Route::get('/cities/{id}', 'Admin\Ad\City@showForm')->name('admin.adCities.edit');
-    Route::post('/cities/create', 'Admin\Ad\City@create')->name('admin.adCities.create');
-    Route::post('/cities/update', 'Admin\Ad\City@update')->name('admin.adCities.update');
-    Route::get('/cities/delete/{id}', 'Admin\Ad\City@delete')->name('admin.adCities.delete');
-
-    // Объявления > Валюты
-    Route::get('/currencies', 'Admin\Ad\Currency@showForm')->name('admin.adCurrencies');
-    Route::get('/currencies/search', 'Admin\Ad\Currency@search')->name('admin.adCurrencies.search');
-    Route::get('/currencies/{id}', 'Admin\Ad\Currency@showForm')->name('admin.adCurrencies.edit');
-    Route::post('/currencies/create', 'Admin\Ad\Currency@create')->name('admin.adCurrencies.create');
-    Route::post('/currencies/update', 'Admin\Ad\Currency@update')->name('admin.adCurrencies.update');
-    Route::get('/currencies/delete/{id}', 'Admin\Ad\Currency@delete')->name('admin.adCurrencies.delete');
-
-
-
-//    Route::get('/adCategory', 'AdminPageController@adCategory')->name('admin.adCategory');
-//    Route::get('/country', 'AdminPageController@country')->name('admin.country');
-//    Route::get('/city', 'AdminPageController@city')->name('admin.city');
-
-    Route::get('/pages', 'Admin\Page\PageController@showPages')->name('admin.pages');
-    Route::get('/pages/add', 'Admin\Page\PageController@showForm')->name('admin.page.new');
-    Route::get('/page/{id}', 'Admin\Page\PageController@showForm')->name('admin.page.edit');
-    Route::post('/page/create', 'Admin\Page\PageController@create')->name('admin.page.create');
-    Route::post('/page/update', 'Admin\Page\PageController@update')->name('admin.page.update');
-    Route::post('/page/delete', 'Admin\Page\PageController@delete')->name('admin.page.delete');
-
-    Route::get('/articles', 'Admin\Article\ArticleController@showArticles')->name('admin.articles');
-    Route::get('/article/add', 'Admin\Article\ArticleController@showArticleAddForm')->name('admin.article.add');
-    Route::post('/article/add', 'Admin\Article\ArticleController@add')->name('admin.article.create');
-    Route::get('/article/edit/{id}', 'Admin\Article\ArticleController@showArticleEditForm')->name('admin.article.edit');
-    Route::post('/article/update', 'Admin\Article\ArticleController@update')->name('admin.article.update');
-    Route::post('/article/delete', 'Admin\Article\ArticleController@delete')->name('admin.article.delete');
-
-    Route::get('/articleCategories', 'Admin\Article\CategoryController@index')->name('admin.article.category.index');
-    Route::get('/articleCategory', 'Admin\Article\CategoryController@add')->name('admin.article.category.add');
-    Route::get('/articleCategory/{id}', 'Admin\Article\CategoryController@show')->name('admin.article.category.show');
-    Route::post('/articleCategory/add', 'Admin\Article\CategoryController@create')->name('admin.article.category.create');
-    Route::post('/articleCategory/update/{id}', 'Admin\Article\CategoryController@update')->name('admin.article.category.update');
-
-    Route::get('/seo', 'Admin\Seo\Seo@page')->name('admin.seo');
-    Route::post('/seo/update', 'Admin\Seo\Seo@update')->name('admin.seo.update');
-    Route::get('/seo/index', 'Admin\Seo\Index@form')->name('admin.seo.index');
-    Route::get('/seo/contacts', 'Admin\Seo\Contacts@form')->name('admin.seo.contacts');
-    Route::get('/seo/countries', 'Admin\Seo\Countries@form')->name('admin.seo.countries');
-    Route::get('/seo/ad', 'Admin\Seo\Ad@form')->name('admin.seo.ad');
-    Route::get('/seo/ad-product', 'Admin\Seo\AdProduct@form')->name('admin.seo.ad-product');
-    Route::get('/seo/ad-user', 'Admin\Seo\AdUser@form')->name('admin.seo.ad-user');
-    Route::get('/seo/ad-tag', 'Admin\Seo\AdTag@form')->name('admin.seo.ad-tag');
-    Route::get('/seo/ad-category', 'Admin\Seo\AdCategory@form')->name('admin.seo.ad-category');
-    Route::get('/seo/ad-country', 'Admin\Seo\AdCountry@form')->name('admin.seo.ad-country');
-    Route::get('/seo/ad-region', 'Admin\Seo\AdRegion@form')->name('admin.seo.ad-region');
-    Route::get('/seo/ad-city', 'Admin\Seo\AdCity@form')->name('admin.seo.ad-city');
-    Route::get('/seo/search', 'Admin\Seo\Search@form')->name('admin.seo.search');
-    Route::get('/seo/shop-list', 'Admin\Seo\ShopList@form')->name('admin.seo.shop-list');
-});
 
 
