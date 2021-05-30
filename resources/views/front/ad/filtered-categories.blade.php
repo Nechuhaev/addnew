@@ -5,31 +5,25 @@
 @section('meta_description', $meta['meta_description'] ?? '')
 
 @section('content')
+
     <main class="home-page">
         <div class="container">
             <div class="banner">
                 @include('front.adsense.top')
             </div>
+
+            <h1>{{ $meta['meta_title'] }}</h1>
+
             @if($categories)
                 <div class="columns">
                     @foreach($categories as $category)
                         <div class="col">
-                            @foreach($category as $parent_category)
-                                <ul class="catalog">
-                                    <li class="first first-64">
-                                        <img src="{{ asset($parent_category['image']) }}" alt="{{ $parent_category['name'] }}" class="catalog-img">
-                                        <a href="{{ $parent_category['url'] }}">{{ $parent_category['name'] }}</a>
-                                    </li>
-                                    @if($parent_category['children'])
-                                        @foreach($parent_category['children'] as $child)
-                                            <li><a href="{{ $child['url'] }}">{{ $child['name'] }}</a></li>
-                                        @endforeach
-                                    @endif
-                                </ul>
-                            @endforeach
-                            @if($loop->iteration == 3)
-                                {{ $adsense::block('home-vertical') }}
-                            @endif
+                            <ul class="catalog">
+                                <li class="first first-64">
+                                    <img src="{{ asset($category['image']) }}" alt="{{ $category['name'] }}" class="catalog-img">
+                                    <a href="{{ $category['url'] }}">{{ $category['name'] }}</a>
+                                </li>
+                            </ul>
                         </div>
                     @endforeach
                 </div>
@@ -47,23 +41,60 @@
                 @include('front.adsense.bottom')
             </div>
 
-{{--            @if ($ads_groups)--}}
-{{--                <h2 class="last-advs-header">Последние объявления</h2>--}}
-{{--                @foreach($ads_groups as $group)--}}
-{{--                    <div class="last-advs" {!!  ($loop->iteration != 1) ? 'style="border:none;"' : ''  !!}>--}}
-{{--                        @foreach($group as $ad)--}}
-{{--                            <a href="{{ $ad['url'] }}">--}}
-{{--                        <span class="last-adv-title">--}}
-{{--                            <img src="{{ $ad['image'] }}" alt="{{ $ad['name'] }}">--}}
-{{--                            <strong> {{ $ad['name'] }}</strong>--}}
-{{--                        </span>--}}
-{{--                                <span class="last-adv-price"> {{ $ad['price'] }} </span>--}}
-{{--                            </a>--}}
-{{--                        @endforeach--}}
-{{--                    </div>--}}
-{{--                @endforeach--}}
 
-{{--            @endif--}}
+            @if($cities)
+                <div class="random-cities">
+                    @foreach($cities as $city)
+                        <a href="{{ $city['url'] }}">{{ $city['name'] }}</a>
+                    @endforeach
+                </div>
+            @endif
+
+
+            @if($tags)
+                <div class="random-cities widget-tag-cloud" style="padding-top: 25px; height: initial">
+                    @foreach($tags as $tag)
+                        <a href="{{ $tag['url'] }}">{{ $tag['name'] }}</a>
+                    @endforeach
+                </div>
+            @endif
+
+            @if ($ads_groups)
+                <h2 class="last-advs-header">Последние объявления</h2>
+                @foreach($ads_groups as $group)
+                    <div class="last-advs" {!!  ($loop->iteration != 1) ? 'style="border:none;"' : ''  !!}>
+                        @foreach($group as $ad)
+                            <a href="{{ $ad['url'] }}">
+                        <span class="last-adv-title">
+                            <img src="{{ $ad['image'] }}" alt="{{ $ad['name'] }}">
+                            <strong> {{ $ad['name'] }}</strong>
+                        </span>
+                                <span class="last-adv-price"> {{ $ad['price'] }} </span>
+                            </a>
+                        @endforeach
+                    </div>
+                @endforeach
+
+            @endif
+
+            <section>
+                <p class="section-heading">Популярные магазины</p>
+                <p class="text-center"><a class="btn" href="{{ route('stores') }}">Перейти к списку всех магазинов</a></p>
+                <div class="related-ads">
+                    @foreach($shop_users as $user)
+                        <div class="related-ad">
+                            <div class="image">
+                                <a href="{{ route('author', $user->id)  }}" title="Продавец {{ $user->username }} на сайте addnew.biz">
+                                    <img src="{{ $user->image ?? asset('assets/front/img/placeholder.png') }}" alt="Страница магазина {{ $user->username }} на сайте addnew.biz" class="img-responsive">
+                                </a>
+                            </div>
+                            <div class="price">{{ $user->ads_count }} предложений</div>
+                            <a href="{{ route('author', $user->id) }}" title="Продавец {{ $user->username }} на сайте addnew.biz" class="ad-heading">{{ $user->username }}</a>
+                        </div>
+                    @endforeach
+                </div>
+            </section>
+
 
         </div>
 

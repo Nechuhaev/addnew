@@ -4,18 +4,21 @@ namespace App\Http\Controllers\Front\Ad;
 
 use App\Ad;
 use App\AdCategory;
+use App\AdCity;
 use App\AdRegion;
 use App\AdTag;
 use App\Http\AdSense;
 use App\Http\Controllers\Controller;
+use App\Localization\Localization;
 use App\SeoField;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class Region extends Controller
 {
-    public function page($country, $region)
+    public function page(Localization $localization, $country, $region)
     {
         $entity = AdRegion::where('slug', '=', $region)->first();
 
@@ -48,28 +51,17 @@ class Region extends Controller
             $categories = [];
             foreach ($_category_list as $list_item_key => $list_item_value) {
                 foreach ($list_item_value as $parent_category) {
-
-                    $_children = $parent_category->children;
-
-                    $children = [];
-                    if ($_children->count()) {
-                        foreach ($_children as $child) {
-                            $children[] = [
-                                'name' => $child->name,
-                                'url' => $child->getFilteredUrl($entity->slug),
-                            ];
-                        }
-                    }
-
-                    $categories[$list_item_key][] = [
+                    $categories[] = [
                         'name' => $parent_category->name,
                         'url' => $parent_category->getFilteredUrl($entity->slug),
                         'image' => $parent_category->image,
-                        'children' => $children
                     ];
                 }
             }
-            return $categories;
+
+
+            $categories = collect($categories);
+            return $categories->toArray();
         });
 
 
@@ -97,12 +89,36 @@ class Region extends Controller
             $meta['description'] = false;
         }
 
+        $citiesQuery = AdCity::query()
+            ->where('region_id', $entity->id)
+            ->get();
+
+        $cities = [];
+        foreach ($citiesQuery as $city) {
+            $cities[] = [
+                'name' => $city->name,
+                'url' => $city->url
+            ];
+        }
+
+        $shop_users = User::withCount('ads')
+            ->whereHas('ads', function ($query) use ($localization) {
+                $query->where('is_product', 1)->whereIn('city_id', $localization->citiesIds());
+            })
+            ->orderBy('created_at', 'desc')
+            ->take(12)
+            ->get();
+
         return view('front.ad.filtered-categories')->with([
             'entity' => $entity,
             'breadcrumbs' => 'city.page',
             'meta' => $meta,
             'categories' => $categories,
-            'adsense' => new AdSense()
+            'adsense' => new AdSense(),
+            'cities' => $cities,
+            'tags' => [],
+            'shop_users' => $shop_users,
+            'ads_groups' => [],
         ]);
     }
 }

@@ -91,6 +91,9 @@
                                 </div>
                                 <div class="col-1 text-right">
                                     <a href="{{ route('admin.user', $user->id) }}"><i class="mdi mdi-24px mdi-account-edit"></i></a>
+
+                                    <a onclick="return confirm('Пользователь {{ $user->username }} будет удален вместе с его объявлениями. Подтвердите действия!')"
+                                       href="{{ route('admin.user.delete', $user->id) }}"><i class="text-danger mdi mdi-24px mdi-delete"></i></a>
                                 </div>
                             </div>
                         </div>

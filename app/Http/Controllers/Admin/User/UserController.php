@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin\User;
 
+use App\Ad;
 use App\Http\Controllers\Controller;
 use App\User;
 use Illuminate\Http\Request;
@@ -108,10 +109,14 @@ class UserController extends Controller
         $user->save();
 
         return redirect(route('admin.users'))->with('success', 'Данные пользователя обновлены!');
-        //dd($request->post('firstname'));
-
     }
 
-
-
+    public function delete($id)
+    {
+        Ad::query()->where([
+            'user_id' => $id
+        ])->delete();
+        User::find($id)->delete();
+        return redirect(route('admin.users'))->with('success', 'Пользователь удален. Надеюсь, Вам полегчало!');
+    }
 }

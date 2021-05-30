@@ -8,7 +8,9 @@ use App\AdCity;
 use App\AdTag;
 use App\Http\AdSense;
 use App\Http\Controllers\Controller;
+use App\Localization\Localization;
 use App\SeoField;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -16,7 +18,7 @@ use Illuminate\Support\Facades\DB;
 class City extends Controller
 {
     // todo избавиться от всех дублирований такого кода для городов / стран / главной
-    public function page($country, $region, $city)
+    public function page(Localization $localization, $country, $region, $city)
     {
         $entity = AdCity::where('slug', '=', $city)->first();
 
@@ -50,28 +52,17 @@ class City extends Controller
             $categories = [];
             foreach ($_category_list as $list_item_key => $list_item_value) {
                 foreach ($list_item_value as $parent_category) {
-
-                    $_children = $parent_category->children;
-
-                    $children = [];
-                    if ($_children->count()) {
-                        foreach ($_children as $child) {
-                            $children[] = [
-                                'name' => $child->name,
-                                'url' => $child->getFilteredUrl($entity->slug),
-                            ];
-                        }
-                    }
-
-                    $categories[$list_item_key][] = [
+                    $categories[] = [
                         'name' => $parent_category->name,
                         'url' => $parent_category->getFilteredUrl($entity->slug),
                         'image' => $parent_category->image,
-                        'children' => $children
                     ];
                 }
             }
-            return $categories;
+
+
+            $categories = collect($categories);
+            return $categories->toArray();
         });
 
         if (!$entity) abort(404);
@@ -101,12 +92,75 @@ class City extends Controller
             $meta['description'] = false;
         }
 
+        $citiesQuery = AdCity::query()
+            ->where('region_id', $entity->region_id)
+            ->where('id', '>', $entity->id)
+            ->limit(20)
+            ->get();
+
+        $cities = [];
+        foreach ($citiesQuery as $city) {
+            $cities[] = [
+                'name' => $city->name,
+                'url' => $city->url
+            ];
+        }
+
+
+        $_tags = AdTag::query()->withCount('ads')
+            ->whereHas('ads', function ($query) use ($entity) {
+                return $query->where('city_id', $entity->id);
+            })
+            ->having('ads_count', '>', 15)->get();
+
+        $displayTagsCount = ($_tags->count() > 15) ? 15 : $_tags->count();
+
+        $tags = [];
+        foreach ($_tags->random($displayTagsCount) as $tag) {
+            $tags[] = [
+                'name' => $tag->name,
+                'url' => $tag->url
+            ];
+        }
+
+        $shop_users = User::withCount('ads')
+            ->whereHas('ads', function ($query) use ($localization) {
+                $query->where('is_product', 1)->whereIn('city_id', $localization->citiesIds());
+            })
+            ->orderBy('created_at', 'desc')
+            ->take(12)
+            ->get();
+
+        $_ads_groups = $localization->ads()
+            ->where('city_id', $entity->id)
+            ->orderBy('created_at', 'desc')
+            ->groupBy('user_id')
+            ->take(20)
+            ->get()
+            ->chunk(5);
+
+        $ads_groups = [];
+        foreach ($_ads_groups as $key => $group) {
+            foreach ($group as $ad) {
+                $ads_groups[$key][] = [
+                    'name' => $ad->name,
+                    'url' => $ad->url,
+                    'price' => $ad->formetted_price,
+                    'image' => $ad->image
+                ];
+            }
+        }
+
         return view('front.ad.filtered-categories')->with([
             'entity' => $entity,
             'breadcrumbs' => 'city.page',
             'meta' => $meta,
             'categories' => $categories,
-            'adsense' => new AdSense()
+            'adsense' => new AdSense(),
+            'cities' => $cities,
+            'tags' => $tags,
+            'shop_users' => $shop_users,
+            'ads_groups' => $ads_groups,
         ]);
     }
 }
