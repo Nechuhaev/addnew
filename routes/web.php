@@ -24,6 +24,11 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
         Route::get('/ads', 'Admin\Stat\AdStatController@index')->name('admin.stat.ads');
     });
 
+    // Стоп-слова
+    Route::get('/stop-words', 'Admin\StopWord\StopWordController@index')->name('admin.stop-word');
+    Route::post('/stop-words/check', 'Admin\StopWord\StopWordController@check')->name('admin.stop-word.check');
+    Route::post('/stop-words/delete', 'Admin\StopWord\StopWordController@delete')->name('admin.stop-word.delete');
+
     // Пользователи
     Route::get('/users', 'Admin\User\UserController@showUsersList')->name('admin.users');
     Route::get('/users/search', 'Admin\User\UserController@search')->name('admin.users.search');

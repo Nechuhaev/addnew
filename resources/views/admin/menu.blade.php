@@ -125,5 +125,11 @@
             <span class="hide-menu">Импорт файлов</span>
         </a>
     </li>
+    <li class="sidebar-item">
+        <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{{ route('admin.stop-word') }}" aria-expanded="false">
+            <i class="mdi mdi-stop-circle"></i>
+            <span class="hide-menu">Стоп-слова</span>
+        </a>
+    </li>
 
 </ul>
