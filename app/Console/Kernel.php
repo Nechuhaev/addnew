@@ -33,7 +33,7 @@ class Kernel extends ConsoleKernel
             }
         })->mondays()->at('17:00');
 
-        $schedule->command('sitemap:generate')->fridays()->at('17:00')->runInBackground();
+        $schedule->command('sitemap:update')->fridays()->at('17:00')->runInBackground();
     }
 
     /**
