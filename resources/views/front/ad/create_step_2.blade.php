@@ -162,7 +162,7 @@
                                     <input class="input-file-name" type="text" id="input-file-name" value="Файл не выбран." disabled />
                                 </label>
 
-                                <span class="form-help">Допустимое количество загружаемых файлов: 5. Максимальный размер файла: 1024 KB.</span>
+                                <span class="form-help">Допустимое количество загружаемых файлов: 5. Максимальный размер файла: 1024 KB. Для выбора нескольких изображений - зажмите ctrl и выберите соответствующие файлы.</span>
                             </div>
                         </div>
                         <div class="col-2">
