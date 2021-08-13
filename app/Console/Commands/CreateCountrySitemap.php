@@ -12,6 +12,7 @@ use App\Http\Resources\Ad\Country;
 use Illuminate\Console\Command;
 use Spatie\Sitemap\Sitemap;
 use Spatie\Sitemap\SitemapIndex;
+use Illuminate\Support\Facades\DB;
 
 class CreateCountrySitemap extends Command
 {
@@ -46,6 +47,7 @@ class CreateCountrySitemap extends Command
      */
     public function handle()
     {
+        ini_set('memory_limit', '512M');
         // Идентификаторы стран для которых позволена генерация сайтмапа
         $allowedCountryIds = [
             62 // Украина
@@ -59,7 +61,7 @@ class CreateCountrySitemap extends Command
 
 
 
-                // объявления
+                //объявления
                 Ad::query()
                     ->whereIn('city_id', $country->cities->pluck('id'))
                     ->chunk(5000, function ($ads, $iteration) use ($sitemap_index) {
@@ -120,12 +122,14 @@ class CreateCountrySitemap extends Command
                 $country->regions()->chunk(5000, function ($regions, $iteration) use ($sitemap_index) {
                     $sitemap_regions = Sitemap::create();
 
-                    $regions->each(function ($item) use ($sitemap_regions) {
-                        if ($item->country && $item->region) {
-                            $sitemap_regions->add(route('region.page', ['country' => $item->country, 'region' => $item->region]));
-                        }
-
-                    });
+                    DB::table('ad_regions')
+                        ->selectRaw('ad_countries.slug as country, ad_regions.slug as region')
+                        ->leftJoin('ad_countries', 'ad_regions.country_id', '=', 'ad_countries.id')
+                        ->get()->each(function ($item) use ($sitemap_regions) {
+                            if ($item->country == 'ukraina' && $item->region) {
+                                $sitemap_regions->add(route('region.page', ['country' => $item->country, 'region' => $item->region]));
+                            }
+                        });
 
                     $filename = "regions-{$iteration}.xml";
                     $sitemap_regions->writeToFile(public_path($filename));
@@ -145,11 +149,15 @@ class CreateCountrySitemap extends Command
                 $country->cities()->chunk(5000, function ($cities, $iteration) use ($sitemap_index) {
                     $sitemap_cities = Sitemap::create();
 
-                    $cities->each(function ($item) use ($sitemap_cities) {
-                        if ($item->country && $item->region) {
-                            $sitemap_cities->add(route('city.page', ['country' => $item->country, 'region' => $item->region, 'city' => $item->city]));
-                        }
-                    });
+                    DB::table('ad_cities')
+                        ->selectRaw('ad_countries.slug as country, ad_regions.slug as region, ad_cities.slug as city')
+                        ->leftJoin('ad_regions', 'ad_cities.region_id', '=', 'ad_regions.id')
+                        ->leftJoin('ad_countries', 'ad_regions.country_id', '=', 'ad_countries.id')
+                        ->get()->each(function ($item) use ($sitemap_cities) {
+                            if ($item->country == 'ukraina' && $item->region) {
+                                $sitemap_cities->add(route('city.page', ['country' => $item->country, 'region' => $item->region, 'city' => $item->city]));
+                            }
+                        });
 
                     $filename = "cities-{$iteration}.xml";
                     $sitemap_cities->writeToFile(public_path($filename));
