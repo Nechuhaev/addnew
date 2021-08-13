@@ -76,10 +76,10 @@
                                 <label>Страна<span class="star">(*)</span></label>
                                 @if($countries)
                                     <select name="country_id" class="form-control ad-country-id">
-                                        <option value="">-- Выберите --</option>
-                                        @foreach($countries as $country)
+                                        <option selected value="62">Украина</option>
+                                        <!-- @foreach($countries as $country)
                                             <option {{ ($country['id'] == $country_id) ? 'selected' : '' }} value="{{ $country['id'] }}">{{ $country['name'] }}</option>
-                                        @endforeach
+                                        @endforeach -->
                                     </select>
                                 @endif
                             </div>
