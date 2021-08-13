@@ -40,12 +40,12 @@ class Category extends Controller
 
         $entity = AdCategory::where('slug', $categorySlug)->first();
 
+        if (!$entity) abort(404);
+
         // фикс ошибки с ad-category/slug
         if (!$entity->parent_id && $subcategory) return  redirect(route('category.page', [
             'category' => $subcategory
         ]));
-
-        if (!$entity) abort(404);
 
         $this->category_id = $entity->id;
 
