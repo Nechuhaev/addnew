@@ -185,7 +185,7 @@
 
 </header>
 
-<div style="background: #000; color: #fff; text-align: center; font-size: 16px">
+<div style="padding: 48px;margin-top: 100px;background: #000; color: #fff; text-align: center; font-size: 16px">
     addnew.biz
 </div>
 @yield('content')
