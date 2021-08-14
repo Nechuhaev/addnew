@@ -54,9 +54,6 @@
 
 </head>
 <body class=""> <!-- fixed -->
-<div style="background: #000; color: #fff; text-align: center; font-size: 16px">
-    addnew.biz
-</div>
 <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M89V7L"
                   height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -188,7 +185,9 @@
 
 </header>
 
-
+<div style="background: #000; color: #fff; text-align: center; font-size: 16px">
+    addnew.biz
+</div>
 @yield('content')
 
 
