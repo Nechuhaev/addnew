@@ -17,7 +17,7 @@ class CreateAdTagsTable extends Migration
             $table->bigIncrements('id');
             $table->string('name', 255);
             $table->string('slug', 255);
-            $table->string('content')->nullable();
+            $table->text('content')->nullable();
             $table->string('meta_title', 255)->nullable();
             $table->string('meta_description', 255)->nullable();
         });

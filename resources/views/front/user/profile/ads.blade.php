@@ -1,10 +1,13 @@
 @extends('front.layout')
 
+@section('meta_title', "Мои объявления | Доска объявлений addnew.biz")
+@section('meta_description', "Мои объявления | Доска объявлений addnew.biz")
+
 @section('content')
     <main class="account-page">
         <div class="container">
             <div class="banner">
-                <img src="img/banners/banner-4.jpg" alt="">
+                @include('front.adsense.top')
             </div>
 
             {{ Breadcrumbs::render('profile.ads') }}
@@ -13,11 +16,23 @@
                 <div class="column-content">
                     <h1>Мои объявления</h1>
 
-                    <div class="alert success"> <!-- success -->
-                        <img class="img-svg" height="20" width="20" src="img/dashicons/warning.svg" />
-                        <span>Объявление было приостановлено</span>
-                    </div>
+                    @if(session()->has('success'))
+                        <div class="alert success"> <!-- success -->
+                            <img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/warning.svg') }}" />
+                            {{ session()->get('success') }}
+                        </div>
+                    @endif
+                    @if(session()->has('error'))
+                        <div class="alert"> <!-- success -->
+                            <img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/warning.svg') }}" />
+                            {{ session()->get('error') }}
+                        </div>
+                    @endif
+
                     <p>Ниже указан список всех объявлений, размещённых вами. Для совершения определённой задачи, нажмите на одну из опций. Если у вас всё ещё остались вопросы, свяжитесь с администрацией сайта.</p>
+
+                    @if($ads)
+
 
                     <table class="table-account">
                         <thead>
@@ -30,115 +45,74 @@
                         </tr>
                         </thead>
                         <tbody>
+                        @foreach($ads as $ad)
+
                         <tr>
-                            <td class="td-number"><span class="btn-table-toggle"><i class="icon icon-plus"></i></span>1.</td>
+                            <td class="td-number"><span class="btn-table-toggle"><i class="icon icon-plus"></i></span>{{ $loop->iteration }}.</td>
 
                             <td class="td-adv">
-                                <h3><a href="https://addnew.biz/?post_type=ad_listing&amp;p=202151">Пластиковые цветочные горшки в ассортименте</a></h3>
+                                <h3><a href="{{ $ad->url }}">{{ $ad->name }}</a></h3>
 
                                 <p class="td-meta">
-                                    <span class="meta-tag"><img class="img-svg" height="20" width="20" src="img/dashicons/editor-ul.svg" />&nbsp;<a href="https://addnew.biz/biznes-i-uslugi/prochie-uslugi/" rel="tag" class="">Хозяйственный инвентарь / бытовая химия</a></span>
-                                    <span class="meta-date"><img class="img-svg" height="20" width="20" src="img/dashicons/clock.svg" />&nbsp;<span>Сентябрь 3, 2019</span></span>
+                                    <span class="meta-tag"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/editor-ul.svg') }}" />&nbsp;<a href="{{ $ad->category->url }}" rel="tag" class="">{{ $ad->category->path }}</a></span>
+                                    <span class="meta-date"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/clock.svg') }}" />&nbsp;<span>{{ $ad->date_start }}</span></span>
                                 </p>
                                 <div class="td-actions">
                                     <ul>
-                                        <li><strong>Просмотры:</strong> 0</li>
+                                        <li><strong>Просмотры:</strong> {{ $ad->total_views }}</li>
                                         <li><strong>Статус:</strong> Выключено</li>
                                         <li><strong>Опции:</strong>
                                             <a title="Редактировать объявление" href="https://addnew.biz/edit-listing/?listing_edit=202151" class="edit">
-                                                <img class="img-svg" height="20" width="20" src="img/dashicons/edit.svg" />
+                                                <img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/edit.svg') }}" />
                                             </a>
                                             <a title="Удалить объявление" href="https://addnew.biz/dashboard/?aid=202151&amp;action=delete" onclick="return confirmBeforeDeleteAd();" class="delete">
-                                                <img class="img-svg" height="20" width="20" src="img/dashicons/trash.svg" />
+                                                <img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/trash.svg') }}" />
                                             </a>
                                             <a title="Возобновить объявление" href="https://addnew.biz/dashboard/?aid=202151&amp;action=restart" class="restart">
-                                                <img class="img-svg" height="20" width="20" src="img/dashicons/update.svg" />
+                                                <img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/update.svg') }}" />
                                             </a>
                                         </li>
                                         <li><a title="Отметить как устаревшее" href="https://addnew.biz/dashboard/?aid=202151&amp;action=setSold">Отметить как устаревшее</a></li>
                                     </ul>
                                 </div>
                             </td>
-
-                            <td class="hidden-xs">0</td>
-
-                            <td class="hidden-xs">
-                                <span class="status">Выключено</span>
-                            </td>
+                            <td class="hidden-xs">{{ $ad->total_views }}</td>
 
                             <td class="hidden-xs">
-                                <ul class="td-actions">
-                                    <li>
-                                        <a title="Редактировать объявление" href="https://addnew.biz/edit-listing/?listing_edit=202151" class="edit">
-                                            <img class="img-svg" height="20" width="20" src="img/dashicons/edit.svg" />
-                                        </a>
-                                        <a title="Удалить объявление" href="https://addnew.biz/dashboard/?aid=202151&amp;action=delete" onclick="return confirmBeforeDeleteAd();" class="delete">
-                                            <img class="img-svg" height="20" width="20" src="img/dashicons/trash.svg" />
-                                        </a>
-                                        <a title="Возобновить объявление" href="https://addnew.biz/dashboard/?aid=202151&amp;action=restart" class="restart">
-                                            <img class="img-svg" height="20" width="20" src="img/dashicons/controls-pause.svg" />
-                                        </a>
-                                    </li>
-                                    <li><a title="Отметить как устаревшее" href="https://addnew.biz/dashboard/?aid=202151&amp;action=setSold">Отметить как устаревшее</a></li>
-                                </ul>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td class="td-number"><span class="btn-table-toggle"><i class="icon icon-plus"></i></span>2.</td>
-
-                            <td class="td-adv">
-                                <h3><a href="https://addnew.biz/?post_type=ad_listing&amp;p=202151">Тестовая услуга 2</a></h3>
-
-                                <p class="td-meta">
-                                    <span class="meta-tag"><img class="img-svg" height="20" width="20" src="img/dashicons/editor-ul.svg" />&nbsp;<a href="https://addnew.biz/biznes-i-uslugi/prochie-uslugi/" rel="tag" class="">Прочие услуги</a></span>
-                                    <span class="meta-date"><img class="img-svg" height="20" width="20" src="img/dashicons/clock.svg" />&nbsp;<span>Сентябрь 3, 2019</span></span>
-                                </p>
-                                <div class="td-actions">
-                                    <ul>
-                                        <li><strong>Просмотры:</strong> 0</li>
-                                        <li><strong>Статус:</strong> Включено</li>
-                                        <li><strong>Опции:</strong>
-                                            <a title="Редактировать объявление" href="https://addnew.biz/edit-listing/?listing_edit=202151" class="edit">
-                                                <img class="img-svg" height="20" width="20" src="img/dashicons/edit.svg" />
-                                            </a>
-                                            <a title="Удалить объявление" href="https://addnew.biz/dashboard/?aid=202151&amp;action=delete" onclick="return confirmBeforeDeleteAd();" class="delete">
-                                                <img class="img-svg" height="20" width="20" src="img/dashicons/trash.svg" />
-                                            </a>
-                                            <a title="Возобновить объявление" href="https://addnew.biz/dashboard/?aid=202151&amp;action=restart" class="restart">
-                                                <img class="img-svg" height="20" width="20" src="img/dashicons/controls-pause.svg" />
-                                            </a>
-                                        </li>
-                                        <li><a title="Отметить как устаревшее" href="https://addnew.biz/dashboard/?aid=202151&amp;action=setSold">Отметить как устаревшее</a></li>
-                                    </ul>
-                                </div>
-                            </td>
-
-                            <td class="hidden-xs">0</td>
-
-                            <td class="hidden-xs">
-                                <span class="status">Выключено</span>
+                                <span class="status">{{ __('user/ads.status_' . $ad->status) }}</span>
                             </td>
 
                             <td class="hidden-xs">
                                 <ul class="td-actions">
                                     <li>
-                                        <a title="Редактировать объявление" href="https://addnew.biz/edit-listing/?listing_edit=202151" class="edit">
-                                            <img class="img-svg" height="20" width="20" src="img/dashicons/edit.svg" />
+                                        <a title="Редактировать объявление" href="{{ route('ad.edit', ['id' => $ad->id]) }}" class="edit">
+                                            <img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/edit.svg') }}" />
                                         </a>
-                                        <a title="Удалить объявление" href="https://addnew.biz/dashboard/?aid=202151&amp;action=delete" onclick="return confirmBeforeDeleteAd();" class="delete">
-                                            <img class="img-svg" height="20" width="20" src="img/dashicons/trash.svg" />
+                                        <a title="Удалить объявление" href="{{ route('ad.delete', ['id' => $ad->id]) }}" onclick="return confirm('Вы дейсвительно хотите удалить объявление? Отменить это действие будет невозможно.');" class="delete">
+                                            <img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/trash.svg') }}" />
                                         </a>
-                                        <a title="Возобновить объявление" href="https://addnew.biz/dashboard/?aid=202151&amp;action=restart" class="restart">
-                                            <img class="img-svg" height="20" width="20" src="img/dashicons/controls-pause.svg" />
+                                        @if ($ad->status == 'active')
+                                        <a title="Приостановить объявление" href="{{ route('ad.changeStatus', ['ad_id' => $ad->id, 'status_id' => 0]) }}" class="restart">
+                                            <img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/controls-pause.svg') }}" />
                                         </a>
+                                        @else
+                                        <a title="Возобновить объявление" href="{{ route('ad.changeStatus', ['ad_id' => $ad->id, 'status_id' => 1]) }}" class="restart">
+                                            <img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/update.svg') }}" />
+                                        </a>
+                                        @endif
                                     </li>
-                                    <li><a title="Отметить как устаревшее" href="https://addnew.biz/dashboard/?aid=202151&amp;action=setSold">Отметить как устаревшее</a></li>
+                                    @if ($ad->status != 'archive')
+                                        <li><a title="Отметить как устаревшее" href="{{ route('ad.changeStatus', ['ad_id' => $ad->id, 'status_id' => 2]) }}">Отметить как устаревшее</a></li>
+                                    @endif
                                 </ul>
                             </td>
                         </tr>
+                        @endforeach
+
                         </tbody>
                     </table>
+                        {{ $ads->links('front.widgets.paginate') }}
+                    @endif
 
                 </div>
                 @include('front.sidebars.user')

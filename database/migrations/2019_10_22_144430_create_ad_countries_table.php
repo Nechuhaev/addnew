@@ -14,13 +14,14 @@ class CreateAdCountriesTable extends Migration
     public function up()
     {
         Schema::create('ad_countries', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->smallIncrements('id');
             $table->string('name', 255);
+            $table->string('image', 255);
             $table->string('slug', 255);
-            $table->string('content');
-            $table->string('meta_title', 255);
-            $table->string('meta_description', 255);
-            $table->integer('sort_order');
+            $table->text('content')->nullable();
+            $table->string('meta_title', 255)->nullable();
+            $table->string('meta_description', 255)->nullable();
+            $table->integer('sort_order')->default(0)->nullable();
             $table->timestamps();
         });
     }

@@ -1,10 +1,13 @@
 @extends('front.layout')
 
+@section('meta_title', "Вход в личный кабинет | Доска объявлений addnew.biz")
+@section('meta_description', "Вход в личный кабинет | Доска объявлений addnew.biz")
+
 @section('content')
     <main class="login-page">
         <div class="container">
             <div class="banner">
-                <img src="{{ asset('assets/front/img/banners/banner-7.jpg') }}" alt="">
+                @include('front.adsense.top')
             </div>
 
             <ul class="breadcrumb">
@@ -80,14 +83,15 @@
                         </div>
                         <div class="form-group">
                             <label>{{ __('user/login.enter_with_social') }}:</label>
-                            <div class="form-social">
-                                <a href="#" class="form-social-link"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/vk.svg') }}" /></a>
-                                <a href="#" class="form-social-link"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/facebook-alt.svg') }}" /></a>
-                                <a href="#" class="form-social-link"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/twitter.svg') }}" /></a>
-                                <a href="#" class="form-social-link"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/at.svg') }}" /></a>
-                                <a href="#" class="form-social-link"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/google-plus.svg') }}" /></a>
-                                <a href="#" class="form-social-link"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/ok.svg') }}" /></a>
-                            </div>
+                            @include('front.widgets.social')
+                            {{--<div class="form-social">--}}
+                                {{--<a href="#" class="form-social-link"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/vk.svg') }}" /></a>--}}
+                                {{--<a href="#" class="form-social-link"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/facebook-alt.svg') }}" /></a>--}}
+                                {{--<a href="#" class="form-social-link"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/twitter.svg') }}" /></a>--}}
+                                {{--<a href="#" class="form-social-link"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/at.svg') }}" /></a>--}}
+                                {{--<a href="#" class="form-social-link"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/google-plus.svg') }}" /></a>--}}
+                                {{--<a href="#" class="form-social-link"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/ok.svg') }}" /></a>--}}
+                            {{--</div>--}}
 
                         </div>
                         <a href="{{ route('password.request') }}">{{ __('user/login.text_forgot_password') }}</a><br>

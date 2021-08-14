@@ -16,9 +16,13 @@
         "laravel/helpers": "^1.1",
         "laravel/tinker": "^1.0",
         "laravel/ui": "^1.0",
+        "league/csv": "^9.6",
+        "league/flysystem-aws-s3-v3": "^1.0",
+        "spatie/laravel-sitemap": "^5.5",
         "unisharp/laravel-filemanager": "~1.8"
     },
     "require-dev": {
+        "barryvdh/laravel-debugbar": "^3.2",
         "barryvdh/laravel-ide-helper": "^2.6",
         "facade/ignition": "^1.4",
         "fzaninotto/faker": "^1.4",
@@ -41,7 +45,7 @@
             "App\\": "app/"
         },
         "files": [
-            "app/Http/helpers.php"
+            "app/Http/AdSense.php"
         ],
         "classmap": [
             "database/seeds",

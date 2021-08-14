@@ -16,6 +16,7 @@
     <!-- Custom CSS -->
     <link href="{{ asset('assets/admin/dist/css/style.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/admin/dist/css/custom.css') }}" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tag-editor/1.0.20/jquery.tag-editor.min.css" rel="stylesheet">
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -108,16 +109,21 @@
                     <!-- ============================================================== -->
                     <!-- User profile and search -->
                     <!-- ============================================================== -->
+
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark pro-pic" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="{{ asset('assets/admin/assets/images/users/1.jpg') }}" alt="user" class="rounded-circle" width="31"></a>
+                        <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark pro-pic" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="{{ Auth::user()->image ?? asset('assets/front/img/placeholder.png') }}" alt="user" class="" width="31"></a>
                         <div class="dropdown-menu dropdown-menu-right user-dd animated">
+                            <a href="{{ route('admin.user', ['id' => Auth::user()->id]) }}" class="dropdown-item"><i class="mdi mdi-face-profile m-r-5 m-l-5"></i> Редактировать профиль</a>
                             <a class="dropdown-item" href="{{ route('logout') }}"
                                onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();"><i class="ti-user m-r-5 m-l-5"></i> Выход</a>
+                                                     document.getElementById('logout-form').submit();"><i class="mdi mdi-logout m-r-5 m-l-5"></i> Выход</a>
                             <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                                 @csrf
                             </form>
                         </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link waves-effect waves-dark" target="_blank" href="{{ route('index') }}"><i class="mdi mdi-logout m-r-5 m-l-5"></i> На сайт</a>
                     </li>
                     <!-- ============================================================== -->
                     <!-- User profile and search -->
@@ -169,6 +175,13 @@
                 </div>
             @endif
 
+                @if(session()->has('error'))
+                    <div class="alert alert-danger">
+                        {{ session()->get('error') }}
+                    </div>
+                @endif
+
+
             @if ($errors->any())
                 <div class="alert alert-danger">
                     <ul style="padding: 0 0 0 10px;margin: 0;">
@@ -205,6 +218,10 @@
 <!-- All Jquery -->
 <!-- ============================================================== -->
 <script src="{{ asset('assets/admin/assets/libs/jquery/dist/jquery.min.js') }}"></script>
+<script
+        src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"
+        integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E="
+        crossorigin="anonymous"></script>
 <!-- Bootstrap tether Core JavaScript -->
 <script src="{{ asset('assets/admin/assets/libs/popper.js/dist/umd/popper.min.js') }}"></script>
 <script src="{{ asset('assets/admin/assets/libs/bootstrap/dist/js/bootstrap.min.js') }}"></script>
@@ -215,61 +232,24 @@
 <!--Menu sidebar -->
 <script src="{{ asset('assets/admin/dist/js/sidebarmenu.js') }}"></script>
 <!--Custom JavaScript -->
+<script src="{{ asset('assets/admin/dist/js/pages/dashboards/dashboard1.js') }}"></script>
+<script src="/vendor/laravel-filemanager/js/lfm.js"></script>
+<script src="{{ asset('assets/admin/assets/libs/addnew_file.js') }}"></script>
+<script src="https://cdn.tiny.cloud/1/acl3zjjcwn2wu5y9ad8741ibtyz1fcoi1iwhsdhpqblv1q2y/tinymce/4/tinymce.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/caret/1.3.7/jquery.caret.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tag-editor/1.0.20/jquery.tag-editor.min.js"></script>
+
 <script src="{{ asset('assets/admin/dist/js/custom.min.js') }}"></script>
-<!--This page JavaScript -->
 <!--chartis chart-->
 <script src="{{ asset('assets/admin/assets/libs/chartist/dist/chartist.min.js') }}"></script>
 <script src="{{ asset('assets/admin/assets/libs/chartist-plugin-tooltips/dist/chartist-plugin-tooltip.min.js') }}"></script>
-<script src="{{ asset('assets/admin/dist/js/pages/dashboards/dashboard1.js') }}"></script>
-<script src="/vendor/laravel-filemanager/js/lfm.js"></script>
-<script src="https://cdn.tiny.cloud/1/acl3zjjcwn2wu5y9ad8741ibtyz1fcoi1iwhsdhpqblv1q2y/tinymce/4/tinymce.min.js"></script>
 
-<script>
+<!--This page JavaScript -->
+<script src="{{ asset('assets/admin/dist/js/admin.js') }}"></script>
 
-    var editor_config = {
-        path_absolute : "/",
-        selector: "textarea.content",
-        height: 400,
-        plugins: [
-            "advlist autolink lists link image charmap print preview hr anchor pagebreak",
-            "searchreplace wordcount visualblocks visualchars code fullscreen",
-            "insertdatetime media nonbreaking save table contextmenu directionality",
-            "emoticons template paste textcolor colorpicker textpattern"
-        ],
-        toolbar: "styleselect | alignleft aligncenter alignright | bullist numlist | outdent indent | link image media | code",
-        relative_urls: false,
-        file_browser_callback : function(field_name, url, type, win) {
-            var x = window.innerWidth || document.documentElement.clientWidth || document.getElementsByTagName('body')[0].clientWidth;
-            var y = window.innerHeight|| document.documentElement.clientHeight|| document.getElementsByTagName('body')[0].clientHeight;
+@yield('footer-scripts')
 
-            var cmsURL = editor_config.path_absolute + 'laravel-filemanager?field_name=' + field_name;
-            if (type == 'image') {
-                cmsURL = cmsURL + "&type=Images";
-            } else {
-                cmsURL = cmsURL + "&type=Files";
-            }
-
-            tinyMCE.activeEditor.windowManager.open({
-                file : cmsURL,
-                title : 'Filemanager',
-                width : x * 0.8,
-                height : y * 0.8,
-                resizable : "yes",
-                close_previous : "no"
-            });
-        }
-    };
-
-    tinymce.init(editor_config);
-
-    jQuery(function () {
-        if (jQuery('#lfm').length) {
-            jQuery('#lfm').filemanager('image');
-        }
-
-    });
-
-</script>
 
 </body>
 

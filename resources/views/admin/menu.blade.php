@@ -5,6 +5,29 @@
             <span class="hide-menu">Главная</span>
         </a>
     </li>
+
+    <li class="sidebar-item">
+        <a class="sidebar-link has-arrow waves-effect waves-dark" href="javascript:void(0)" aria-expanded="false">
+            <i class="mdi mdi-chart-areaspline"></i>
+            <span class="hide-menu">Статистика</span>
+        </a>
+        <ul aria-expanded="false" class="collapse first-level">
+            <li class="sidebar-item">
+                <a href="{{ route('admin.stat.ads') }}" class="sidebar-link">
+                    <i class="mdi mdi-chart-bar"></i>
+                    <span class="hide-menu">Объявления</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ route('admin.articles') }}" class="sidebar-link">
+                    <i class="mdi mdi-chart-bar"></i>
+                    <span class="hide-menu">Категории</span>
+                </a>
+            </li>
+
+        </ul>
+    </li>
+
     <li class="sidebar-item">
         <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{{ route('admin.users') }}" aria-expanded="false">
             <i class="mdi mdi-face"></i>
@@ -54,6 +77,12 @@
                     <span class="hide-menu">Города</span>
                 </a>
             </li>
+            <li class="sidebar-item">
+                <a href="{{ route('admin.adCurrencies') }}" class="sidebar-link">
+                    <i class="mdi mdi-currency-usd"></i>
+                    <span class="hide-menu">Валюты</span>
+                </a>
+            </li>
         </ul>
     </li>
 
@@ -85,9 +114,21 @@
         </ul>
     </li>
     <li class="sidebar-item">
-        <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{{ route('admin.adSenseBlocks') }}" aria-expanded="false">
-            <i class="mdi mdi-sitemap"></i>
-            <span class="hide-menu">Рекламные блоки</span>
+        <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{{ route('admin.seo') }}" aria-expanded="false">
+            <i class="mdi mdi-textbox"></i>
+            <span class="hide-menu">SEO тексты</span>
+        </a>
+    </li>
+    <li class="sidebar-item">
+        <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{{ route('admin.ad.uploader') }}" aria-expanded="false">
+            <i class="mdi mdi-file-import"></i>
+            <span class="hide-menu">Импорт файлов</span>
+        </a>
+    </li>
+    <li class="sidebar-item">
+        <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{{ route('admin.stop-word') }}" aria-expanded="false">
+            <i class="mdi mdi-stop-circle"></i>
+            <span class="hide-menu">Стоп-слова</span>
         </a>
     </li>
 

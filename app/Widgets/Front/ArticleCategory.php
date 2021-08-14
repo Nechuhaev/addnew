@@ -16,6 +16,8 @@ class ArticleCategory extends AbstractWidget
         'categories' => []
     ];
 
+    public $cacheTime = 300;
+
     /**
      * Treat this method as a controller action.
      * Return view() or other content to display.
@@ -28,7 +30,7 @@ class ArticleCategory extends AbstractWidget
         foreach ($categories as $category) {
             $this->config['categories'][] = [
                 'name' => $category->name,
-                'href' => $category->href,
+                'href' => $category->url,
                 'id' => $category->id,
                 'posts_count' => $category->articles()->count()
             ];

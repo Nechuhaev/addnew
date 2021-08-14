@@ -2,39 +2,31 @@
 
 namespace App\Http\Controllers\Front\Article;
 
-use App\ArticleCategory;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Article;
-use Illuminate\Support\Facades\DB;
 
 class ArticleController extends Controller
 {
-    public function showArticles() {
 
-        $articles = Article::with('categories')->paginate(15);
-
-        return view('front.article.category')->with([
-            'articles' => $articles
-        ]);
-    }
-
-    public function showArticle($slug) {
-
+    /**
+     * Страница статьи блога
+     *
+     * @param $slug
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function page($slug)
+    {
         $article = Article::where('slug', $slug)->first();
 
-        return view('front.article.article', ['article' => $article]);
+        if ($article) {
+
+            $data['article'] = $article;
+
+            return view('front.article.article')->with($data);
+        }
+
+        abort(404);
     }
 
-    public function showCategory($slug) {
-
-        $category = ArticleCategory::where('slug', $slug)->first();
-
-        $articles = $category->articles()->paginate(15);
-
-        return view('front.article.category')->with([
-            'articles' => $articles,
-            'category_object' => $category
-        ]);
-    }
 }

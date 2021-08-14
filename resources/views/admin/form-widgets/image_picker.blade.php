@@ -9,6 +9,6 @@
             </span>
             <input id="thumbnail" value="{{ $default['image'] }}" class="form-control" type="text" name="image">
         </div>
-        <img id="holder" class="img-fluid" style="margin-top: 20px" src="{{ $default['image'] ?? 'http://placehold.it/400x250'}}">
+        <img id="holder" class="img-fluid" style="margin-top: 20px" src="{{ $default['image'] ?? asset('assets/front/img/placeholder.png')}}">
     </div>
 </div>

@@ -4,6 +4,7 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Illuminate\Support\Facades\Storage;
 
 class Kernel extends ConsoleKernel
 {
@@ -24,8 +25,15 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')
-        //          ->hourly();
+        $schedule->call(function () {
+            foreach (Storage::directories('ads') as $directory) {
+                if(time() - (int)basename($directory) > 604800) {
+                    Storage::deleteDirectory($directory);
+                }
+            }
+        })->mondays()->at('17:00');
+
+        $schedule->command('sitemap:update')->fridays()->at('17:00')->runInBackground();
     }
 
     /**

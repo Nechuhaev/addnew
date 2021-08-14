@@ -1,10 +1,13 @@
 @extends('front.layout')
 
+@section('meta_title', "Регистрация пользователя | Доска объявлений addnew.biz")
+@section('meta_description', "Регистрация пользователя | Доска объявлений addnew.biz")
+
 @section('content')
     <main class="login-page">
         <div class="container">
             <div class="banner">
-                <img src="{{ asset('assets/front/img/banners/banner-7.jpg') }}" alt="">
+                @include('front.adsense.top')
             </div>
 
             <ul class="breadcrumb">
@@ -57,16 +60,28 @@
                                 <span class="btn-text">{{ __('user/register.button') }}</span>
                             </button>
                         </div>
+
+                        <div class="form-group">
+                            <h2>Для интернет-магазинов</h2>
+                            <label for="#">Желаете опубликовать и управлять товарами имеющегося интернет-магазина?</label>
+                            <p style="font-size: 12px;">
+                                Восспользуйтесь кнопкой регистрации интернет магазина для публикации своих товаров на addnew.biz.
+                                <br>
+                                Регистрация не займет много времени, а для добавления товаров достаточно предоставить список товаров <b>в любом формате</b>
+                            </p>
+                            <a class="business-register-link" href="{{ route('business-register') }}">Регистрация интернет-магазина</a>
+                        </div>
                         <div class="form-group">
                             <label>{{ __('user/register.text_social_login') }}</label>
-                            <div class="form-social">
-                                <a href="#" class="form-social-link"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/vk.svg') }}" /></a>
-                                <a href="#" class="form-social-link"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/facebook-alt.svg') }}" /></a>
-                                <a href="#" class="form-social-link"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/twitter.svg') }}" /></a>
-                                <a href="#" class="form-social-link"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/at.svg') }}" /></a>
-                                <a href="#" class="form-social-link"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/google-plus.svg') }}" /></a>
-                                <a href="#" class="form-social-link"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/ok.svg') }}" /></a>
-                            </div>
+                            @include('front.widgets.social')
+                            {{--<div class="form-social">--}}
+                                {{--<a href="#" class="form-social-link"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/vk.svg') }}" /></a>--}}
+                                {{--<a href="#" class="form-social-link"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/facebook-alt.svg') }}" /></a>--}}
+                                {{--<a href="#" class="form-social-link"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/twitter.svg') }}" /></a>--}}
+                                {{--<a href="#" class="form-social-link"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/at.svg') }}" /></a>--}}
+                                {{--<a href="#" class="form-social-link"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/google-plus.svg') }}" /></a>--}}
+                                {{--<a href="#" class="form-social-link"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/ok.svg') }}" /></a>--}}
+                            {{--</div>--}}
 
                         </div>
                     </form>

@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-M89V7L');</script>
+    <!-- End Google Tag Manager -->
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -10,8 +17,47 @@
     <meta name="description" content="@yield('meta_description')">
 
     <link href="{{ asset('assets/front/css/start.min.css') }}" rel="stylesheet">
+    <!-- Styles -->
+    <link rel="stylesheet" href="{{ asset('assets/front/css/style.min.css') }}" media="all">
+
+    @yield('style')
+
+    <link rel="icon" type="image/png" href="/favicon.png" />
+
+    @if(request()->get('page'))
+        @if(starts_with(request()->path(), 'r/ukraina/'))
+            <link rel="canonical" href="{{ url(str_replace('r/ukraina/', '', request()->path())) }}" />
+        @else
+            <link rel="canonical" href="{{ url()->current() }}" />
+        @endif
+    @elseif(starts_with(request()->path(), 'r/ukraina/'))
+        <link rel="canonical" href="{{ url(str_replace('r/ukraina/', '', request()->path())) }}" />
+    @else
+        <link rel="canonical" href="{{ url()->current() }}" />
+    @endif
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "url": "https://addnew.biz",
+      "email": "info@addnew.biz",
+      "name": "ADDNEW.BIZ",
+      "logo": "https://addnew.biz/assets/front/img/logo.png",
+      "potentialAction": [{
+          "@type": "SearchAction",
+          "target": "https://addnew.biz//search?s={search_term_string}&cat_id=0&sub_cat_id=0&city_id=0",
+          "query-input": "required name=search_term_string"
+      }]
+    }
+    </script>
+
 </head>
 <body class=""> <!-- fixed -->
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M89V7L"
+                  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
 <div class="debugGrid">
     <div>
         <div>
@@ -33,7 +79,7 @@
 <div class="nav-mobile"> <!-- open -->
     <div class="nav-top">
         <div class="header-logo">
-            <a href="/main.html"><img src='{{ asset('assets/front/img/logo.png') }}' alt=""></a>
+            <a href="{{ route('index') }}"><img src='{{ asset('assets/front/img/logo.png') }}' alt=""></a>
         </div>
         <div class="btn-bars">
             <i class="icon-arrow-left">&nbsp;</i>
@@ -42,58 +88,58 @@
     <div class="nav-inner">
         <div class="nav-account">
             <span class="nav-h">Добро пожаловать, <strong>гость</strong>!</span><br>
-            <a href="/create-listing" class="header-link">Подать объявление</a><br>
+            <a href="{{ route('ad.step.category') }}" class="header-link">Подать объявление</a><br>
             <a href="/?s=&scat=0&loc_search=&sa=search" class="header-link">Поиск по объявлениям</a><br>
-            <a href="/register.html" rel="nofollow" class="header-link link-register">Регистрация</a>
+            <a href="{{ route('register') }}" rel="nofollow" class="header-link link-register">Регистрация</a>
         </div>
         <div class="nav-countries">
             <p class="nav-h">Поиск объявлений по странам</p>
             <div class="country-wrap">
-                <a href="https://addnew.biz/ukraina/" class="country-name"><img src="{{ asset('assets/front/img/flags/ukrane.png') }}"> <span>Украина</span> <span class="btn-toggle"><i class="icon icon-plus"></i></span></a>
+                <a href="https://addnew.biz/regions/ukraina" class="country-name"><img src="{{ asset('assets/front/img/flags/ukrane.png') }}"> <span>Украина</span> <span class="btn-toggle"><i class="icon icon-plus"></i></span></a>
                 <ul class="cities-list">
-                    <li><a href="https://addnew.biz/ukraina/kievskaya-obl/kiev">Киев <span class="city-rate">2384</span></a></li>
-                    <li><a href="https://addnew.biz/ukraina/harkovskaya-obl/harkov">Харьков <span class="city-rate">959</span></a></li>
-                    <li><a href="https://addnew.biz/ukraina/dnepropetrovskaya-obl/dnepropetrovsk">Днепропетровск <span class="city-rate">520</span></a></li>
-                    <li><a href="https://addnew.biz/ukraina/odesskaya-obl/odessa">Одесса <span class="city-rate">506</span></a></li>
-                    <li><a href="https://addnew.biz/ukraina/zaporozhskaya-obl/zaporozhe">Запорожье <span class="city-rate">276</span></a></li>
-                    <li><a href="https://addnew.biz/ukraina/lvovskaya-obl/lvov">Львов <span class="city-rate">244</span></a></li>
-                    <li><a href="https://addnew.biz/ukraina/sumskaya-obl/sumi">Сумы <span class="city-rate">158</span></a></li>
-                    <li><a href="https://addnew.biz/ukraina/hmelnitckaya-obl/hmelnitckij">Хмельницкий <span class="city-rate">143</span></a></li>
-                    <li><a href="https://addnew.biz/ukraina/nikolaevskaya-obl/nikolaev">Николаев <span class="city-rate">137</span></a></li>
-                    <li><a href="https://addnew.biz/ukraina/vinnitckaya-obl/vinnitca">Винница <span class="city-rate">113</span></a></li>
+                    <li><a href="https://addnew.biz/regions/ukraina/kievskaya-obl/kiev">Киев <span class="city-rate">2384</span></a></li>
+                    <li><a href="https://addnew.biz/regions/ukraina/harkovskaya-obl/harkov">Харьков <span class="city-rate">959</span></a></li>
+                    <li><a href="https://addnew.biz/regions/ukraina/dnepropetrovskaya-obl/dnepropetrovsk">Днепропетровск <span class="city-rate">520</span></a></li>
+                    <li><a href="https://addnew.biz/regions/ukraina/odesskaya-obl/odessa">Одесса <span class="city-rate">506</span></a></li>
+                    <li><a href="https://addnew.biz/regions/ukraina/zaporozhskaya-obl/zaporozhe">Запорожье <span class="city-rate">276</span></a></li>
+                    <li><a href="https://addnew.biz/regions/ukraina/lvovskaya-obl/lvov">Львов <span class="city-rate">244</span></a></li>
+                    <li><a href="https://addnew.biz/regions/ukraina/sumskaya-obl/sumi">Сумы <span class="city-rate">158</span></a></li>
+                    <li><a href="https://addnew.biz/regions/ukraina/hmelnitckaya-obl/hmelnitckij">Хмельницкий <span class="city-rate">143</span></a></li>
+                    <li><a href="https://addnew.biz/regions/ukraina/nikolaevskaya-obl/nikolaev">Николаев <span class="city-rate">137</span></a></li>
+                    <li><a href="https://addnew.biz/regions/ukraina/vinnitckaya-obl/vinnitca">Винница <span class="city-rate">113</span></a></li>
                 </ul>
             </div>
             <div class="country-wrap">
-                <a href="https://addnew.biz/rossiya/" class="country-name"> <!-- active -->
+                <a href="https://addnew.biz/regions/rossiya" class="country-name"> <!-- active -->
                     <img src="{{ asset('assets/front/img/flags/russia.png') }}">
                     <span>Россия</span>
                     <span class="btn-toggle"><i class="icon icon-plus"></i></span>
                 </a>
                 <ul class="cities-list">
-                    <li><a href="https://addnew.biz/rossiya/moskva-i-moskovskaya-obl/moskva">Москва <span class="city-rate">81</span></a></li>
-                    <li><a href="https://addnew.biz/rossiya/lipetckaya-obl/lipetck">Липецк <span class="city-rate">68</span></a></li>
-                    <li><a href="https://addnew.biz/rossiya/rostovskaya-obl/rostov-na-donu">Ростов-на-Дону <span class="city-rate">41</span></a></li>
-                    <li><a href="https://addnew.biz/rossiya/sankt-peterburg-i-oblast/sankt-peterburg">Санкт-Петербург <span class="city-rate">27</span></a></li>
-                    <li><a href="https://addnew.biz/rossiya/novosibirskaya-obl/novosibirsk">Новосибирск <span class="city-rate">14</span></a></li>
-                    <li><a href="https://addnew.biz/rossiya/krasnodarskij-kraj/sochi">Сочи <span class="city-rate">14</span></a></li>
-                    <li><a href="https://addnew.biz/rossiya/ryazanskaya-obl/ryazan">Рязань <span class="city-rate">10</span></a></li>
-                    <li><a href="https://addnew.biz/rossiya/sverdlovskaya-obl/ekaterinburg">Екатеринбург <span class="city-rate">10</span></a></li>
-                    <li><a href="https://addnew.biz/rossiya/moskva-i-moskovskaya-obl/noginsk">Ногинск <span class="city-rate">8</span></a></li>
-                    <li><a href="https://addnew.biz/rossiya/tatarstan/naberezhnie-chelni">Набережные Челны <span class="city-rate">8</span></a></li>
+                    <li><a href="https://addnew.biz/regions/rossiya/moskva-i-moskovskaya-obl/moskva">Москва <span class="city-rate">81</span></a></li>
+                    <li><a href="https://addnew.biz/regions/rossiya/lipetckaya-obl/lipetck">Липецк <span class="city-rate">68</span></a></li>
+                    <li><a href="https://addnew.biz/regions/rossiya/rostovskaya-obl/rostov-na-donu">Ростов-на-Дону <span class="city-rate">41</span></a></li>
+                    <li><a href="https://addnew.biz/regions/rossiya/sankt-peterburg-i-oblast/sankt-peterburg">Санкт-Петербург <span class="city-rate">27</span></a></li>
+                    <li><a href="https://addnew.biz/regions/rossiya/novosibirskaya-obl/novosibirsk">Новосибирск <span class="city-rate">14</span></a></li>
+                    <li><a href="https://addnew.biz/regions/rossiya/krasnodarskij-kraj/sochi">Сочи <span class="city-rate">14</span></a></li>
+                    <li><a href="https://addnew.biz/regions/rossiya/ryazanskaya-obl/ryazan">Рязань <span class="city-rate">10</span></a></li>
+                    <li><a href="https://addnew.biz/regions/rossiya/sverdlovskaya-obl/ekaterinburg">Екатеринбург <span class="city-rate">10</span></a></li>
+                    <li><a href="https://addnew.biz/regions/rossiya/moskva-i-moskovskaya-obl/noginsk">Ногинск <span class="city-rate">8</span></a></li>
+                    <li><a href="https://addnew.biz/regions/rossiya/tatarstan/naberezhnie-chelni">Набережные Челны <span class="city-rate">8</span></a></li>
                 </ul>
             </div>
             <div class="country-wrap">
-                <a href="https://addnew.biz/kitaj/" class="country-name">
+                <a href="https://addnew.biz/regions/kitaj" class="country-name">
                     <img src="{{ asset('assets/front/img/flags/china.png') }}">
                     <span>Китай</span>
                     <span class="btn-toggle"><i class="icon icon-plus"></i></span>
                 </a>
                 <ul class="cities-list">
-                    <li><a href="https://addnew.biz/kitaj/hejluntczyan/harbin">Харбин <span class="city-rate">214</span></a></li>
-                    <li><a href="https://addnew.biz/kitaj/gansu/lanchzhou">Ланьчжоу <span class="city-rate">9</span></a></li>
-                    <li><a href="https://addnew.biz/kitaj/pekin/pekin">Пекин <span class="city-rate">3</span></a></li>
-                    <li><a href="https://addnew.biz/kitaj/hebej/shihajkvang">Шихайкванг <span class="city-rate">2</span></a></li>
-                    <li><a href="https://addnew.biz/kitaj/guandon/zhenzhen">Женьжень <span class="city-rate">2</span></a></li>
+                    <li><a href="https://addnew.biz/regions/kitaj/hejluntczyan/harbin">Харбин <span class="city-rate">214</span></a></li>
+                    <li><a href="https://addnew.biz/regions/kitaj/gansu/lanchzhou">Ланьчжоу <span class="city-rate">9</span></a></li>
+                    <li><a href="https://addnew.biz/regions/kitaj/pekin/pekin">Пекин <span class="city-rate">3</span></a></li>
+                    <li><a href="https://addnew.biz/regions/kitaj/hebej/shihajkvang">Шихайкванг <span class="city-rate">2</span></a></li>
+                    <li><a href="https://addnew.biz/regions/kitaj/guandon/zhenzhen">Женьжень <span class="city-rate">2</span></a></li>
                 </ul>
             </div>
         </div>
@@ -107,7 +153,7 @@
                     <i class="icon-bars">&nbsp;</i>
                 </div>
                 <div class="header-logo">
-                    <a href="/main.html"><img src='{{ asset('assets/front/img/logo.png') }}' alt=""></a>
+                    <a href="{{ route('index') }}"><img src='{{ asset('assets/front/img/logo.png') }}' alt=""></a>
                 </div>
 
                 <div class="header-account">
@@ -127,72 +173,16 @@
                         <a href="{{ route('register') }}" rel="nofollow" class="header-link link-register">Регистрация</a>
                         <a href="{{ route('login') }}" rel="nofollow" class="header-link link-login">Вход</a>
                     @endif
-                        <a href="/create-advert.html" class="btn btn-advert"><i class="icon icon-plus"></i> Подать объявление</a>
+                        <a href="{{ route('ad.step.category') }}" class="btn btn-advert"><i class="icon icon-plus"></i> Подать объявление</a>
 
                 </div>
 
             </div>
         </div>
     </div>
-    <div class="header-search">
-        <div class="container">
-            <form class="search">
-                <div class="form-group">
-                    <input type="text" class="form-control" name="s" placeholder="Что ищем?">
-                </div>
-                <div class="search-mob">
-                    <div class="form-group">
-                        <select class="form-control" name="cat_id" id="main_category" style="width: 100%;">
-                            <option value="0">Выберите категорию</option>
-                            <option value="878">Строительство и ремонт</option>
-                            <option value="899">Отдам даром</option>
-                            <option value="900">Оборудование</option>
-                            <option value="8">Детский мир</option>
-                            <option value="19">Транспорт</option>
-                            <option value="32">Бизнес и услуги</option>
-                            <option value="54">Работа</option>
-                            <option value="75">Недвижимость</option>
-                            <option value="91">Животные</option>
-                            <option value="104">Дом и сад</option>
-                            <option value="117">Электроника</option>
-                            <option value="130">Мода и стиль</option>
-                            <option value="138">Хобби, отдых и спорт</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <select class="form-control" class="" name="sub_cat_id" id="hub_sub_category" style="width: 100%;">
-                            <option value="0">Искать во всей категории</option>
-                            <option value="880">Строительные материалы</option>
-                            <option value="881">Отделочные и облицовочные материалы</option>
-                            <option value="882">Окна</option>
-                            <option value="883">Двери</option>
-                            <option value="884">Замки и фурнитура</option>
-                            <option value="885">Балконы</option>
-                            <option value="886">Лестницы</option>
-                            <option value="887">Ворота и заборы</option>
-                            <option value="888">Сантехника</option>
-                            <option value="889">Отопление</option>
-                            <option value="890">Электрика</option>
-                            <option value="892">Насосы</option>
-                            <option value="891">Вентиляционные системы</option>
-                            <option value="893">Готовые конструкции</option>
-                            <option value="894">Металлоконструкции</option>
-                            <option value="895">Инструменты</option>
-                            <option value="896">Другое</option>
-                            <option value="897">Аренда</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <input type="text" class="form-control" id="autocomplete_cities" placeholder="Город для поиска">
-                    </div>
-                </div>
-                <div class="search-button">
-                    <button type="button" class="btn btn-search">Поиск</button>
-                    <a href="#" class="view-more">Уточнить поиск</a>
-                </div>
-            </form>
-        </div>
-    </div>
+
+    @widget('front.search')
+
 </header>
 
 
@@ -206,11 +196,15 @@
             <ul class="footer-menu">
                 <li><a href="/">Главная</a></li>
                 <li><a href="{{ route('blog.index') }}">Блог</a></li>
-                <li><a href="https://addnew.biz/regions/">Страны</a></li>
-                <li><a href="#">Контакты</a></li>
-                <li><a href="#">Confide</a></li>
+{{--                <li><a href="{{ route('countries') }}">Страны</a></li>--}}
+                <li><a href="{{ route('contacts') }}">Контакты</a></li>
+                @if($pages)
+                    @foreach($pages as $page)
+                        <li><a href="{{ $page->url }}">{{ $page->name }}</a></li>
+                    @endforeach
+                @endif
             </ul>
-            <div class="btn btn-subscribe modal" data-modal="modal-subscribe">Подписаться</div>
+            <div class="btn btn-subscribe" onclick="modal.set('subscribe-modal').show();">Подписаться</div>
             <ul class="footer-social">
                 <li><a href="https://vk.com/public131156262" class="vk" target="_blank" rel="noreferrer" alt="Доска бесплатных объявлений Addnew.biz в социальной сети Вконтакте"></a></li>
                 <li><a href="https://www.facebook.com/addnew.biz/" class="fb" target="_blank" rel="noreferrer" alt="Доска бесплатных объявлений Addnew.biz в социальной сети Facebook"></a></li>
@@ -221,41 +215,31 @@
                 <li><a href="https://ok.ru/group/54246475890813/" class="ok" target="_blank" rel="noreferrer"></a></li>
             </ul>
         </div>
-        <div class="copyright">© 2019 Доска объявлений AddNew.Biz. Все права защищены.</div>
+        <div class="copyright">© {{ date("Y") }} Доска объявлений AddNew.Biz. Все права защищены.</div>
     </div>
 </footer>
 <div class="toTop"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/arrow-up-alt2.svg') }}" /></div>
-<div id="subscribe-shadow">
-    <div class="subscribe-wrap">
-        <button id="subscribe-close" class="modal-close">
+
+<div id="subscribe-modal" class="modal">
+    <div class="modal-wrap">
+        <button class="close" onclick="modal.close()">
             <img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/no-alt.svg') }}" />
         </button>
 
-        <div class="thanks">
-            Спасибо!<br><br>
-            Проверьте свою почту для подтверждения подписки.
-            <button class="btn btn-subscribe modal-close">Закрыть</button>
-        </div>
         <div class="form-subscribe">
             <div class="form-group">
-                <label>Ваше имя <span class="star">*</span></label>
-                <input type="text" class="form-control">
-            </div>
-            <div class="form-group">
                 <label>Ваша электронная почта <span class="star">*</span></label>
-                <input type="text" class="form-control">
+                <input type="text" name="subscriber_email" id="subscriber_email" class="form-control">
             </div>
-            <button class="btn btn-subscribe btn-submit">Подписаться</button>
+            <p class="error-holder"></p>
+            <button class="btn btn-subscribe btn-subscribe-trigger">Подписаться</button>
         </div>
-
-
     </div>
 </div>
 
+
 <div class="backdrop"></div>
 
-<!-- Styles -->
-<link rel="stylesheet" href="{{ asset('assets/front/css/style.min.css') }}" media="all">
 <style>
     .start-page{
         min-height: calc(100% - 87px);
@@ -275,6 +259,11 @@
     }
 </style>
 <script src="{{ asset('assets/front/js/common.js') }}"></script>
+<script src="{{ asset('assets/front/js/global.js') }}"></script>
+<script src="{{ asset('assets/front/js/maps.js') }}"></script>
+@yield('load-scripts')
+
+@yield('script')
 
 </body>
 </html>

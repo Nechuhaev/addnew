@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Front\User\Auth;
 
 use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -27,7 +28,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/profile/ads';
+    //protected $redirectTo = '/profile/ads';
 
     /**
      * Create a new controller instance.
@@ -82,4 +83,21 @@ class LoginController extends Controller
         ]);
     }
 
+    /**
+     * @return string
+     */
+    public function redirectTo() : string
+    {
+        if (session()->has('ad')) {
+            $redirectTo = '/create-listing/preview';
+        } else {
+            $redirectTo = '/profile/ads';
+        }
+        return $redirectTo;
+    }
+
+    protected function authenticated(Request $request, $user) {
+        $user->updated_at = Carbon::now()->toDateTimeString();
+        $user->save();
+    }
 }

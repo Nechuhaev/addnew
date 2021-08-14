@@ -1,0 +1,1 @@
+{{ \App\Http\AdSense::block('category-right') }}

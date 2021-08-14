@@ -1,0 +1,1 @@
+{{ \App\Http\AdSense::block('ad-after-product') }}

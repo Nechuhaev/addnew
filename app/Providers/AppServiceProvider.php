@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Page;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -23,6 +25,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        view()->composer('front.layout', function ($view) {
+            $pages = Page::orderBy('sort_order', 'asc')->get();
+            $view->with('pages', $pages);
+
+        });
+        Schema::defaultStringLength(191);
     }
 }

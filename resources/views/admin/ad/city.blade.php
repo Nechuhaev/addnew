@@ -4,18 +4,11 @@
     <div class="page-breadcrumb">
         <div class="row">
             <div class="col-5 align-self-center">
-                <h4 class="page-title">Dashboard</h4>
+                <h4 class="page-title">{{ $city->name ?? 'Города' }}</h4>
             </div>
             <div class="col-7 align-self-center">
                 <div class="d-flex align-items-center justify-content-end">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item">
-                                <a href="#">Home</a>
-                            </li>
-                            <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
-                        </ol>
-                    </nav>
+                    {{ Breadcrumbs::render('admin.adCities') }}
                 </div>
             </div>
         </div>
@@ -27,94 +20,120 @@
         <div class="col-4">
             <div class="card">
                 <div class="card-body">
-                    <form action="" class="category-form">
+                    <form action="{{ $action }}" method="POST" class="category-form">
+                        @csrf
+
+                        @if ($city)
+                            <input type="hidden" name="city_id" value="{{ $city->id }}">
+                        @endif
+
+                        <div class="form-group">
+                            <label>Страна</label>
+                            <div>
+                                <select name="country_id" onchange="city.loadRegions(this);" class="form-control" id="">
+                                    <option value="0">Страна не выбрана</option>
+                                    @if($countries)
+                                        @foreach($countries as $country)
+                                            @if($city && $city->region->country->id && $city->region->country->id == $country->id)
+                                                <option selected value="{{ $country->id }}">{{ $country->name }}</option>
+                                            @else
+                                                <option value="{{ $country->id }}">{{ $country->name }}</option>
+                                            @endif
+                                        @endforeach
+                                    @endif
+                                </select>
+                            </div>
+                        </div>
 
 
                         <div class="form-group">
-                            <label>Родительская категория</label>
+                            <label>Область</label>
                             <div>
-                                <select name="" class="form-control" id="">
-                                    <option value="0">У этой категории нет родителей :(</option>
-                                    <option value="1">Категория 1</option>
+                                <select name="region_id" onchange="" class="form-control" id="">
+                                    @if($regions && $city)
+                                        <option value="0">Выберите область</option>
+                                        @foreach($regions as $region)
+                                            @if($region->id == $city->region->id)
+                                                <option selected value="{{ $region->id }}">{{ $region->name }}</option>
+                                            @else
+                                                <option value="{{ $region->id }}">{{ $region->name }}</option>
+                                            @endif
+                                        @endforeach
+                                    @else
+                                    <option value="0">Сначала выберите страну</option>
+                                    @endif
                                 </select>
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label>Название категории</label>
+                            <label>Город</label>
                             <div>
                                 <input type="text"
                                        name="name"
-                                       value=""
-                                       placeholder="noobmaster69"
+                                       id="name"
+                                       value="{{ old('name') ?? $city->name ?? '' }}"
+                                       placeholder=""
                                        class="form-control form-control-line">
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label>Slug</label>
+                            <label for="slug">Slug</label>
                             <div>
                                 <input type="text"
-                                       name="name"
-                                       value=""
-                                       placeholder="noobmaster69"
+                                       name="slug"
+                                       id="slug"
+                                       value="{{ old('slug') ?? $city->slug ?? '' }}"
+                                       placeholder=""
                                        class="form-control form-control-line">
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label>Описание категории</label>
+                            <label for="content">Описание для города</label>
                             <div>
-                                <textarea name="excerpt" rows="5"
-                                          class="form-control form-control-line"></textarea>
+                                <textarea name="content"
+                                          id="content"
+                                          class="content form-control form-control-line">{{ old('content') ?? $city->content ?? '' }}</textarea>
 
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label>Meta-тег title</label>
+                            <label for="meta_title">Meta-тег title</label>
                             <div>
                                 <input type="text"
-                                       name="name"
-                                       value=""
-                                       placeholder="noobmaster69"
+                                       name="meta_title"
+                                       id="meta_title"
+                                       value="{{ old('meta_title') ?? $city->meta_title ?? '' }}"
+                                       placeholder=""
                                        class="form-control form-control-line">
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label>Meta-тег description</label>
+                            <label for="meta_description">Meta-тег description</label>
                             <div>
-                                <textarea name="excerpt" rows="5"
-                                          class="form-control form-control-line"></textarea>
+                                <textarea name="meta_description"
+                                          rows="5"
+                                          id="meta_description"
+                                          class="form-control form-control-line">{{ old('meta_description') ?? $city->meta_description ?? '' }}</textarea>
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label>Порядок сортировки</label>
+                            <label for="sort_order">Порядок сортировки</label>
                             <div>
                                 <input type="text"
-                                       name="name"
-                                       value=""
-                                       placeholder="noobmaster69"
+                                       name="sort_order"
+                                       id="sort_order"
+                                       value="{{ old('sort_order') ?? $city->sort_order ?? '' }}"
+                                       placeholder=""
                                        class="form-control form-control-line">
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <label>Изображение</label>
-                            <div>
-                                <div class="input-group">
-                                    <span class="input-group-btn">
-                                        <a id="lfm" data-input="thumbnail" data-preview="holder" class="btn btn-primary select-image">
-                                        <i class="fa fa-picture-o"></i> Выбрать
-                                        </a>
-                                    </span>
-                                    <input id="thumbnail" value="" class="form-control" type="text" name="image">
-                                </div>
-                                <img id="holder" class="img-fluid" style="margin-top: 20px" src="http://placehold.it/400x250">
-                            </div>
-                        </div>
                         <hr>
                         <div class="form-group text-center">
                             <button class="btn btn-success">Сохранить</button>
@@ -127,204 +146,48 @@
         <div class="col-8">
             <div class="card">
                 <div class="card-body">
-                    <table class="table table-bordered table-hover table-middle-cell">
-                        <tr>
-                            <th>Город</th>
-                            <th>Регион</th>
-                            <th>Страна</th>
-                            <th></th>
-                        </tr>
+                    <form action="{{ $action_search }}" method="GET">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <input type="text"
+                                       name="name"
+                                       value="{{ $requested_city ?? "" }}"
+                                       placeholder="Поиск городов"
+                                       class="form-control form-control-line">
+                            </div>
+                            <div class="col-md-4"><button class="btn btn-primary btn-block">Найти город</button></div>
+                        </div>
+                    </form>
+                    <hr>
+                    @if ($cities->items())
+                        <table class="table table-bordered table-hover table-middle-cell">
+                            <tr>
+                                <th class="text-center">ID</th>
+                                <th>Город</th>
+                                <th>Регион</th>
+                                <th>Страна</th>
+                                <th></th>
+                            </tr>
 
-                        <tr>
-                            <td>Город</td>
-                            <td>Регион</td>
-                            <td>Страна</td>
-                            <td class="text-center cell-actions">
-                                <a href="#"><i class="mdi mdi-18px mdi-table-edit"></i></a>
-                                <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Город</td>
-                            <td>Регион</td>
-                            <td>Страна</td>
-                            <td class="text-center cell-actions">
-                                <a href="#"><i class="mdi mdi-18px mdi-table-edit"></i></a>
-                                <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Город</td>
-                            <td>Регион</td>
-                            <td>Страна</td>
-                            <td class="text-center cell-actions">
-                                <a href="#"><i class="mdi mdi-18px mdi-table-edit"></i></a>
-                                <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Город</td>
-                            <td>Регион</td>
-                            <td>Страна</td>
-                            <td class="text-center cell-actions">
-                                <a href="#"><i class="mdi mdi-18px mdi-table-edit"></i></a>
-                                <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Город</td>
-                            <td>Регион</td>
-                            <td>Страна</td>
-                            <td class="text-center cell-actions">
-                                <a href="#"><i class="mdi mdi-18px mdi-table-edit"></i></a>
-                                <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Город</td>
-                            <td>Регион</td>
-                            <td>Страна</td>
-                            <td class="text-center cell-actions">
-                                <a href="#"><i class="mdi mdi-18px mdi-table-edit"></i></a>
-                                <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Город</td>
-                            <td>Регион</td>
-                            <td>Страна</td>
-                            <td class="text-center cell-actions">
-                                <a href="#"><i class="mdi mdi-18px mdi-table-edit"></i></a>
-                                <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Город</td>
-                            <td>Регион</td>
-                            <td>Страна</td>
-                            <td class="text-center cell-actions">
-                                <a href="#"><i class="mdi mdi-18px mdi-table-edit"></i></a>
-                                <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Город</td>
-                            <td>Регион</td>
-                            <td>Страна</td>
-                            <td class="text-center cell-actions">
-                                <a href="#"><i class="mdi mdi-18px mdi-table-edit"></i></a>
-                                <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Город</td>
-                            <td>Регион</td>
-                            <td>Страна</td>
-                            <td class="text-center cell-actions">
-                                <a href="#"><i class="mdi mdi-18px mdi-table-edit"></i></a>
-                                <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Город</td>
-                            <td>Регион</td>
-                            <td>Страна</td>
-                            <td class="text-center cell-actions">
-                                <a href="#"><i class="mdi mdi-18px mdi-table-edit"></i></a>
-                                <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Город</td>
-                            <td>Регион</td>
-                            <td>Страна</td>
-                            <td class="text-center cell-actions">
-                                <a href="#"><i class="mdi mdi-18px mdi-table-edit"></i></a>
-                                <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Город</td>
-                            <td>Регион</td>
-                            <td>Страна</td>
-                            <td class="text-center cell-actions">
-                                <a href="#"><i class="mdi mdi-18px mdi-table-edit"></i></a>
-                                <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Город</td>
-                            <td>Регион</td>
-                            <td>Страна</td>
-                            <td class="text-center cell-actions">
-                                <a href="#"><i class="mdi mdi-18px mdi-table-edit"></i></a>
-                                <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Город</td>
-                            <td>Регион</td>
-                            <td>Страна</td>
-                            <td class="text-center cell-actions">
-                                <a href="#"><i class="mdi mdi-18px mdi-table-edit"></i></a>
-                                <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Город</td>
-                            <td>Регион</td>
-                            <td>Страна</td>
-                            <td class="text-center cell-actions">
-                                <a href="#"><i class="mdi mdi-18px mdi-table-edit"></i></a>
-                                <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Город</td>
-                            <td>Регион</td>
-                            <td>Страна</td>
-                            <td class="text-center cell-actions">
-                                <a href="#"><i class="mdi mdi-18px mdi-table-edit"></i></a>
-                                <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Город</td>
-                            <td>Регион</td>
-                            <td>Страна</td>
-                            <td class="text-center cell-actions">
-                                <a href="#"><i class="mdi mdi-18px mdi-table-edit"></i></a>
-                                <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Город</td>
-                            <td>Регион</td>
-                            <td>Страна</td>
-                            <td class="text-center cell-actions">
-                                <a href="#"><i class="mdi mdi-18px mdi-table-edit"></i></a>
-                                <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Город</td>
-                            <td>Регион</td>
-                            <td>Страна</td>
-                            <td class="text-center cell-actions">
-                                <a href="#"><i class="mdi mdi-18px mdi-table-edit"></i></a>
-                                <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Город</td>
-                            <td>Регион</td>
-                            <td>Страна</td>
-                            <td class="text-center cell-actions">
-                                <a href="#"><i class="mdi mdi-18px mdi-table-edit"></i></a>
-                                <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
-                            </td>
-                        </tr>
-                    </table>
+                            @foreach($cities as $city_item)
+                                <tr>
+                                    <td class="text-center">{{ $city_item->id }}</td>
+                                    <td><b>{{ $city_item->name }}</b></td>
+                                    <td>{{ $city_item->region->name }}</td>
+                                    <td>{{ $city_item->region->country->name }}</td>
+                                    <td class="text-center cell-actions">
+                                        <a href="{{ route('admin.adCities.edit', ['id' => $city_item->id]) }}"><i class="mdi mdi-18px mdi-table-edit"></i></a>
+                                        <a href="{{ route('admin.adCities.delete', ['id' => $city_item->id]) }}" onclick="return confirm('Вы пытаетесь удалить город {{ $city_item->name }}. Подтвердите действие.')" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </table>
+                        {{ $cities->links() }}
+                    @else
+                        <p>Города не найдены</p>
+                    @endif
+
+
                 </div>
             </div>
         </div>

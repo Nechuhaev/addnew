@@ -17,13 +17,39 @@ class AdCategory extends Model
         'sort_order'
     ];
 
+    /**
+     * Получить родительскую категорию
+     * @return mixed|static
+     */
+    public function getParentAttribute()
+    {
+        if ($this->parent_id) {
+            return AdCategory::find($this->parent_id);
+        }
+    }
+
+    /**
+     * Полный путь категории
+     * @return string
+     */
+    public function getPathAttribute()
+    {
+        $path = "";
+        if ($this->parent_id) {
+            $path .= $this->parent->name . ' > ';
+        }
+        $path .= $this->name;
+
+        return $path;
+    }
 
     /**
      * Слаг должен содержать английские символы
      * И быть уникальным
      * @param $value
      */
-    public function setSlugAttribute($value) {
+    public function setSlugAttribute($value)
+    {
         if (!isset($value)) {
             // Похожите
 
@@ -63,11 +89,56 @@ class AdCategory extends Model
         }
     }
 
-    public function setSortOrderAttribute($value) {
-        if (!isset($value)) {
-            $this->attributes['sort_order'] = 0;
+
+    public function getUrlAttribute() {
+        $parent = $this->parent;
+
+        if ($parent) {
+            $url = route('sub_category.page', [
+                'category' => $parent->slug,
+                'subcategory' => $this->slug
+            ]);
         } else {
-            $this->attributes['sort_order'] = (int)$value;
+            $url = route('category.page', ['category' => $this->slug]);
         }
+
+        return $url;
+    }
+
+    public function getFilteredUrl($filter)
+    {
+        $parent = $this->parent;
+
+        if ($parent) {
+            $url = route('filtered_subcategory.page', [
+                'filter' => $filter,
+                'category' => $parent->slug,
+                'subcategory' => $this->slug
+            ]);
+        } else {
+            $url = route('filtered_category.page', [
+                'filter' => $filter,
+                'category' => $this->slug
+            ]);
+        }
+
+        return $url;
+    }
+
+    /**
+     * Связь категорий с таблицей объявлений
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function ads()
+    {
+        return $this->hasMany(Ad::class, 'category_id');
+    }
+
+    public function children() {
+        return $this->hasMany(AdCategory::class, 'parent_id');
+    }
+
+    public function parent() {
+        return $this->belongsTo(AdCategory::class, 'parent_id');
     }
 }

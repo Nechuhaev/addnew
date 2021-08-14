@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Front\User;
 
+use App\Ad;
 use App\Http\Controllers\Controller;
 use App\User;
 use Illuminate\Http\Request;
@@ -20,7 +21,8 @@ class UserController extends Controller
 
     public function ads()
     {
-        return view('front.user.profile.ads');
+        $data['ads'] = Auth::user()->ads()->orderBy('created_at')->paginate(15);
+        return view('front.user.profile.ads')->with($data);
     }
     public function edit()
     {
@@ -54,7 +56,7 @@ class UserController extends Controller
             'info.max' => 'Максимальное количество символов для поля "Обо мне" составляет: :max символов.',
         ];
         $request->validate([
-            'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:1024',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:1024',
             'firstname' => 'max:100',
             'lastname' => 'max:100',
             'telephone' => 'max:32',
@@ -82,6 +84,8 @@ class UserController extends Controller
         $user->site_url = $request->site_url;
         $user->twitter_url = $request->twitter_url;
         $user->facebook_url = $request->facebook_url;
+        $user->telegram_url = $request->telegram_url;
+        $user->instagram_url = $request->instagram_url;
         $user->info = $request->info;
 
 
