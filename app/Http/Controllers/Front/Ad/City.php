@@ -21,9 +21,11 @@ class City extends Controller
     public function page(Localization $localization, $country, $region, $city)
     {
         $entity = AdCity::where('slug', '=', $city)->first();
+        if (!$entity) abort(404);
 
         // Эту штуку потом хорошо бы переписать, тк она дублируется и кеш в перспективе может вызвать проблем
         $cache_key = sprintf('city_categories_%s', $entity->id);
+        
         $categories = Cache::remember($cache_key, 43200, function () use ($entity) {
             $parents = AdCategory::where('parent_id', 0)
                 ->orderBy('sort_order', 'ASC')->get();
@@ -65,10 +67,12 @@ class City extends Controller
             return $categories->toArray();
         });
 
-        if (!$entity) abort(404);
+        
+
+        $categories = [];
 
         $seo_field = SeoField::where('index', 'ad-city')->first();
-
+        
         if ($seo_field) {
             $entity_values = [
                 '---city_name---'  => $entity->name,
@@ -87,7 +91,7 @@ class City extends Controller
                 'description' => $entity->content,
             ];
         }
-
+        
         if (request()->get('page')) {
             $meta['description'] = false;
         }
@@ -106,7 +110,7 @@ class City extends Controller
             ];
         }
 
-
+        
         $_tags = AdTag::query()->withCount('ads')
             ->whereHas('ads', function ($query) use ($entity) {
                 return $query->where('city_id', $entity->id);
@@ -117,12 +121,14 @@ class City extends Controller
 
         $tags = [];
         foreach ($_tags->random($displayTagsCount) as $tag) {
-            $tags[] = [
-                'name' => $tag->name,
-                'url' => $tag->url
-            ];
+            if ($tag->name && $tag->url) {
+                $tags[] = array(
+                    'name' => $tag->name,
+                    'url' => $tag->url,
+                );
+            }          
         }
-
+        
         $shop_users = User::withCount('ads')
             ->whereHas('ads', function ($query) use ($localization) {
                 $query->where('is_product', 1)->whereIn('city_id', $localization->citiesIds());
@@ -150,7 +156,7 @@ class City extends Controller
                 ];
             }
         }
-
+        
         return view('front.ad.filtered-categories')->with([
             'entity' => $entity,
             'breadcrumbs' => 'city.page',

@@ -21,6 +21,7 @@ class Region extends Controller
     public function page(Localization $localization, $country, $region)
     {
         $entity = AdRegion::where('slug', '=', $region)->first();
+        if (!$entity) abort(404);
 
         $cache_key = sprintf('region_categories_%s', $entity->id);
         $categories = Cache::remember($cache_key, 43200, function () use ($entity) {
