@@ -35,6 +35,9 @@ class Ad extends Controller
         $ad = \App\Ad::where('slug', '=', $ad)->first();
         if (!$ad) abort(404);
 
+        $user = User::where('id', '=', $ad['user_id'])->first();
+        if (!$user) abort(404);
+
         $allowed_country_ids = [62];
         if (!in_array($ad->city->region->country->id, $allowed_country_ids)) {
             return redirect('/', 301);
@@ -86,7 +89,6 @@ class Ad extends Controller
                 'description' => '',
             ];
         }
-
         // Стоимость
         $currencies = AdCurrency::all();
         $price = 0;
