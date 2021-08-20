@@ -218,6 +218,8 @@ class Ad extends Controller
                 'name.min' => 'Минимальная длина названия объявления не может быть короче :min символов',
                 'content.required' => 'Введите описание объявления!',
                 'content.min' => 'Минимальная длина описания не может быть короче :min символов',
+                'tags.required' => 'Введите метки объявления!',
+                'tags.min' => 'Минимальная длина метки не может быть короче :min символов',
                 'image.required' => 'Выберите минимум одно изображение!',
                 'image.*.image' => 'Недопустимый формат изображения!',
                 'image.*.mimes' => 'Недопустимый формат изображения!',
@@ -233,6 +235,7 @@ class Ad extends Controller
                 'email' => 'sometimes|required|email',
                 'name' => 'required|min:6',
                 'content' => 'required|min:70',
+                'tags' => 'required|min:3',
                 'image' => 'required',
                 'image.*' => 'image|max:1024|mimes:jpg,jpeg,bmp,png',
                 'price' => 'required|numeric',
@@ -246,6 +249,7 @@ class Ad extends Controller
             $request->session()->put('ad.name', $request->get('name'));
             $request->session()->put('ad.tags', $request->get('tags'));
             $request->session()->put('ad.content', $request->get('content'));
+            $request->session()->put('ad.tags', $request->get('tags'));
             $request->session()->put('ad.price', $request->get('price'));
             $request->session()->put('ad.currency_id', $request->get('currency_id'));
 
