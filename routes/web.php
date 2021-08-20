@@ -24,6 +24,12 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
         Route::get('/ads', 'Admin\Stat\AdStatController@index')->name('admin.stat.ads');
     });
 
+    // Список запрещенных email адресов
+    Route::get('/blocked-emails', 'Admin\BlockedEmails\BlockedEmailsController@showEmailsList')->name('admin.blocked-emails');
+    Route::get('/blocked-emails/new', 'Admin\BlockedEmails\BlockedEmailsController@new')->name('admin.blocked-email.new');
+    Route::post('/blocked-emails/create', 'Admin\BlockedEmails\BlockedEmailsController@create')->name('admin.blocked-email.create');
+    Route::get('/blocked-emails/{id}/delete', 'Admin\BlockedEmails\BlockedEmailsController@delete')->name('admin.blocked-email.delete');
+
     // Стоп-слова
     Route::get('/stop-words', 'Admin\StopWord\StopWordController@index')->name('admin.stop-word');
     Route::post('/stop-words/check', 'Admin\StopWord\StopWordController@check')->name('admin.stop-word.check');

@@ -83,6 +83,12 @@
                     <span class="hide-menu">Валюты</span>
                 </a>
             </li>
+            <li class="sidebar-item">
+                <a href="{{ route('admin.blocked-emails') }}" class="sidebar-link">
+                    <i class="mdi mdi-stop-circle"></i>
+                    <span class="hide-menu">Заблок. адреса</span>
+                </a>
+            </li>
         </ul>
     </li>
 
