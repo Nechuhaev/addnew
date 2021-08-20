@@ -1,6 +1,6 @@
 <div class="columns columns-nowrap empty-category">
     <aside class="column-left hidden-xs">
-        <img src="https://cdn.pixabay.com/photo/2018/05/22/18/26/robot-3422113_960_720.png" style="max-width: 100%" alt="">
+        <img src="https://cdn.pixabay.com/photo/2018/05/22/18/26/robot-3422113_960_720.png" style="max-width: 100%" alt="изображение робота">
     </aside>
     <div class="column-content">
         <p class="heading">А уже все продано!</p>

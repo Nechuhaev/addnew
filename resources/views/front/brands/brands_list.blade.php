@@ -19,27 +19,27 @@
 
                 <div class="brands__list">
                     <a href="#" class="brands__list__item">
-                        <img src="https://placehold.it/1000x1000" alt="">
+                        <img src="https://placehold.it/1000x1000" alt="brand 1">
                         <h2 class="brand__name">Lorem ipsum</h2>
                     </a>
 
                     <div class="brands__list__item">
-                        <img src="https://placehold.it/1000x1000" alt="">
+                        <img src="https://placehold.it/1000x1000" alt="brand 2">
                         <h2 class="brand__name">Lorem ipsum</h2>
                     </div>
 
                     <div class="brands__list__item">
-                        <img src="https://placehold.it/1000x1000" alt="">
+                        <img src="https://placehold.it/1000x1000" alt="brand 3">
                         <h2 class="brand__name">Lorem ipsum</h2>
                     </div>
 
                     <div class="brands__list__item">
-                        <img src="https://placehold.it/1000x1000" alt="">
+                        <img src="https://placehold.it/1000x1000" alt="brand 4">
                         <h2 class="brand__name">Lorem ipsum</h2>
                     </div>
 
                     <div class="brands__list__item">
-                        <img src="https://placehold.it/1000x1000" alt="">
+                        <img src="https://placehold.it/1000x1000" alt="brand 5">
                         <h2 class="brand__name">Lorem ipsum</h2>
                     </div>
 

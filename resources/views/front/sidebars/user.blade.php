@@ -18,7 +18,7 @@
     <h2 class="account-h2">Информация об учётной записи</h2>
     <div class="account-author author">
         <div class="author-photo">
-            <img alt="" src="{{ Auth::user()->image ?? 'https://secure.gravatar.com/avatar/f17c59914122f91f742418889e41b124?s=250&amp;d=mm&amp;r=g' }}" class="author-avatar" height="250" width="250">
+            <img alt="аватар профиля" src="{{ Auth::user()->image ?? 'https://secure.gravatar.com/avatar/f17c59914122f91f742418889e41b124?s=250&amp;d=mm&amp;r=g' }}" class="author-avatar" height="250" width="250">
         </div>
         <ul class="author-info">
             <li><strong>{{ Auth()->user()->email }}</strong></li>

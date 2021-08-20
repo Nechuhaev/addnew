@@ -79,7 +79,7 @@
 <div class="nav-mobile"> <!-- open -->
     <div class="nav-top">
         <div class="header-logo">
-            <a href="{{ route('index') }}"><img src='{{ asset('assets/front/img/logo.png') }}' alt=""></a>
+            <a href="{{ route('index') }}"><img src='{{ asset('assets/front/img/logo.png') }}' alt="логотип"></a>
         </div>
         <div class="btn-bars">
             <i class="icon-arrow-left">&nbsp;</i>
@@ -153,7 +153,7 @@
                     <i class="icon-bars">&nbsp;</i>
                 </div>
                 <div class="header-logo">
-                    <a href="{{ route('index') }}"><img src='{{ asset('assets/front/img/logo.png') }}' alt=""></a>
+                    <a href="{{ route('index') }}"><img src='{{ asset('assets/front/img/logo.png') }}' alt="логотип"></a>
                 </div>
 
                 <div class="header-account">

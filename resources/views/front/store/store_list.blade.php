@@ -33,7 +33,7 @@
                             @foreach($shop_users->items() as $shop_user)
                                 <div class="stores__list__item">
                                     <div class="stores__list__item-logo">
-                                        <img src="{{ $shop_user->image ?? asset('assets/front/img/placeholder.png') }}" alt="">
+                                        <img src="{{ $shop_user->image ?? asset('assets/front/img/placeholder.png') }}" alt="изображение {{ $shop_user->username }}">
                                     </div>
                                     <div class="stores__list__item-content">
                                         <div class="stores__list__item-name">{{ $shop_user->username }}</div>

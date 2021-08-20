@@ -37,7 +37,7 @@
 
                         <div class="account-author author-edit">
                             <div class="author-photo">
-                                <img alt="" src="{{ $user->image ?? 'https://secure.gravatar.com/avatar/f17c59914122f91f742418889e41b124?s=250&amp;d=mm&amp;r=g' }}" class="author-avatar" height="250" width="250">
+                                <img alt="аватар автора" src="{{ $user->image ?? 'https://secure.gravatar.com/avatar/f17c59914122f91f742418889e41b124?s=250&amp;d=mm&amp;r=g' }}" class="author-avatar" height="250" width="250">
                             </div>
 
                             <div class="upload-file upload-avatar">
