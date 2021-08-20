@@ -234,6 +234,7 @@ class Ad extends Model
             $ads[] = [
                 'id' => $ad->id,
                 'name' => $ad->name,
+                'user_id' => $ad->user_id,
                 'date_active' => date ("Y-m-d H:i", strtotime($ad->date_active)),
                 'url' => route('ad.page', ['slug' => $ad->slug]),
                 'image' => $image,
@@ -259,6 +260,7 @@ class Ad extends Model
                 'ads.image',
                 'ads.content',
                 'ads.price',
+                'ads.user_id',
                 'ads.currency_id',
                 'ad_cities.id AS city_id',
                 'ad_cities.name AS city',

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Front\Ad;
 
 use App\Ad;
+use App\User;
 use App\AdCategory;
 use App\AdCity;
 use App\AdCountry;
@@ -108,6 +109,11 @@ class Category extends Controller
 
         $ads = Ad::getLoopArray($results);
 
+        for ($i=0; $i < count($ads); $i++) { 
+            $user = User::find($ads[$i]['user_id']);
+            $ads[$i]['author_name'] = $user->firstname;
+        }
+        
         return view('front.ad.category')->with([
             'entity' => $entity,
             'filters' => $this->getFilters(),
