@@ -21,6 +21,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::get('/ad/category/autocomplete/{name?}', 'API\Ad\Category@autocomplete');
 Route::get('/ad/category/children/{parent_id?}', 'API\Ad\Category@getChildren');
 Route::get('/ad/city/autocomplete/{name?}', 'API\Ad\City@autocomplete');
+Route::get('/ad/item/autocomplete/{name?}', 'API\Ad\Item@autocomplete');
 Route::get('/ad/tag/autocomplete/{name?}', 'API\Ad\Tag@autocomplete');
 Route::get('/user/autocomplete/{search?}', 'API\User@autocomplete');
 // Объявления > Страны

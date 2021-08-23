@@ -15,7 +15,6 @@ class CreateBlockedEmailsTable extends Migration
     {
         Schema::create('blocked_emails', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->timestamps();
             $table->string('mailbox');
         });
     }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Front\User\Auth;
 use App\Http\Controllers\Controller;
 use App\Mail\UserPasswordDetails;
 use App\User;
+use App\BlockedEmail;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\Request;
@@ -43,6 +44,23 @@ class RegisterController extends Controller
     public function __construct()
     {
         $this->middleware('guest');
+
+        $emails = BlockedEmail::all();
+        // Validator::extend("blocked-emails", function($attribute, $value, $parameters) {
+        //     $rules = [
+        //         'email' => 'required|email',
+        //     ];
+        //     foreach ($emails as $email) {
+        //         $data = [
+        //             'email' => $email
+        //         ];
+        //         $validator = Validator::make($data, $rules);
+        //         if ($validator->fails()) {
+        //             return false;
+        //         }
+        //     }
+        //     return true;
+        // });
     }
 
     /**

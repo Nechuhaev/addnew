@@ -8,7 +8,7 @@
             </div>
             <div class="col-7 align-self-center">
                 <div class="d-flex align-items-center justify-content-end">
-
+                    <a href="/admin/blocked-emails/new" style="color:white;" class="btn btn-success">Добавить</a>
                 </div>
             </div>
         </div>
@@ -37,8 +37,8 @@
                     </div>
                 </div>
                 @foreach($emails as $email)
-                    <div class="card">
-                        <div class="card-body">
+                    <div class="card" style="margin-bottom:3px;">
+                        <div class="card-body" style="padding: 0.25rem;">
                             <div class="row align-items-center">
                                 <div class="col-3">
                                     <div><small class="text-muted">ID</small></div>

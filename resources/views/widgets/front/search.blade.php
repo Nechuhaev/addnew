@@ -2,7 +2,7 @@
     <div class="container">
         <form class="search" method="get" action="{{ $config['action'] }}">
             <div class="form-group">
-                <input type="text" class="form-control" name="s" value="{{ $config['search_term'] }}" placeholder="Что ищем?">
+                <input type="text" id="autocomplete_i" class="form-control" name="s" value="{{ $config['search_term'] }}" placeholder="Что ищем?">
             </div>
             <div class="search-mob">
                 <div class="form-group">

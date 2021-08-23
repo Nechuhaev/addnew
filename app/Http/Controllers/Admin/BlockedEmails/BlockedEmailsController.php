@@ -28,16 +28,15 @@ class BlockedEmailsController extends Controller
 
     public function create(Request $request)
     {
+
         $errors = [
             'mailbox.required' => "Введите почтовый ящик",
         ];
-
         $request->validate([
             'mailbox' => 'required',
         ], $errors);
-        $data = $request->all();
-
         
+        $data = $request->all();
 
         $mailbox = new BlockedEmail;
         $mailbox->mailbox = $data['mailbox'];

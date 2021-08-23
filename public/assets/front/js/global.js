@@ -30,6 +30,32 @@ var modal = {
 
 $("#autocomplete_c").easyAutocomplete(options);
 
+
+
+
+// Автокомплит для основного ввода
+var optionsMain = {
+    url: function(phrase) {
+        if (phrase.length > 2 && phrase.length < 9 ) {
+            return "/api/ad/item/autocomplete/" + phrase;
+        }
+    },
+    getValue: "name",
+    list: {
+        match: {
+            enabled: true
+        }
+    },
+    template: {
+		type: "iconLeft",
+		fields: {
+			iconSrc: "image"
+		}
+	}
+};
+
+$("#autocomplete_i").easyAutocomplete(optionsMain);
+
 // Подтягиваем категорию при выборе родительской для поиска
 $('#search_category').on('change', function () {
     var value = $(this).val();

@@ -23,7 +23,7 @@
             <div class="card">
                 <div class="card-body">
                     <div class="form-group col-8" style="display:inline-block;">
-                        <label for="email" class="col-md-12">Ящик</label>
+                        <label for="mailbox" class="col-md-12">Ящик</label>
                         <div class="col-md-12">
                             <input type="text required"
                                    name="mailbox"
