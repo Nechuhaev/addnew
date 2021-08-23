@@ -14,6 +14,7 @@ class City extends Controller
 
         if ($name) {
             $cities = AdCity::where('name', 'like', "%$name%")->orderBy('name', 'asc')
+                ->where('region_id', 642)
                 ->take(10)
                 ->get();
         } else {
