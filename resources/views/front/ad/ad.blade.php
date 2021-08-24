@@ -80,6 +80,15 @@
                         @include('front.adsense.ad-left')
                     </div>
                     @widget('front.adTags', ['tags' => $ad->tags()->get()])
+
+                    @if(env('APP_ENV') == 'production')
+                    <div class="adv-location">
+                        <div class="adv-h">Расположение:</div>
+
+                        <div id="map" style="display: block; position: relative; overflow: hidden; min-height: 300px"></div>
+                    </div>
+                    @endif
+                    
                 </aside>
                 <div class="column-content">
                     <div class="adv-title">
@@ -213,14 +222,6 @@
                     <div class="banner">
                         @include('front.adsense.ad-middle')
                     </div>
-
-                    @if(env('APP_ENV') == 'production')
-                    <div class="adv-location">
-                        <div class="adv-h">Расположение:</div>
-
-                        <div id="map" style="display: block; position: relative; overflow: hidden; min-height: 300px"></div>
-                    </div>
-                    @endif
 
                     @if ($ad->email)
                     <div class="adv-callback">
