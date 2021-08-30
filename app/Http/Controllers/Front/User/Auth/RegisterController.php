@@ -44,23 +44,6 @@ class RegisterController extends Controller
     public function __construct()
     {
         $this->middleware('guest');
-
-        $emails = BlockedEmail::all();
-        // Validator::extend("blocked-emails", function($attribute, $value, $parameters) {
-        //     $rules = [
-        //         'email' => 'required|email',
-        //     ];
-        //     foreach ($emails as $email) {
-        //         $data = [
-        //             'email' => $email
-        //         ];
-        //         $validator = Validator::make($data, $rules);
-        //         if ($validator->fails()) {
-        //             return false;
-        //         }
-        //     }
-        //     return true;
-        // });
     }
 
     /**
@@ -89,8 +72,19 @@ class RegisterController extends Controller
             'email.unique' => __('errors.email.unique'),
         ];
 
+        Validator::extend('not_from_block_list',function($attribute, $value, $parameters){
+            $emails = BlockedEmail::all();
+            $mailbox = stristr($value, '@');
+            foreach ($emails as $email) {
+                if ('@'.$email->mailbox === $mailbox) {
+                    return false;
+                }
+            }
+            return true;
+        }, "Почтовые адреса этого сервиса не поддерживается нашим сайтом. Пожалуйста, воспользуйтесь другим почтовым сервисом.");
+
         return Validator::make($data, [
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users', 'not_from_block_list'],
         ], $errors);
     }
 
