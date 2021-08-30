@@ -15,7 +15,6 @@
                         <i class="st-1"><strong>Размещено:</strong><span class="st-1">{{ $ad['date_active'] }}</span></i>
 {{--                        <i class="st-1"><strong>Страна:</strong><span class="st-1"><a href="{{ $ad['country_url'] }}">{{ $ad['country'] }}</a></span></i>--}}
                         <i class="st-1"><strong>Город:</strong><span class="st-1"><a href="{{ $ad['city_url'] }}">{{ $ad['city'] }}</a></span></i>
-                        <i class="st-1"><strong>Автор:</strong><span class="st-1"><a href="/author/{{ $ad['user_id'] }}">{{ $ad['author_name'] }}</a></span></i>
                     </p>
                 </div>
                 <div class="category-price">
