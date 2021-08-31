@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Front\Ad;
 
 use App\Ad;
 use App\AdTag;
+use App\User;
 use App\Http\Controllers\Controller;
 use App\SeoField;
 use Illuminate\Http\Request;
@@ -44,7 +45,13 @@ class Tag extends Controller
             ->where('ad_tag.tag_id', $entity->id)
             ->paginate(15);
 
-        $ads = Ad::getLoopArray($results);
+        $adsOld = Ad::getLoopArray($results);
+        $ads = [];
+        foreach ($adsOld as $ad) {
+            $user = User::find($ad['user_id']);
+            $ad['author_name'] = $user->firstname ? $user->firstname : $user->email;
+            $ads[] = $ad;
+        }
 
         $microdata_info = DB::table('ad_tags')
             ->selectRaw('min(ads.price) as min, max(ads.price) as max, count(ads.id) as ads_count')
