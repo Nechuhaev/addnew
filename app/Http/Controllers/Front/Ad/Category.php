@@ -111,7 +111,7 @@ class Category extends Controller
 
         for ($i=0; $i < count($ads); $i++) { 
             $user = User::find($ads[$i]['user_id']);
-            $ads[$i]['author_name'] = $user->firstname;
+            $ads[$i]['author_name'] = $user->firstname ? $user->firstname : $user->email;
         }
         
         return view('front.ad.category')->with([

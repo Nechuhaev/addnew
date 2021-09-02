@@ -134,6 +134,11 @@ class Country extends Controller
 
         $ads = Ad::getLoopArray($results);
 
+        for ($i=0; $i < count($ads); $i++) { 
+            $user = User::find($ads[$i]['user_id']);
+            $ads[$i]['author_name'] = $user->firstname ? $user->firstname : $user->email;
+        }
+
         $microdata_info = DB::table('ad_countries')
             ->selectRaw('min(ads.price) as min, max(ads.price) as max, count(ads.id) as ads_count')
             ->leftJoin('ad_regions', 'ad_regions.country_id', '=', 'ad_countries.id')
