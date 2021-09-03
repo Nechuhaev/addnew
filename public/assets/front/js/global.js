@@ -98,8 +98,8 @@ $('.btn-subscribe-trigger').on('click', function () {
 });
 
 $('.form-control').on("keypress", function() {
-    if (this.value.match(/[^а-яА-Яа-яЁёЇїІіЄєҐґa-zA-Z0-9.@]/s)) {
-        this.value = this.value.replace(/[^а-яА-Яа-яЁёЇїІіЄєҐґa-zA-Z0-9.@]/s, '');
+    if (this.value.match(/[^а-яА-Яа-яЁёЇїІіЄєҐґa-zA-Z0-9.@ -]/s)) {
+        this.value = this.value.replace(/[^а-яА-Яа-яЁёЇїІіЄєҐґa-zA-Z0-9.@ -]/s, '');
         return false;
     }
 });

@@ -26,6 +26,10 @@ class Item extends Controller
 
         for ($i=0; $i < 10; $i++) { 
             $category = AdCategory::find($items[$i]->category_id);
+            if ($category->parent_id != '0') {
+                $category = AdCategory::find($category->parent_id);
+            }
+            
             $items[$i]->image = '/'.$category->image;
         }
 
