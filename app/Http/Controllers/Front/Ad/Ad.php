@@ -15,6 +15,7 @@ use App\Mail\AdDetails;
 use App\Mail\UserPasswordDetails;
 use App\SeoField;
 use App\User;
+use App\BlockedEmail;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -205,6 +206,18 @@ class Ad extends Controller
         }
 
         if ($request->method() == 'POST') {
+
+            Validator::extend('not_from_block_list',function($attribute, $value, $parameters){
+                $emails = BlockedEmail::all();
+                $mailbox = stristr($value, '@');
+                foreach ($emails as $email) {
+                    if ('@'.$email->mailbox === $mailbox) {
+                        return false;
+                    }
+                }
+                return true;
+            }, "Почтовые адреса этого сервиса не поддерживается нашим сайтом. Пожалуйста, воспользуйтесь другим почтовым сервисом.");
+
             $errors = [
                 'author.required' => 'Введите имя автора объявления',
                 'author.min' => 'Имя автора не может быть короче :min символов',
@@ -232,7 +245,7 @@ class Ad extends Controller
                 'author' => 'sometimes|required|min:3',
                 'telephone' => 'required|min:6',
                 'city_id' => 'required|exists:ad_cities,id',
-                'email' => 'sometimes|required|email',
+                'email' => 'sometimes|required|email|not_from_block_list',
                 'name' => 'required|min:6',
                 'content' => 'required|min:70',
                 'tags' => 'required|min:3',
