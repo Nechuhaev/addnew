@@ -4,3 +4,6 @@
     max-height: 30px;
     float: left;
 }
+.eac-icon-left .eac-item img[src="undefined"] {
+    display: none;
+}
