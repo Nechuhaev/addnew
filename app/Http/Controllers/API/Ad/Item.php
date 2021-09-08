@@ -20,9 +20,25 @@ class Item extends Controller
                 ->take(10)
                 ->get();
 
-            $items = Ad::where('name', 'like', "%$name%")->orderBy('name', 'asc')
-                ->take(10)
-                ->get();
+                
+            $results = Ad::getAds();
+            $results->where(function($query) use ($name) {
+                $query->where('ads.name', 'LIKE', "%".$name."%")
+                    ->orWhere('ads.content', 'LIKE', "%".$name."%")
+                    ->take(10);
+            });
+            $results = $results->paginate(11);
+
+            $items = [];
+            foreach ($results as $ad) {
+                $category = AdCategory::find($ad->category_id);
+                if ($category->parent_id != '0') {
+                    $category = AdCategory::find($category->parent_id);
+                }
+                $ad->image = '/'.$category->image;
+                $items[] = $ad;
+            }
+
         } else {
             $cities = null;
             $items = Ad::orderBy('region_id', 'desc')
@@ -30,23 +46,16 @@ class Item extends Controller
                 ->take(10)
                 ->get();
         }
-
-        for ($i=0; $i < 10; $i++) { 
-            $category = AdCategory::find($items[$i]->category_id);
-            if ($category->parent_id != '0') {
-                $category = AdCategory::find($category->parent_id);
-            }
-            $items[$i]->image = '/'.$category->image;
-        }
         
         if ($cities) {
             foreach ($items as $attr => $value) {
                 $cities[] = $value;
             }
+        } else {
+            $cities = $items;
         }
 
         if ($items) {
-            //return CityResourse::collection($cities);
             return response()->json($cities);
         } else {
             return response()->json(['error' => 'Объявлений не найдено']);

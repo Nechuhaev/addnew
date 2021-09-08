@@ -4,7 +4,7 @@
             <div class="form-group">
                 <input type="text" id="autocomplete_i" class="form-control" name="s" value="{{ $config['search_term'] }}" placeholder="Что ищем?">
             </div>
-            <div class="search-mob">
+            <!-- <div class="search-mob">
                 <div class="form-group">
                     <select class="form-control" name="cat_id" id="search_category" style="width: 100%;">
                         <option value="0">Выберите категорию</option>
@@ -27,7 +27,7 @@
                     <input type="text" class="form-control" id="autocomplete_c" value="{{ $config['city'] }}" placeholder="Горoд для поиска">
                     <input type="hidden" name="city_id" id="search_city_id" value="{{ $config['city_id'] }}">
                 </div>
-            </div>
+            </div> -->
             <div class="search-button">
                 <button class="btn btn-search">Поиск</button>
                 <a href="#" class="view-more">Уточнить поиск</a>

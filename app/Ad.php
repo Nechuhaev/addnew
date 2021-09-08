@@ -254,6 +254,7 @@ class Ad extends Model
     {
         return DB::table('ads')
             ->select(['ads.id',
+                'ads.category_id',
                 'ads.slug',
                 'ads.date_active',
                 'ads.name',
