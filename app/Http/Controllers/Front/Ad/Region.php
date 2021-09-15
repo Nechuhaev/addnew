@@ -6,6 +6,7 @@ use App\Ad;
 use App\AdCategory;
 use App\AdCity;
 use App\AdRegion;
+use App\AdCountry;
 use App\AdTag;
 use App\Http\AdSense;
 use App\Http\Controllers\Controller;
@@ -120,6 +121,50 @@ class Region extends Controller
             'tags' => [],
             'shop_users' => $shop_users,
             'ads_groups' => [],
+        ]);
+    }
+
+    public function all() {
+        $entity = AdCountry::getCurrentCountry();
+        $seo_field = SeoField::where('index', 'ad-country')->first();
+
+        $entity_values = [
+            '---country_name---'  => $entity->name
+        ];
+        $meta = [
+            'meta_title' => strtr($seo_field->meta_title, $entity_values) ?? strtr($seo_field->meta_title, $entity_values),
+            'meta_description' => strtr($seo_field->meta_description, $entity_values) ?? strtr($seo_field->meta_description, $entity_values),
+            'description' => strtr($seo_field->description, $entity_values) ?? strtr($seo_field->description, $entity_values)
+        ];
+        
+        $results = Ad::getAds()
+            ->selectRaw('COUNT(ads.id) as ads_count')
+            ->where('country_id', $entity->id)
+            ->groupBy('region_id')
+            ->orderBy('name')
+            ->get()->toArray();
+
+             
+        $ids = array_column($results, 'region_id');
+        $ads_counts = array_column($results, 'ads_count', 'region_id');
+        $filters = AdRegion::find($ids);
+        
+        $data = [];
+        foreach ($filters as $filter) {
+
+            $data[] = [
+                'name' => $filter->name,
+                'ads_count' => $ads_counts[$filter->id],
+                'url' => '/regions/ukraine/'.$filter->slug,
+                'image' => $filter->image ?? null,
+            ];
+        }
+
+        return view('front.page.regions')->with([
+            'entity' => $entity,
+            'breadcrumbs' => 'country.page',
+            'filters' => $data,
+            'meta' => $meta
         ]);
     }
 }

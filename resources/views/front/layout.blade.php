@@ -196,6 +196,7 @@
             <ul class="footer-menu">
                 <li><a href="/">Главная</a></li>
                 <li><a href="{{ route('blog.index') }}">Блог</a></li>
+                <li><a href="{{ route('country.regions') }}">Регионы</a></li>
 {{--                <li><a href="{{ route('countries') }}">Страны</a></li>--}}
                 <li><a href="{{ route('contacts') }}">Контакты</a></li>
                 @if($pages)

@@ -218,10 +218,7 @@ Route::middleware(['localized'])->group(function () {
 //Route::get('/regions/', 'Front\Ad\Country@getList')->name('countries');
 //Route::get('/regions/{country}', 'Front\Ad\Country@page')->name('country.page');
 
-
-    Route::get('/regions/', function () {
-        return redirect( '/', 301);
-    })->name('countries');
+    Route::get('/regions/', 'Front\Ad\Region@all')->name('country.regions');
     Route::get('/regions/{country}', function () {
         return redirect( '/', 301);
     })->name('country.page');
