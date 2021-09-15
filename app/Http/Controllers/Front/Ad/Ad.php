@@ -512,13 +512,23 @@ class Ad extends Controller
             'currency_id.*' => 'Выберите валюту из списка!',
         ];
 
+        Validator::extend('not_from_block_list',function($attribute, $value, $parameters){
+            $emails = BlockedEmail::all();
+            $mailbox = stristr($value, '@');
+            foreach ($emails as $email) {
+                if ('@'.$email->mailbox === $mailbox) {
+                    return false;
+                }
+            }
+            return true;
+        }, "Почтовые адреса этого сервиса не поддерживается нашим сайтом. Пожалуйста, воспользуйтесь другим почтовым сервисом.");
 
         $validator = Validator::make($ad, [
             'category_id' => 'required|integer|exists:ad_categories,id',
             'author' => 'sometimes|required|min:3',
             'telephone' => 'required|min:6',
             'city_id' => 'required|exists:ad_cities,id',
-            'email' => 'required|required|email',
+            'email' => 'required|required|email|not_from_block_list',
             'name' => 'required|min:6',
             'content' => 'required|min:70',
             'images' => 'required',
@@ -554,6 +564,36 @@ class Ad extends Controller
                 $user = Auth::user();
             }
 
+            // Добавить в MailChimp
+            $email = $ad['email'];
+
+            $apiKey = '94492d7246f58de6bdc22950014e9744-us19';
+            $listId = 'b435fcadb5';
+
+            $memberId = md5(strtolower($email));
+            $dataCenter = substr($apiKey,strpos($apiKey,'-')+1);
+            $url = 'https://' . $dataCenter . '.api.mailchimp.com/3.0/lists/' . $listId . '/members/' . $memberId;
+            //dd($url);
+
+            $json = json_encode([
+                'email_address' => $email,
+                'status'        => 'subscribed',
+            ]);
+
+            $ch = curl_init($url);
+
+            curl_setopt($ch, CURLOPT_USERPWD, 'user:' . $apiKey);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
+
+            $result = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+            
             // Добавить объявление
             $ad['user_id'] = $user->id;
             $ad['name'] = strip_tags($ad['name']);
@@ -567,7 +607,7 @@ class Ad extends Controller
 
             $images = [];
             foreach ($ad['images'] as $key => $image) {
-
+                //ошибка
                 if (!$disk->exists($image)) {
                     $disk->put($image, Storage::get('public/'. $image), 'public');
                 }
