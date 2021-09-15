@@ -230,6 +230,7 @@ class Ad extends Model
 //            }
             //$image = $ad->image;
 
+            $category = AdCategory::find($ad->category_id);
 
             $ads[] = [
                 'id' => $ad->id,
@@ -241,7 +242,7 @@ class Ad extends Model
                 'price' => AdCurrency::convert($ad->price),
                 'content' => Str::words(strip_tags($ad->content), 20, "..."),
                 'city' => $ad->city,
-                'city_url' => route('city.page', ['country' => $ad->country_slug, 'region' => $ad->region_slug, 'city' => $ad->city_slug]),
+                'city_url' => $category->getFilteredUrl($ad->city_slug),
                 'country' => $ad->country,
                 'country_url' => route('country.page', ['country' => $ad->country_slug])
             ];
