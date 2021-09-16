@@ -91,6 +91,12 @@ return [
             'level' => 'debug',
         ],
 
+        'mail' => [
+            'driver' => 'single',
+            'path' => 'logs/mail.log',
+            'level' => 'debug',
+        ],
+
         'null' => [
             'driver' => 'monolog',
             'handler' => NullHandler::class,

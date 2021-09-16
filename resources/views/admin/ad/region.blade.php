@@ -148,6 +148,7 @@
                             <th>Область (Регион)</th>
                             <th>Страна</th>
                             <th style="max-width: 80px" class="text-center">Городов</th>
+                            <th style="max-width: 80px" class="text-center"><a style="color: black" href="?order=ads_count&direction={{ ($direction == 'asc') ? 'desc' : 'asc'  }}">Кол-во</a> {!! ($order == 'ads_count') ? ($direction != 'asc') ? '<i class="mdi mdi-arrow-down"></i>' : '<i class="mdi mdi-arrow-up"></i>' : '';   !!}</th>
                             <th class="text-center cell-actions">
                             </th>
                         </tr>
@@ -158,6 +159,7 @@
                                 <td><b>{{ $region_item->name }}</b></td>
                                 <td>{{ $region_item->country->name }}</td>
                                 <td style="max-width: 80px" class="text-center">{{ $region_item->cities->count() }}</td>
+                                <td style="max-width: 80px" class="text-center">{{ $region_item->ads_count }}</td>
                                 <td class="text-center cell-actions">
                                     <a href="{{ route('admin.adRegions.edit', ['id' => $region_item->id]) }}"><i class="mdi mdi-18px mdi-table-edit"></i></a>
                                     <a href="{{ route('admin.adRegions.delete', ['id' => $region_item->id]) }}" onclick="return confirm('Вы пытаетесь удалить регион {{ $region_item->name }}. Подтвердите действие.')" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>

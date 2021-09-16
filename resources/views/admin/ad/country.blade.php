@@ -143,6 +143,7 @@
                                 <th>Страна</th>
                                 <th class="text-center" style="max-width: 50px">Областей</th>
                                 <th class="text-center" style="max-width: 50px">Городов</th>
+                                <th class="text-center" style="max-width: 80px"><a style="color: black" href="?order=ads_count&direction={{ ($direction == 'asc') ? 'desc' : 'asc'  }}">Кол-во</a> {!! ($order == 'ads_count') ? ($direction != 'asc') ? '<i class="mdi mdi-arrow-down"></i>' : '<i class="mdi mdi-arrow-up"></i>' : '';   !!}</th>
                                 <th></th>
                             </tr>
                             @foreach($countries as $country_item)
@@ -151,6 +152,7 @@
                                     <td><b>{{ $country_item->name }}</b></td>
                                     <td class="text-center" style="max-width: 50px">{{ $country_item->regions->count() }}</td>
                                     <td class="text-center" style="max-width: 50px">{{ $country_item->total_cities }}</td>
+                                    <td class="text-center">{{ $country_item->ads_count }}</td>
                                     <td class="text-center cell-actions">
                                         <a href="{{ route('admin.adCountries.edit', ['id' => $country_item->id]) }}"><i class="mdi mdi-18px mdi-table-edit"></i></a>
                                         <a href="{{ route('admin.adCountries.delete', ['id' => $country_item->id]) }}" onclick="return confirm('Вы пытаетесь удалить страну {{ $country_item->name }}. Подтвердите действие.')" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>

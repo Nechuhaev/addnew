@@ -109,9 +109,15 @@
 
                     @if($tags->items())
                         <table class="table table-bordered table-hover table-middle-cell">
+                            <tr>
+                                <th class="text-center">Метка</th>
+                                <th><a style="color: black; width: 100px" href="?order=ads_count&direction={{ ($direction == 'asc') ? 'desc' : 'asc'  }}">Кол-во</a> {!! ($order == 'ads_count') ? ($direction != 'asc') ? '<i class="mdi mdi-arrow-down"></i>' : '<i class="mdi mdi-arrow-up"></i>' : '';   !!}</th>
+                                <th class="text-center"></th>
+                            </tr>
                             @foreach($tags as $tag)
                                 <tr>
                                     <td>{{ $tag->name }}</td>
+                                    <td style="width: 100px" class="text-center">{{ $tag->ads_count }}</td>
                                     <td class="text-center cell-actions">
                                         <a href="{{ route('admin.adTags.edit', ['id' => $tag->id]) }}"><i class="mdi mdi-18px mdi-table-edit"></i></a>
                                         <a href="{{ route('admin.adTags.delete', ['id' => $tag->id]) }}" onclick="return confirm('Вы пытаетесь удалить метку {{ $tag->name }}. Подтвердите действие.')" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>

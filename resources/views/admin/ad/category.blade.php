@@ -146,6 +146,7 @@
                                 <tr>
                                     <th>{{ $item['name'] }}</th>
                                     <th></th>
+                                    <th><a style="color: black; width: 100px" href="?order=ads_count&direction={{ ($direction == 'asc') ? 'desc' : 'asc'  }}">Кол-во</a> {!! ($order == 'ads_count') ? ($direction != 'asc') ? '<i class="mdi mdi-arrow-down"></i>' : '<i class="mdi mdi-arrow-up"></i>' : '';   !!}</th>
                                     <th class="text-center cell-actions">
                                         <a href="{{ route('admin.adCategories.edit', ['id' => $item['id']]) }}"><i class="mdi mdi-18px mdi-table-edit"></i></a>
                                         <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
@@ -156,6 +157,7 @@
                                         <tr>
                                             <td></td>
                                             <td>{{ $child['name'] }}</td>
+                                            <td style="width: 100px">{{ $child['ads_count'] }}</td>
                                             <td class="text-center cell-actions">
                                                 <a href="{{ route('admin.adCategories.edit', ['id' => $child['id']]) }}"><i class="mdi mdi-18px mdi-table-edit"></i></a>
                                                 <a href="{{ route('admin.adCategories.delete', ['id' => $child['id']]) }}" onclick="return confirm('Вы пытаетесь удалить категорию {{ $child['name'] }}. Подтвердите действие.')" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>

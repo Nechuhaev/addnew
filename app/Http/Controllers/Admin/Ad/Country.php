@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin\Ad;
 
 use App\AdCountry;
+use App\Ad;
+use Illuminate\Pagination\LengthAwarePaginator;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -10,11 +12,66 @@ class Country extends Controller
 {
     private $per_page = 20;
 
-    public function showForm($country_id = null)
+    public function showForm(Request $request, $country_id = null)
     {
+        $direction = $request->get('direction') ?? 'ASC';
+        $order = $request->get('order') ?? 'name';
+        $page = $request->get('page') ?? 1;
+
         $countries = AdCountry::select('id', 'image', 'name')
-            ->orderBy('name', 'asc')
-            ->paginate($this->per_page);
+            ->orderBy('name', 'asc')->get();
+
+        //получаем кол-во
+        foreach ($countries as $country) {
+            $count = 0;
+            foreach ($country->regions as $region) {
+                foreach ($region->cities as $city) {
+                    $count += Ad::where('city_id', '=', $city->id)->count();
+                }
+            }
+            $country['ads_count'] = $count;
+        }
+
+        if ($order == 'ads_count') {
+            $size = count($countries);
+            //сортируем по количеству
+            if ($direction == 'desc') {
+                do {
+                    $swapped = false;
+                    for ($i = 0; $i < $size - 1; $i++) {
+                        if ($countries[$i]->ads_count < $countries[$i + 1]->ads_count) {
+                            $temp = $countries[$i];
+                            $countries[$i] = $countries[$i + 1];
+                            $countries[$i + 1] = $temp;
+                            $swapped = true;
+                        }
+                    }
+                    $size--;
+                } while ($swapped);
+            } else {
+                do {
+                    $swapped = false;
+                    for ($i = 0; $i < $size - 1; $i++) {
+                        if ($countries[$i]->ads_count > $countries[$i + 1]->ads_count) {
+                            $temp = $countries[$i];
+                            $countries[$i] = $countries[$i + 1];
+                            $countries[$i + 1] = $temp;
+                            $swapped = true;
+                        }
+                    }
+                    $size--;
+                } while ($swapped);
+            }
+        }
+
+        //пагинация
+        $countries = new LengthAwarePaginator(
+            $countries->forPage($page, $this->per_page),
+            count($countries),
+            $this->per_page,
+            $page,
+            ['path' => url('admin/countries?order='.$order.'&direction='.$direction)]
+        );
 
         $country = null;
 
@@ -28,6 +85,8 @@ class Country extends Controller
         return view('admin.ad.country')->with([
             'action' => $action,
             'country' => $country,
+            'direction' => $direction,
+            'order' => $order,
             'countries' => $countries,
             'action_search' => route('admin.adCountries.search')
         ]);

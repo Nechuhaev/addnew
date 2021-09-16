@@ -166,6 +166,7 @@
                                 <th>Город</th>
                                 <th>Регион</th>
                                 <th>Страна</th>
+                                <th><a style="color: black" href="?order=ads_count&direction={{ ($direction == 'asc') ? 'desc' : 'asc'  }}">Кол-во</a> {!! ($order == 'ads_count') ? ($direction != 'asc') ? '<i class="mdi mdi-arrow-down"></i>' : '<i class="mdi mdi-arrow-up"></i>' : '';   !!}</th>
                                 <th></th>
                             </tr>
 
@@ -175,6 +176,7 @@
                                     <td><b>{{ $city_item->name }}</b></td>
                                     <td>{{ $city_item->region->name }}</td>
                                     <td>{{ $city_item->region->country->name }}</td>
+                                    <td>{{ $city_item->ads_count }}</td>
                                     <td class="text-center cell-actions">
                                         <a href="{{ route('admin.adCities.edit', ['id' => $city_item->id]) }}"><i class="mdi mdi-18px mdi-table-edit"></i></a>
                                         <a href="{{ route('admin.adCities.delete', ['id' => $city_item->id]) }}" onclick="return confirm('Вы пытаетесь удалить город {{ $city_item->name }}. Подтвердите действие.')" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>

@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Admin\Ad;
 
 use App\AdCountry;
 use App\AdRegion;
+use App\AdCity;
+use App\Ad;
+use Illuminate\Pagination\LengthAwarePaginator;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -22,14 +25,65 @@ class Region extends Controller
      * @param null $region_id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function showForm($region_id = null) {
+    public function showForm(Request $request, $region_id = null) {
+
+        $direction = $request->get('direction') ?? 'asc';
+        $order = $request->get('order') ?? 'name';
+        $page = $request->get('page') ?? 1;
 
         $countries_list = AdCountry::select(['id', 'name'])->get()->toArray();
+        $regions = AdRegion::orderBy('name', 'ASC')->get();
+        
+        //получаем кол-во
+        foreach ($regions as $region) {
+            $count = 0;
+            foreach ($region->cities as $city) {
+                $count += Ad::where('city_id', '=', $city->id)->count();
+            }
+            $region['ads_count'] = $count;
+        }
 
-        $regions = AdRegion::orderBy('name', 'ASC')
-            ->paginate($this->per_page);
+        if ($order == 'ads_count') {
+            $size = count($regions);
+            //сортируем по количеству
+            if ($direction == 'desc') {
+                do {
+                    $swapped = false;
+                    for ($i = 0; $i < $size - 1; $i++) {
+                        if ($regions[$i]->ads_count < $regions[$i + 1]->ads_count) {
+                            $temp = $regions[$i];
+                            $regions[$i] = $regions[$i + 1];
+                            $regions[$i + 1] = $temp;
+                            $swapped = true;
+                        }
+                    }
+                    $size--;
+                } while ($swapped);
+            } else {
+                do {
+                    $swapped = false;
+                    for ($i = 0; $i < $size - 1; $i++) {
+                        if ($regions[$i]->ads_count > $regions[$i + 1]->ads_count) {
+                            $temp = $regions[$i];
+                            $regions[$i] = $regions[$i + 1];
+                            $regions[$i + 1] = $temp;
+                            $swapped = true;
+                        }
+                    }
+                    $size--;
+                } while ($swapped);
+            }
+        }
 
-
+        //пагинация
+        $regions = new LengthAwarePaginator(
+            $regions->forPage($page, $this->per_page),
+            count($regions),
+            $this->per_page,
+            $page,
+            ['path' => url('admin/regions?order='.$order.'&direction='.$direction)]
+        );
+        
         $region = null;
 
         if ($region_id) {
@@ -41,6 +95,8 @@ class Region extends Controller
         return view('admin.ad.region')->with([
             'action' => $action,
             'countries' => $countries_list,
+            'direction' => $direction,
+            'order' => $order,
             'region' => $region,
             'regions' => $regions,
             'action_search' => route('admin.adRegions.search')

@@ -8,11 +8,18 @@ use Illuminate\Http\Request;
 
 class Category extends Controller
 {
-    public function showForm($category_id = null) {
+    public function showForm(Request $request, $category_id = null) {
+        if ($request->has('order')) {
+            $order = $request->get('order');
+        } else {
+            $order = 'name';
+        }
 
-        $parent_list = AdCategory::where('parent_id', 0)->orderBy('name', 'asc')->get(['id', 'name'])->toArray();
+        $direction = $request->get('direction') ?? 'asc';
 
-        $categories = AdCategory::select(['id', 'parent_id', 'name'])->get()->toArray();
+        $parent_list = AdCategory::where('parent_id', 0)->withCount('ads')->orderBy($order, $direction)->get(['id', 'name'])->toArray();
+
+        $categories = AdCategory::withCount('ads')->orderBy($order, $direction)->get()->toArray();
 
         // Строим дерево
         $categories_tree = [];
@@ -46,6 +53,8 @@ class Category extends Controller
         return view('admin.ad.category')->with([
             'action' => $action,
             'category' => $category,
+            'direction' => $direction,
+            'order' => $order,
             'parent_list' => $parent_list,
             'tree' => $categories_tree
         ]);

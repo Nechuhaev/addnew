@@ -15,10 +15,12 @@ class Tag extends Controller
      * @param null $tag_id
      * @return $this
      */
-    public function showForm($tag_id = null)
+    public function showForm(Request $request, $tag_id = null)
     {
-        $tags = AdTag::select(['id', 'name'])
-            ->orderBy('name', "ASC")
+        $direction = $request->get('direction') ?? 'asc';
+        $order = $request->get('order') ?? 'name';
+
+        $tags = AdTag::withCount('ads')->orderBy($order, $direction)
             ->paginate($this->per_page);
 
         $tag = null;
@@ -31,6 +33,8 @@ class Tag extends Controller
 
         return view('admin.ad.tag')->with([
             'action' => $action,
+            'direction' => $direction,
+            'order' => $order,
             'tag' => $tag,
             'tags' => $tags,
             'action_search' => route('admin.adTags.search')

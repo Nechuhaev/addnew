@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\Ad;
 
 use App\AdCity;
+use App\Ad;
 use App\AdCountry;
 use App\AdRegion;
 use App\Http\Controllers\Controller;
@@ -23,20 +24,22 @@ class City extends Controller
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function showForm($city_id = null)
+    public function showForm(Request $request, $city_id = null)
     {
         $countries = AdCountry::all();
         $regions = null;
         $city = null;
 
-        $cities = AdCity::orderBy('name', 'ASC')
+        $direction = $request->get('direction') ?? 'ASC';
+        $order = $request->get('order') ?? 'name';
+        
+        $cities = AdCity::withCount('ads')->orderBy($order, $direction)
             ->paginate($this->per_page);
-
+            
 
         if ($city_id) {
             $city = AdCity::find($city_id);
             $regions = AdRegion::find($city->region_id)->country->regions;
-
 
             $action = route('admin.adCities.update');
         } else {
@@ -45,6 +48,8 @@ class City extends Controller
         return view('admin.ad.city')->with([
             'countries' => $countries,
             'regions' => $regions,
+            'direction' => $direction,
+            'order' => $order,
             'cities' => $cities,
             'city' => $city,
             'action' => $action,
