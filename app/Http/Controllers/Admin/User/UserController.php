@@ -119,4 +119,19 @@ class UserController extends Controller
         User::find($id)->delete();
         return redirect(route('admin.users'))->with('success', 'Пользователь удален. Надеюсь, Вам полегчало!');
     }
+
+    public function deleteMany($ids)
+    {
+        $ids = explode(',', $ids);
+
+        if ($ids) {
+            foreach ($ids as $id) {
+                Ad::query()->where([
+                    'user_id' => $id
+                ])->delete();
+                User::find($id)->delete();
+            }
+            return route('admin.users');
+        } 
+    }
 }

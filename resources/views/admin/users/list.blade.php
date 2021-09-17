@@ -24,7 +24,7 @@
                     <div class="card-body">
                         <form action="{{ $action_search }}" method="GET">
                             <div class="row">
-                                <div class="col-md-9">
+                                <div class="col-md-7">
                                     <input type="text"
                                            name="name"
                                            value="{{ $s ?? "" }}"
@@ -32,6 +32,9 @@
                                            class="form-control form-control-line">
                                 </div>
                                 <div class="col-md-3"><button class="btn btn-primary btn-block">Искать</button></div>
+                                <div class="col-2">
+                                    <a id="deleteMany" href="/admin/user/deleteMany" class="btn btn-danger btn-block">Удалить</a>
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -41,10 +44,11 @@
                     <div class="card-body" style="padding: 5px 1.25rem;font-weight: 900;color: #000;font-size: 12px">
                         <div class="row align-items-center">
                             <div class="col-1"></div>
+                            <div class="col-1"></div>
                             <div class="col-2">
                                 <a style="color: #6e6e6e" href="?order=username&direction={{ ($direction == 'asc') ? 'desc' : 'asc'  }}">ФИО (ЛОГИН)</a> {!! ($order == 'username') ? ($direction != 'asc') ? '<i class="mdi mdi-arrow-up"></i>' : '<i class="mdi mdi-arrow-down"></i>' : '';   !!}
                             </div>
-                            <div class="col-3">
+                            <div class="col-2">
                                 <a style="color: #6e6e6e" href="?order=email&direction={{ ($direction == 'asc') ? 'desc' : 'asc'  }}">EMAIL</a> {!! ($order == 'email') ? ($direction != 'asc') ? '<i class="mdi mdi-arrow-up"></i>' : '<i class="mdi mdi-arrow-down"></i>' : '';   !!}
                             </div>
                             <div class="col-2">
@@ -67,13 +71,16 @@
                         <div class="card-body">
                             <div class="row align-items-center">
                                 <div class="col-1">
+                                    <input type="checkbox" name="id[]" value="{{ $user->id }}">
+                                </div>
+                                <div class="col-1">
                                     <img src="{{ $user->image ?? asset('assets/front/img/placeholder.png') }}" alt="user" width="60">
                                 </div>
                                 <div class="col-2">
                                     <div><small class="text-muted">ФИО</small></div>
                                     {{ $user->username }}
                                 </div>
-                                <div class="col-3">
+                                <div class="col-2">
                                     <div><small class="text-muted">email</small></div>
                                     {{ $user->email }}
                                 </div>

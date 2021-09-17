@@ -218,4 +218,26 @@ class Region extends Controller
         return redirect(route('admin.adRegions'))->with($data);
     }
 
+    /**
+     * Удалить регионы / области
+     * @param $region_id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @throws \Exception
+     */
+    public function deleteMany($ids)
+    {
+        $ids = explode(',', $ids);
+
+        if ($ids) {
+            foreach ($ids as $id) {
+                $region = AdRegion::find($id);
+    
+                if (!$region->cities->count()) {
+                    $region->delete();
+                }
+            }
+            return route('admin.adRegions');
+        }
+    }
+
 }

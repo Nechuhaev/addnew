@@ -127,4 +127,15 @@ class Tag extends Controller
         return redirect(route('admin.adTags'))->with('success', 'Данные тега удалены');
     }
 
+    public function deleteMany($ids) {
+        $ids = explode(',', $ids);
+
+        if ($ids) {
+            foreach ($ids as $id) {
+                AdTag::find($id)->delete();
+            }
+        }
+        return route('admin.adTags');
+    }
+
 }

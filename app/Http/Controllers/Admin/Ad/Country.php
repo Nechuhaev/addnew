@@ -183,4 +183,19 @@ class Country extends Controller
         return redirect(route('admin.adCountries'))->with($data);
     }
 
+    public function deleteMany($ids)
+    {
+        $ids = explode(',', $ids);
+
+        if ($ids) {
+            foreach ($ids as $id) {
+                $country = AdCountry::find($id);
+
+                if (!$country->regions->count()) {
+                    $country->delete();
+                }
+            }
+            return route('admin.adCountries');
+        }
+    }
 }

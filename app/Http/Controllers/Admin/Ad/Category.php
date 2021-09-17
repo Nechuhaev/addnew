@@ -116,7 +116,7 @@ class Category extends Controller
     }
 
     /**
-     * Удалить категорию.
+     * Удалить категорию +все объявления категории(+все метки из объявлений).
      * В случае, если в категории есть дочерние категории
      * или объявления - уведомляем что удаление невозможно
      */
@@ -126,5 +126,19 @@ class Category extends Controller
             AdCategory::find($category_id)->delete();
         }
         return redirect(route('admin.adCategories'))->with('success', 'Категория удалена');
+    }
+
+    /**
+     * Удалить категории.
+     */
+    public function deleteMany($ids) {
+        $ids = explode(',', $ids);
+
+        if ($ids) {
+            foreach ($ids as $id) {
+                AdCategory::find($id)->delete();
+            }
+        }
+        return route('admin.adCategories');
     }
 }

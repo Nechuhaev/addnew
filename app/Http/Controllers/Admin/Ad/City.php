@@ -170,4 +170,22 @@ class City extends Controller
         return redirect(route('admin.adCities'))
             ->with('success', 'Город удален с лица земли.');
     }
+
+    /**
+     * Удалить города.
+     * @param $city_id integer Идентификатор города
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @throws \Exception
+     */
+    public function deleteMany($ids)
+    {
+        $ids = explode(',', $ids);
+
+        if ($ids) {
+            foreach ($ids as $id) {
+                AdCity::find($id)->delete();
+            }
+            return route('admin.adCities');
+        }
+    }
 }

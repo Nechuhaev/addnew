@@ -56,4 +56,16 @@ class BlockedEmailsController extends Controller
         BlockedEmail::find($id)->delete();
         return redirect(route('admin.blocked-emails'))->with('success', 'Ящик удален. Надеюсь, Вам полегчало!');
     }
+
+    public function deleteMany($ids)
+    {
+        $ids = explode(',', $ids);
+
+        if ($ids) {
+            foreach ($ids as $id) {
+                BlockedEmail::find($id)->delete();
+            }
+            return route('admin.blocked-emails');
+        }
+    }
 }

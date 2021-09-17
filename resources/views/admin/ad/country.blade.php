@@ -123,14 +123,17 @@
                 <div class="card-body">
                     <form action="{{ $action_search }}" method="GET">
                         <div class="row">
-                            <div class="col-md-8">
+                            <div class="col-md-7">
                                 <input type="text"
                                        name="name"
                                        value="{{ $requested_country ?? "" }}"
                                        placeholder="Поиск по странам"
                                        class="form-control form-control-line">
                             </div>
-                            <div class="col-md-4"><button class="btn btn-primary btn-block">Искать</button></div>
+                            <div class="col-md-3"><button class="btn btn-primary btn-block">Искать</button></div>
+                            <div class="col-2">
+                                <a id="deleteMany" href="/admin/countries/deleteMany" class="btn btn-danger btn-block">Удалить</a>
+                            </div>
                         </div>
                     </form>
 
@@ -139,6 +142,7 @@
                     @if($countries->items())
                         <table class="table table-bordered table-hover table-middle-cell">
                             <tr>
+                                <th></th>
                                 <th class="text-center">ID</th>
                                 <th>Страна</th>
                                 <th class="text-center" style="max-width: 50px">Областей</th>
@@ -148,6 +152,7 @@
                             </tr>
                             @foreach($countries as $country_item)
                                 <tr>
+                                    <td style="width: 30px"><input type="checkbox" name="id[]" value="{{ $country_item->id }}"></td>
                                     <td class="text-center">{{ $country_item->id }}</td>
                                     <td><b>{{ $country_item->name }}</b></td>
                                     <td class="text-center" style="max-width: 50px">{{ $country_item->regions->count() }}</td>

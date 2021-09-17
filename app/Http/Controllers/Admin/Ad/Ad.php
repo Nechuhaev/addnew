@@ -227,14 +227,43 @@ class Ad extends Controller
     public function delete(Request $request)
     {
         $ad = AdModel::find($request->get('ad_id'));
-
         if ($ad) {
+            $tags = AdTag::getAdTags($ad);
+            if ($tags) {
+                foreach ($tags as $tag) {
+                    AdTag::find($tag->id)->delete();
+                }
+            }
+
             $ad->delete();
             return redirect(route('admin.ads'))
                 ->with('success', 'Объявление удалено');
         } else {
             return redirect(route('admin.ads'))
                 ->with('error', 'Объявление не найдено');
+        }
+    }
+
+    public function deleteMany($ids)
+    {
+        $ids = explode(',', $ids);
+
+        if ($ids) {
+            foreach ($ids as $id) {
+                $ad = AdModel::find($id);
+                if ($ad) {
+                    $tags = AdTag::getAdTags($ad);
+                    if ($tags) {
+                        foreach ($tags as $tag) {
+                            AdTag::find($tag->id)->delete();
+                        }
+                    }
+                    $ad->delete();
+                    return route('admin.ads');
+                } else {
+                    return route('admin.ads');
+                }
+            }
         }
     }
 

@@ -288,6 +288,27 @@ var uploader = {
         //jQuery('#uploader-form').submit();
     }
 }
-
-
-
+jQuery(function () {
+    $('#deleteMany').on('click', function(e){
+        e.preventDefault();
+        const href = $('#deleteMany').attr('href');
+        var checkboxes = [];
+        $('input[name="id[]"]:checked').each(function(){
+            checkboxes.push( $(this).val() );
+        });
+        if (checkboxes.length < 1) {
+            alert("Ничего не выбрано");
+            return false;
+        } else alert(' Подтвердите удаление. Важно: Если строка не удаляется, значит сначала нужно удалить подкатегории.');
+        $.ajax({
+            type: "GET",
+            url: href+'/'+checkboxes.toString(),
+            success: function(response){
+                window.location.href = response;
+            },
+            error: function(err) { 
+              alert("Не найдено");
+            }
+        });
+    })
+})

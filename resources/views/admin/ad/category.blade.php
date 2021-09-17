@@ -131,6 +131,7 @@
                         <hr>
                         <div class="form-group text-center">
                             <button class="btn btn-success">Сохранить</button>
+                            <a id="deleteMany" href="/admin/adCategories/deleteMany" class="btn btn-danger">Удалить выбранные</a>
                         </div>
                     </form>
                 </div>
@@ -144,6 +145,7 @@
                         <table class="table table-bordered table-hover table-middle-cell">
                         @foreach($tree as $item)
                                 <tr>
+                                    <th></th>
                                     <th>{{ $item['name'] }}</th>
                                     <th></th>
                                     <th><a style="color: black; width: 100px" href="?order=ads_count&direction={{ ($direction == 'asc') ? 'desc' : 'asc'  }}">Кол-во</a> {!! ($order == 'ads_count') ? ($direction != 'asc') ? '<i class="mdi mdi-arrow-down"></i>' : '<i class="mdi mdi-arrow-up"></i>' : '';   !!}</th>
@@ -155,6 +157,7 @@
                                 @if($item['children'])
                                     @foreach($item['children'] as $child)
                                         <tr>
+                                            <td style="width: 30px"><input type="checkbox" name="id[]" value="{{ $child['id'] }}"></td>
                                             <td></td>
                                             <td>{{ $child['name'] }}</td>
                                             <td style="width: 100px">{{ $child['ads_count'] }}</td>

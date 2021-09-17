@@ -128,14 +128,17 @@
                 <div class="card-body">
                     <form action="{{ $action_search }}" method="GET">
                         <div class="row">
-                            <div class="col-md-8">
+                            <div class="col-md-7">
                                 <input type="text"
                                        name="name"
                                        value="{{ $requested_region ?? "" }}"
                                        placeholder="Поиск областей"
                                        class="form-control form-control-line">
                             </div>
-                            <div class="col-md-4"><button class="btn btn-primary btn-block">Найти область</button></div>
+                            <div class="col-md-3"><button class="btn btn-primary btn-block">Найти область</button></div>
+                            <div class="col-2">
+                                <a id="deleteMany" href="/admin/regions/deleteMany" class="btn btn-danger btn-block">Удалить</a>
+                            </div>
                         </div>
                     </form>
 
@@ -144,6 +147,7 @@
                     @if ($regions)
                     <table class="table table-bordered table-hover table-middle-cell">
                         <tr>
+                            <th></th>
                             <th class="text-center">ID</th>
                             <th>Область (Регион)</th>
                             <th>Страна</th>
@@ -155,6 +159,7 @@
 
                         @foreach($regions as $region_item)
                             <tr>
+                                <td style="width: 40px" class="text-center"><input type="checkbox" name="id[]" value="{{ $region_item->id }}"></td>
                                 <td class="text-center">{{ $region_item->id }}</td>
                                 <td><b>{{ $region_item->name }}</b></td>
                                 <td>{{ $region_item->country->name }}</td>

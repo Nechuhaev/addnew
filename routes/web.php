@@ -29,6 +29,7 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::get('/blocked-emails/new', 'Admin\BlockedEmails\BlockedEmailsController@new')->name('admin.blocked-email.new');
     Route::post('/blocked-emails/create', 'Admin\BlockedEmails\BlockedEmailsController@create')->name('admin.blocked-email.create');
     Route::get('/blocked-emails/{id}/delete', 'Admin\BlockedEmails\BlockedEmailsController@delete')->name('admin.blocked-email.delete');
+    Route::get('/blocked-emails/deleteMany/{id}', 'Admin\BlockedEmails\BlockedEmailsController@deleteMany')->name('admin.blocked-email.deleteMany');
 
     // Стоп-слова
     Route::get('/stop-words', 'Admin\StopWord\StopWordController@index')->name('admin.stop-word');
@@ -41,6 +42,7 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::get('/user/{id}', 'Admin\User\UserController@showUserInformation')->name('admin.user');
     Route::post('/user/update', 'Admin\User\UserController@update')->name('admin.user.update');
     Route::get('/user/{id}/delete', 'Admin\User\UserController@delete')->name('admin.user.delete');
+    Route::get('/user/deleteMany/{id}', 'Admin\User\UserController@deleteMany')->name('admin.user.deleteMany');
 
 
     // Объявления
@@ -55,6 +57,7 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::post('/ad/create', 'Admin\Ad\Ad@create')->name('admin.ad.create');
     Route::post('/ad/update', 'Admin\Ad\Ad@update')->name('admin.ad.update');
     Route::post('/ad/delete', 'Admin\Ad\Ad@delete')->name('admin.ad.delete');
+    Route::get('/ad/delete/{ids}', 'Admin\Ad\Ad@deleteMany')->name('admin.ad.deleteMany');
     Route::post('/ad/archive', 'Admin\Ad\Ad@archive')->name('admin.ad.archive');
 
     // Объявления > Категории
@@ -63,6 +66,7 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::post('/adCategories/create', 'Admin\Ad\Category@create')->name('admin.adCategories.create');
     Route::post('/adCategories/update', 'Admin\Ad\Category@update')->name('admin.adCategories.update');
     Route::get('/adCategories/delete/{id}', 'Admin\Ad\Category@delete')->name('admin.adCategories.delete');
+    Route::get('/adCategories/deleteMany/{id}', 'Admin\Ad\Category@deleteMany')->name('admin.adCategories.deleteMany');
 
     // Объявления > Теги
     Route::get('/adTags', 'Admin\Ad\Tag@showForm')->name('admin.adTags');
@@ -71,6 +75,7 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::post('/adTags/create', 'Admin\Ad\Tag@create')->name('admin.adTags.create');
     Route::post('/adTags/update', 'Admin\Ad\Tag@update')->name('admin.adTags.update');
     Route::get('/adTags/delete/{id}', 'Admin\Ad\Tag@delete')->name('admin.adTags.delete');
+    Route::get('/adTags/deleteMany/{ids}', 'Admin\Ad\Tag@deleteMany')->name('admin.adTags.deleteMany');
 
     // Объявления > Страны
     Route::get('/countries', 'Admin\Ad\Country@showForm')->name('admin.adCountries');
@@ -79,6 +84,7 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::post('/countries/create', 'Admin\Ad\Country@create')->name('admin.adCountries.create');
     Route::post('/countries/update', 'Admin\Ad\Country@update')->name('admin.adCountries.update');
     Route::get('/countries/delete/{id}', 'Admin\Ad\Country@delete')->name('admin.adCountries.delete');
+    Route::get('/countries/deleteMany/{ids}', 'Admin\Ad\Country@deleteMany')->name('admin.adCountries.deleteMany');
 
     // Объявления > Области / Регионы
     Route::get('/regions', 'Admin\Ad\Region@showForm')->name('admin.adRegions');
@@ -87,6 +93,7 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::post('/regions/create', 'Admin\Ad\Region@create')->name('admin.adRegions.create');
     Route::post('/regions/update', 'Admin\Ad\Region@update')->name('admin.adRegions.update');
     Route::get('/regions/delete/{id}', 'Admin\Ad\Region@delete')->name('admin.adRegions.delete');
+    Route::get('/regions/deleteMany/{ids}', 'Admin\Ad\Region@deleteMany')->name('admin.adRegions.deleteMany');
 
     // Объявления > Города
     Route::get('/cities', 'Admin\Ad\City@showForm')->name('admin.adCities');
@@ -95,6 +102,7 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::post('/cities/create', 'Admin\Ad\City@create')->name('admin.adCities.create');
     Route::post('/cities/update', 'Admin\Ad\City@update')->name('admin.adCities.update');
     Route::get('/cities/delete/{id}', 'Admin\Ad\City@delete')->name('admin.adCities.delete');
+    Route::get('/cities/deleteMany/{ids}', 'Admin\Ad\City@deleteMany')->name('admin.adCities.deleteMany');
 
     // Объявления > Валюты
     Route::get('/currencies', 'Admin\Ad\Currency@showForm')->name('admin.adCurrencies');

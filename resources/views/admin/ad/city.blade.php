@@ -148,20 +148,24 @@
                 <div class="card-body">
                     <form action="{{ $action_search }}" method="GET">
                         <div class="row">
-                            <div class="col-md-8">
+                            <div class="col-md-7">
                                 <input type="text"
                                        name="name"
                                        value="{{ $requested_city ?? "" }}"
                                        placeholder="Поиск городов"
                                        class="form-control form-control-line">
                             </div>
-                            <div class="col-md-4"><button class="btn btn-primary btn-block">Найти город</button></div>
+                            <div class="col-md-3"><button class="btn btn-primary btn-block">Найти город</button></div>
+                            <div class="col-2">
+                                <a id="deleteMany" href="/admin/cities/deleteMany" class="btn btn-danger btn-block">Удалить</a>
+                            </div>
                         </div>
                     </form>
                     <hr>
                     @if ($cities->items())
                         <table class="table table-bordered table-hover table-middle-cell">
                             <tr>
+                                <th></th>
                                 <th class="text-center">ID</th>
                                 <th>Город</th>
                                 <th>Регион</th>
@@ -172,6 +176,7 @@
 
                             @foreach($cities as $city_item)
                                 <tr>
+                                    <td style="width: 30px"><input type="checkbox" name="id[]" value="{{ $city_item->id }}"></td>
                                     <td class="text-center">{{ $city_item->id }}</td>
                                     <td><b>{{ $city_item->name }}</b></td>
                                     <td>{{ $city_item->region->name }}</td>

@@ -93,4 +93,21 @@ class AdTag extends Model
 
         return $tags;
     }
+
+    /**
+     * Получить список тегов для объявления
+     * @param $ad
+     * @return \Illuminate\Support\Collection
+     */
+    public static function getAdTags($ad) {
+
+        $tags = DB::table('ad_tags')
+            ->select(DB::raw("DISTINCT(ad_tags.slug)"), 'ad_tags.id', 'ad_tags.name')
+            ->leftJoin('ad_tag', 'ad_tags.id', '=', 'ad_tag.tag_id')
+            ->where('ad_tag.ad_id', '=', $ad['id'])->orderBy('ad_tags.slug', 'asc')
+            ->take(30)
+            ->get();
+
+        return $tags;
+    }
 }
