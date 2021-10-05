@@ -259,11 +259,9 @@ class Ad extends Controller
                         }
                     }
                     $ad->delete();
-                    return route('admin.ads');
-                } else {
-                    return route('admin.ads');
                 }
             }
+            return route('admin.ads');
         }
     }
 
