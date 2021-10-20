@@ -115,7 +115,6 @@ class RegisterController extends Controller
         $memberId = md5(strtolower($email));
         $dataCenter = substr($apiKey,strpos($apiKey,'-')+1);
         $url = 'https://' . $dataCenter . '.api.mailchimp.com/3.0/lists/' . $listId . '/members/' . $memberId;
-        //dd($url);
 
         $json = json_encode([
             'email_address' => $email,
