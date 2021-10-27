@@ -49,10 +49,12 @@ class Tag extends Controller
      */
     public function search(Request $request) {
 
+        $direction = $request->get('direction') ?? 'asc';
+        $order = $request->get('order') ?? 'name';
         $requested_tag = $request->name;
-        $tags = AdTag::select(['id', 'name'])
-            ->where('name', 'like', '%' . $requested_tag . '%')
-            ->orderBy('name', "ASC")->paginate($this->per_page);
+
+        $tags = AdTag::withCount('ads')->where('name', 'like', '%' . $requested_tag . '%')->orderBy($order, $direction)
+            ->paginate($this->per_page);
 
         $tag = null;
 
@@ -60,6 +62,8 @@ class Tag extends Controller
 
         return view('admin.ad.tag')->with([
             'action' => $action,
+            'direction' => $direction,
+            'order' => $order,
             'tag' => $tag,
             'tags' => $tags,
             'action_search' => route('admin.adTags.search'),
