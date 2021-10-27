@@ -130,7 +130,7 @@
                                 </tr>
                             @endforeach
                         </table>
-                        {{ $tags->links() }}
+                        {{ $tags->appends($_GET)->links() }}
                     @else
                         <p>Меток не найдено</p>
                     @endif

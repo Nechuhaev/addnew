@@ -94,7 +94,7 @@
                     </div>
                 </div>
             @endforeach
-                {{ $ads->links() }}
+                {{ $ads->appends($_GET)->links() }}
             @else
                 <div class="card">
                     <div class="card-body">

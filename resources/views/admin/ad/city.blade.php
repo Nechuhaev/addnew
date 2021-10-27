@@ -189,7 +189,7 @@
                                 </tr>
                             @endforeach
                         </table>
-                        {{ $cities->links() }}
+                        {{ $cities->appends($_GET)->links() }}
                     @else
                         <p>Города не найдены</p>
                     @endif
