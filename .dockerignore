@@ -1,0 +1,13 @@
+/vendor
+/node_modules
+/storage/*
+!/storage/logs/*
+!/storage/app/*
+!/storage/framework/*
+
+.env
+.git
+.idea
+.vscode
+
+*.log

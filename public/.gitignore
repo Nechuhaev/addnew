@@ -1,0 +1,27 @@
+# Generated XML sitemaps and feeds
+*.xml
+
+# User uploaded files
+/files/*
+!/files/.gitkeep
+
+# Monitoring/analytics scripts (not part of codebase)
+opcache-stat-*.php
+/stats-ams/
+
+# Generated shop feeds and images
+/shops/*
+!/shops/.gitkeep
+
+# Vendor assets (installed by package manager)
+/vendor/
+
+# User uploaded avatars (default avatars already tracked via git are not affected)
+/images/avatar-[0-9]*.jpg
+/images/avatar-[0-9]*.JPG
+/images/avatar-[0-9]*.png
+/images/avatar-[0-9]*.jpeg
+/images/avatar-[0-9]*.gif
+
+# Blog/article share images (runtime uploaded content)
+/images/shares/
