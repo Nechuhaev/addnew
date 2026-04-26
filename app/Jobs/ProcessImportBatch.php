@@ -86,7 +86,7 @@ class ProcessImportBatch implements ShouldQueue
                     continue;
                 }
 
-                $images = $record['images'];
+                $images = $this->downloadAndUploadImages($record['images'], $import->user_id);
                 $mainImage = $images[0] ?? null;
                 $additionalImages = array_slice($images, 1);
 
@@ -160,6 +160,50 @@ class ProcessImportBatch implements ShouldQueue
             $import->update(['status' => Import::STATUS_COMPLETED]);
             @unlink($import->file_path);
         }
+    }
+
+    protected function downloadAndUploadImages(array $imageUrls, int $userId): array
+    {
+        $disk = Storage::disk('s3');
+        $uploadedUrls = [];
+        $dir = 'imports/' . $userId . '/' . time();
+
+        foreach ($imageUrls as $index => $url) {
+            if (empty($url) || !filter_var($url, FILTER_VALIDATE_URL)) {
+                continue;
+            }
+
+            try {
+                $content = @file_get_contents($url);
+                if ($content === false) {
+                    continue;
+                }
+
+                $extension = $this->getImageExtension($url);
+                $filename = $index . '.' . $extension;
+                $path = $dir . '/' . $filename;
+
+                $disk->put($path, $content, 'public');
+                $uploadedUrls[] = $disk->url($path);
+            } catch (\Throwable $e) {
+                continue;
+            }
+        }
+
+        return $uploadedUrls;
+    }
+
+    protected function getImageExtension(string $url): string
+    {
+        $ext = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION);
+        $ext = strtolower($ext);
+
+        $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
+        if (in_array($ext, $allowed)) {
+            return $ext === 'jpeg' ? 'jpg' : $ext;
+        }
+
+        return 'jpg';
     }
 
     protected function deleteOldImages(Ad $product): void
