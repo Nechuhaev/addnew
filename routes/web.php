@@ -199,6 +199,7 @@ Route::middleware(['localized'])->group(function () {
         Route::get('/profile/shop', 'Front\User\Shop\AllActionsController@index')->name('profile.shop');
         Route::get('/profile/shop/import', 'Front\User\Shop\AllActionsController@import')->name('profile.shop.import');
         Route::get('/profile/shop/export', 'Front\User\Shop\AllActionsController@export')->name('profile.shop.export');
+        Route::post('/profile/shop/export', 'Front\User\Shop\AllActionsController@generateExport')->name('profile.shop.export.generate');
         Route::get('/profile/shop/info', 'Front\User\Shop\ShopInfoController@index')->name('profile.shop.info');
         Route::post('/profile/shop/info', 'Front\User\Shop\ShopInfoController@update')->name('profile.shop.info.update');
     });
