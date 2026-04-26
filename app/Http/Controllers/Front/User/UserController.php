@@ -21,6 +21,10 @@ class UserController extends Controller
 
     public function ads()
     {
+        if (Auth::user()->is_shop_owner) {
+            return redirect()->route('profile.shop.dashboard');
+        }
+
         $data['ads'] = Auth::user()->ads()->orderBy('created_at')->paginate(15);
         return view('front.user.profile.ads')->with($data);
     }

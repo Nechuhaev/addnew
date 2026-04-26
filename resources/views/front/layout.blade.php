@@ -159,7 +159,11 @@
                 <div class="header-account">
                     @if(Auth::check())
                         <span class="header-welcome">Добро пожаловать, <strong>{{ Auth::user()->email }}</strong>!</span>
-                        <a href="{{ route('profile.ads') }}" rel="nofollow" class="header-link link-register">Кабинет</a>
+                        @if(Auth::user()->is_shop_owner)
+                            <a href="{{ route('profile.shop.dashboard') }}" rel="nofollow" class="header-link link-register">Мой магазин</a>
+                        @else
+                            <a href="{{ route('profile.ads') }}" rel="nofollow" class="header-link link-register">Кабинет</a>
+                        @endif
                         <a href="{{ route('logout') }}"
                            onclick="event.preventDefault();
                                     document.getElementById('logout-form').submit();"
