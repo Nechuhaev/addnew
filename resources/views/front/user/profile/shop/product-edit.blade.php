@@ -113,6 +113,11 @@
                                         @endif
                                     </select>
                                 </div>
+
+                                <div class="form-group">
+                                    <label>Опис товару <span class="star">(*)</span></label>
+                                    <textarea name="content" class="form-control required" rows="10">{{ old('content', $product->content) }}</textarea>
+                                </div>
                             </div>
 
                             <div class="product-edit-section">
@@ -146,17 +151,7 @@
                                 </div>
                             </div>
 
-                            <div class="product-edit-section">
-                                <h2>Опис</h2>
-
-                                <div class="form-group">
-                                    <label>Опис товару <span class="star">(*)</span></label>
-                                    <textarea name="content" class="form-control required" rows="8">{{ old('content', $product->content) }}</textarea>
-                                </div>
-                            </div>
-
                             <div class="form-action">
-                                <a href="{{ route('profile.shop.dashboard') }}" class="btn btn-secondary">Скасувати</a>
                                 <input type="submit" name="submit" class="btn btn-step" value="Зберегти зміни">
                             </div>
                         </div>
