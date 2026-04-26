@@ -135,11 +135,17 @@ class ProductExportService
             ->with('currency')
             ->get();
 
+        foreach ($products as $product) {
+            if (!$product->import_key) {
+                $product->import_key = 'exp_' . $product->id;
+                $product->save();
+            }
+        }
+
         $fields = $this->fieldDefinitions();
 
         $handle = fopen('php://temp', 'r+');
 
-        // UTF-8 BOM для коректного відображення кирилиці в Excel / Google Sheets
         fwrite($handle, "\xEF\xBB\xBF");
 
         fputcsv($handle, array_column($fields, 'header'));

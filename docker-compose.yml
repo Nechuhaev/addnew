@@ -25,6 +25,19 @@ services:
     depends_on:
       - db
 
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/var/www/html
+    environment:
+      - TZ=Europe/Kyiv
+    depends_on:
+      - php
+      - db
+    command: php artisan queue:work --sleep=3 --tries=3 --timeout=120
+
   db:
     image: mysql:8.0
     ports:

@@ -198,7 +198,11 @@ Route::middleware(['localized'])->group(function () {
         Route::post('/profile/type', 'Front\User\ProfileTypeController@switchIsShopOwner')->name('switch-profile-type');
         Route::get('/profile/shop', 'Front\User\Shop\ShopDashboardController@index')->name('profile.shop.dashboard');
         Route::get('/profile/shop/import-export', 'Front\User\Shop\AllActionsController@index')->name('profile.shop');
-        Route::get('/profile/shop/import', 'Front\User\Shop\AllActionsController@import')->name('profile.shop.import');
+        Route::get('/profile/shop/import', 'Front\User\Shop\ProductImportController@index')->name('profile.shop.import')->middleware('shop_owner');
+        Route::post('/profile/shop/import/upload', 'Front\User\Shop\ProductImportController@upload')->name('profile.shop.import.upload')->middleware('shop_owner');
+        Route::post('/profile/shop/import/confirm', 'Front\User\Shop\ProductImportController@confirm')->name('profile.shop.import.confirm')->middleware('shop_owner');
+        Route::get('/profile/shop/import/progress', 'Front\User\Shop\ProductImportController@progress')->name('profile.shop.import.progress')->middleware('shop_owner');
+        Route::post('/profile/shop/import/cancel', 'Front\User\Shop\ProductImportController@cancel')->name('profile.shop.import.cancel')->middleware('shop_owner');
         Route::get('/profile/shop/export', 'Front\User\Shop\AllActionsController@export')->name('profile.shop.export');
         Route::post('/profile/shop/export', 'Front\User\Shop\AllActionsController@generateExport')->name('profile.shop.export.generate');
         Route::get('/profile/shop/info', 'Front\User\Shop\ShopInfoController@index')->name('profile.shop.info');
