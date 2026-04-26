@@ -187,17 +187,19 @@ Route::middleware(['localized'])->group(function () {
 
 
 // Профиль
-    Route::get('/profile/', 'Front\User\UserController@edit')->name('profile.index');
-    Route::post('profile/update', 'Front\User\UserController@updateUser')->name('profile.update');
-    Route::get('/profile/ads', 'Front\User\UserController@ads')->name('profile.ads');
-    Route::get('/profile/password', 'Front\User\UserController@password')->name('profile.password');
-    Route::post('profile/password/update', 'Front\User\UserController@updatePassword')->name('profile.password.update');
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/profile/', 'Front\User\UserController@edit')->name('profile.index');
+        Route::post('profile/update', 'Front\User\UserController@updateUser')->name('profile.update');
+        Route::get('/profile/ads', 'Front\User\UserController@ads')->name('profile.ads');
+        Route::get('/profile/password', 'Front\User\UserController@password')->name('profile.password');
+        Route::post('profile/password/update', 'Front\User\UserController@updatePassword')->name('profile.password.update');
 
-    Route::get('/profile/type', 'Front\User\ProfileTypeController@index');
-    Route::post('/profile/type', 'Front\User\ProfileTypeController@switchIsShopOwner')->name('switch-profile-type');
-    Route::get('/profile/shop', 'Front\User\Shop\AllActionsController@index')->name('profile.shop');
-    Route::get('/profile/shop/info', 'Front\User\Shop\ShopInfoController@index')->name('profile.shop.info');
-    Route::post('/profile/shop/info', 'Front\User\Shop\ShopInfoController@update')->name('profile.shop.info.update');
+        Route::get('/profile/type', 'Front\User\ProfileTypeController@index');
+        Route::post('/profile/type', 'Front\User\ProfileTypeController@switchIsShopOwner')->name('switch-profile-type');
+        Route::get('/profile/shop', 'Front\User\Shop\AllActionsController@index')->name('profile.shop');
+        Route::get('/profile/shop/info', 'Front\User\Shop\ShopInfoController@index')->name('profile.shop.info');
+        Route::post('/profile/shop/info', 'Front\User\Shop\ShopInfoController@update')->name('profile.shop.info.update');
+    });
 
 
 // Блог
