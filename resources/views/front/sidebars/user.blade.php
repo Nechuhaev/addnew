@@ -12,7 +12,12 @@
             <li><a href="{{ route('profile.password') }}">Изменить пароль</a></li>
         @endis_shop_owner
 
-        <li><a href="#">Выход</a></li>
+        <li>
+            <form action="{{ route('logout') }}" method="POST" style="display:inline;">
+                @csrf
+                <button type="submit" style="background:none;border:none;padding:0;cursor:pointer;font:inherit;color:inherit;">Выход</button>
+            </form>
+        </li>
     </ul>
     <h2 class="account-h2">Информация об учётной записи</h2>
     <div class="account-author author">
