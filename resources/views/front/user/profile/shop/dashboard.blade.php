@@ -72,7 +72,7 @@
                                             </div>
                                         @endif
                                         <div class="shop-product-card__actions">
-                                            <a href="{{ route('ad.edit', ['id' => $product->id]) }}" class="shop-action shop-action--edit">Редактировать</a>
+                                            <a href="{{ route('profile.shop.product.edit', ['id' => $product->id]) }}" class="shop-action shop-action--edit">Редактировать</a>
                                             <a href="{{ route('ad.delete', ['id' => $product->id]) }}" onclick="return confirm('Вы действительно хотите удалить этот товар? Отменить это действие будет невозможно.');" class="shop-action shop-action--delete">Удалить</a>
                                             @if ($product->status == 'active')
                                                 <a href="{{ route('ad.changeStatus', ['ad_id' => $product->id, 'status_id' => 0]) }}" class="shop-action shop-action--suspend">Приостановить</a>

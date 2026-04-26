@@ -203,6 +203,8 @@ Route::middleware(['localized'])->group(function () {
         Route::post('/profile/shop/export', 'Front\User\Shop\AllActionsController@generateExport')->name('profile.shop.export.generate');
         Route::get('/profile/shop/info', 'Front\User\Shop\ShopInfoController@index')->name('profile.shop.info');
         Route::post('/profile/shop/info', 'Front\User\Shop\ShopInfoController@update')->name('profile.shop.info.update');
+        Route::get('/profile/shop/product/{id}/edit', 'Front\User\Shop\ProductEditController@edit')->name('profile.shop.product.edit');
+        Route::post('/profile/shop/product/{id}/edit', 'Front\User\Shop\ProductEditController@update')->name('profile.shop.product.update');
     });
 
 

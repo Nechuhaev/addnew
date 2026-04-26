@@ -220,6 +220,12 @@ Breadcrumbs::for('profile.shop.export', function ($trail) {
     $trail->push('Экспорт товаров', route('profile.shop.export'));
 });
 
+// Главная > Мой магазин > Редактировать товар
+Breadcrumbs::for('profile.shop.product.edit', function ($trail, $product) {
+    $trail->parent('profile.shop.dashboard');
+    $trail->push('Редактировать товар: ' . $product->name, route('profile.shop.product.edit', ['id' => $product->id]));
+});
+
 /**
  * ******************************* Блог *******************************
  */
