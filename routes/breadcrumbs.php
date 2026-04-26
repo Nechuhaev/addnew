@@ -190,6 +190,12 @@ Breadcrumbs::for('user.store_list', function ($trail) {
     $trail->push('Список магазинов', route('stores'));
 });
 
+// Главная > Информация о магазине
+Breadcrumbs::for('profile.shop.info', function ($trail) {
+    $trail->parent('index');
+    $trail->push('Информация о магазине', route('profile.shop.info'));
+});
+
 /**
  * ******************************* Блог *******************************
  */
