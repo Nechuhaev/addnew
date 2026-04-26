@@ -206,15 +206,6 @@
                 @endif
             </ul>
             <div class="btn btn-subscribe" onclick="modal.set('subscribe-modal').show();">Подписаться</div>
-            <ul class="footer-social">
-                <li><a href="https://vk.com/public131156262" class="vk" target="_blank" rel="noreferrer" alt="Доска бесплатных объявлений Addnew.biz в социальной сети Вконтакте"></a></li>
-                <li><a href="https://www.facebook.com/addnew.biz/" class="fb" target="_blank" rel="noreferrer" alt="Доска бесплатных объявлений Addnew.biz в социальной сети Facebook"></a></li>
-                <li><a href="https://www.instagram.com/addnewbiz/" class="in" target="_blank" rel="noreferrer"></a></li>
-                <li><a href="https://addnewbiz.business.site/" class="plus" target="_blank"></a></li>
-                <li><a href="https://twitter.com/AddnewBiz" class="tw" target="_blank" rel="noreferrer"></a></li>
-                <li><a href="https://my.mail.ru/community/addnew.biz/" class="mail" target="_blank" rel="noreferrer"></a></li>
-                <li><a href="https://ok.ru/group/54246475890813/" class="ok" target="_blank" rel="noreferrer"></a></li>
-            </ul>
         </div>
         <div class="copyright">© {{ date("Y") }} Доска объявлений AddNew.Biz. Все права защищены.</div>
     </div>
