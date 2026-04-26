@@ -196,6 +196,24 @@ Breadcrumbs::for('profile.shop.info', function ($trail) {
     $trail->push('Информация о магазине', route('profile.shop.info'));
 });
 
+// Главная > Импорт/экспорт товаров
+Breadcrumbs::for('profile.shop.import-export', function ($trail) {
+    $trail->parent('index');
+    $trail->push('Импорт/экспорт товаров', route('profile.shop'));
+});
+
+// Главная > Импорт товаров
+Breadcrumbs::for('profile.shop.import', function ($trail) {
+    $trail->parent('profile.shop.import-export');
+    $trail->push('Импорт товаров', route('profile.shop.import'));
+});
+
+// Главная > Экспорт товаров
+Breadcrumbs::for('profile.shop.export', function ($trail) {
+    $trail->parent('profile.shop.import-export');
+    $trail->push('Экспорт товаров', route('profile.shop.export'));
+});
+
 /**
  * ******************************* Блог *******************************
  */
