@@ -86,13 +86,26 @@ class ProductExportService
                 'header'      => 'brand',
                 'label'       => 'Бренд',
                 'description' => 'Название бренда или производителя товара.',
-                'resolve'     => fn() => '',
+                'resolve'     => fn(Ad $ad) => $ad->brand ?? '',
             ],
             [
                 'header'      => 'mpn',
                 'label'       => 'Артикул',
                 'description' => 'Артикул или код товара (MPN — Manufacturer Part Number).',
-                'resolve'     => fn() => '',
+                'resolve'     => fn(Ad $ad) => $ad->code ?? '',
+            ],
+            [
+                'header'      => 'additional_image_link',
+                'label'       => 'Додаткові зображення',
+                'description' => 'URL-адреси додаткових зображень товару (через кому).',
+                'resolve'     => function (Ad $ad) {
+                    $images = array_filter((array) $ad->images);
+                    $urls = array_map(
+                        fn($img) => strpos($img, 'http') === 0 ? $img : asset($img),
+                        $images
+                    );
+                    return implode(',', array_values($urls));
+                },
             ],
         ];
     }
