@@ -2,7 +2,7 @@
     <h2 class="account-h2">Личный кабинет</h2>
     <ul class="account-menu">
         @is_shop_owner
-            <li><a href="{{ route('profile.ads') }}">Мои товары</a></li>
+            <li><a href="{{ route('profile.shop.dashboard') }}">Мой магазин</a></li>
             <li><a href="{{ route('profile.shop') }}">Импорт/экспорт товаров</a></li>
             <li><a href="{{ route('profile.shop.info') }}">Информация о магазине</a></li>
             <li><a href="{{ route('profile.password') }}">Изменить пароль</a></li>

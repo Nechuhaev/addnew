@@ -4986,3 +4986,270 @@ li.active {
 .eac-icon-left .eac-item img[src="undefined"] {
     display: none;
 }
+
+.shop-info-card {
+    border: 1px solid #e8e8e8;
+    border-radius: 6px;
+    background: #fff;
+    margin-bottom: 25px;
+    padding: 16px 20px;
+}
+
+.shop-info-card__header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.shop-info-card__logo {
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #f5f5f5;
+}
+
+.shop-info-card__logo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.shop-info-card__info {
+    flex: 1;
+    min-width: 0;
+}
+
+.shop-info-card__name {
+    margin: 0 0 4px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.shop-info-card__edit-link {
+    color: #3b5998;
+    font-size: 13px;
+    text-decoration: underline;
+}
+
+.shop-info-card__edit-link:hover {
+    color: #2d4373;
+    text-decoration: none;
+}
+
+.shop-products-heading {
+    margin-bottom: 15px;
+    font-size: 20px;
+    color: #333;
+}
+
+.table-account th.th-number {
+    width: 50px;
+}
+
+.table-account th.th-img {
+    width: 80px;
+}
+
+.table-account th.th-name {
+    text-align: left;
+}
+
+.table-account tbody td.td-img {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.table-account tbody td.td-name {
+    text-align: left;
+}
+
+.shop-product-img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    border: 1px solid #e8e8e8;
+    border-radius: 4px;
+    background: #fafafa;
+}
+
+.shop-products-table .td-actions ul {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.shop-products-table .td-actions ul li {
+    margin: 0;
+}
+
+.shop-products-table .td-actions a {
+    margin-right: 0;
+}
+
+.shop-products-list {
+    display: none;
+}
+
+.shop-product-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid #e8e8e8;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    background: #fff;
+}
+
+.shop-product-card__image {
+    flex-shrink: 0;
+    width: 50px;
+    height: 50px;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #fafafa;
+}
+
+.shop-product-card__img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.shop-product-card__info {
+    flex: 1;
+    min-width: 0;
+}
+
+.shop-product-card__name {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+    word-break: break-word;
+}
+
+.shop-product-card__price {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #28a745;
+    margin-bottom: 8px;
+}
+
+.shop-product-card__actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.shop-action {
+    display: inline-block;
+    padding: 4px 10px;
+    font-size: 12px;
+    border-radius: 4px;
+    color: #3b5998;
+    background: #f0f3f8;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+    white-space: nowrap;
+}
+
+.shop-action:hover {
+    background: #3b5998;
+    color: #fff;
+    text-decoration: none;
+}
+
+.shop-action--delete:hover {
+    background: #dc3545;
+}
+
+.shop-action--suspend:hover {
+    background: #ffc107;
+    color: #333;
+}
+
+.shop-action--resume:hover {
+    background: #28a745;
+}
+
+.shop-products-table .shop-td-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.shop-products-table .shop-td-actions li {
+    margin: 0;
+}
+
+@media screen and (max-width: 800px) {
+    .shop-products-table {
+        display: none;
+    }
+
+    .shop-products-list {
+        display: block;
+    }
+
+    .shop-info-card__header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+.td-price {
+    margin: 5px 0 0 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: #28a745;
+}
+
+.status-active {
+    color: #28a745;
+    font-weight: 600;
+}
+
+.status-suspend {
+    color: #ffc107;
+    font-weight: 600;
+}
+
+.status-archive {
+    color: #6c757d;
+    font-weight: 600;
+}
+
+.shop-empty-products {
+    padding: 40px 20px;
+    text-align: center;
+    background: #f8f9fa;
+    border: 1px dashed #ccc;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.shop-empty-products p {
+    margin: 0 0 15px 0;
+    color: #666;
+    font-size: 15px;
+}
+
+@media screen and (max-width: 800px) {
+    .shop-info-card__header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

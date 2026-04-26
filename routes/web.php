@@ -196,7 +196,8 @@ Route::middleware(['localized'])->group(function () {
 
         Route::get('/profile/type', 'Front\User\ProfileTypeController@index');
         Route::post('/profile/type', 'Front\User\ProfileTypeController@switchIsShopOwner')->name('switch-profile-type');
-        Route::get('/profile/shop', 'Front\User\Shop\AllActionsController@index')->name('profile.shop');
+        Route::get('/profile/shop', 'Front\User\Shop\ShopDashboardController@index')->name('profile.shop.dashboard');
+        Route::get('/profile/shop/import-export', 'Front\User\Shop\AllActionsController@index')->name('profile.shop');
         Route::get('/profile/shop/import', 'Front\User\Shop\AllActionsController@import')->name('profile.shop.import');
         Route::get('/profile/shop/export', 'Front\User\Shop\AllActionsController@export')->name('profile.shop.export');
         Route::post('/profile/shop/export', 'Front\User\Shop\AllActionsController@generateExport')->name('profile.shop.export.generate');
