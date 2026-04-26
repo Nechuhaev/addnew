@@ -3,7 +3,6 @@
     <ul class="account-menu">
         @is_shop_owner
             <li><a href="{{ route('profile.ads') }}">Мои товары</a></li>
-            <li><a href="{{ route('profile.shop') }}">Загрузить прайс-лист</a></li>
             <li><a href="{{ route('profile.shop') }}">Импорт/экспорт товаров</a></li>
             <li><a href="{{ route('profile.shop.info') }}">Информация о магазине</a></li>
             <li><a href="{{ route('profile.password') }}">Изменить пароль</a></li>
