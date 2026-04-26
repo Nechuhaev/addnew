@@ -31,12 +31,21 @@
 
                     <div class="shop-info-card">
                         <div class="shop-info-card__header">
-                            <div class="shop-info-card__logo">
-                                <img src="{{ $shop['logo_url'] }}" alt="{{ $shop['name'] }}" class="shop-info-card__logo-img">
-                            </div>
                             <div class="shop-info-card__info">
                                 <h2 class="shop-info-card__name">{{ $shop['name'] ?? 'Название магазина не указано' }}</h2>
+                                @if($shop['description'])
+                                    <p class="shop-info-card__description">{{ Str::limit($shop['description'], 150) }}</p>
+                                @endif
+                                <ul class="shop-info-card__contacts">
+                                    @if($shop['telephone'])
+                                        <li>{{ $shop['telephone'] }}</li>
+                                    @endif
+                                    <li>{{ $shop['email'] }}</li>
+                                </ul>
                                 <a href="{{ route('profile.shop.info') }}" class="shop-info-card__edit-link">Редактировать информацию о магазине</a>
+                            </div>
+                            <div class="shop-info-card__logo">
+                                <img src="{{ $shop['logo_url'] }}" alt="{{ $shop['name'] }}" class="shop-info-card__logo-img">
                             </div>
                         </div>
                     </div>
@@ -57,7 +66,10 @@
                                     <div class="shop-product-card__info">
                                         <a href="{{ $product->url }}" class="shop-product-card__name">{{ $product->name }}</a>
                                         @if($product->price)
-                                            <span class="shop-product-card__price">{{ $product->formatted_price }}</span>
+                                            <div class="shop-product-card__price-row">
+                                                <span class="shop-product-card__price">{{ $product->formatted_price }}</span>
+                                                <span class="shop-product-card__availability">{{ $product->stock == 'out_of_stock' ? 'нет в наличии' : 'в наличии' }}</span>
+                                            </div>
                                         @endif
                                         <div class="shop-product-card__actions">
                                             <a href="{{ route('ad.edit', ['id' => $product->id]) }}" class="shop-action shop-action--edit">Редактировать</a>
@@ -72,54 +84,6 @@
                                 </div>
                             @endforeach
                         </div>
-
-                        <table class="table-account shop-products-table">
-                            <thead>
-                            <tr>
-                                <th class="th-number">&nbsp;</th>
-                                <th class="th-img">Изображение</th>
-                                <th class="th-name">Название</th>
-                                <th class="hidden-xs">Просмотры</th>
-                                <th class="hidden-xs">Статус</th>
-                                <th class="hidden-xs">Опции</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach($products as $product)
-                                <tr>
-                                    <td class="td-number">{{ $loop->iteration }}.</td>
-                                    <td class="td-img">
-                                        @if($product->image)
-                                            <img src="{{ $product->image }}" alt="{{ $product->name }}" class="shop-product-img">
-                                        @else
-                                            <img src="{{ asset('assets/front/img/placeholder.png') }}" alt="{{ $product->name }}" class="shop-product-img">
-                                        @endif
-                                    </td>
-                                    <td class="td-name">
-                                        <a href="{{ $product->url }}">{{ $product->name }}</a>
-                                        @if($product->price)
-                                            <p class="td-price">{{ $product->formatted_price }}</p>
-                                        @endif
-                                    </td>
-                                    <td class="hidden-xs">{{ $product->total_views }}</td>
-                                    <td class="hidden-xs">
-                                        <span class="status status-{{ $product->status }}">{{ __('user/ads.status_' . $product->status) }}</span>
-                                    </td>
-                                    <td class="hidden-xs">
-                                        <ul class="td-actions shop-td-actions">
-                                            <li><a href="{{ route('ad.edit', ['id' => $product->id]) }}" class="shop-action shop-action--edit">Редактировать</a></li>
-                                            <li><a href="{{ route('ad.delete', ['id' => $product->id]) }}" onclick="return confirm('Вы действительно хотите удалить этот товар? Отменить это действие будет невозможно.');" class="shop-action shop-action--delete">Удалить</a></li>
-                                            @if ($product->status == 'active')
-                                                <li><a href="{{ route('ad.changeStatus', ['ad_id' => $product->id, 'status_id' => 0]) }}" class="shop-action shop-action--suspend">Приостановить</a></li>
-                                            @elseif ($product->status == 'suspend')
-                                                <li><a href="{{ route('ad.changeStatus', ['ad_id' => $product->id, 'status_id' => 1]) }}" class="shop-action shop-action--resume">Возобновить</a></li>
-                                            @endif
-                                        </ul>
-                                    </td>
-                                </tr>
-                            @endforeach
-                            </tbody>
-                        </table>
                         {{ $products->links('front.widgets.paginate') }}
                     @else
                         <div class="shop-empty-products">
