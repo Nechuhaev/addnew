@@ -164,10 +164,6 @@
                         @else
                             <a href="{{ route('profile.ads') }}" rel="nofollow" class="header-link link-register">Кабинет</a>
                         @endif
-                        <a href="{{ route('logout') }}"
-                           onclick="event.preventDefault();
-                                    document.getElementById('logout-form').submit();"
-                           rel="nofollow" class="header-link link-login">Выход</a>
 
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                             @csrf
