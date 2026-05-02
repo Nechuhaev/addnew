@@ -85,7 +85,6 @@
                     <details class="format-details">
                         <summary>
                             <span class="format-details-title">Поля CSV файла</span>
-                            <span class="format-details-hint">нажмите, чтобы раскрыть</span>
                         </summary>
                         <div class="format-details-body">
                             <p style="margin-top: 0;">Для корректного импорта файл должен содержать следующие поля:</p>
@@ -161,7 +160,6 @@
                     <details class="format-details">
                         <summary>
                             <span class="format-details-title">Поля XML файла (Google Merchant Center)</span>
-                            <span class="format-details-hint">нажмите, чтобы раскрыть</span>
                         </summary>
                         <div class="format-details-body">
                             <p style="margin-top: 0;">XML файл должен соответствовать формату <strong>Google Merchant Center RSS</strong> с пространством имён <code>g:</code>. Структура файла:</p>
@@ -901,12 +899,11 @@ document.addEventListener('DOMContentLoaded', function () {
         uploadArea.style.display = 'block';
     }
 
-    function showCompleteBanner(data) {
+    function showCompleteBanner(data, importId, autoReload) {
         var added = data.new_count || 0;
         var updated = data.update_count || 0;
         var errors = data.error_count || 0;
-        var total = added + updated;
-        var msg = 'Импорт завершён! ' + total + ' ' + pluralize(total, 'товар', 'товара', 'товаров') + ' добавлено или обновлено';
+        var msg;
         if (added > 0 && updated > 0) {
             msg = 'Импорт завершён! Добавлено ' + added + ', обновлено ' + updated + ' товаров.';
         } else if (added > 0) {
@@ -919,10 +916,15 @@ document.addEventListener('DOMContentLoaded', function () {
         if (errors > 0) {
             msg += ' Ошибок: ' + errors + '.';
         }
+        if (importId) {
+            localStorage.setItem('importShown_' + importId, '1');
+        }
         document.getElementById('import-complete-text').textContent = msg;
         document.getElementById('import-complete-banner').style.display = 'block';
         document.getElementById('import-running').style.display = 'none';
-        setTimeout(function () { window.location.reload(); }, 4000);
+        if (autoReload !== false) {
+            setTimeout(function () { window.location.reload(); }, 4000);
+        }
     }
 
     function pluralize(n, one, few, many) {
@@ -952,7 +954,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         if (response.data.status === 'completed') {
                             clearInterval(progressPollInterval);
                             progressPollInterval = null;
-                            showCompleteBanner(response.data);
+                            showCompleteBanner(response.data, response.data.id, true);
                         } else if (response.data.status === 'cancelled' || response.data.status === 'failed') {
                             clearInterval(progressPollInterval);
                             progressPollInterval = null;
@@ -1020,14 +1022,25 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     @if($progress)
-        showProgressSection();
-        updateProgress({
-            status: '{{ $progress['status'] }}',
-            progress: {{ $progress['progress'] }},
-            processed: {{ $progress['processed'] }},
-            total: {{ $progress['total'] }}
-        });
-        startProgressPolling();
+        @if($progress['status'] === 'completed' || $progress['status'] === 'failed')
+            if (!localStorage.getItem('importShown_{{ $progress['id'] }}')) {
+                showProgressSection();
+                showCompleteBanner({
+                    new_count: {{ $progress['new_count'] }},
+                    update_count: {{ $progress['update_count'] }},
+                    error_count: {{ $progress['error_count'] }}
+                }, {{ $progress['id'] }}, false);
+            }
+        @else
+            showProgressSection();
+            updateProgress({
+                status: '{{ $progress['status'] }}',
+                progress: {{ $progress['progress'] }},
+                processed: {{ $progress['processed'] }},
+                total: {{ $progress['total'] }}
+            });
+            startProgressPolling();
+        @endif
     @endif
 });
 </script>

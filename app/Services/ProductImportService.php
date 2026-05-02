@@ -109,6 +109,14 @@ class ProductImportService
             ->first();
 
         if (!$import) {
+            $import = Import::where('user_id', $user->id)
+                ->whereIn('status', [Import::STATUS_COMPLETED, Import::STATUS_FAILED])
+                ->where('updated_at', '>=', now()->subMinutes(5))
+                ->latest()
+                ->first();
+        }
+
+        if (!$import) {
             return null;
         }
 
