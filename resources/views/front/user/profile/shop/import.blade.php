@@ -29,7 +29,7 @@
                         </div>
                     @endif
 
-                    <p>Импорт формирует товары из CSV-файла в формате <strong>Google Merchant Center</strong>. При импорте новые товары добавляются на сайт, а существующие (определяются по полю <code>id</code>) обновляются: заменяются все поля и изображения. <a href="#how-it-works" class="scroll-link">Как это работает</a></p>
+                    <p>Импорт формирует товары из файла <strong>CSV или XML</strong> в формате Google Merchant Center. При импорте новые товары добавляются на сайт, а существующие (определяются по полю <code>id</code>) обновляются: заменяются все поля и изображения. <a href="#how-it-works" class="scroll-link">Как это работает</a></p>
 
                     <div id="upload-area" class="upload-area">
                         <div id="upload-prompt">
@@ -38,7 +38,7 @@
                                 <polyline points="17 8 12 3 7 8"></polyline>
                                 <line x1="12" y1="3" x2="12" y2="15"></line>
                             </svg>
-                            <p style="margin: 0 0 8px; font-size: 15px; color: #333;">Перетащите CSV-файл сюда</p>
+                            <p style="margin: 0 0 8px; font-size: 15px; color: #333;">Перетащите CSV или XML файл сюда</p>
                             <p style="margin: 0; font-size: 13px; color: #727272;">или нажмите в любое место области</p>
                             <input type="file" id="file-input" accept=".csv,.txt,.xml" style="display: none;">
                         </div>
@@ -51,100 +51,243 @@
                     <div id="upload-error" class="alert" style="display: none; margin-top: 16px;"></div>
 
                     <div id="import-progress-section" style="display: none; margin-top: 24px;">
-                        <div class="import-progress-bar">
-                            <div class="progress-fill" id="progress-bar" style="width: 0%;"></div>
-                            <span id="progress-text" class="progress-text">0%</span>
+                        <div id="import-complete-banner" style="display: none; background: #e8f7ee; border: 1px solid #27ae60; border-radius: 6px; padding: 16px 20px; margin-bottom: 12px;">
+                            <p id="import-complete-text" style="margin: 0; font-weight: 600; color: #1e8449; font-size: 15px;"></p>
+                            <p style="margin: 6px 0 0; font-size: 13px; color: #555;">Страница обновится автоматически через несколько секунд...</p>
                         </div>
-                        <div class="progress-info">
-                            <span id="progress-details">Обработано 0 из 0</span>
-                            <button id="cancel-import-btn" class="btn-link-cancel">Отменить</button>
+                        <div id="import-running">
+                            <div class="import-progress-bar">
+                                <div class="progress-fill" id="progress-bar" style="width: 0%;"></div>
+                                <span id="progress-text" class="progress-text">0%</span>
+                            </div>
+                            <div class="progress-info">
+                                <span id="progress-details">Обработано 0 из 0</span>
+                                <button id="cancel-import-btn" class="btn-link-cancel">Отменить</button>
+                            </div>
                         </div>
                     </div>
 
                     <h2 id="how-it-works" style="margin-top: 30px; font-size: 18px;">Как это работает</h2>
                     <p>Процесс импорта состоит из двух этапов:</p>
                     <ol>
-                        <li><strong>Загрузка и обработка файла</strong> — вы перетаскиваете CSV-файл в область выше (или выбираете вручную). Система обрабатывает файл и показывает предварительные результаты.</li>
+                        <li><strong>Загрузка и обработка файла</strong> — вы перетаскиваете CSV или XML файл в область выше (или выбираете вручную). Система обрабатывает файл и показывает предварительные результаты.</li>
                         <li><strong>Подтверждение импорта</strong> — в модальном окне отображается статистика (всего товаров, новых, на обновление) и список 20 случайных товаров. Вы можете подтвердить импорт или отменить его.</li>
                     </ol>
 
                     <h2 style="margin-top: 30px; font-size: 18px;">Требования к файлу</h2>
                     <ul>
-                        <li>Формат файла: <strong>CSV</strong> (разделитель — запятая)</li>
+                        <li>Форматы: <strong>CSV</strong> (разделитель — запятая) или <strong>XML</strong> (Google Merchant Center RSS)</li>
                         <li>Максимальный размер: <strong>25 МБ</strong></li>
                         <li>Кодировка: <strong>UTF-8</strong></li>
-                        <li>Первая строка файла должна содержать заголовки полей</li>
+                        <li>Для CSV: первая строка файла должна содержать заголовки полей</li>
                     </ul>
 
-                    <h2 style="margin-top: 30px; font-size: 18px;">Поля в файле импорта</h2>
-                    <p>Для корректного импорта файл должен содержать следующие поля:</p>
+                    <details class="format-details">
+                        <summary>
+                            <span class="format-details-title">Поля CSV файла</span>
+                            <span class="format-details-hint">нажмите, чтобы раскрыть</span>
+                        </summary>
+                        <div class="format-details-body">
+                            <p style="margin-top: 0;">Для корректного импорта файл должен содержать следующие поля:</p>
+                            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                                <thead>
+                                    <tr style="background: #f5f5f5;">
+                                        <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left;">Поле</th>
+                                        <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left;">Название</th>
+                                        <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left;">Описание</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>id</code></td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">ID товара</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">Уникальный идентификатор товара. Используется для определения существующих товаров при обновлении.</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>title</code></td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Название</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">Название товара (до 150 символов).</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>description</code></td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Описание</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">Текстовое описание товара. HTML-теги будут удалены.</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>link</code></td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Ссылка</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">Внешняя ссылка на товар (опционально).</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>image_link</code></td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Главное изображение</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">URL главного изображения товара.</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>price</code></td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Цена</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">Цена товара с кодом валюты (напр. <code>100.00 UAH</code>).</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>availability</code></td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Наличие</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;"><code>in_stock</code> (есть на складе) или <code>out_of_stock</code>.</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>condition</code></td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Состояние</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;"><code>new</code> (новый), <code>used</code> (б/у), <code>refurbished</code> (восстановленный).</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>brand</code></td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Бренд</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">Название бренда или производителя.</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>mpn</code></td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Артикул</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">Артикул или код товара (MPN / EAN).</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>additional_image_link</code></td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Дополнительные изображения</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">URL дополнительных изображений через запятую.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </details>
 
-                    <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-                        <thead>
-                            <tr style="background: #f5f5f5;">
-                                <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left;">Поле</th>
-                                <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left;">Название</th>
-                                <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left;">Описание</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>id</code></td>
-                                <td style="border: 1px solid #ddd; padding: 8px 12px;">ID товара</td>
-                                <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">Уникальный идентификатор товара. Используется для определения существующих товаров при обновлении.</td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>title</code></td>
-                                <td style="border: 1px solid #ddd; padding: 8px 12px;">Название</td>
-                                <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">Название товара (до 150 символов).</td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>description</code></td>
-                                <td style="border: 1px solid #ddd; padding: 8px 12px;">Описание</td>
-                                <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">Текстовое описание товара. HTML-теги будут удалены.</td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>link</code></td>
-                                <td style="border: 1px solid #ddd; padding: 8px 12px;">Ссылка</td>
-                                <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">Внешняя ссылка на товар (опционально).</td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>image_link</code></td>
-                                <td style="border: 1px solid #ddd; padding: 8px 12px;">Главное изображение</td>
-                                <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">URL главного изображения товара.</td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>price</code></td>
-                                <td style="border: 1px solid #ddd; padding: 8px 12px;">Цена</td>
-                                <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">Цена товара с кодом валюты (напр. <code>100.00 UAH</code>).</td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>availability</code></td>
-                                <td style="border: 1px solid #ddd; padding: 8px 12px;">Наличие</td>
-                                <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;"><code>in_stock</code> (есть на складе) или <code>out_of_stock</code>.</td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>condition</code></td>
-                                <td style="border: 1px solid #ddd; padding: 8px 12px;">Состояние</td>
-                                <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;"><code>new</code> (новый), <code>used</code> (б/у), <code>refurbished</code> (восстановленный).</td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>brand</code></td>
-                                <td style="border: 1px solid #ddd; padding: 8px 12px;">Бренд</td>
-                                <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">Название бренда или производителя.</td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>mpn</code></td>
-                                <td style="border: 1px solid #ddd; padding: 8px 12px;">Артикул</td>
-                                <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">Артикул или код товара (MPN / EAN).</td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>additional_image_link</code></td>
-                                <td style="border: 1px solid #ddd; padding: 8px 12px;">Дополнительные изображения</td>
-                                <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">URL дополнительных изображений через запятую.</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <details class="format-details">
+                        <summary>
+                            <span class="format-details-title">Поля XML файла (Google Merchant Center)</span>
+                            <span class="format-details-hint">нажмите, чтобы раскрыть</span>
+                        </summary>
+                        <div class="format-details-body">
+                            <p style="margin-top: 0;">XML файл должен соответствовать формату <strong>Google Merchant Center RSS</strong> с пространством имён <code>g:</code>. Структура файла:</p>
+                            <pre class="code-block">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;rss xmlns:g="http://base.google.com/ns/1.0" version="2.0"&gt;
+  &lt;channel&gt;
+    &lt;item&gt;
+      &lt;g:id&gt;123&lt;/g:id&gt;
+      &lt;g:title&gt;Название товара&lt;/g:title&gt;
+      &lt;g:description&gt;Описание&lt;/g:description&gt;
+      &lt;g:link&gt;https://example.com/product&lt;/g:link&gt;
+      &lt;g:image_link&gt;https://example.com/img.jpg&lt;/g:image_link&gt;
+      &lt;g:price&gt;100.00 UAH&lt;/g:price&gt;
+      &lt;g:availability&gt;in_stock&lt;/g:availability&gt;
+      &lt;g:condition&gt;new&lt;/g:condition&gt;
+      &lt;g:brand&gt;BrandName&lt;/g:brand&gt;
+      &lt;g:mpn&gt;ART-001&lt;/g:mpn&gt;
+    &lt;/item&gt;
+  &lt;/channel&gt;
+&lt;/rss&gt;</pre>
+                            <table style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 16px;">
+                                <thead>
+                                    <tr style="background: #f5f5f5;">
+                                        <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left;">Поле</th>
+                                        <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left;">Название</th>
+                                        <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left;">Описание</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>g:id</code></td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">ID товара</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">Уникальный идентификатор. Используется для обновления существующих товаров.</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>g:title</code></td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Название</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">Название товара.</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>g:description</code></td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Описание</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">Текстовое описание. HTML-теги будут удалены.</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>g:link</code></td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Ссылка</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">Внешняя ссылка на товар (опционально).</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>g:image_link</code></td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Главное изображение</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">URL главного изображения товара.</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>g:additional_image_link</code></td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Доп. изображения</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">URL дополнительных изображений (можно повторять тег несколько раз).</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>g:price</code></td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Цена</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">Цена с кодом валюты: <code>100.00 UAH</code>.</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>g:availability</code></td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Наличие</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;"><code>in_stock</code> или <code>out_of_stock</code>.</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>g:condition</code></td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Состояние</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;"><code>new</code>, <code>used</code> или <code>refurbished</code>.</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>g:brand</code></td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Бренд</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">Название бренда или производителя.</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>g:mpn</code></td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Артикул</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">Артикул или код товара.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </details>
+
+                    @if(!empty($history))
+                    <h2 style="margin-top: 40px; font-size: 18px;">История импортов</h2>
+                    <div class="table-responsive" style="margin-top: 12px;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                            <thead>
+                                <tr style="background: #f5f5f5;">
+                                    <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left;">Дата</th>
+                                    <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: center;">Всего</th>
+                                    <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: center;">Добавлено</th>
+                                    <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: center;">Обновлено</th>
+                                    <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: center;">Ошибок</th>
+                                    <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: center;">Статус</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($history as $item)
+                                <tr>
+                                    <td style="border: 1px solid #ddd; padding: 8px 12px; color: #555;">{{ $item['created_at'] }}</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px 12px; text-align: center;">{{ $item['total'] }}</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px 12px; text-align: center; color: #27ae60; font-weight: 600;">{{ $item['new_count'] }}</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px 12px; text-align: center; color: #f39c12; font-weight: 600;">{{ $item['update_count'] }}</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px 12px; text-align: center; color: {{ $item['error_count'] > 0 ? '#e74c3c' : '#727272' }};">{{ $item['error_count'] }}</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px 12px; text-align: center;">
+                                        @if($item['status'] === 'completed')
+                                            <span class="badge-status badge-completed">Завершён</span>
+                                        @elseif($item['status'] === 'cancelled')
+                                            <span class="badge-status badge-cancelled">Отменён</span>
+                                        @else
+                                            <span class="badge-status badge-failed">Ошибка</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    @endif
 
                 </div>
                 @include('front.sidebars.user')
@@ -338,17 +481,6 @@
     .btn-primary:hover {
         background: #2980b9;
     }
-    .btn-cancel {
-        background: #e74c3c;
-        color: #fff;
-        border: none;
-        padding: 8px 16px;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-    .btn-cancel:hover {
-        background: #c0392b;
-    }
     .table-sm {
         width: 100%;
         border-collapse: collapse;
@@ -376,6 +508,25 @@
         padding: 2px 8px;
         border-radius: 3px;
         font-size: 12px;
+    }
+    .badge-status {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 3px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    .badge-completed {
+        background: #e8f7ee;
+        color: #1e8449;
+    }
+    .badge-cancelled {
+        background: #f5f5f5;
+        color: #727272;
+    }
+    .badge-failed {
+        background: #fde8e8;
+        color: #c0392b;
     }
     .scroll-link {
         color: #3498db;
@@ -425,6 +576,62 @@
     }
     .btn-link-cancel:hover {
         color: #c0392b;
+    }
+    .format-details {
+        margin-top: 24px;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        overflow: hidden;
+    }
+    .format-details summary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        background: #f5f5f5;
+        cursor: pointer;
+        user-select: none;
+        list-style: none;
+    }
+    .format-details summary::-webkit-details-marker {
+        display: none;
+    }
+    .format-details summary::after {
+        content: '▸';
+        font-size: 14px;
+        color: #727272;
+        transition: transform 0.2s ease;
+        flex-shrink: 0;
+    }
+    .format-details[open] summary::after {
+        transform: rotate(90deg);
+    }
+    .format-details-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+    }
+    .format-details-hint {
+        font-size: 12px;
+        color: #999;
+        margin-left: 10px;
+        font-weight: normal;
+    }
+    .format-details[open] .format-details-hint {
+        display: none;
+    }
+    .format-details-body {
+        padding: 16px;
+    }
+    .code-block {
+        background: #f8f8f8;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        padding: 12px 16px;
+        font-size: 13px;
+        line-height: 1.6;
+        overflow-x: auto;
+        white-space: pre;
     }
 </style>
 @endsection
@@ -506,7 +713,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var ext = file.name.split('.').pop().toLowerCase();
 
         if (ext !== 'csv' && ext !== 'txt' && ext !== 'xml') {
-            showError('Пожалуйста, выберите CSV или XML-файл.');
+            showError('Пожалуйста, выберите CSV или XML файл.');
             isUploading = false;
             return;
         }
@@ -694,6 +901,38 @@ document.addEventListener('DOMContentLoaded', function () {
         uploadArea.style.display = 'block';
     }
 
+    function showCompleteBanner(data) {
+        var added = data.new_count || 0;
+        var updated = data.update_count || 0;
+        var errors = data.error_count || 0;
+        var total = added + updated;
+        var msg = 'Импорт завершён! ' + total + ' ' + pluralize(total, 'товар', 'товара', 'товаров') + ' добавлено или обновлено';
+        if (added > 0 && updated > 0) {
+            msg = 'Импорт завершён! Добавлено ' + added + ', обновлено ' + updated + ' товаров.';
+        } else if (added > 0) {
+            msg = 'Импорт завершён! Добавлено ' + added + ' ' + pluralize(added, 'товар', 'товара', 'товаров') + '.';
+        } else if (updated > 0) {
+            msg = 'Импорт завершён! Обновлено ' + updated + ' ' + pluralize(updated, 'товар', 'товара', 'товаров') + '.';
+        } else {
+            msg = 'Импорт завершён!';
+        }
+        if (errors > 0) {
+            msg += ' Ошибок: ' + errors + '.';
+        }
+        document.getElementById('import-complete-text').textContent = msg;
+        document.getElementById('import-complete-banner').style.display = 'block';
+        document.getElementById('import-running').style.display = 'none';
+        setTimeout(function () { window.location.reload(); }, 4000);
+    }
+
+    function pluralize(n, one, few, many) {
+        var mod10 = n % 10;
+        var mod100 = n % 100;
+        if (mod10 === 1 && mod100 !== 11) return one;
+        if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return few;
+        return many;
+    }
+
     function startProgressPolling() {
         if (progressPollInterval) {
             clearInterval(progressPollInterval);
@@ -710,7 +949,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (response.success) {
                         updateProgress(response.data);
 
-                        if (response.data.status === 'completed' || response.data.status === 'cancelled' || response.data.status === 'failed') {
+                        if (response.data.status === 'completed') {
+                            clearInterval(progressPollInterval);
+                            progressPollInterval = null;
+                            showCompleteBanner(response.data);
+                        } else if (response.data.status === 'cancelled' || response.data.status === 'failed') {
                             clearInterval(progressPollInterval);
                             progressPollInterval = null;
                             window.location.reload();
@@ -728,9 +971,11 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function updateProgress(data) {
-        document.getElementById('progress-text').textContent = data.progress + '%';
-        document.getElementById('progress-bar').style.width = data.progress + '%';
-        document.getElementById('progress-details').textContent = 'Обработано ' + data.processed + ' из ' + data.total;
+        var pct = Math.min(Math.round(data.progress), 100);
+        var displayed = Math.min(data.processed, data.total);
+        document.getElementById('progress-text').textContent = pct + '%';
+        document.getElementById('progress-bar').style.width = pct + '%';
+        document.getElementById('progress-details').textContent = 'Обработано ' + displayed + ' из ' + data.total;
 
         if (data.status === 'cancelled') {
             document.getElementById('progress-text').textContent = 'Отменено';

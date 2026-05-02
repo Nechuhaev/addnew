@@ -20,10 +20,13 @@ class ProductImportController extends Controller
 
     public function index()
     {
-        $progress = $this->importService->getProgress(auth()->user());
+        $user = auth()->user();
+        $progress = $this->importService->getProgress($user);
+        $history = $this->importService->getHistory($user);
 
         return view('front.user.profile.shop.import', [
             'progress' => $progress,
+            'history' => $history,
         ]);
     }
 

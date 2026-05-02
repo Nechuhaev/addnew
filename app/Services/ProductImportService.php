@@ -145,6 +145,27 @@ class ProductImportService
         return true;
     }
 
+    public function getHistory(User $user, int $limit = 15): array
+    {
+        return Import::where('user_id', $user->id)
+            ->whereIn('status', [Import::STATUS_COMPLETED, Import::STATUS_CANCELLED, Import::STATUS_FAILED])
+            ->latest()
+            ->limit($limit)
+            ->get()
+            ->map(function ($import) {
+                return [
+                    'id' => $import->id,
+                    'status' => $import->status,
+                    'total' => $import->total,
+                    'new_count' => $import->new_count,
+                    'update_count' => $import->update_count,
+                    'error_count' => $import->error_count,
+                    'created_at' => $import->created_at->format('d.m.Y H:i'),
+                ];
+            })
+            ->toArray();
+    }
+
     protected function getRandomPreview(array $products, int $limit): array
     {
         if (count($products) <= $limit) {

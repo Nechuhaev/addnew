@@ -12,14 +12,15 @@ class ImportFormatDetector
             return new XmlImportFormat();
         }
 
-        // Визначення за вмістом файлу якщо розширення не xml
+        // Визначення за вмістом файлу
         $handle = fopen($filePath, 'r');
-        $peek = $handle ? fread($handle, 200) : '';
+        $peek = $handle ? fread($handle, 500) : '';
         if ($handle) {
             fclose($handle);
         }
 
-        $peek = ltrim($peek); // прибираємо BOM та пробіли
+        $peek = ltrim($peek);
+
         if (strpos($peek, '<?xml') !== false || strpos($peek, '<rss') !== false || strpos($peek, '<feed') !== false) {
             return new XmlImportFormat();
         }
