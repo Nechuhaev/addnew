@@ -40,7 +40,7 @@
                             </svg>
                             <p style="margin: 0 0 8px; font-size: 15px; color: #333;">Перетащите CSV-файл сюда</p>
                             <p style="margin: 0; font-size: 13px; color: #727272;">или нажмите в любое место области</p>
-                            <input type="file" id="file-input" accept=".csv,.txt" style="display: none;">
+                            <input type="file" id="file-input" accept=".csv,.txt,.xml" style="display: none;">
                         </div>
                         <div id="upload-progress" style="display: none;">
                             <div class="spinner"></div>
@@ -505,8 +505,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         var ext = file.name.split('.').pop().toLowerCase();
 
-        if (ext !== 'csv' && ext !== 'txt') {
-            showError('Пожалуйста, выберите CSV-файл.');
+        if (ext !== 'csv' && ext !== 'txt' && ext !== 'xml') {
+            showError('Пожалуйста, выберите CSV или XML-файл.');
             isUploading = false;
             return;
         }
@@ -713,12 +713,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         if (response.data.status === 'completed' || response.data.status === 'cancelled' || response.data.status === 'failed') {
                             clearInterval(progressPollInterval);
                             progressPollInterval = null;
-
-                            if (response.data.status === 'completed') {
-                                window.location.reload();
-                            }
+                            window.location.reload();
                         }
                     }
+                } else if (xhr.status === 404) {
+                    clearInterval(progressPollInterval);
+                    progressPollInterval = null;
+                    hideProgressSection();
                 }
             };
 
@@ -758,14 +759,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     clearInterval(progressPollInterval);
                     progressPollInterval = null;
                 }
-                updateProgress({ status: 'cancelled', progress: 0, processed: 0, total: 0 });
-                setTimeout(function () {
-                    hideProgressSection();
-                    btn.disabled = false;
-                    btn.textContent = 'Отменить';
-                    document.getElementById('cancel-import-btn').style.display = '';
-                    document.getElementById('progress-bar').style.background = '';
-                }, 1500);
+                window.location.reload();
+            } else {
+                btn.disabled = false;
+                btn.textContent = 'Отменить';
             }
         };
 

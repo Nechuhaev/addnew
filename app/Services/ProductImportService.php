@@ -126,19 +126,20 @@ class ProductImportService
 
     public function cancelImport(User $user): bool
     {
-        $import = Import::where('user_id', $user->id)
+        $imports = Import::where('user_id', $user->id)
             ->whereIn('status', [Import::STATUS_PENDING, Import::STATUS_PROCESSING])
-            ->latest()
-            ->first();
+            ->get();
 
-        if (!$import) {
+        if ($imports->isEmpty()) {
             return false;
         }
 
-        $import->update(['status' => Import::STATUS_CANCELLED]);
+        foreach ($imports as $import) {
+            $import->update(['status' => Import::STATUS_CANCELLED]);
 
-        if (file_exists($import->file_path)) {
-            @unlink($import->file_path);
+            if (file_exists($import->file_path)) {
+                @unlink($import->file_path);
+            }
         }
 
         return true;

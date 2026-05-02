@@ -101,7 +101,7 @@ class ProductEditService
             return;
         }
 
-        $disk = Storage::disk('s3');
+        $disk = Storage::cloud();
         $currentImages = $this->getCurrentImages($product);
 
         foreach ($deleteSlots as $slotIndex => $value) {
@@ -162,7 +162,13 @@ class ProductEditService
      */
     protected function deleteImageFromStorage($disk, string $url): void
     {
-        $path = ltrim(parse_url($url, PHP_URL_PATH), '/');
+        $baseUrl = rtrim($disk->url(''), '/') . '/';
+        if (strpos($url, $baseUrl) === 0) {
+            $path = substr($url, strlen($baseUrl));
+        } else {
+            $path = ltrim(parse_url($url, PHP_URL_PATH), '/');
+        }
+
         if ($disk->exists($path)) {
             $disk->delete($path);
         }

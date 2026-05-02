@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Front\User\Shop;
 
 use App\Http\Controllers\Controller;
 use App\Services\ProductImportService;
-use App\Services\Import\CsvImportFormat;
+use App\Services\Import\ImportFormatDetector;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -30,7 +30,7 @@ class ProductImportController extends Controller
     public function upload(Request $request)
     {
         $request->validate([
-            'file' => 'required|file|mimes:csv,txt|max:25600',
+            'file' => 'required|file|mimes:csv,txt,xml|max:25600',
         ]);
 
         $user = auth()->user();
@@ -41,7 +41,7 @@ class ProductImportController extends Controller
             $path = $file->storeAs('imports', $uniqueName, 'local');
             $fullPath = storage_path('app/' . $path);
 
-            $format = new CsvImportFormat();
+            $format = ImportFormatDetector::detect($fullPath);
             $stats = $this->importService->processFile($fullPath, $format, $user);
 
             return response()->json([
