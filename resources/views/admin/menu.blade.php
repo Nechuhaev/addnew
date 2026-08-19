@@ -19,12 +19,23 @@
                 </a>
             </li>
             <li class="sidebar-item">
-                <a href="{{ route('admin.articles') }}" class="sidebar-link">
-                    <i class="mdi mdi-chart-bar"></i>
-                    <span class="hide-menu">Категории</span>
+                 <a href="{{ route('admin.stat.adCategories') }}" class="sidebar-link">
+                       <i class="mdi mdi-chart-bar"></i>
+                      <span class="hide-menu">Категории</span>
                 </a>
             </li>
-
+            <li class="sidebar-item">
+                <a href="{{ route('admin.stat.articles') }}" class="sidebar-link">
+                    <i class="mdi mdi-chart-bar"></i>
+                    <span class="hide-menu">Статьи</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ route('admin.stat.indexing') }}" class="sidebar-link">
+                    <i class="mdi mdi-google"></i>
+                    <span class="hide-menu">Індексація</span>
+                </a>
+            </li>
         </ul>
     </li>
 
@@ -34,6 +45,12 @@
             <span class="hide-menu">Пользователи</span>
         </a>
     </li>
+    <li class="sidebar-item">
+    <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{{ route('admin.shops') }}" aria-expanded="false">
+        <i class="mdi mdi-store"></i>
+        <span class="hide-menu">Магазины</span>
+    </a>
+</li>
 
     <li class="sidebar-item">
         <a class="sidebar-link has-arrow waves-effect waves-dark" href="javascript:void(0)" aria-expanded="false">

@@ -39,6 +39,7 @@ class ProductEditService
             'currency_id' => 'required|integer|exists:ad_currencies,id',
             'brand' => 'nullable|string|max:255',
             'code' => 'nullable|string|max:255',
+            'competitor_url' => 'nullable|url|max:500',
             'stock' => 'required|in:in_stock,out_of_stock',
             'condition' => 'required|in:new,used,refurbished',
             'image.*' => 'nullable|sometimes|image|max:1024|mimes:jpg,jpeg,bmp,png',
@@ -59,6 +60,7 @@ class ProductEditService
             'price.numeric' => 'Ціна має бути числом',
             'currency_id.required' => 'Виберіть валюту',
             'currency_id.exists' => 'Виберіть валюту зі списку',
+            'competitor_url.url' => 'Введіть коректне посилання (https://...)',
             'stock.required' => 'Виберіть статус наявності',
             'condition.required' => 'Виберіть стан товару',
             'image.*.image' => 'Недопустимий формат зображення',
@@ -78,6 +80,7 @@ class ProductEditService
         $product->currency_id = $data['currency_id'];
         $product->brand = $data['brand'] ?? null;
         $product->code = $data['code'] ?? null;
+        $product->competitor_url = $data['competitor_url'] ?? null;
         $product->stock = $data['stock'];
         $product->condition = $data['condition'];
 

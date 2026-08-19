@@ -5,7 +5,7 @@
                 <div class="category-count">{{ $loop->iteration }}</div>
                 <div class="category-img">
                     <a href="{{ $ad['url'] }}" title="{{ $ad['name'] }}" class="preview" data-rel="{{ $ad['image'] }}">
-                        <img width="250" height="250" src="{{ $ad['image'] }}" class="attachment-ad-medium size-ad-medium" alt="{{ $ad['name'] }}">
+                        <img width="250" height="250" src="{{ $ad['image'] }}" class="attachment-ad-medium size-ad-medium" alt="{{ $ad['name'] }}" onerror="this.onerror=null;this.src='{{ asset('assets/front/img/placeholder.png') }}';">
                     </a>
                 </div>
                 <div class="category-caption">

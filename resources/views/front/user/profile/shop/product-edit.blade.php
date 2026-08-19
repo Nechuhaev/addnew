@@ -151,6 +151,25 @@
                                 </div>
                             </div>
 
+                            <div class="product-edit-section">
+                                <h2>Моніторинг ціни конкурента</h2>
+
+                                <div class="form-group">
+                                    <label>Посилання на аналогічний товар в іншому магазині</label>
+                                    <input type="url" name="competitor_url" value="{{ old('competitor_url', $product->competitor_url) }}" class="form-control" placeholder="https://...">
+                                    <span class="form-help">
+                                        Якщо вказано — система регулярно перевірятиме ціну за цим посиланням
+                                        і автоматично оновлюватиме ціну вашого товару, якщо вона зміниться
+                                        (тільки якщо валюта на сторінці конкурента збігається з валютою товару).
+                                    </span>
+                                    @if($product->competitor_url)
+                                        <span class="form-help">
+                                            Остання перевірка: {{ optional($product->priceChecks()->latest('checked_at')->first())->checked_at ?? 'ще не перевірялось' }}
+                                        </span>
+                                    @endif
+                                </div>
+                            </div>
+
                             <div class="form-action">
                                 <input type="submit" name="submit" class="btn btn-step" value="Зберегти зміни">
                             </div>

@@ -21,28 +21,39 @@
             {{ Breadcrumbs::render($breadcrumbs, $entity) }}
 
             <p style="font-size: 20px;font-weight: 900;">Все объявления пользователя {{ $entity->username }}</p>
-            <div class="author">
-                <div class="author-photo"><img alt="Пользователь {{ $entity->username }}" src="{{ $entity->image ?? asset('assets/front/img/placeholder.png') }}" class="author-avatar" height="250" width="250"></div>
-                @if($is_shop)
-                    <div class="author-info"><strong>Количество предложений: </strong> {{ $entity->ads()->count() }}</div>
-                    @if($entity->telephone)
-                    <div class="author-info"><strong>Телефон: </strong> {{ $entity->telephone }}</div>
-                    @endif
-                    @if($entity->email)
-                        <div class="author-info"><strong>Email :</strong> {{ $entity->email }}</div>
-                    @endif
-                    @if($entity->site_url)
-                        <div class="author-info"><strong>Сайт: </strong> {{ $entity->site_url }}</div>
-                    @endif
 
-                @else
-                <div class="author-info"><strong>Дата регистрации:</strong> {{ $entity->created_at }}</div>
-                <div class="author-info"><strong>Всего объявлений автора:</strong> {{ $entity->ads()->count() }}</div>
-                @endif
-                @if ($entity->info)
-                    <div class="author-description">
-                        <h3>Описание</h3>
-                        <p>{{ $entity->info }}</p>
+            <div class="author" style="display:flex; flex-wrap:wrap; gap: 20px; align-items:flex-start;">
+                <div class="author-photo"><img alt="Пользователь {{ $entity->username }}" src="{{ $entity->image ?? asset('assets/front/img/placeholder.png') }}" class="author-avatar" height="250" width="250"></div>
+                <div class="author-details" style="flex: 1 1 250px; min-width: 250px;">
+                    @if($is_shop)
+                        <div class="author-info"><strong>Количество предложений: </strong> {{ $entity->ads()->count() }}</div>
+                        @if($entity->telephone)
+                        <div class="author-info"><strong>Телефон: </strong> {{ $entity->telephone }}</div>
+                        @endif
+                        @if($entity->email)
+                            <div class="author-info"><strong>Email :</strong> {{ $entity->email }}</div>
+                        @endif
+                        @if($entity->site_url)
+                            <div class="author-info"><strong>Сайт: </strong> {{ $entity->site_url }}</div>
+                        @endif
+
+                    @else
+                    <div class="author-info"><strong>Дата регистрации:</strong> {{ $entity->created_at }}</div>
+                    <div class="author-info"><strong>Всего объявлений автора:</strong> {{ $entity->ads()->count() }}</div>
+                    @endif
+                    @if ($entity->info)
+                        <div class="author-description">
+                            <h3>Описание</h3>
+                            <p>{{ $entity->info }}</p>
+                        </div>
+                    @endif
+                </div>
+                @if($is_shop && $entity->banner)
+                    @php
+                        $bannerUrl = strpos($entity->banner, 'http') === 0 ? $entity->banner : asset($entity->banner);
+                    @endphp
+                    <div class="author-banner" style="flex: 1 1 320px; max-width: 420px; height: 150px; overflow:hidden; border-radius:6px;">
+                        <img src="{{ $bannerUrl }}" alt="Баннер магазина {{ $entity->username }}" style="width:100%; height:100%; object-fit:cover; display:block;">
                     </div>
                 @endif
             </div>

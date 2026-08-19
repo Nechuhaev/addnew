@@ -33,7 +33,12 @@ use Illuminate\Support\Str;
 class Article extends Model
 {
 
-    protected $fillable = ['name', 'slug', 'excerpt', 'content', 'sort_order', 'meta_title', 'meta_description', 'image'];
+    protected $fillable = ['name', 'slug', 'excerpt', 'content', 'sort_order', 'meta_title', 'meta_description', 'image', 'focus_keyword', 'tags', 'ai_generated'];
+    
+    protected $casts = [
+    'tags' => 'array',
+    'ai_generated' => 'boolean',
+];
 
 
     public function categories() {

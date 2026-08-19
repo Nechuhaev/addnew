@@ -53,6 +53,34 @@
                             </div>
                         </div>
 
+                        @if(isset($ad))
+                            @php
+                                $boardUrl = rtrim(config('app.url'), '/') . $ad->url;
+                                // ВАЖЛИВО: $ad->url — аксесор, завжди повертає внутрішній шлях
+                                // "/ads/slug". Реальне посилання на сайт-джерело зберігається
+                                // сирим у стовпці url — беремо через getOriginal(), інакше
+                                // отримаємо той самий внутрішній шлях замість зовнішнього.
+                                $sourceUrl = $ad->competitor_url ?: $ad->getOriginal('url');
+                            @endphp
+                            <div class="form-group">
+                                <label>Посилання на дошці</label>
+                                <div>
+                                    <a href="{{ $boardUrl }}" target="_blank" rel="noopener noreferrer">{{ $boardUrl }} &#8599;</a>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Посилання на сайті магазину</label>
+                                <div>
+                                    @if($sourceUrl)
+                                        <a href="{{ $sourceUrl }}" target="_blank" rel="noopener noreferrer">{{ $sourceUrl }} &#8599;</a>
+                                    @else
+                                        <span class="text-muted">— не вказано —</span>
+                                    @endif
+                                </div>
+                            </div>
+                        @endif
+
                         <div class="form-group">
                             <label for="price">Цена</label>
                             <div>
@@ -205,9 +233,16 @@
                                 <div class="col-7">
                                     <select name="status" class="form-control" id="">
                                         @if(isset($ad))
-                                            <option value="0" {{ ($ad->status == 0) ? 'selected' : '' }}>Остановлено</option>
-                                            <option value="1" {{ ($ad->status == 1) ? 'selected' : '' }}>Активно</option>
-                                            <option value="2" {{ ($ad->status == 2) ? 'selected' : '' }}>В архиве</option>
+                                            {{-- ВАЖЛИВО: $ad->status йде через аксесор і повертає РЯДОК
+                                                 ('active'/'suspend'/'archive'), а не число з БД. У PHP 7
+                                                 нечисловий рядок при == з числом кастується в 0, тому
+                                                 будь-який рядок "дорівнював" 0, і "Остановлено" завжди
+                                                 показувалось обраним незалежно від реального статусу.
+                                                 Порівнюємо із сирим значенням через getOriginal(). --}}
+                                            @php $rawStatus = $ad->getOriginal('status'); @endphp
+                                            <option value="0" {{ ($rawStatus == 0) ? 'selected' : '' }}>Остановлено</option>
+                                            <option value="1" {{ ($rawStatus == 1) ? 'selected' : '' }}>Активно</option>
+                                            <option value="2" {{ ($rawStatus == 2) ? 'selected' : '' }}>В архиве</option>
                                         @elseif (old('status') || old('status') === '0')
                                             <option value="0" {{ (old('status') == 0) ? 'selected' : '' }}>Остановлено</option>
                                             <option value="1" {{ (old('status') == 1) ? 'selected' : '' }}>Активно</option>
@@ -315,5 +350,4 @@
 
         </div>
     </form>
-
 @endsection

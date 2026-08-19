@@ -16,6 +16,7 @@ use Illuminate\Notifications\Notifiable;
  * @property string $email
  * @property string|null $telephone
  * @property string|null $site_url
+ * @property string|null $country
  * @property string|null $facebook_url
  * @property string|null $twitter_url
  * @property string $password
@@ -61,7 +62,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'firstname', 'email', 'password', 'is_shop_owner', 'site_url',
+        'firstname', 'email', 'password', 'is_shop_owner', 'site_url', 'country', 'banner',
         'telephone', 'info', 'image',
     ];
 

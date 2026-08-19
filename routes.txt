@@ -1,0 +1,2 @@
+
+Parse error: syntax error, unexpected '->' (T_OBJECT_OPERATOR) in /home/addnew/addnew.biz/www/vendor/laravel/framework/src/Illuminate/Support/Collection.php on line 103

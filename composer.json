@@ -10,7 +10,7 @@
     "require": {
         "php": "^7.2",
         "arrilot/laravel-widgets": "^3.13",
-        "davejamesmiller/laravel-breadcrumbs": "5.x",
+        "diglactic/laravel-breadcrumbs": "5.3.2",
         "fideloper/proxy": "^4.0",
         "laravel/framework": "^6.0",
         "laravel/helpers": "^1.1",

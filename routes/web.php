@@ -17,11 +17,26 @@
  * *******************************************************************************
  */
 
+Route::get('/system/cron-runner/{token}', 'CronRunnerController@run');
+
 Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::get('/', 'AdminPageController@index')->name('admin.index');
+    
+    Route::get('/shops', 'Admin\Shop\ShopController@index')->name('admin.shops');
+    Route::get('/shops/{id}', 'Admin\Shop\ShopController@edit')->name('admin.shops.edit');
+    Route::post('/shops/{id}/update', 'Admin\Shop\ShopController@update')->name('admin.shops.update');
+    Route::get('/shops/{id}/products', 'Admin\Shop\ShopController@products')->name('admin.shops.products');
+    Route::get('/shops/{id}/impersonate', 'Admin\Shop\ShopController@impersonate')->name('admin.shops.impersonate');
+    Route::delete('/shops/product/{id}', 'Admin\Shop\ShopController@deleteProduct')->name('admin.shops.product.delete');
+    Route::delete('/shops/{id}', 'Admin\Shop\ShopController@destroy')->name('admin.shops.destroy');
+    Route::delete('/shops/{id}/products/delete-inactive', 'Admin\Shop\ShopController@bulkDeleteInactive')->name('admin.shops.products.deleteInactive');
+    Route::post('/shops/{id}/message', 'Admin\Shop\ShopController@sendMessage')->name('admin.shops.message');
 
     Route::prefix('stat')->group(function () {
         Route::get('/ads', 'Admin\Stat\AdStatController@index')->name('admin.stat.ads');
+        Route::get('/ad-categories', 'Admin\Stat\AdCategoryStatController@index')->name('admin.stat.adCategories');
+        Route::get('/articles', 'Admin\Stat\ArticleStatController@index')->name('admin.stat.articles');
+        Route::get('/indexing', 'Admin\Stat\IndexingStatController@index')->name('admin.stat.indexing');
     });
 
     // Список запрещенных email адресов
@@ -35,6 +50,8 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::get('/stop-words', 'Admin\StopWord\StopWordController@index')->name('admin.stop-word');
     Route::post('/stop-words/check', 'Admin\StopWord\StopWordController@check')->name('admin.stop-word.check');
     Route::post('/stop-words/delete', 'Admin\StopWord\StopWordController@delete')->name('admin.stop-word.delete');
+    Route::post('/stop-words/store', 'Admin\StopWord\StopWordController@store')->name('admin.stop-word.store');
+    Route::delete('/stop-words/{id}', 'Admin\StopWord\StopWordController@destroy')->name('admin.stop-word.destroy');
 
     // Пользователи
     Route::get('/users', 'Admin\User\UserController@showUsersList')->name('admin.users');
@@ -209,6 +226,7 @@ Route::middleware(['localized'])->group(function () {
         Route::post('/profile/shop/info', 'Front\User\Shop\ShopInfoController@update')->name('profile.shop.info.update');
         Route::get('/profile/shop/product/{id}/edit', 'Front\User\Shop\ProductEditController@edit')->name('profile.shop.product.edit');
         Route::post('/profile/shop/product/{id}/edit', 'Front\User\Shop\ProductEditController@update')->name('profile.shop.product.update');
+        Route::get('/impersonate/leave', 'Front\ImpersonationController@leave')->name('impersonate.leave');
     });
 
 

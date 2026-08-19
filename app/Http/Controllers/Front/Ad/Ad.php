@@ -218,6 +218,10 @@ class Ad extends Controller
                 return true;
             }, "Почтовые адреса этого сервиса не поддерживается нашим сайтом. Пожалуйста, воспользуйтесь другим почтовым сервисом.");
 
+            Validator::extend('not_stop_word', function ($attribute, $value, $parameters) {
+                return \App\StopWord::findMatchIn($value) === null;
+            }, "Текст содержит запрещенное слово и не может быть опубликован.");
+
             $errors = [
                 'author.required' => 'Введите имя автора объявления',
                 'author.min' => 'Имя автора не может быть короче :min символов',
@@ -229,8 +233,10 @@ class Ad extends Controller
                 'email.email' => 'Введите свой email!',
                 'name.required' => 'Введите название объявления!',
                 'name.min' => 'Минимальная длина названия объявления не может быть короче :min символов',
+                'name.not_stop_word' => 'Название объявления содержит запрещенное слово.',
                 'content.required' => 'Введите описание объявления!',
                 'content.min' => 'Минимальная длина описания не может быть короче :min символов',
+                'content.not_stop_word' => 'Описание объявления содержит запрещенное слово.',
                 'tags.required' => 'Введите метки объявления!',
                 'tags.min' => 'Минимальная длина метки не может быть короче :min символов',
                 'image.required' => 'Выберите минимум одно изображение!',
@@ -246,8 +252,8 @@ class Ad extends Controller
                 'telephone' => 'required|min:6',
                 'city_id' => 'required|exists:ad_cities,id',
                 'email' => 'sometimes|required|email|not_from_block_list',
-                'name' => 'required|min:6',
-                'content' => 'required|min:70',
+                'name' => 'required|min:6|not_stop_word',
+                'content' => 'required|min:70|not_stop_word',
                 'tags' => 'required|min:3',
                 'image' => 'required',
                 'image.*' => 'image|max:1024|mimes:jpg,jpeg,bmp,png',
@@ -502,8 +508,10 @@ class Ad extends Controller
             'email.email' => 'Введите свой email!',
             'name.required' => 'Введите название объявления!',
             'name.min' => 'Минимальная длина названия объявления не может быть короче :min символов',
+            'name.not_stop_word' => 'Название объявления содержит запрещенное слово.',
             'content.required' => 'Введите описание объявления!',
             'content.min' => 'Минимальная длина описания не может быть короче :min символов',
+            'content.not_stop_word' => 'Описание объявления содержит запрещенное слово.',
             'image.required' => 'Выберите минимум одно изображение!',
             'image.*.image' => 'Недопустимый формат изображения!',
             'image.*.mimes' => 'Недопустимый формат изображения!',
@@ -523,14 +531,18 @@ class Ad extends Controller
             return true;
         }, "Почтовые адреса этого сервиса не поддерживается нашим сайтом. Пожалуйста, воспользуйтесь другим почтовым сервисом.");
 
+        Validator::extend('not_stop_word', function ($attribute, $value, $parameters) {
+            return \App\StopWord::findMatchIn($value) === null;
+        }, "Текст содержит запрещенное слово и не может быть опубликован.");
+
         $validator = Validator::make($ad, [
             'category_id' => 'required|integer|exists:ad_categories,id',
             'author' => 'sometimes|required|min:3',
             'telephone' => 'required|min:6',
             'city_id' => 'required|exists:ad_cities,id',
             'email' => 'required|required|email|not_from_block_list',
-            'name' => 'required|min:6',
-            'content' => 'required|min:70',
+            'name' => 'required|min:6|not_stop_word',
+            'content' => 'required|min:70|not_stop_word',
             'images' => 'required',
             'price' => 'required|numeric',
             'currency_id' => 'required|integer|exists:ad_currencies,id',
@@ -736,6 +748,10 @@ class Ad extends Controller
 
     public function update($ad_id, Request $request) {
 
+        Validator::extend('not_stop_word', function ($attribute, $value, $parameters) {
+            return \App\StopWord::findMatchIn($value) === null;
+        }, "Текст содержит запрещенное слово и не может быть опубликован.");
+
         $errors = [
             'telephone.required' => 'Введите номер телефона',
             'telephone.min' => 'Номер телефона не может быть короче :min символов',
@@ -743,8 +759,10 @@ class Ad extends Controller
             'email.email' => 'Введите свой email!',
             'name.required' => 'Введите название объявления!',
             'name.min' => 'Минимальная длина названия объявления не может быть короче :min символов',
+            'name.not_stop_word' => 'Название объявления содержит запрещенное слово.',
             'content.required' => 'Введите описание объявления!',
             'content.min' => 'Минимальная длина описания не может быть короче :min символов',
+            'content.not_stop_word' => 'Описание объявления содержит запрещенное слово.',
             'image.*.image' => 'Недопустимый формат изображения!',
             'image.*.mimes' => 'Недопустимый формат изображения!',
             'image.*.max' => 'Недопустимый размер файла. Максимально доступный размер :min байт',
@@ -755,8 +773,8 @@ class Ad extends Controller
         $request->validate([
             'telephone' => 'required|min:6',
             'email' => 'required|email',
-            'name' => 'required|min:6',
-            'content' => 'required|min:70',
+            'name' => 'required|min:6|not_stop_word',
+            'content' => 'required|min:70|not_stop_word',
             'image.*' => 'nullable|sometimes|image|max:1024|mimes:jpg,jpeg,bmp,png',
             'price' => 'required|numeric',
             'currency_id' => 'required|integer|exists:ad_currencies,id',

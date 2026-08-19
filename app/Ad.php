@@ -301,5 +301,9 @@ class Ad extends Model
     public function scopeProducts(Builder $query) {
         return $query->where('is_product', 1);
     }
+    public function priceChecks()
+    {
+    return $this->hasMany(\App\ProductPriceCheck::class, 'ad_id');
+    }
 
 }

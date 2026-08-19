@@ -5,7 +5,7 @@
 @section('meta_description', $meta['meta_description'] ?? $ad->content)
 
 @section('load-scripts')
-    <script type="text/javascript" charset="UTF-8" src="https://maps.googleapis.com/maps/api/js?language=ru&region=RU&key=AIzaSyDfdB0wmym_DAbmbgubW-Tm3ivVN_ZCJMw&ver=3.0"></script>
+    <script type="text/javascript" charset="UTF-8" src="https://maps.googleapis.com/maps/api/js?language=ru&region=RU&key=AIzaSyCndp-qqA81hIeD45u32313k_MUY3um2Ds&ver=3.0"></script>
 @endsection
 
 @section('content')
@@ -49,14 +49,14 @@
                 <aside class="column-left hidden-xs">
                     <div class="adv-img">
                         <a href="{{ $ad->image }}" data-rel="colorbox" class="colorbox group1" title="{{ $ad->name }}">
-                            <img class="img-responsive" src="{{ $ad->image }}" title="{{ $ad->name }}" alt="{{ $ad->name }}" style="opacity: 1;">
+                            <img class="img-responsive" src="{{ $ad->image }}" title="{{ $ad->name }}" alt="{{ $ad->name }}" style="opacity: 1;" onerror="this.onerror=null;this.src='{{ asset('assets/front/img/placeholder.png') }}';">
                         </a>
 
                         @if($ad->images && !empty($ad->images[0]))
                             <div class="adv-imgs">
                             @foreach($ad->images as $image)
                                     <a href="{{ $image }}" id="thumb{{ $loop->iteration }}" class="colorbox group1" data-rel="colorbox" title="{{ $ad->name }} - Изображение {{ $loop->iteration }}">
-                                        <img src="{{ $image }}" alt="{{ $ad->name . $loop->iteration }}" title="{{ $ad->name . $loop->iteration }}" width="50" height="50" style="opacity: 1;">
+                                        <img src="{{ $image }}" alt="{{ $ad->name . $loop->iteration }}" title="{{ $ad->name . $loop->iteration }}" width="50" height="50" style="opacity: 1;" onerror="this.onerror=null;this.src='{{ asset('assets/front/img/placeholder.png') }}';">
                                     </a>
                             @endforeach
                             </div>
@@ -97,12 +97,12 @@
 
                         <div class="adv-img visible-xs">
                             <a href="{{ $ad->image }}" data-rel="colorbox" class="colorbox group1" title="{{ $ad->name }}">
-                                <img class="img-responsive" src="{{ $ad->image }}" title="{{ $ad->name }}" alt="{{ $ad->name }}" style="opacity: 1;">
+                                <img class="img-responsive" src="{{ $ad->image }}" title="{{ $ad->name }}" alt="{{ $ad->name }}" style="opacity: 1;" onerror="this.onerror=null;this.src='{{ asset('assets/front/img/placeholder.png') }}';">
                             </a>
                             @if($ad->images)
                                 <div class="adv-imgs">
                                     @foreach($ad->images as $image)
-                                        <a href="{{ $ad->image }}" id="thumb{{ $loop->iteration }}" class="colorbox group1" data-rel="colorbox" title="{{ $ad->name }} - Изображение {{ $loop->iteration }}"><img src="{{ $ad->image }}" alt="{{ $ad->name . $loop->iteration }}" title="{{ $ad->name . $loop->iteration }}" width="50" height="50" style="opacity: 1;"></a>
+                                        <a href="{{ $ad->image }}" id="thumb{{ $loop->iteration }}" class="colorbox group1" data-rel="colorbox" title="{{ $ad->name }} - Изображение {{ $loop->iteration }}"><img src="{{ $ad->image }}" alt="{{ $ad->name . $loop->iteration }}" title="{{ $ad->name . $loop->iteration }}" width="50" height="50" style="opacity: 1;" onerror="this.onerror=null;this.src='{{ asset('assets/front/img/placeholder.png') }}';"></a>
                                     @endforeach
                                 </div>
                             @endif
@@ -300,7 +300,7 @@
                         <div class="related-ad">
                             <div class="image">
                                 <a href="{{ $related_ad->url }}" title="{{ $related_ad->name }}">
-                                    <img src="{{ $related_ad->image }}" alt="{{ $related_ad->name }}" class="img-responsive">
+                                    <img src="{{ $related_ad->image }}" alt="{{ $related_ad->name }}" class="img-responsive" onerror="this.onerror=null;this.src='{{ asset('assets/front/img/placeholder.png') }}';">
                                 </a>
                             </div>
                             <div class="price">100 грн <span class="city">Днепропетровск</span></div>
@@ -317,7 +317,8 @@
 @section('script')
     @if (env('APP_ENV') == 'production')
     <script>
-        init_google_map('{{ $ad->city->region->country->name }}, {{ $ad->city->name }}', '{{ $ad->name }}');
+        window.addressFallback = '{{ $ad->city->region->country->name }}, {{ $ad->city->name }}';
+        init_google_map('{{ $ad->city->region->country->name }}, {{ $ad->city->region->name }}, {{ $ad->city->name }}', '{{ $ad->name }}');
     </script>
     @endif
 @endsection

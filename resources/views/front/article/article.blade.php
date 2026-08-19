@@ -1,8 +1,6 @@
 @extends('front.layout')
-
 @section('meta_title', $article->meta_title ?? $article->name);
 @section('meta_description', $article->meta_description ?? strip_tags($article->excerpt) ?? strip_tags($article->description));
-
 @section('content')
     <main class="post-page">
         <div class="container">
@@ -35,8 +33,55 @@
                             {!! $article->content !!}
                         </div>
                     </div>
+
+                    @if($randomProducts->isNotEmpty())
+                        <section class="article-promo-block">
+                            <p class="section-heading">Товари з магазинів</p>
+                            <div class="related-ads">
+                                @foreach($randomProducts as $product)
+                                    <div class="related-ad">
+                                        <div class="image">
+                                            <a href="{{ route('ad.page', ['slug' => $product->slug]) }}" title="{{ $product->name }}">
+                                                <img src="{{ $product->image }}" alt="{{ $product->name }}" class="img-responsive" onerror="this.onerror=null;this.src='{{ asset('assets/front/img/placeholder.png') }}';">
+                                            </a>
+                                        </div>
+                                        <div class="price">{{ $product->price }} {{ optional($product->currency)->code }}</div>
+                                        <a href="{{ route('ad.page', ['slug' => $product->slug]) }}" title="{{ $product->name }}" class="ad-heading">{{ $product->name }}</a>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </section>
+                    @endif
+
+                    @if($randomListings->isNotEmpty())
+                        <section class="article-promo-block">
+                            <p class="section-heading">Оголошення на дошці</p>
+                            <div class="related-ads">
+                                @foreach($randomListings as $listing)
+                                    <div class="related-ad">
+                                        <div class="image">
+                                            <a href="{{ route('ad.page', ['slug' => $listing->slug]) }}" title="{{ $listing->name }}">
+                                                <img src="{{ $listing->image }}" alt="{{ $listing->name }}" class="img-responsive" onerror="this.onerror=null;this.src='{{ asset('assets/front/img/placeholder.png') }}';">
+                                            </a>
+                                        </div>
+                                        <div class="price">
+                                            @if($listing->price)
+                                                {{ $listing->price }} {{ optional($listing->currency)->code }}
+                                            @else
+                                                Безкоштовно
+                                            @endif
+                                        </div>
+                                        <a href="{{ route('ad.page', ['slug' => $listing->slug]) }}" title="{{ $listing->name }}" class="ad-heading">{{ $listing->name }}</a>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </section>
+                    @endif
                 </div>
                 <aside class="column-right">
+                    <div class="banner">
+                        @include('front.adsense.category-right')
+                    </div>
                     @widget('front.articleCategory')
                 </aside>
             </div>

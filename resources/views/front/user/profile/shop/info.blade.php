@@ -10,6 +10,10 @@
     } elseif (!$logoUrl) {
         $logoUrl = asset('assets/front/img/placeholder.png');
     }
+    $bannerUrl = $user->banner;
+    if ($bannerUrl && strpos($bannerUrl, 'http') !== 0) {
+        $bannerUrl = asset($bannerUrl);
+    }
 @endphp
 
 @section('content')
@@ -57,7 +61,20 @@
                                 <img src="{{ $logoUrl }}" alt="Логотип магазина" id="logo-preview" class="logo-preview" style="max-width: 100px; max-height: 100px;">
                             </div>
                             <input type="file" name="logo" id="logo" accept="image/jpeg,image/png,image/gif,image/webp" class="form-control-file">
-                            <small class="form-text text-muted">Допустимые форматы: JPG, PNG, GIF, WEBP. Максимальный размер: 2 МБ</small>
+                            <small class="form-text text-muted">Рекомендований розмір: 200×200px (квадратне зображення). Допустимі форматы: JPG, PNG, GIF, WEBP. Максимальный размер: 2 МБ</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="banner">Баннер магазина</label>
+                            <div class="banner-preview-wrapper">
+                                @if($bannerUrl)
+                                    <img src="{{ $bannerUrl }}" alt="Баннер магазина" id="banner-preview" class="banner-preview" style="max-width: 100%; max-height: 200px; display:block; margin-bottom: 10px;">
+                                @else
+                                    <img src="" alt="" id="banner-preview" class="banner-preview" style="max-width: 100%; max-height: 200px; display:none; margin-bottom: 10px;">
+                                @endif
+                            </div>
+                            <input type="file" name="banner" id="banner" accept="image/jpeg,image/png,image/gif,image/webp" class="form-control-file">
+                            <small class="form-text text-muted">Рекомендований розмір: 1200×300px (широкий формат — показується на всю ширину сторінки вашого магазину). Допустимі формати: JPG, PNG, GIF, WEBP. Максимальний розмір: 3 МБ.</small>
                         </div>
 
                         <div class="form-group">
@@ -99,6 +116,21 @@
                     const reader = new FileReader();
                     reader.onload = function(e) {
                         logoPreview.src = e.target.result;
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            const bannerInput = document.getElementById('banner');
+            const bannerPreview = document.getElementById('banner-preview');
+
+            bannerInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        bannerPreview.src = e.target.result;
+                        bannerPreview.style.display = 'block';
                     }
                     reader.readAsDataURL(file);
                 }
