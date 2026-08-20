@@ -1,9 +1,6 @@
 @extends('front.layout')
-
 @section('meta_title', $meta['meta_title'] ?? "Контактная информация")
-
 @section('meta_description', $meta['meta_description'] ?? "Контактная информация addnew.biz")
-
 @section('style')
     <script src="https://www.google.com/recaptcha/api.js"></script>
     <script>
@@ -12,44 +9,37 @@
         }
     </script>
 @endsection
-
 @section('content')
     <main class="contact-page">
         <div class="container">
             <div class="banner">
                 @include('front.adsense.top')
             </div>
-
             <ul class="breadcrumb">
-                <li><a href="{{ route('index') }}">Главная</a></li>
-                <li><span>Контакты</span></li>
+                <li><a href="{{ route('index') }}">{{ __('front.home') }}</a></li>
+                <li><span>{{ __('front.contacts') }}</span></li>
             </ul>
-
-            <h1>Контакты</h1>
-
-
+            <h1>{{ __('front.contacts') }}</h1>
             <div class="columns columns-nowrap">
                 <aside class="column-left hidden-xs">
                     <div class="notice-wrap">
                         <div class="notice">
                             <i class="icon icon-note"></i>
                             <div>
-                                <p>Мы всегда готовы ответить на ваши вопросы о работе сайта, а так же принять конструктивную критику. Для более полного ответа, пожалуйста, помимо самого вопроса, предоставьте как можно больше дополнительных данных: ссылки на объявления, скриншоты.</p>
+                                <p>{{ __('contacts.intro_notice') }}</p>
                             </div>
                         </div>
                     </div>
                 </aside>
                 <div class="column-content">
-
                     <div class="notice-wrap visible-xs">
                         <div class="notice">
                             <i class="icon icon-note"></i>
                             <div>
-                                <p>Мы всегда готовы ответить на ваши вопросы о работе сайта, а так же принять конструктивную критику. Для более полного ответа, пожалуйста, помимо самого вопроса, предоставьте как можно больше дополнительных данных: ссылки на объявления, скриншоты.</p>
+                                <p>{{ __('contacts.intro_notice') }}</p>
                             </div>
                         </div>
                     </div>
-
                     <form class="form-contact"
                           id="contact-form"
                           action="{{ route('contacts.submit') }}"
@@ -65,52 +55,50 @@
                                 </ul>
                             </div>
                         @endif
-
                         @if(session()->has('success'))
                             <div class="alert alert-success">
                                 {{ session()->get('success') }}
                             </div>
                         @endif
                         <div class="form-group">
-                            <label>Ваше имя <span class="star">*</span>:</label>
+                            <label>{{ __('contacts.name_label') }} <span class="star">*</span>:</label>
                             <input type="text" name="name" class="form-control" value="{{ old('name') }}">
                         </div>
                         <div class="form-group">
-                            <label>Введите ваш адрес электронной почты <span class="star">*</span>:</label>
+                            <label>{{ __('contacts.email_label') }} <span class="star">*</span>:</label>
                             <input type="email" name="email" class="form-control" value="{{ old('email') }}">
                         </div>
                         <div class="form-group">
-                            <label>Выберите интересующий вас раздел <span class="star">*</span>:</label>
+                            <label>{{ __('contacts.subject_label') }} <span class="star">*</span>:</label>
                             <select name="subject" class="form-control" style="width: 100%;">
-                                <option value="0">-- Выберите --</option>
-                                <option value="Подключение магазина">Подключение магазина</option>
-                                <option value="Проблемы регистрации и входа">Проблемы регистрации и входа</option>
-                                <option value="Объявление на модерации">Объявление на модерации</option>
-                                <option value="У меня не работает...">У меня не работает...</option>
-                                <option value="Профиль, управление объявлениями">Профиль, управление объявлениями</option>
+                                <option value="0">{{ __('ad_create.select_dash_placeholder') }}</option>
+                                {{-- value="" лишаємо оригінальним російським текстом навмисно —
+                                     можливо, десь у бекенді чи листах адміну звіряється саме
+                                     ця строка; перекладаємо тільки видимий текст. --}}
+                                <option value="Подключение магазина">{{ __('contacts.subject_shop') }}</option>
+                                <option value="Проблемы регистрации и входа">{{ __('contacts.subject_auth') }}</option>
+                                <option value="Объявление на модерации">{{ __('contacts.subject_moderation') }}</option>
+                                <option value="У меня не работает...">{{ __('contacts.subject_broken') }}</option>
+                                <option value="Профиль, управление объявлениями">{{ __('contacts.subject_profile') }}</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Описание <span class="star">*</span></label>
+                            <label>{{ __('contacts.description_label') }} <span class="star">*</span></label>
                             <textarea name="description" rows="8" class="form-control">{{ old('description') }}</textarea>
                         </div>
-
                         <div class="form-group">
-                            <label>Изображения</label>
+                            <label>{{ __('contacts.images_label') }}</label>
                             <input type="file" multiple name="images">
-                            <p class="help">Допустимое количество загружаемых файлов: 5. Максимальный размер файла: 1024 KB.</p>
+                            <p class="help">{{ __('contacts.images_help') }}</p>
                         </div>
-
                         <div class="form-action">
                             <input type="submit" class="btn btn-contact g-recaptcha"
                                    data-sitekey="6LcqmP4ZAAAAAOoQscpUmczUD25MFl3tk_CT2C_i"
                                    data-callback='onSubmit'
                                    data-action='submit'
-                                   value="Отправить">
+                                   value="{{ __('contacts.send_button') }}">
                         </div>
-
                     </form>
-
                 </div>
             </div>
             <div class="show-more">
@@ -118,9 +106,8 @@
                     {!! $meta['description']  !!}
                 </section>
                 <div class="show-more__shadow"></div>
-                <span class="show-more__btn btn-show">Показать</span>
+                <span class="show-more__btn btn-show">{{ __('front.show_more') }}</span>
             </div>
         </div>
-
     </main>
 @endsection

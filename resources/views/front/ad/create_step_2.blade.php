@@ -12,38 +12,38 @@
             {{--</div>--}}
 
             <ul class="breadcrumb">
-                <li><a href="{{ route('index') }}">Главная</a></li>
-                <li><span>Детали</span></li>
+                <li><a href="{{ route('index') }}">{{ __('front.home') }}</a></li>
+                <li><span>{{ __('ad_create.step_details') }}</span></li>
             </ul>
 
             <ul class="steps-row" data-steps="4">
-                <li class="steps-done">Категория</li>
-                <li class="steps-done">Детали</li>
-                <li class="steps-todo">Предпросмотр</li>
-                <li class="steps-todo">Спасибо</li>
+                <li class="steps-done">{{ __('ad_create.step_category') }}</li>
+                <li class="steps-done">{{ __('ad_create.step_details') }}</li>
+                <li class="steps-todo">{{ __('ad_create.step_preview') }}</li>
+                <li class="steps-todo">{{ __('ad_create.step_thanks') }}</li>
             </ul>
             <div class="steps-content" id="step-2">
-                <h2>Размещение объявления: <span>Детали</span></h2>
+                <h2>{{ __('ad_create.step1_heading_prefix') }} <span>{{ __('ad_create.step_details') }}</span></h2>
                 <div class="columns">
                     <div class="col-2">
-                        <p class="hidden-xs">Пожалуйста, заполните поля ниже, чтобы разместить объявление на сайте. Обязательные для заполнения поля обозначены звездочкой (&nbsp;*&nbsp;). У вас будет возможность ознакомиться с вашим объявлением перед его размещением.</p>
+                        <p class="hidden-xs">{{ __('ad_create.intro_text1') }}</p>
                         <!--more-->
-                        <p class="hidden-xs">Зарегистрируйтесь бесплатно и начните размещать объявления в считанные минуты. Управляйте объявлениями из личного кабинета.</p>
+                        <p class="hidden-xs">{{ __('ad_create.intro_text2') }}</p>
 
                     </div>
                     <div class="col-2">
                         <div class="notice-wrap">
                             <div class="notice">
                                 <i class="icon icon-lock"></i>
-                                <div><p><a href="#">Зарегистрируйтесь</a> бесплатно и начните размещать объявления в считанные минуты. Управляйте объявлениями из личного кабинета.</p></div>
+                                <div><p>{!! __('ad_create.register_notice_html') !!}</p></div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <hr>
                 <div class="category-change">
-                    <strong>Категория: <br>{{ $category->path }}</strong>
-                    <a href="{{ route('ad.step.category') }}">Изменить</a>
+                    <strong>{{ __('ad_create.category_label') }} <br>{{ $category->path }}</strong>
+                    <a href="{{ route('ad.step.category') }}">{{ __('ad_create.change_link') }}</a>
                 </div>
                 @if ($errors->any())
                     <div class="alert alert-danger">
@@ -59,24 +59,24 @@
                     <div class="columns">
                         <div class="col-2">
                             <div class="form-group">
-                                <label>Автор объявления<span class="star">(*)</span></label>
+                                <label>{{ __('ad_create.author_label') }}<span class="star">(*)</span></label>
                                 <input {{ (Auth::check()) ? 'disabled' : '' }} type="text" name="author" value="{{ $author ?? '' }}" class="form-control required">
-                                <span class="form-help">Введите имя, от лица которого вы публикуете объявление.</span>
+                                <span class="form-help">{{ __('ad_create.author_help') }}</span>
                             </div>
                         </div>
                         <div class="col-2">
                             <div class="form-group">
-                                <label>Телефон<span class="star">(*)</span></label>
+                                <label>{{ __('ad_create.telephone_label') }}<span class="star">(*)</span></label>
                                 <input type="text" name="telephone" value="{{ $telephone ?? '' }}" class="form-control required">
-                                <span class="form-help">Введите телефонный номер в международной системе нумерации, например: +380501112233.</span>
+                                <span class="form-help">{{ __('ad_create.telephone_help') }}</span>
                             </div>
                         </div>
                         <div class="col-2">
                             <div class="form-group">
-                                <label>Страна<span class="star">(*)</span></label>
+                                <label>{{ __('ad_create.country_label') }}<span class="star">(*)</span></label>
                                 @if($countries)
                                     <select name="country_id" class="form-control ad-country-id">
-                                        <option selected value="62">Украина</option>
+                                        <option selected value="62">{{ __('front.country_ukraine') }}</option>
                                         <!-- @foreach($countries as $country)
                                             <option {{ ($country['id'] == $country_id) ? 'selected' : '' }} value="{{ $country['id'] }}">{{ $country['name'] }}</option>
                                         @endforeach -->
@@ -86,99 +86,94 @@
                         </div>
                         <div class="col-2">
                             <div class="form-group">
-                                <label>Область<span class="star">(*)</span></label>
+                                <label>{{ __('ad_create.region_label') }}<span class="star">(*)</span></label>
                                 @if($regions)
                                     <select name="region_id" class="form-control ad-region-id">
-                                        <option value="0">-- Выберите --</option>
+                                        <option value="0">{{ __('ad_create.select_dash_placeholder') }}</option>
                                             @foreach($regions as $region)
                                             <option {{ ($region['id'] == $region_id) ? 'selected' : '' }} value="{{ $region['id'] }}">{{ $region['name'] }}</option>
                                             @endforeach
                                     </select>
                                 @else
                                     <select name="region_id" disabled class="form-control ad-region-id">
-                                        <option value="0">-- Сначала выберите страну --</option>
+                                        <option value="0">{{ __('ad_create.select_country_first') }}</option>
                                     </select>
                                 @endif
                             </div>
                         </div>
                         <div class="col-2">
                             <div class="form-group">
-                                <label>Город<span class="star">(*)</span></label>
+                                <label>{{ __('ad_create.city_label') }}<span class="star">(*)</span></label>
                                 @if($cities)
                                     <select name="city_id" class="form-control ad-city-id">
-                                        <option value="0">-- Выберите --</option>
+                                        <option value="0">{{ __('ad_create.select_dash_placeholder') }}</option>
                                         @foreach($cities as $city)
                                             <option {{ ($city['id'] == $city_id) ? 'selected' : '' }} value="{{ $city['id'] }}">{{ $city['name'] }}</option>
                                         @endforeach
                                     </select>
                                 @else
                                     <select name="city_id" disabled class="form-control ad-city-id">
-                                        <option value="0">-- Сначала выберите область --</option>
+                                        <option value="0">{{ __('ad_create.select_region_first') }}</option>
                                     </select>
                                 @endif
                             </div>
                         </div>
                         <div class="col-2">
                             <div class="form-group">
-                                <label>Электронная почта<span class="star">(*)</span></label>
+                                <label>{{ __('ad_create.email_label') }}<span class="star">(*)</span></label>
                                 <input {{ (Auth::check()) ? 'disabled' : '' }} type="email" name="email" value="{{ $email ?? '' }}" class="form-control required">
                             </div>
                         </div>
                         <div class="col-2">
                             <div class="form-group">
-                                <label>Заголовок<span class="star">(*)</span></label>
+                                <label>{{ __('ad_create.name_label') }}<span class="star">(*)</span></label>
                                 <input type="text" name="name" value="{{ $name ?? '' }}" class="form-control required">
-                                <span class="form-help">Введите наименование товара, объекта или услуги. Чем точнее тематические слова,
-                                    тем выше вероятность показа вашего объявления в поисковиках. В заголовке не допускается:
-                                    номер телефона, электронный адрес, ссылки. Не допускаются заглавные буквы (кроме аббревиатур).</span>
+                                <span class="form-help">{{ __('ad_create.name_help') }}</span>
                             </div>
                         </div>
                         <div class="col-2">
                             <div class="form-group">
-                                <label>Метки<span class="star">(*)</span></label>
+                                <label>{{ __('ad_create.tags_label') }}<span class="star">(*)</span></label>
                                 <input type="text"
                                        name="tags"
                                        data-json="{{ (isset($tags)) ? $tags : '' }}"
                                        id="tags"
                                        class="form-control required"
                                        value="{{ $tags ?? '' }}">
-                                <span class="form-help">Метки - это ключевые слова, по которым поисковые системы определяют, что именно
-                                    находится на странице. Это поле обязательно к заполнению. Наличие правильных меток увеличит количество просмотров
-                                    вашего объявления. Используйте только те ключевые слова, которые имеют отношение к вашему объявлению.</span>
+                                <span class="form-help">{{ __('ad_create.tags_help') }}</span>
                             </div>
                         </div>
                         <div class="col-2">
                             <div class="form-group">
-                                <label>Описание<span class="star">(*)</span></label>
+                                <label>{{ __('ad_create.content_label') }}<span class="star">(*)</span></label>
                                 <textarea rows="8" name="content" class="form-control required">{{ $content ?? '' }}</textarea>
                             </div>
                         </div>
                         <div class="col-2">
 
                             <div class="form-group upload-file">
-                                <label>Изображение</label><br>
+                                <label>{{ __('ad_create.image_label') }}</label><br>
                                 <label class="upload-label">
                                     <input name="image[]" type="file" class="input-file"  multiple />
-                                    <div>Загрузить</div>
-                                    <input class="input-file-name" type="text" id="input-file-name" value="Файл не выбран." disabled />
+                                    <div>{{ __('ad_create.upload_button') }}</div>
+                                    <input class="input-file-name" type="text" id="input-file-name" value="{{ __('ad_create.no_file_selected') }}" disabled />
                                 </label>
 
-                                <span class="form-help">Допустимое количество загружаемых файлов: 5. Максимальный размер файла: 1024 KB. Для выбора нескольких изображений - зажмите ctrl и выберите соответствующие файлы.</span>
+                                <span class="form-help">{{ __('ad_create.image_help') }}</span>
                             </div>
                         </div>
                         <div class="col-2">
                             <div class="form-group">
-                                <label>Цена<span class="star">(*)</span></label>
+                                <label>{{ __('ad_create.price_label') }}<span class="star">(*)</span></label>
                                 <input type="text" name="price" value="{{ $price ?? '' }}" class="form-control required">
-                                <span class="form-help">Введите реальную стоимость вашего товара или услуги. Администрация площадки врпаве
-                                    удалить объявление за некорректно предоставленную информацию.</span>
+                                <span class="form-help">{{ __('ad_create.price_help') }}</span>
                             </div>
                         </div>
                         <div class="col-2">
                             <div class="form-group">
-                                <label>Валюта<span class="star">(*)</span></label>
+                                <label>{{ __('ad_create.currency_label') }}<span class="star">(*)</span></label>
                                 <select name="currency_id" class="form-control required">
-                                    <option value="">-- Выберите --</option>
+                                    <option value="">{{ __('ad_create.select_dash_placeholder') }}</option>
                                     @if($currencies)
                                         @foreach($currencies as $currency)
                                             <option {{ ($currency['id'] == $currency_id) ? 'selected' : '' }} value="{{ $currency['id'] }}">{{ $currency['code'] }}</option>
@@ -191,7 +186,7 @@
                     </div>
 
                     <div class="form-action">
-                        <input type="submit" name="step1" id="step1" class="btn btn-step" value="Продолжить">
+                        <input type="submit" name="step1" id="step1" class="btn btn-step" value="{{ __('ad_create.continue_button') }}">
                     </div>
 
                 </form>
@@ -230,7 +225,7 @@
         $('.ad-country-id').on('change', function(){
             var value = $(this).val();
             if (value && value != 0) {
-                var html = '<option value="0">-- Выберите --</option>';
+                var html = '<option value="0">{{ __('ad_create.select_dash_placeholder') }}</option>';
 
                 $.getJSON("/api/ad/country/" + value, function ( data ) {
 
@@ -241,7 +236,7 @@
                     $('.ad-region-id').html(html).prop('disabled', false);
                 });
             } else {
-                var html = '<option value="0">-- Сначала выберите страну --</option>';
+                var html = '<option value="0">{{ __('ad_create.select_country_first') }}</option>';
                 $('.ad-region-id').html(html).prop('disabled', true).trigger('change');
             }
         })
@@ -249,7 +244,7 @@
         $('.ad-region-id').on('change', function(){
             var value = $(this).val();
             if (value && value != 0) {
-                var html = '<option value="0">-- Выберите --</option>';
+                var html = '<option value="0">{{ __('ad_create.select_dash_placeholder') }}</option>';
 
                 $.getJSON("/api/ad/region/" + value, function ( data ) {
 
@@ -260,14 +255,14 @@
                     $('.ad-city-id').html(html).prop('disabled', false);
                 });
             } else {
-                var html = '<option value="0">-- Сначала выберите область --</option>';
+                var html = '<option value="0">{{ __('ad_create.select_region_first') }}</option>';
                 $('.ad-city-id').html(html).prop('disabled', true).trigger('change');
             }
         })
 
         $("#tags").tagEditor({
             initialTags: $("#tags").data('json'),
-            placeholder: 'Добавить теги...',
+            placeholder: '{{ __('ad_create.tags_placeholder') }}',
             autocomplete: {
                 minLength: 0,
                 source: function (request, response) {

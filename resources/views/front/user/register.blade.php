@@ -11,8 +11,8 @@
             </div>
 
             <ul class="breadcrumb">
-                <li><a href="/">Главная</a></li>
-                <li><span>Регистрация</span></li>
+                <li><a href="/">{{ __('front.home') }}</a></li>
+                <li><span>{{ __('user/register.heading') }}</span></li>
             </ul>
 
             <h1>{{ __('user/register.heading') }}</h1>
@@ -62,14 +62,12 @@
                         </div>
 
                         <div class="form-group">
-                            <h2>Для интернет-магазинов</h2>
-                            <label for="#">Желаете опубликовать и управлять товарами имеющегося интернет-магазина?</label>
+                            <h2>{{ __('user/register.business_heading') }}</h2>
+                            <label for="#">{{ __('user/register.business_question') }}</label>
                             <p style="font-size: 12px;">
-                                Восспользуйтесь кнопкой регистрации интернет магазина для публикации своих товаров на addnew.biz.
-                                <br>
-                                Регистрация не займет много времени, а для добавления товаров достаточно предоставить список товаров <b>в любом формате</b>
+                                {!! __('user/register.business_info') !!}
                             </p>
-                            <a class="business-register-link" href="{{ route('business-register') }}">Регистрация интернет-магазина</a>
+                            <a class="business-register-link" href="{{ route('business-register') }}">{{ __('user/register.business_link_text') }}</a>
                         </div>
                         <div class="form-group">
                             <label>{{ __('user/register.text_social_login') }}</label>

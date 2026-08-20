@@ -11,11 +11,11 @@
             </div>
 
             <ul class="breadcrumb">
-                <li><a href="/">Главная</a></li>
-                <li><span>Регистрация бизнес-пользователя</span></li>
+                <li><a href="/">{{ __('front.home') }}</a></li>
+                <li><span>{{ __('user/business-register.heading') }}</span></li>
             </ul>
 
-            <h1>Регистрация бизнес-пользователя</h1>
+            <h1>{{ __('user/business-register.heading') }}</h1>
 
             <div class="columns columns-nowrap">
                 <aside class="column-left hidden-xs">
@@ -23,7 +23,7 @@
                         <div class="notice">
                             <i class="icon icon-lock"></i>
                             <div>
-                                <p>Регистрация бизнес-пользователя</p>
+                                <p>{{ __('user/business-register.notice_info') }}</p>
                             </div>
                         </div>
                     </div>
@@ -56,22 +56,22 @@
                         </div>
 
                         <div class="form-group">
-                            <label>Придумайте пароль</label>
+                            <label>{{ __('user/business-register.password') }}</label>
                             <input type="password" name="password" value="" class="form-control required" aria-required="true">
                         </div>
 
                         <div class="form-group">
-                            <label>Повторите пароль</label>
+                            <label>{{ __('user/business-register.password_confirm') }}</label>
                             <input type="password" name="password_confirmation" value="" class="form-control required" aria-required="true">
                         </div>
 
                         <div class="form-group">
-                            <label>Название магазина (не обязательно)</label>
+                            <label>{{ __('user/business-register.shop_name') }}</label>
                             <input type="text" name="shop_name" value="{{ old('shop_name') }}" class="form-control required" aria-required="true">
                         </div>
 
                         <div class="form-group">
-                            <label>Ссылка на интернет-магазин (не обязательно)</label>
+                            <label>{{ __('user/business-register.shop_url') }}</label>
                             <input type="text" name="shop_url" value="{{ old('shop_url') }}" class="form-control required" aria-required="true">
                         </div>
 

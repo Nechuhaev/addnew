@@ -13,29 +13,29 @@
         {{--</div>--}}
 
         <ul class="breadcrumb">
-            <li><a href="{{ route('index') }}">Главная</a></li>
-            <li><span>Выбор категории</span></li>
+            <li><a href="{{ route('index') }}">{{ __('front.home') }}</a></li>
+            <li><span>{{ __('ad_create.breadcrumb_category') }}</span></li>
         </ul>
-        <h1>Подать бесплатное объявление на addnew.biz</h1>
+        <h1>{{ __('ad_create.page_title') }}</h1>
 
         <ul class="steps-row" data-steps="4">
-            <li class="steps-done">Категория</li>
-            <li class="steps-todo">Детали</li>
-            <li class="steps-todo">Предпросмотр</li>
-            <li class="steps-todo">Спасибо</li>
+            <li class="steps-done">{{ __('ad_create.step_category') }}</li>
+            <li class="steps-todo">{{ __('ad_create.step_details') }}</li>
+            <li class="steps-todo">{{ __('ad_create.step_preview') }}</li>
+            <li class="steps-todo">{{ __('ad_create.step_thanks') }}</li>
         </ul>
         <div class="steps-content" id="step-1">
-            <h2>Размещение объявления: <span>Выбор категории</span></h2>
+            <h2>{{ __('ad_create.step1_heading_prefix') }} <span>{{ __('ad_create.breadcrumb_category') }}</span></h2>
             <div class="columns">
                 <div class="col-2">
-                    <p class="hidden-xs">Пожалуйста, заполните поля ниже, чтобы разместить объявление на сайте. Обязательные для заполнения поля обозначены звездочкой (&nbsp;*&nbsp;). У вас будет возможность ознакомиться с вашим объявлением перед его размещением.</p>
+                    <p class="hidden-xs">{{ __('ad_create.intro_text1') }}</p>
                     <!--more-->
-                    <p class="hidden-xs">Зарегистрируйтесь бесплатно и начните размещать объявления в считанные минуты. Управляйте объявлениями из личного кабинета.</p>
+                    <p class="hidden-xs">{{ __('ad_create.intro_text2') }}</p>
                     <div class="notice-price hidden-xs">
                         <i class="icon icon-note"></i>
                         <div>
-                            <h3>Все объявления на сайте AddNew.biz абсолютно бесплатны!</h3>
-                            <p>Платных услуг по размещению объявлений, поднятию в ТОП, закреплению вверху наша доска не предоставляет.</p>
+                            <h3>{{ __('ad_create.free_notice_heading') }}</h3>
+                            <p>{{ __('ad_create.free_notice_text') }}</p>
                         </div>
                     </div>
 
@@ -51,11 +51,11 @@
 
                     <form class="form-step" action="{{ route('ad.create.step.category') }}" method="post">
                         @csrf
-                        <label>Выберите категорию</label>
+                        <label>{{ __('ad_create.select_category_label') }}</label>
                         @if ($parent_categories)
                             <div class="form-group">
                                 <select name="category" style="width: 100%;">
-                                    <option value="0">Выберите какую</option>
+                                    <option value="0">{{ __('ad_create.select_placeholder') }}</option>
                                     @foreach($parent_categories as $parent_category)
 
                                         <option
@@ -70,7 +70,7 @@
                         <div class="form-group sub-category">
                             @if($children_categories)
                                 <select name="sub_category" id="ad_sub_category" style="width: 100%" onchange="select_ad_category();">
-                                    <option value="0">Выберите какую</option>
+                                    <option value="0">{{ __('ad_create.select_placeholder') }}</option>
                                     @foreach($children_categories as $children_category)
                                         <option {{ ($selected_child_id == $children_category['id']) ? 'selected' : '' }}
                                                 value="{{ $children_category['id'] }}">{{ $children_category['name'] }}</option>
@@ -81,7 +81,7 @@
                         </div>
                         <div class="form-action step-submit {{ (!isset($selected_parent_id)) ? 'hidden' : '' }}">
                             <input type="hidden" name="category_id" id="ad_category_id" value="{{ $selected_child_id ?? $selected_parent_id  ?? '0'}}">
-                            <input type="submit" class="btn btn-step" value="Дальше">
+                            <input type="submit" class="btn btn-step" value="{{ __('ad_create.next_button') }}">
                         </div>
                     </form>
 
@@ -90,17 +90,21 @@
                     <div class="notice-wrap">
                         <div class="notice">
                             <i class="icon icon-lock"></i>
-                            <div><p><a href="#">Зарегистрируйтесь</a> бесплатно и начните размещать объявления в считанные минуты. Управляйте объявлениями из личного кабинета.</p></div>
+                            <div><p>{!! __('ad_create.register_notice_html') !!}</p></div>
                         </div>
                     </div>
                     <div class="notice-wrap">
                         <div class="notice">
                             <i class="icon icon-lock"></i>
                             <div>
-                                <h4>Как подать объявление на доске Addnew.biz?</h4>
+                                <h4>{{ __('ad_create.how_to_post_heading') }}</h4>
                             </div>
                             <div class="notice-content">
-                                <p>Появилась необходимость быстро продать автомобиль или квартиру, компьютер или кондиционер, мебель, любые товары, найти покупателей вашей услуги, распродать или отдать даром старые вещи или наоборот – приобрести товар или услуги напрямую у продавцов? Да и специфика товара требует найти продавца в вашем регионе, чтобы не сильно тратиться на транспортировку. Но где найти покупателя, когда времени и желания искать по всему городу подходящего клиента нет? Самым востребованным и эффективным решением будет подать объявление о покупке или продаже ваших товаров и услуг.</p>
+                                {{-- ВЕЛИКИЙ SEO-текст нижче свідомо ЗАЛИШЕНО без перекладу
+                                     на цьому етапі — це окрема, велика робота (якісний
+                                     копірайтинг, не швидкий переклад), варта окремого
+                                     кроку. Показується однаково на uk і ru поки що. --}}
+                                <p><span style="font-weight: 400;">Появилась необходимость быстро продать автомобиль или квартиру, компьютер или кондиционер, мебель, любые товары, найти покупателей вашей услуги, распродать или отдать даром старые вещи или наоборот – приобрести товар или услуги напрямую у продавцов? Да и специфика товара требует найти продавца в вашем регионе, чтобы не сильно тратиться на транспортировку. Но где найти покупателя, когда времени и желания искать по всему городу подходящего клиента нет? Самым востребованным и эффективным решением будет подать объявление о покупке или продаже ваших товаров и услуг.</span></p>
                                 <div class="more-info">
                                     <p>Доска онлайн объявлений addnew.biz предоставляет пользователям тысячи объявлений различных тематик, разбитые для удобства по группам. Благодаря огромному количеству посетителей, шанс найти покупателя своих товаров и услуг достаточно велик. Да и досок объявлений в сети очень много, и часто подача объявления совершенно бесплатна.</p>
                                     <p>Так что стоит лишь потратить немного времени на создание информативного объявления, указать свои контакты, разместить объявление на большом количестве сайтов и покупатель обязательно появится.</p>
@@ -139,7 +143,7 @@
                                     <p>Если же вы пока не находите подходящей категории на сайте для вашего уникального предложения, смело обращайтесь к нам и наши специалисты быстро это поправят.</p>
                                     <p>Размещайте свои объявления на addnew.biz и двигайтесь к успеху вместе с нами!</p>
                                 </div>
-                                <span class="btn-notice-more">Развернуть</span>
+                                <span class="btn-notice-more">{{ __('ad_create.expand_button') }}</span>
                             </div>
                         </div>
                     </div>
@@ -156,7 +160,7 @@
             // Запрос на получение подкатегорий
             var value = $(this).val();
 
-            var sub_categories = '<select name="sub_category" id="ad_sub_category" onchange="select_ad_category();"><option value="0">Выберите какую</option>';
+            var sub_categories = '<select name="sub_category" id="ad_sub_category" onchange="select_ad_category();"><option value="0">{{ __('ad_create.select_placeholder') }}</option>';
 
             $.getJSON("/api/ad/category/children/" + value, function ( data ) {
 

@@ -143,6 +143,12 @@
         </a>
     </li>
     <li class="sidebar-item">
+    <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{{ route('admin.translations') }}" aria-expanded="false">
+        <i class="mdi mdi-translate"></i>
+        <span class="hide-menu">Переклади</span>
+    </a>
+</li>
+    <li class="sidebar-item">
         <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{{ route('admin.ad.uploader') }}" aria-expanded="false">
             <i class="mdi mdi-file-import"></i>
             <span class="hide-menu">Импорт файлов</span>

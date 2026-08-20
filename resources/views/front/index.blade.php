@@ -40,7 +40,7 @@
                     {!! $meta['description']  !!}
                 </section>
                 <div class="show-more__shadow"></div>
-                <span class="show-more__btn btn-show">Показать</span>
+                <span class="show-more__btn btn-show">{{ __('front.show_more') }}</span>
             </div>
 
             <div class="banner">
@@ -48,7 +48,7 @@
             </div>
 
             @if ($ads_groups)
-                <h2 class="last-advs-header">Последние объявления</h2>
+                <h2 class="last-advs-header">{{ __('front.latest_ads') }}</h2>
                     @foreach($ads_groups as $group)
                     <div class="last-advs" {!!  ($loop->iteration != 1) ? 'style="border:none;"' : ''  !!}>
                         @foreach($group as $ad)
@@ -82,18 +82,18 @@
             @endif
 
             <section>
-                <p class="section-heading">Популярные магазины</p>
-                <p class="text-center"><a class="btn" href="{{ route('stores') }}">Перейти к списку всех магазинов</a></p>
+                <p class="section-heading">{{ __('front.popular_shops') }}</p>
+                <p class="text-center"><a class="btn" href="{{ route('stores') }}">{{ __('front.all_shops_link') }}</a></p>
                 <div class="related-ads">
                     @foreach($shop_users as $user)
                         <div class="related-ad">
                             <div class="image">
-                                <a href="{{ route('author', $user->id)  }}" title="Продавец {{ $user->username }} на сайте addnew.biz">
-                                    <img src="{{ $user->image ?? asset('assets/front/img/placeholder.png') }}" alt="Страница магазина {{ $user->username }} на сайте addnew.biz" class="img-responsive">
+                                <a href="{{ route('author', $user->id)  }}" title="{{ __('front.seller_on_site', ['name' => $user->username]) }}">
+                                    <img src="{{ $user->image ?? asset('assets/front/img/placeholder.png') }}" alt="{{ __('front.shop_page_on_site', ['name' => $user->username]) }}" class="img-responsive">
                                 </a>
                             </div>
-                            <div class="price">{{ $user->ads_count }} предложений</div>
-                            <a href="{{ route('author', $user->id) }}" title="Продавец {{ $user->username }} на сайте addnew.biz" class="ad-heading">{{ $user->username }}</a>
+                            <div class="price">{{ \App\Translation::pluralChoice('front', 'offers_count', $user->ads_count) }}</div>
+                            <a href="{{ route('author', $user->id) }}" title="{{ __('front.seller_on_site', ['name' => $user->username]) }}" class="ad-heading">{{ $user->username }}</a>
                         </div>
                     @endforeach
                 </div>

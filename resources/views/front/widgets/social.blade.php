@@ -1,11 +1,9 @@
 {{-- Social buttons--}}
-
-<div class="text-center margin-bottom-20" id="uLogin"
-     data-ulogin="display=panel;theme=flat;fields=email;
-                             providers=facebook,google,vkontakte,twitter,odnoklassniki,mailru;
-                             redirect_uri={{ urlencode('http://' . $_SERVER['HTTP_HOST']) }}/ulogin;mobilebuttons=0;">
+<div class="form-social">
+    <a href="{{ route('social.login', 'google') }}" class="form-social-link" title="Google">
+        <img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/google-plus.svg') }}" />
+    </a>
+    <a href="{{ route('social.login', 'facebook') }}" class="form-social-link" title="Facebook">
+        <img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/social/facebook-alt.svg') }}" />
+    </a>
 </div>
-
-@section('script')
-    <script src="//ulogin.ru/js/ulogin.js"></script>
-@endsection

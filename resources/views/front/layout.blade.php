@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -79,7 +79,7 @@
 <div class="nav-mobile"> <!-- open -->
     <div class="nav-top">
         <div class="header-logo">
-            <a href="{{ route('index') }}"><img src='{{ asset('assets/front/img/logo.png') }}' alt="логотип"></a>
+            <a href="{{ route('index') }}"><img src='{{ asset('assets/front/img/logo.png') }}' alt="{{ __('front.logo_alt') }}"></a>
         </div>
         <div class="btn-bars">
             <i class="icon-arrow-left">&nbsp;</i>
@@ -87,15 +87,31 @@
     </div>
     <div class="nav-inner">
         <div class="nav-account">
-            <span class="nav-h">Добро пожаловать, <strong>гость</strong>!</span><br>
-            <a href="{{ route('ad.step.category') }}" class="header-link">Подать объявление</a><br>
-            <a href="/?s=&scat=0&loc_search=&sa=search" class="header-link">Поиск по объявлениям</a><br>
-            <a href="{{ route('register') }}" rel="nofollow" class="header-link link-register">Регистрация</a>
+            <span class="nav-h">{!! __('front.welcome_guest') !!}</span><br>
+            <a href="{{ route('ad.step.category') }}" class="header-link">{{ __('front.post_ad') }}</a><br>
+            <a href="/?s=&scat=0&loc_search=&sa=search" class="header-link">{{ __('front.search_ads') }}</a><br>
+            <a href="{{ route('register') }}" rel="nofollow" class="header-link link-register">{{ __('front.register') }}</a><br>
+            @php
+                $mobileCurrentRouteName = \Route::currentRouteName();
+                $mobileRouteParams = request()->route() ? request()->route()->parameters() : [];
+                $mobileIsRu = $mobileCurrentRouteName && starts_with($mobileCurrentRouteName, 'ru.');
+                $mobileUkRouteName = $mobileIsRu ? substr($mobileCurrentRouteName, 3) : $mobileCurrentRouteName;
+                $mobileRuRouteName = $mobileIsRu ? $mobileCurrentRouteName : 'ru.' . $mobileCurrentRouteName;
+            @endphp
+            <div style="margin-top:10px;">
+                @if($mobileUkRouteName && \Route::has($mobileUkRouteName))
+                    <a href="{{ route($mobileUkRouteName, $mobileRouteParams) }}" class="header-link" style="{{ !$mobileIsRu ? 'font-weight:700; text-decoration:underline;' : 'opacity:0.6;' }}">UA</a>
+                @endif
+                &nbsp;/&nbsp;
+                @if($mobileRuRouteName && \Route::has($mobileRuRouteName))
+                    <a href="{{ route($mobileRuRouteName, $mobileRouteParams) }}" class="header-link" style="{{ $mobileIsRu ? 'font-weight:700; text-decoration:underline;' : 'opacity:0.6;' }}">RU</a>
+                @endif
+            </div>
         </div>
         <div class="nav-countries">
-            <p class="nav-h">Поиск объявлений по странам</p>
+            <p class="nav-h">{{ __('front.search_by_countries') }}</p>
             <div class="country-wrap">
-                <a href="https://addnew.biz/regions/ukraina" class="country-name"><img src="{{ asset('assets/front/img/flags/ukrane.png') }}"> <span>Украина</span> <span class="btn-toggle"><i class="icon icon-plus"></i></span></a>
+                <a href="https://addnew.biz/regions/ukraina" class="country-name"><img src="{{ asset('assets/front/img/flags/ukrane.png') }}"> <span>{{ __('front.country_ukraine') }}</span> <span class="btn-toggle"><i class="icon icon-plus"></i></span></a>
                 <ul class="cities-list">
                     <li><a href="https://addnew.biz/regions/ukraina/kievskaya-obl/kiev">Киев <span class="city-rate">2384</span></a></li>
                     <li><a href="https://addnew.biz/regions/ukraina/harkovskaya-obl/harkov">Харьков <span class="city-rate">959</span></a></li>
@@ -112,7 +128,7 @@
             <div class="country-wrap">
                 <a href="https://addnew.biz/regions/rossiya" class="country-name"> <!-- active -->
                     <img src="{{ asset('assets/front/img/flags/russia.png') }}">
-                    <span>Россия</span>
+                    <span>{{ __('front.country_russia') }}</span>
                     <span class="btn-toggle"><i class="icon icon-plus"></i></span>
                 </a>
                 <ul class="cities-list">
@@ -131,7 +147,7 @@
             <div class="country-wrap">
                 <a href="https://addnew.biz/regions/kitaj" class="country-name">
                     <img src="{{ asset('assets/front/img/flags/china.png') }}">
-                    <span>Китай</span>
+                    <span>{{ __('front.country_china') }}</span>
                     <span class="btn-toggle"><i class="icon icon-plus"></i></span>
                 </a>
                 <ul class="cities-list">
@@ -153,27 +169,51 @@
                     <i class="icon-bars">&nbsp;</i>
                 </div>
                 <div class="header-logo">
-                    <a href="{{ route('index') }}"><img src='{{ asset('assets/front/img/logo.png') }}' alt="логотип"></a>
+                    <a href="{{ route('index') }}"><img src='{{ asset('assets/front/img/logo.png') }}' alt="{{ __('front.logo_alt') }}"></a>
+                </div>
+
+                @php
+                    $currentRouteName = \Route::currentRouteName();
+                    $routeParams = request()->route() ? request()->route()->parameters() : [];
+                    $isRu = $currentRouteName && starts_with($currentRouteName, 'ru.');
+                    $ukRouteName = $isRu ? substr($currentRouteName, 3) : $currentRouteName;
+                    $ruRouteName = $isRu ? $currentRouteName : 'ru.' . $currentRouteName;
+                @endphp
+                <style>
+                    /* Перемикач мов у десктопній шапці — ховаємо на мобільних,
+                       щоб не ламати flex-розкладку .header-row (там на мобільних
+                       вже своя логіка через .nav-mobile/.btn-bars). */
+                    @media (max-width: 767px) {
+                        .lang-switcher-desktop { display: none !important; }
+                    }
+                </style>
+                <div class="lang-switcher lang-switcher-desktop" style="display:flex; align-items:center; gap:6px; margin-left:10px; margin-right:15px; font-size:13px;">
+                    @if($ukRouteName && \Route::has($ukRouteName))
+                        <a href="{{ route($ukRouteName, $routeParams) }}" style="color:#fff; {{ !$isRu ? 'font-weight:700; text-decoration:underline;' : 'opacity:0.6;' }}">UA</a>
+                    @endif
+                    @if($ruRouteName && \Route::has($ruRouteName))
+                        <a href="{{ route($ruRouteName, $routeParams) }}" style="color:#fff; {{ $isRu ? 'font-weight:700; text-decoration:underline;' : 'opacity:0.6;' }}">RU</a>
+                    @endif
                 </div>
 
                 <div class="header-account">
                     @if(Auth::check())
-                        <span class="header-welcome">Добро пожаловать, <strong>{{ Auth::user()->email }}</strong>!</span>
+                        <span class="header-welcome">{!! __('front.welcome_user', ['email' => e(Auth::user()->email)]) !!}</span>
                         @if(Auth::user()->is_shop_owner)
-                            <a href="{{ route('profile.shop.dashboard') }}" rel="nofollow" class="header-link link-register">Мой магазин</a>
+                            <a href="{{ route('profile.shop.dashboard') }}" rel="nofollow" class="header-link link-register">{{ __('front.my_shop') }}</a>
                         @else
-                            <a href="{{ route('profile.ads') }}" rel="nofollow" class="header-link link-register">Кабинет</a>
+                            <a href="{{ route('profile.ads') }}" rel="nofollow" class="header-link link-register">{{ __('front.cabinet') }}</a>
                         @endif
 
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                             @csrf
                         </form>
                     @else
-                        <span class="header-welcome">Добро пожаловать, <strong>гость</strong>!</span>
-                        <a href="{{ route('register') }}" rel="nofollow" class="header-link link-register">Регистрация</a>
-                        <a href="{{ route('login') }}" rel="nofollow" class="header-link link-login">Вход</a>
+                        <span class="header-welcome">{!! __('front.welcome_guest') !!}</span>
+                        <a href="{{ route('register') }}" rel="nofollow" class="header-link link-register">{{ __('front.register') }}</a>
+                        <a href="{{ route('login') }}" rel="nofollow" class="header-link link-login">{{ __('front.login') }}</a>
                     @endif
-                        <a href="{{ route('ad.step.category') }}" class="btn btn-advert"><i class="icon icon-plus"></i> Подать объявление</a>
+                        <a href="{{ route('ad.step.category') }}" class="btn btn-advert"><i class="icon icon-plus"></i> {{ __('front.post_ad') }}</a>
 
                 </div>
 
@@ -194,20 +234,20 @@
     <div class="container">
         <div class="footer-inner">
             <ul class="footer-menu">
-                <li><a href="/">Главная</a></li>
-                <li><a href="{{ route('blog.index') }}">Блог</a></li>
-                <li><a href="{{ route('country.regions') }}">Регионы</a></li>
+                <li><a href="/">{{ __('front.home') }}</a></li>
+                <li><a href="{{ route('blog.index') }}">{{ __('front.blog') }}</a></li>
+                <li><a href="{{ route('country.regions') }}">{{ __('front.regions') }}</a></li>
 {{--                <li><a href="{{ route('countries') }}">Страны</a></li>--}}
-                <li><a href="{{ route('contacts') }}">Контакты</a></li>
+                <li><a href="{{ route('contacts') }}">{{ __('front.contacts') }}</a></li>
                 @if($pages)
                     @foreach($pages as $page)
                         <li><a href="{{ $page->url }}">{{ $page->name }}</a></li>
                     @endforeach
                 @endif
             </ul>
-            <div class="btn btn-subscribe" onclick="modal.set('subscribe-modal').show();">Подписаться</div>
+            <div class="btn btn-subscribe" onclick="modal.set('subscribe-modal').show();">{{ __('front.subscribe') }}</div>
         </div>
-        <div class="copyright">© {{ date("Y") }} Доска объявлений AddNew.Biz. Все права защищены.</div>
+        <div class="copyright">© {{ date("Y") }} {{ __('front.copyright_text') }}</div>
     </div>
 </footer>
 <div class="toTop"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/arrow-up-alt2.svg') }}" /></div>
@@ -220,11 +260,11 @@
 
         <div class="form-subscribe">
             <div class="form-group">
-                <label>Ваша электронная почта <span class="star">*</span></label>
+                <label>{{ __('front.your_email') }} <span class="star">*</span></label>
                 <input type="text" name="subscriber_email" id="subscriber_email" class="form-control">
             </div>
             <p class="error-holder"></p>
-            <button class="btn btn-subscribe btn-subscribe-trigger">Подписаться</button>
+            <button class="btn btn-subscribe btn-subscribe-trigger">{{ __('front.subscribe') }}</button>
         </div>
     </div>
 </div>

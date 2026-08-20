@@ -31,6 +31,12 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::delete('/shops/{id}', 'Admin\Shop\ShopController@destroy')->name('admin.shops.destroy');
     Route::delete('/shops/{id}/products/delete-inactive', 'Admin\Shop\ShopController@bulkDeleteInactive')->name('admin.shops.products.deleteInactive');
     Route::post('/shops/{id}/message', 'Admin\Shop\ShopController@sendMessage')->name('admin.shops.message');
+    
+    
+        Route::get('/translations', 'Admin\Translation\TranslationController@index')->name('admin.translations');
+    Route::post('/translations', 'Admin\Translation\TranslationController@store')->name('admin.translations.store');
+    Route::post('/translations/update', 'Admin\Translation\TranslationController@update')->name('admin.translations.update');
+    Route::delete('/translations', 'Admin\Translation\TranslationController@destroy')->name('admin.translations.destroy');
 
     Route::prefix('stat')->group(function () {
         Route::get('/ads', 'Admin\Stat\AdStatController@index')->name('admin.stat.ads');
@@ -173,7 +179,29 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
 });
 
 
-Route::middleware(['localized'])->group(function () {
+
+/**
+ * *******************************************************************************
+ * ***************** ДВОМОВНІ FRONT-МАРШРУТИ (uk за замовчуванням, ru — /ru) *****
+ * *******************************************************************************
+ *
+ * Увесь набір публічних маршрутів визначений ОДИН раз у $frontRoutes нижче,
+ * і реєструється Laravel'ом ДВІЧІ — під префіксом /ru і без префіксу.
+ * Контролери й логіка лишаються повністю незмінними для обох мов —
+ * різниця лише в тому, яку локаль встановлює middleware 'setlocale'
+ * (і, у Фазі 3, яку колонку БД читатимуть моделі).
+ *
+ * ВАЖЛИВО: /ru-група зареєстрована ПЕРШОЮ, до "catch-all" маршрутів
+ * /{category} наприкінці — інакше запит /ru міг би помилково зловитись
+ * українською групою як category="ru" ще до того, як Laravel дійде до
+ * власне російської групи.
+ */
+// OAuth соціальний вхід — свідомо ПОЗА uk/ru системою: callback URL має
+// бути один фіксований, зареєстрований у Google/Facebook Developer Console.
+Route::get('/login/{provider}', 'Front\User\Auth\SocialAuthController@redirect')->name('social.login');
+Route::get('/login/{provider}/callback', 'Front\User\Auth\SocialAuthController@callback')->name('social.callback');
+ 
+$frontRoutes = function () {
     // Главная
     Route::get('/', "Front\HomeController@index")->name('index');
     Route::get('/subscribe', "Front\HomeController@subscribe")->name('subscribe');
@@ -195,13 +223,6 @@ Route::middleware(['localized'])->group(function () {
 // Роут регистрации маркетплейсов
     Route::post('/business-register', 'Front\User\Auth\BusinessRegisterController@register')->name('post-business-register');
     Route::get('/business-register', 'Front\User\Auth\BusinessRegisterController@showRegistrationForm')->name('business-register');
-
-// Категории объявлений
-//Route::get('/{category}', 'Front\User\Auth\RegisterController@showRegistrationForm')->name('register');
-//Route::get('/{category}/{sub_category}', 'Front\User\Auth\RegisterController@showRegistrationForm')->name('register');
-//Route::get('/{s}', 'Front\User\Auth\RegisterController@showRegistrationForm')->name('register');
-
-
 
 // Профиль
     Route::middleware(['auth'])->group(function () {
@@ -255,9 +276,6 @@ Route::middleware(['localized'])->group(function () {
     Route::get('/search', 'Front\Ad\Search@page')->name('ad.search');
 
 // Страны
-//Route::get('/regions/', 'Front\Ad\Country@getList')->name('countries');
-//Route::get('/regions/{country}', 'Front\Ad\Country@page')->name('country.page');
-
     Route::get('/regions/', 'Front\Ad\Region@all')->name('country.regions');
     Route::get('/regions/{country}', function () {
         return redirect( '/', 301);
@@ -297,7 +315,23 @@ Route::middleware(['localized'])->group(function () {
     Route::get('/page/{slug}', 'Front\Page\PageController@page')->name('page');
     Route::get('/{category}', 'Front\Ad\Category@page')->name('category.page');
     Route::get('/{category}/{subcategory}', 'Front\Ad\Category@page')->name('sub_category.page');
-});
+};
+
+// Російська версія — ОБОВ'ЯЗКОВО реєструється ПЕРШОЮ (до українських
+// catch-all маршрутів нижче). Іменам маршрутів додається префікс "ru."
+// (напр. "ru.index", "ru.blog.article"), щоб не конфліктувати з
+// однойменними українськими — генерувати посилання: route('ru.blog.article', ...).
+Route::middleware(['localized', 'setlocale:ru'])
+    ->prefix('ru')
+    ->as('ru.')
+    ->group($frontRoutes);
+
+// Українська версія — за замовчуванням, без префіксу. Імена маршрутів
+// лишаються такими ж, як і завжди (route('index'), route('blog.article')
+// і т.д.) — увесь наявний код і view з route()-викликами продовжують
+// працювати без жодних змін.
+Route::middleware(['localized', 'setlocale:uk'])
+    ->group($frontRoutes);
 
 
 /**
@@ -309,6 +343,3 @@ Route::middleware(['localized'])->group(function () {
 //Auth::routes();
 
 //Route::get('/home', 'HomeController@index')->name('home');
-
-
-

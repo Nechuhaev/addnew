@@ -174,7 +174,10 @@ class HomeController extends Controller
 
     public function subscribe(Request $request) {
 
-        $validator = Validator::make($request->all(), ['email' => 'required|email'], ['email.required' => 'Введите свой email!', 'email.email' => 'Неверный email!']);
+        $validator = Validator::make($request->all(), ['email' => 'required|email'], [
+            'email.required' => __('front.email_required'),
+            'email.email' => __('front.email_invalid'),
+        ]);
 
         if (!$validator->fails()) {
 
@@ -208,18 +211,13 @@ class HomeController extends Controller
             curl_close($ch);
 
             if ($httpCode == 200) {
-                return ['success' => "Вы успешно подписались на новости!"];
+                return ['success' => __('front.subscribe_success')];
             } else {
-                return ['error' => "Ошибка подписки на новости."];
+                return ['error' => __('front.subscribe_error')];
             }
 
         } else {
             return ['error' => $validator->errors()->get('email')[0]];
         }
-
-
-
-
-
     }
 }

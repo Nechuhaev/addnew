@@ -19,7 +19,7 @@
 
             @if($ad->status == 'suspend')
             <div class="alert alert-success">
-                Обратите внимание, объявление приостановлено автором!
+                {{ __('ad_page.suspended_notice') }}
             </div>
             @endif
 
@@ -55,7 +55,7 @@
                         @if($ad->images && !empty($ad->images[0]))
                             <div class="adv-imgs">
                             @foreach($ad->images as $image)
-                                    <a href="{{ $image }}" id="thumb{{ $loop->iteration }}" class="colorbox group1" data-rel="colorbox" title="{{ $ad->name }} - Изображение {{ $loop->iteration }}">
+                                    <a href="{{ $image }}" id="thumb{{ $loop->iteration }}" class="colorbox group1" data-rel="colorbox" title="{{ $ad->name }} - {{ __('ad_create.image_number_suffix', ['n' => $loop->iteration]) }}">
                                         <img src="{{ $image }}" alt="{{ $ad->name . $loop->iteration }}" title="{{ $ad->name . $loop->iteration }}" width="50" height="50" style="opacity: 1;" onerror="this.onerror=null;this.src='{{ asset('assets/front/img/placeholder.png') }}';">
                                     </a>
                             @endforeach
@@ -63,10 +63,10 @@
                         @endif
                     </div>
                     <div class="adv-info">
-                        <h3>Объявление <strong>№ {{ $ad->id }}</strong></h3>
+                        <h3>{{ __('ad_page.ad_number_label') }} <strong>№ {{ $ad->id }}</strong></h3>
                         <div class="adv-view">
-                            <div><span>Всего просмотров:</span> <strong>{{ $ad->total_views }}</strong></div>
-                            <div><span>За сегодня:</span> <strong>{{ $ad->today_views }}</strong></div>
+                            <div><span>{{ __('ad_page.total_views_label') }}:</span> <strong>{{ $ad->total_views }}</strong></div>
+                            <div><span>{{ __('ad_page.today_views_label') }}:</span> <strong>{{ $ad->today_views }}</strong></div>
                         </div>
                     </div>
                     <div class="adv-share">
@@ -83,7 +83,7 @@
 
                     @if(env('APP_ENV') == 'production')
                     <div class="adv-location">
-                        <div class="adv-h">Расположение:</div>
+                        <div class="adv-h">{{ __('ad_page.location_label') }}:</div>
 
                         <div id="map" style="display: block; position: relative; overflow: hidden; min-height: 300px"></div>
                     </div>
@@ -102,14 +102,14 @@
                             @if($ad->images)
                                 <div class="adv-imgs">
                                     @foreach($ad->images as $image)
-                                        <a href="{{ $ad->image }}" id="thumb{{ $loop->iteration }}" class="colorbox group1" data-rel="colorbox" title="{{ $ad->name }} - Изображение {{ $loop->iteration }}"><img src="{{ $ad->image }}" alt="{{ $ad->name . $loop->iteration }}" title="{{ $ad->name . $loop->iteration }}" width="50" height="50" style="opacity: 1;" onerror="this.onerror=null;this.src='{{ asset('assets/front/img/placeholder.png') }}';"></a>
+                                        <a href="{{ $ad->image }}" id="thumb{{ $loop->iteration }}" class="colorbox group1" data-rel="colorbox" title="{{ $ad->name }} - {{ __('ad_create.image_number_suffix', ['n' => $loop->iteration]) }}"><img src="{{ $ad->image }}" alt="{{ $ad->name . $loop->iteration }}" title="{{ $ad->name . $loop->iteration }}" width="50" height="50" style="opacity: 1;" onerror="this.onerror=null;this.src='{{ asset('assets/front/img/placeholder.png') }}';"></a>
                                     @endforeach
                                 </div>
                             @endif
                         </div>
                         <div class="adv-price-block">
                             <div class="adv-price-h">
-                                <span>Цена:</span>
+                                <span>{{ __('ad_create.price_label') }}:</span>
                                 @if ($prices)
                                     <div class="adv-currency">
                                         @foreach($prices as $price)
@@ -127,20 +127,20 @@
                                         @endif
                                     @endforeach
                                 @else
-                                    <span class="active">Бесплатно</span>
+                                    <span class="active">{{ __('ad_create.free_label') }}</span>
                                 @endif
                             </div>
                         </div>
                     </div>
                     <div class="adv-meta">
                         <ul class="adv-meta-list">
-                            <li><span>Страна:</span><a href="{{ $ad->category->url }}">{{ $ad->city->region->country->name }}</a></li>
-                            <li><span>Автор:</span><a href="{{ route('author', ['id'=>$ad->user->id]) }}">{{ $ad->user->username }}</a></li>
-                            <li><span>Город:</span><a href="{{ $ad->category->getFilteredUrl($ad->city->slug) }}">{{ $ad->city->name }}</a></li>
-                            <li><span>Дата создания:</span>{{ $ad->date_created}}</li>
-                            <li><span>Район:</span><a href="{{ $ad->category->getFilteredUrl($ad->city->region->slug) }}">{{ $ad->city->region->name }}</a></li>
+                            <li><span>{{ __('ad_create.country_label') }}:</span><a href="{{ $ad->category->url }}">{{ $ad->city->region->country->name }}</a></li>
+                            <li><span>{{ __('ad_create.author_short_label') }}:</span><a href="{{ route('author', ['id'=>$ad->user->id]) }}">{{ $ad->user->username }}</a></li>
+                            <li><span>{{ __('ad_create.city_label') }}:</span><a href="{{ $ad->category->getFilteredUrl($ad->city->slug) }}">{{ $ad->city->name }}</a></li>
+                            <li><span>{{ __('ad_create.date_created_label') }}:</span>{{ $ad->date_created}}</li>
+                            <li><span>{{ __('ad_create.district_label') }}:</span><a href="{{ $ad->category->getFilteredUrl($ad->city->region->slug) }}">{{ $ad->city->region->name }}</a></li>
                             @if($ad->status == 'active')
-                                <li><span>Актуально до:</span>{{ $ad->date_end }}</li>
+                                <li><span>{{ __('ad_create.valid_until_label') }}:</span>{{ $ad->date_end }}</li>
                             @endif
                         </ul>
                         @if($ad->status == 'active')
@@ -148,13 +148,13 @@
                                 <div class="adv-contacts-inner">
                                     <ul class="adv-contacts-list">
                                         @if($ad->is_product)
-                                            <li><span>Телефон:</span> <a href="tel:{{ $ad->user->telephone }}">{{ $ad->user->telephone }}</a></li>
+                                            <li><span>{{ __('ad_create.telephone_label') }}:</span> <a href="tel:{{ $ad->user->telephone }}">{{ $ad->user->telephone }}</a></li>
                                         @else
-                                        <li><span>Телефон:</span> <a href="tel:{{ $ad->telephone }}">{{ $ad->telephone }}</a></li>
+                                        <li><span>{{ __('ad_create.telephone_label') }}:</span> <a href="tel:{{ $ad->telephone }}">{{ $ad->telephone }}</a></li>
                                         @endif
-                                        <li><span>Электронная почта:</span> <a href="mailto:{{ $ad->email }}">{{ $ad->email }}</a></li>
+                                        <li><span>{{ __('ad_create.email_label') }}:</span> <a href="mailto:{{ $ad->email }}">{{ $ad->email }}</a></li>
                                     </ul>
-                                    <span class="btn-notice">Показать контакты</span>
+                                    <span class="btn-notice">{{ __('ad_create.show_contacts_button') }}</span>
                                 </div>
                             </div>
                         @endif
@@ -163,26 +163,26 @@
 
                     @if( $ad->is_product )
                         <div class="shop_product">
-                            <h2 class="display-inline-block">Купить <b>{{ $ad->name }}</b> в интернет-магазине</h2>
-                            <a href="{{ $ad->source_url }}" target="_blank" rel="nofollow noopener" class="btn btn-success pull-right">Перейти в интернет-магазин</a>
+                            <h2 class="display-inline-block">{{ __('ad_page.buy_prefix') }} <b>{{ $ad->name }}</b> {{ __('ad_page.buy_suffix') }}</h2>
+                            <a href="{{ $ad->source_url }}" target="_blank" rel="nofollow noopener" class="btn btn-success pull-right">{{ __('ad_page.goto_shop_button') }}</a>
 
 
-                            <p style="padding-top: 20px">Другие продавцы <b>{{ $ad->name }}</b></p>
+                            <p style="padding-top: 20px">{{ __('ad_page.other_sellers_prefix') }} <b>{{ $ad->name }}</b></p>
 
                             @if($same_products->isNotEmpty())
                                 <div class="other-sellers" style="margin-bottom: 30px">
                                     <div class="seller">
                                         <div class="product-name">
-                                            Товар
+                                            {{ __('ad_page.product_col') }}
                                         </div>
                                         <div class="seller-name">
-                                            Продавец
+                                            {{ __('ad_page.seller_col') }}
                                         </div>
                                         <div class="product-price">
-                                            Цена
+                                            {{ __('ad_create.price_label') }}
                                         </div>
                                         <div class="product-view text-right">
-                                            Просмотр
+                                            {{ __('ad_page.view_col') }}
                                         </div>
                                     </div>
                                     @foreach($same_products as $same_product)
@@ -197,7 +197,7 @@
                                                 {{ $same_product->price }} {{ $same_product->currency->symbol }}
                                             </div>
                                             <div class="product-view text-right">
-                                                <a href="{{ route('ad.page', ['slug' => $same_product->slug]) }}" class="btn btn-success">Просмотреть</a>
+                                                <a href="{{ route('ad.page', ['slug' => $same_product->slug]) }}" class="btn btn-success">{{ __('ad_page.view_button') }}</a>
                                             </div>
                                         </div>
                                         <div style="min-height: 30px"></div>
@@ -213,7 +213,7 @@
 
 
                     <div class="adv-description">
-                        <div class="adv-h">Описание</div>
+                        <div class="adv-h">{{ __('ad_create.content_label') }}</div>
                         <p>{!! nl2br($ad->content)  !!}</p>
                     </div>
 
@@ -225,7 +225,7 @@
 
                     @if ($ad->email)
                     <div class="adv-callback">
-                        <div class="adv-h">Связь:</div>
+                        <div class="adv-h">{{ __('ad_page.contact_heading') }}:</div>
 
                         @if(session()->has('success'))
                             <div class="alert alert-success">
@@ -247,32 +247,32 @@
                             @csrf
                             <div class="form-message">
                                 <i class="icon icon-mail"></i>
-                                <span>Чтобы узнать подробную информацию об этом объявлении, заполните форму ниже и отправьте сообщение автору.</span>
+                                <span>{{ __('ad_page.contact_form_intro') }}</span>
                             </div>
 
                             <div class="col-2">
                                 <div class="form-group">
-                                    <label>Имя</label>
+                                    <label>{{ __('ad_page.name_field_label') }}</label>
                                     <input type="text" name="name" value="{{ old('name') }}" class="form-control required" aria-required="true">
                                 </div>
                             </div>
                             <div class="col-2">
                                 <div class="form-group">
-                                    <label>Почта</label>
+                                    <label>{{ __('ad_page.mail_field_label') }}</label>
                                     <input type="text" name="email" value="{{ old('email') }}" class="form-control required" aria-required="true">
                                 </div>
                             </div>
                             <div class="col-1">
                                 <div class="form-group">
-                                    <label>Сообщение</label>
+                                    <label>{{ __('ad_page.message_field_label') }}</label>
                                     <textarea class="form-control required" name="message" aria-required="true">{{ old('message') }}</textarea>
                                 </div>
                             </div>
                             <div class="col-1">
                                 <div class="form-action">
-                                    <button name="submit" type="submit" class="btn-form" value="Отправить запрос">
+                                    <button name="submit" type="submit" class="btn-form" value="{{ __('ad_page.send_request_button') }}">
                                         <i class="icon icon-plane"></i>
-                                        <span class="btn-text">Отправить запрос</span>
+                                        <span class="btn-text">{{ __('ad_page.send_request_button') }}</span>
                                     </button>
                                 </div>
                             </div>
@@ -289,12 +289,12 @@
                     {!! $meta['description']  !!}
                 </section>
                 <div class="show-more__shadow"></div>
-                <span class="show-more__btn btn-show">Показать</span>
+                <span class="show-more__btn btn-show">{{ __('front.show_more') }}</span>
             </div>
 
             @if($related)
                 <section>
-                    <p class="section-heading">Похожие объявления</p>
+                    <p class="section-heading">{{ __('ad_page.related_ads_heading') }}</p>
                     <div class="related-ads">
                         @foreach($related as $related_ad)
                         <div class="related-ad">
