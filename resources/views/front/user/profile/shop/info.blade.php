@@ -1,7 +1,7 @@
 @extends('front.layout')
 
 @section('meta_title', "Информация о магазине | Доска объявлений addnew.biz")
-@section('meta_description', "Информация о магазине | Доска объявлений addnew биз")
+@section('meta_description', "Информация о магазине | Доска объявлений addnew.biz")
 
 @php
     $logoUrl = $user->image;
@@ -27,7 +27,7 @@
 
             <div class="columns columns-nowrap">
                 <div class="column-content">
-                    <h1>Информация о магазине</h1>
+                    <h1>{{ __('shop.info_heading') }}</h1>
 
                     @if(session()->has('success'))
                         <div class="alert success">
@@ -56,29 +56,29 @@
                         @csrf
 
                         <div class="form-group">
-                            <label for="logo">Логотип магазина</label>
+                            <label for="logo">{{ __('shop.logo_label') }}</label>
                             <div class="logo-preview-wrapper">
-                                <img src="{{ $logoUrl }}" alt="Логотип магазина" id="logo-preview" class="logo-preview" style="max-width: 100px; max-height: 100px;">
+                                <img src="{{ $logoUrl }}" alt="{{ __('shop.logo_label') }}" id="logo-preview" class="logo-preview" style="max-width: 100px; max-height: 100px;">
                             </div>
                             <input type="file" name="logo" id="logo" accept="image/jpeg,image/png,image/gif,image/webp" class="form-control-file">
-                            <small class="form-text text-muted">Рекомендований розмір: 200×200px (квадратне зображення). Допустимі форматы: JPG, PNG, GIF, WEBP. Максимальный размер: 2 МБ</small>
+                            <small class="form-text text-muted">{{ __('shop.logo_recommended_size') }}</small>
                         </div>
 
                         <div class="form-group">
-                            <label for="banner">Баннер магазина</label>
+                            <label for="banner">{{ __('shop.banner_label') }}</label>
                             <div class="banner-preview-wrapper">
                                 @if($bannerUrl)
-                                    <img src="{{ $bannerUrl }}" alt="Баннер магазина" id="banner-preview" class="banner-preview" style="max-width: 100%; max-height: 200px; display:block; margin-bottom: 10px;">
+                                    <img src="{{ $bannerUrl }}" alt="{{ __('shop.banner_label') }}" id="banner-preview" class="banner-preview" style="max-width: 100%; max-height: 200px; display:block; margin-bottom: 10px;">
                                 @else
                                     <img src="" alt="" id="banner-preview" class="banner-preview" style="max-width: 100%; max-height: 200px; display:none; margin-bottom: 10px;">
                                 @endif
                             </div>
                             <input type="file" name="banner" id="banner" accept="image/jpeg,image/png,image/gif,image/webp" class="form-control-file">
-                            <small class="form-text text-muted">Рекомендований розмір: 1200×300px (широкий формат — показується на всю ширину сторінки вашого магазину). Допустимі формати: JPG, PNG, GIF, WEBP. Максимальний розмір: 3 МБ.</small>
+                            <small class="form-text text-muted">{{ __('shop.banner_recommended_size') }}</small>
                         </div>
 
                         <div class="form-group">
-                            <label for="firstname">Название магазина *</label>
+                            <label for="firstname">{{ __('shop.shop_name_label') }} *</label>
                             <input type="text" name="firstname" id="firstname" class="form-control required" value="{{ old('firstname', $user->firstname) }}" required>
                         </div>
 
@@ -88,16 +88,16 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="telephone">Телефон</label>
+                            <label for="telephone">{{ __('ad_create.telephone_label') }}</label>
                             <input type="text" name="telephone" id="telephone" class="form-control" value="{{ old('telephone', $user->telephone) }}">
                         </div>
 
                         <div class="form-group">
-                            <label for="info">Описание магазина</label>
+                            <label for="info">{{ __('shop.shop_description_label') }}</label>
                             <textarea name="info" id="info" class="form-control" rows="6">{{ old('info', $user->info) }}</textarea>
                         </div>
 
-                        <button type="submit" class="btn btn-success">Сохранить изменения</button>
+                        <button type="submit" class="btn btn-success">{{ __('shop.save_changes_button') }}</button>
                     </form>
                 </div>
                 @include('front.sidebars.user')

@@ -169,19 +169,19 @@ Breadcrumbs::for('index', function ($trail) {
 // Главная > Редактировать профиль
 Breadcrumbs::for('profile.edit', function ($trail) {
     $trail->parent('index');
-    $trail->push('Редактировать профиль', route('profile.index'));
+    $trail->push(__('profile.edit_heading'), route('profile.index'));
 });
 
 // Главная > Изменить пароль
 Breadcrumbs::for('profile.password', function ($trail) {
     $trail->parent('index');
-    $trail->push('Изменить пароль', route('profile.password'));
+    $trail->push(__('profile.password_heading'), route('profile.password'));
 });
 
 // Главная > Мои объявления
 Breadcrumbs::for('profile.ads', function ($trail) {
     $trail->parent('index');
-    $trail->push('Мои объявления', route('profile.ads'));
+    $trail->push(__('profile.my_ads_heading'), route('profile.ads'));
 });
 
 // Главная > Список магазинов
@@ -193,37 +193,37 @@ Breadcrumbs::for('user.store_list', function ($trail) {
 // Главная > Мой магазин
 Breadcrumbs::for('profile.shop.dashboard', function ($trail) {
     $trail->parent('index');
-    $trail->push('Мой магазин', route('profile.shop.dashboard'));
+    $trail->push(__('front.my_shop'), route('profile.shop.dashboard'));
 });
 
 // Главная > Информация о магазине
 Breadcrumbs::for('profile.shop.info', function ($trail) {
     $trail->parent('index');
-    $trail->push('Информация о магазине', route('profile.shop.info'));
+    $trail->push(__('shop.info_heading'), route('profile.shop.info'));
 });
 
 // Главная > Импорт/экспорт товаров
 Breadcrumbs::for('profile.shop.import-export', function ($trail) {
     $trail->parent('index');
-    $trail->push('Импорт/экспорт товаров', route('profile.shop'));
+    $trail->push(__('shop.import_export_heading'), route('profile.shop'));
 });
 
 // Главная > Импорт товаров
 Breadcrumbs::for('profile.shop.import', function ($trail) {
     $trail->parent('profile.shop.import-export');
-    $trail->push('Импорт товаров', route('profile.shop.import'));
+    $trail->push(__('shop_import.heading'), route('profile.shop.import'));
 });
 
 // Главная > Экспорт товаров
 Breadcrumbs::for('profile.shop.export', function ($trail) {
     $trail->parent('profile.shop.import-export');
-    $trail->push('Экспорт товаров', route('profile.shop.export'));
+    $trail->push(__('shop.export_heading'), route('profile.shop.export'));
 });
 
 // Главная > Мой магазин > Редактировать товар
 Breadcrumbs::for('profile.shop.product.edit', function ($trail, $product) {
     $trail->parent('profile.shop.dashboard');
-    $trail->push('Редактировать товар: ' . $product->name, route('profile.shop.product.edit', ['id' => $product->id]));
+    $trail->push(__('shop.edit_product_breadcrumb') . ': ' . $product->name, route('profile.shop.product.edit', ['id' => $product->id]));
 });
 
 /**

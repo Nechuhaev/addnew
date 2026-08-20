@@ -14,7 +14,7 @@
 
             <div class="columns columns-nowrap">
                 <div class="column-content">
-                    <h1>Импорт товаров</h1>
+                    <h1>{{ __('shop_import.heading') }}</h1>
 
                     @if(session()->has('success'))
                         <div class="alert success">
@@ -29,7 +29,7 @@
                         </div>
                     @endif
 
-                    <p>Импорт формирует товары из файла <strong>CSV или XML</strong> в формате Google Merchant Center. При импорте новые товары добавляются на сайт, а существующие (определяются по полю <code>id</code>) обновляются: заменяются все поля и изображения. <a href="#how-it-works" class="scroll-link">Как это работает</a></p>
+                    <p>{!! __('shop_import.intro_text') !!}</p>
 
                     <div id="upload-area" class="upload-area">
                         <div id="upload-prompt">
@@ -38,13 +38,13 @@
                                 <polyline points="17 8 12 3 7 8"></polyline>
                                 <line x1="12" y1="3" x2="12" y2="15"></line>
                             </svg>
-                            <p style="margin: 0 0 8px; font-size: 15px; color: #333;">Перетащите CSV или XML файл сюда</p>
-                            <p style="margin: 0; font-size: 13px; color: #727272;">или нажмите в любое место области</p>
+                            <p style="margin: 0 0 8px; font-size: 15px; color: #333;">{{ __('shop_import.dropzone_text1') }}</p>
+                            <p style="margin: 0; font-size: 13px; color: #727272;">{{ __('shop_import.dropzone_text2') }}</p>
                             <input type="file" id="file-input" accept=".csv,.txt,.xml" style="display: none;">
                         </div>
                         <div id="upload-progress" style="display: none;">
                             <div class="spinner"></div>
-                            <p style="margin-top: 12px; color: #333;">Обработка файла...</p>
+                            <p style="margin-top: 12px; color: #333;">{{ __('shop_import.processing_text') }}</p>
                         </div>
                     </div>
 
@@ -53,7 +53,7 @@
                     <div id="import-progress-section" style="display: none; margin-top: 24px;">
                         <div id="import-complete-banner" style="display: none; background: #e8f7ee; border: 1px solid #27ae60; border-radius: 6px; padding: 16px 20px; margin-bottom: 12px;">
                             <p id="import-complete-text" style="margin: 0; font-weight: 600; color: #1e8449; font-size: 15px;"></p>
-                            <p style="margin: 6px 0 0; font-size: 13px; color: #555;">Страница обновится автоматически через несколько секунд...</p>
+                            <p style="margin: 6px 0 0; font-size: 13px; color: #555;">{{ __('shop_import.page_refresh_notice') }}</p>
                         </div>
                         <div id="import-running">
                             <div class="import-progress-bar">
@@ -62,95 +62,95 @@
                             </div>
                             <div class="progress-info">
                                 <span id="progress-details">Обработано 0 из 0</span>
-                                <button id="cancel-import-btn" class="btn-link-cancel">Отменить</button>
+                                <button id="cancel-import-btn" class="btn-link-cancel">{{ __('shop_import.cancel_button') }}</button>
                             </div>
                         </div>
                     </div>
 
-                    <h2 id="how-it-works" style="margin-top: 30px; font-size: 18px;">Как это работает</h2>
-                    <p>Процесс импорта состоит из двух этапов:</p>
+                    <h2 id="how-it-works" style="margin-top: 30px; font-size: 18px;">{{ __('shop_import.how_it_works_heading') }}</h2>
+                    <p>{{ __('shop_import.process_steps_intro') }}</p>
                     <ol>
                         <li><strong>Загрузка и обработка файла</strong> — вы перетаскиваете CSV или XML файл в область выше (или выбираете вручную). Система обрабатывает файл и показывает предварительные результаты.</li>
                         <li><strong>Подтверждение импорта</strong> — в модальном окне отображается статистика (всего товаров, новых, на обновление) и список 20 случайных товаров. Вы можете подтвердить импорт или отменить его.</li>
                     </ol>
 
-                    <h2 style="margin-top: 30px; font-size: 18px;">Требования к файлу</h2>
+                    <h2 style="margin-top: 30px; font-size: 18px;">{{ __('shop_import.requirements_heading') }}</h2>
                     <ul>
                         <li>Форматы: <strong>CSV</strong> (разделитель — запятая) или <strong>XML</strong> (Google Merchant Center RSS)</li>
                         <li>Максимальный размер: <strong>25 МБ</strong></li>
                         <li>Кодировка: <strong>UTF-8</strong></li>
-                        <li>Для CSV: первая строка файла должна содержать заголовки полей</li>
+                        <li>{{ __('shop_import.req_csv_header') }}</li>
                     </ul>
 
                     <details class="format-details">
                         <summary>
-                            <span class="format-details-title">Поля CSV файла</span>
+                            <span class="format-details-title">{{ __('shop_import.csv_fields_toggle') }}</span>
                         </summary>
                         <div class="format-details-body">
-                            <p style="margin-top: 0;">Для корректного импорта файл должен содержать следующие поля:</p>
+                            <p style="margin-top: 0;">{{ __('shop_import.csv_fields_intro') }}</p>
                             <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
                                 <thead>
                                     <tr style="background: #f5f5f5;">
-                                        <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left;">Поле</th>
-                                        <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left;">Название</th>
-                                        <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left;">Описание</th>
+                                    <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left;">{{ __('shop_import.th_field') }}</th>
+                                    <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left;">{{ __('shop_import.th_field_name') }}</th>
+                                    <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left;">{{ __('shop_import.th_field_description') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
                                         <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>id</code></td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">ID товара</td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">Уникальный идентификатор товара. Используется для определения существующих товаров при обновлении.</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">{{ __('shop_import.field_id_name') }}</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">{{ __('shop_import.field_id_desc_csv') }}</td>
                                     </tr>
                                     <tr>
                                         <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>title</code></td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Название</td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">Название товара (до 150 символов).</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">{{ __('shop_import.field_name_name') }}</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">{{ __('shop_import.field_name_desc_csv') }}</td>
                                     </tr>
                                     <tr>
                                         <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>description</code></td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Описание</td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">Текстовое описание товара. HTML-теги будут удалены.</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">{{ __('shop_import.field_description_name') }}</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">{{ __('shop_import.field_description_desc_csv') }}</td>
                                     </tr>
                                     <tr>
                                         <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>link</code></td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Ссылка</td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">Внешняя ссылка на товар (опционально).</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">{{ __('shop_import.field_link_name') }}</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">{{ __('shop_import.field_link_desc') }}</td>
                                     </tr>
                                     <tr>
                                         <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>image_link</code></td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Главное изображение</td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">URL главного изображения товара.</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">{{ __('shop_import.field_main_image_name') }}</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">{{ __('shop_import.field_main_image_desc') }}</td>
                                     </tr>
                                     <tr>
                                         <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>price</code></td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Цена</td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">Цена товара с кодом валюты (напр. <code>100.00 UAH</code>).</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">{{ __('shop_import.field_price_name') }}</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">{!! __('shop_import.field_price_desc_csv') !!}</td>
                                     </tr>
                                     <tr>
                                         <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>availability</code></td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Наличие</td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;"><code>in_stock</code> (есть на складе) или <code>out_of_stock</code>.</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">{{ __('shop_import.field_stock_name') }}</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">{!! __('shop_import.field_stock_desc_csv') !!}</td>
                                     </tr>
                                     <tr>
                                         <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>condition</code></td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Состояние</td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;"><code>new</code> (новый), <code>used</code> (б/у), <code>refurbished</code> (восстановленный).</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">{{ __('shop_import.field_condition_name') }}</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">{!! __('shop_import.field_condition_desc_csv') !!}</td>
                                     </tr>
                                     <tr>
                                         <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>brand</code></td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Бренд</td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">Название бренда или производителя.</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">{{ __('shop_import.field_brand_name') }}</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">{{ __('shop_import.field_brand_desc') }}</td>
                                     </tr>
                                     <tr>
                                         <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>mpn</code></td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Артикул</td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">Артикул или код товара (MPN / EAN).</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">{{ __('shop_import.field_sku_name') }}</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">{!! __('shop_import.field_sku_desc_csv') !!}</td>
                                     </tr>
                                     <tr>
                                         <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>additional_image_link</code></td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Дополнительные изображения</td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">URL дополнительных изображений через запятую.</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">{{ __('shop_import.field_extra_images_name') }}</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">{{ __('shop_import.field_extra_images_desc') }}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -159,7 +159,7 @@
 
                     <details class="format-details">
                         <summary>
-                            <span class="format-details-title">Поля XML файла (Google Merchant Center)</span>
+                            <span class="format-details-title">{{ __('shop_import.xml_fields_toggle') }}</span>
                         </summary>
                         <div class="format-details-body">
                             <p style="margin-top: 0;">XML файл должен соответствовать формату <strong>Google Merchant Center RSS</strong> с пространством имён <code>g:</code>. Структура файла:</p>
@@ -183,66 +183,66 @@
                             <table style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 16px;">
                                 <thead>
                                     <tr style="background: #f5f5f5;">
-                                        <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left;">Поле</th>
-                                        <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left;">Название</th>
-                                        <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left;">Описание</th>
+                                    <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left;">{{ __('shop_import.th_field') }}</th>
+                                    <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left;">{{ __('shop_import.th_field_name') }}</th>
+                                    <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left;">{{ __('shop_import.th_field_description') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
                                         <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>g:id</code></td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">ID товара</td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">Уникальный идентификатор. Используется для обновления существующих товаров.</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">{{ __('shop_import.field_id_name') }}</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">{{ __('shop_import.field_id_desc_xml') }}</td>
                                     </tr>
                                     <tr>
                                         <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>g:title</code></td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Название</td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">Название товара.</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">{{ __('shop_import.field_name_name') }}</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">{{ __('shop_import.field_name_desc_xml') }}</td>
                                     </tr>
                                     <tr>
                                         <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>g:description</code></td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Описание</td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">Текстовое описание. HTML-теги будут удалены.</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">{{ __('shop_import.field_description_name') }}</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">{{ __('shop_import.field_description_desc_xml') }}</td>
                                     </tr>
                                     <tr>
                                         <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>g:link</code></td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Ссылка</td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">Внешняя ссылка на товар (опционально).</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">{{ __('shop_import.field_link_name') }}</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">{{ __('shop_import.field_link_desc') }}</td>
                                     </tr>
                                     <tr>
                                         <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>g:image_link</code></td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Главное изображение</td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">URL главного изображения товара.</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">{{ __('shop_import.field_main_image_name') }}</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">{{ __('shop_import.field_main_image_desc') }}</td>
                                     </tr>
                                     <tr>
                                         <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>g:additional_image_link</code></td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Доп. изображения</td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">URL дополнительных изображений (можно повторять тег несколько раз).</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">{{ __('shop_import.field_extra_images_name_xml') }}</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">{{ __('shop_import.field_extra_images_desc_xml') }}</td>
                                     </tr>
                                     <tr>
                                         <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>g:price</code></td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Цена</td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">Цена с кодом валюты: <code>100.00 UAH</code>.</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">{{ __('shop_import.field_price_name') }}</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">{!! __('shop_import.field_price_desc_xml') !!}</td>
                                     </tr>
                                     <tr>
                                         <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>g:availability</code></td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Наличие</td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;"><code>in_stock</code> или <code>out_of_stock</code>.</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">{{ __('shop_import.field_stock_name') }}</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">{!! __('shop_import.field_stock_desc_xml') !!}</td>
                                     </tr>
                                     <tr>
                                         <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>g:condition</code></td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Состояние</td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;"><code>new</code>, <code>used</code> или <code>refurbished</code>.</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">{{ __('shop_import.field_condition_name') }}</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">{!! __('shop_import.field_condition_desc_xml') !!}</td>
                                     </tr>
                                     <tr>
                                         <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>g:brand</code></td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Бренд</td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">Название бренда или производителя.</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">{{ __('shop_import.field_brand_name') }}</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">{{ __('shop_import.field_brand_desc') }}</td>
                                     </tr>
                                     <tr>
                                         <td style="border: 1px solid #ddd; padding: 8px 12px;"><code>g:mpn</code></td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">Артикул</td>
-                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">Артикул или код товара.</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px;">{{ __('shop_import.field_sku_name') }}</td>
+                                        <td style="border: 1px solid #ddd; padding: 8px 12px; color: #727272;">{{ __('shop_import.field_sku_desc_xml') }}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -250,17 +250,17 @@
                     </details>
 
                     @if(!empty($history))
-                    <h2 style="margin-top: 40px; font-size: 18px;">История импортов</h2>
+                    <h2 style="margin-top: 40px; font-size: 18px;">{{ __('shop_import.history_heading') }}</h2>
                     <div class="table-responsive" style="margin-top: 12px;">
                         <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
                             <thead>
                                 <tr style="background: #f5f5f5;">
-                                    <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left;">Дата</th>
-                                    <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: center;">Всего</th>
-                                    <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: center;">Добавлено</th>
-                                    <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: center;">Обновлено</th>
-                                    <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: center;">Ошибок</th>
-                                    <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: center;">Статус</th>
+                                    <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left;">{{ __('shop_import.th_date') }}</th>
+                                    <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: center;">{{ __('shop_import.th_total') }}</th>
+                                    <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: center;">{{ __('shop_import.th_added') }}</th>
+                                    <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: center;">{{ __('shop_import.th_updated') }}</th>
+                                    <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: center;">{{ __('shop_import.th_errors') }}</th>
+                                    <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: center;">{{ __('profile.th_status') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -273,11 +273,11 @@
                                     <td style="border: 1px solid #ddd; padding: 8px 12px; text-align: center; color: {{ $item['error_count'] > 0 ? '#e74c3c' : '#727272' }};">{{ $item['error_count'] }}</td>
                                     <td style="border: 1px solid #ddd; padding: 8px 12px; text-align: center;">
                                         @if($item['status'] === 'completed')
-                                            <span class="badge-status badge-completed">Завершён</span>
+                            <span class="badge-status badge-completed">{{ __('shop_import.status_completed') }}</span>
                                         @elseif($item['status'] === 'cancelled')
-                                            <span class="badge-status badge-cancelled">Отменён</span>
+                            <span class="badge-status badge-cancelled">{{ __('shop_import.status_cancelled') }}</span>
                                         @else
-                                            <span class="badge-status badge-failed">Ошибка</span>
+                            <span class="badge-status badge-failed">{{ __('shop_import.status_failed') }}</span>
                                         @endif
                                     </td>
                                 </tr>
@@ -297,7 +297,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Подтверждение импорта</h5>
+                    <h5 class="modal-title">{{ __('shop_import.modal_heading') }}</h5>
                     <button type="button" class="close" onclick="importModal.close()">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -305,16 +305,16 @@
                 <div class="modal-body">
                     <div id="import-statistics" class="import-statistics"></div>
 
-                    <h6 style="margin-top: 20px; margin-bottom: 10px;">20 товаров для примера:</h6>
+                    <h6 style="margin-top: 20px; margin-bottom: 10px;">{{ __('shop_import.example_products_label') }}</h6>
                     <div class="table-responsive">
                         <table class="table table-sm" id="preview-table">
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>Название</th>
-                                    <th>Цена</th>
-                                    <th>Бренд</th>
-                                    <th>Статус</th>
+                    <th>{{ __('shop_import.modal_col_name') }}</th>
+                    <th>{{ __('ad_create.price_label') }}</th>
+                    <th>{{ __('shop_import.field_brand_name') }}</th>
+                    <th>{{ __('profile.th_status') }}</th>
                                 </tr>
                             </thead>
                             <tbody id="preview-first-10"></tbody>
@@ -322,8 +322,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="importModal.close()">Отменить</button>
-                    <button type="button" id="confirm-import-btn" class="btn btn-primary">Подтвердить импорт</button>
+                    <button type="button" class="btn btn-secondary" onclick="importModal.close()">{{ __('shop_import.cancel_button') }}</button>
+                    <button type="button" id="confirm-import-btn" class="btn btn-primary">{{ __('shop_import.confirm_import_button') }}</button>
                 </div>
             </div>
         </div>
@@ -711,13 +711,13 @@ document.addEventListener('DOMContentLoaded', function () {
         var ext = file.name.split('.').pop().toLowerCase();
 
         if (ext !== 'csv' && ext !== 'txt' && ext !== 'xml') {
-            showError('Пожалуйста, выберите CSV или XML файл.');
+            showError('{{ __('shop_import.err_select_file') }}');
             isUploading = false;
             return;
         }
 
         if (file.size > 25 * 1024 * 1024) {
-            showError('Размер файла не должен превышать 25 МБ.');
+            showError('{{ __('shop_import.err_file_too_large_25') }}');
             isUploading = false;
             return;
         }
@@ -747,10 +747,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         pendingStats = response.data;
                         showConfirmationModal(response.data);
                     } else {
-                        showError(response.message || 'Произошла ошибка при обработке файла.');
+                    showError(response.message || '{{ __('shop_import.err_processing_generic') }}');
                     }
                 } catch (e) {
-                    showError('Неожиданный ответ сервера.');
+                    showError('{{ __('shop_import.err_unexpected_response') }}');
                 }
             } else if (xhr.status === 422) {
                 try {
@@ -761,19 +761,19 @@ document.addEventListener('DOMContentLoaded', function () {
                             messages = messages.concat(errorResponse.errors[field]);
                         }
                     }
-                    showError(messages.join('<br>') || 'Ошибка валидации файла.');
+                    showError(messages.join('<br>') || '{{ __('shop_import.err_validation_generic') }}');
                 } catch (e) {
-                    showError('Ошибка валидации файла.');
+                showError('{{ __('shop_import.err_validation_generic') }}');
                 }
             } else if (xhr.status === 413) {
-                showError('Файл слишком большой. Максимальный размер: 25 МБ.');
+            showError('{{ __('shop_import.err_file_too_large_max') }}');
             } else if (xhr.status === 419) {
-                showError('Сессия истекла. Обновите страницу и попробуйте снова.');
+            showError('{{ __('shop_import.err_session_expired') }}');
             } else if (xhr.status === 403) {
-                showError('Доступ запрещен. Только владельцы магазинов могут импортировать товары.');
+            showError('{{ __('shop_import.err_access_denied') }}');
             } else {
                 var statusText = xhr.status ? ' (код: ' + xhr.status + ')' : '';
-                showError('Ошибка сервера' + statusText + '. Попробуйте еще раз.');
+            showError('{{ __('shop_import.err_server') }}' + statusText + '{{ __('shop_import.err_try_again_suffix') }}');
             }
         };
 
@@ -781,7 +781,7 @@ document.addEventListener('DOMContentLoaded', function () {
             isUploading = false;
             uploadProgress.style.display = 'none';
             uploadPrompt.style.display = 'block';
-            showError('Ошибка сети. Проверьте подключение и попробуйте еще раз.');
+            showError('{{ __('shop_import.err_network') }}');
         };
 
         xhr.onabort = function () {
@@ -803,15 +803,15 @@ document.addEventListener('DOMContentLoaded', function () {
     function showConfirmationModal(data) {
         var statsHtml = '<div class="stat-item">' +
             '<div class="stat-number">' + data.total + '</div>' +
-            '<div class="stat-label">Всего товаров</div>' +
+            '<div class="stat-label">{{ __('shop_import.stat_label_total') }}</div>' +
             '</div>' +
             '<div class="stat-item">' +
             '<div class="stat-number">' + data.new_count + '</div>' +
-            '<div class="stat-label">Новых</div>' +
+            '<div class="stat-label">{{ __('shop_import.stat_label_new') }}</div>' +
             '</div>' +
             '<div class="stat-item">' +
             '<div class="stat-number">' + data.update_count + '</div>' +
-            '<div class="stat-label">На обновление</div>' +
+            '<div class="stat-label">{{ __('shop_import.stat_label_update') }}</div>' +
             '</div>';
 
         document.getElementById('import-statistics').innerHTML = statsHtml;
@@ -819,7 +819,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var first10Html = '';
         data.preview.forEach(function (product, index) {
             var badgeClass = product.status === 'new' ? 'badge-new' : 'badge-update';
-            var badgeText = product.status === 'new' ? 'Новый' : 'Обновление';
+            var badgeText = product.status === 'new' ? '{{ __('shop_import.badge_new') }}' : '{{ __('shop_import.badge_update') }}';
             first10Html += '<tr>' +
                 '<td>' + (index + 1) + '</td>' +
                 '<td>' + escapeHtml(product.title) + '</td>' +
@@ -855,7 +855,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('confirm-import-btn').addEventListener('click', function () {
         var btn = this;
         btn.disabled = true;
-        btn.textContent = 'Запуск...';
+        btn.textContent = '{{ __('shop_import.btn_starting') }}';
 
         var formData = new FormData();
         formData.append('file_path', pendingFilePath);
@@ -870,20 +870,20 @@ document.addEventListener('DOMContentLoaded', function () {
         xhr.onload = function () {
             importModal.close();
             btn.disabled = false;
-            btn.textContent = 'Подтвердить импорт';
+            btn.textContent = '{{ __('shop_import.confirm_import_button') }}';
 
             if (xhr.status === 200) {
                 showProgressSection();
                 startProgressPolling();
             } else {
-                showError('Ошибка запуска импорта.');
+                showError('{{ __('shop_import.err_start_import') }}');
             }
         };
 
         xhr.onerror = function () {
             btn.disabled = false;
-            btn.textContent = 'Подтвердить импорт';
-            showError('Ошибка сети.');
+            btn.textContent = '{{ __('shop_import.confirm_import_button') }}';
+            showError('{{ __('shop_import.err_network_short') }}');
         };
 
         xhr.send(formData);
@@ -905,16 +905,16 @@ document.addEventListener('DOMContentLoaded', function () {
         var errors = data.error_count || 0;
         var msg;
         if (added > 0 && updated > 0) {
-            msg = 'Импорт завершён! Добавлено ' + added + ', обновлено ' + updated + ' товаров.';
+            msg = '{{ __('shop_import.msg_done_prefix') }}' + added + '{{ __('shop_import.msg_done_both_middle') }}' + updated + '{{ __('shop_import.msg_done_both_suffix') }}';
         } else if (added > 0) {
-            msg = 'Импорт завершён! Добавлено ' + added + ' ' + pluralize(added, 'товар', 'товара', 'товаров') + '.';
+            msg = '{{ __('shop_import.msg_done_prefix') }}' + added + ' ' + pluralize(added, '{{ __('shop_import.word_one') }}', '{{ __('shop_import.word_few') }}', '{{ __('shop_import.word_many') }}') + '.';
         } else if (updated > 0) {
-            msg = 'Импорт завершён! Обновлено ' + updated + ' ' + pluralize(updated, 'товар', 'товара', 'товаров') + '.';
+            msg = '{{ __('shop_import.msg_done_updated_prefix') }}' + updated + ' ' + pluralize(updated, '{{ __('shop_import.word_one') }}', '{{ __('shop_import.word_few') }}', '{{ __('shop_import.word_many') }}') + '.';
         } else {
-            msg = 'Импорт завершён!';
+            msg = '{{ __('shop_import.msg_done_plain') }}';
         }
         if (errors > 0) {
-            msg += ' Ошибок: ' + errors + '.';
+            msg += ' {{ __('shop_import.th_errors') }}: ' + errors + '.';
         }
         if (importId) {
             localStorage.setItem('importShown_' + importId, '1');
@@ -977,23 +977,23 @@ document.addEventListener('DOMContentLoaded', function () {
         var displayed = Math.min(data.processed, data.total);
         document.getElementById('progress-text').textContent = pct + '%';
         document.getElementById('progress-bar').style.width = pct + '%';
-        document.getElementById('progress-details').textContent = 'Обработано ' + displayed + ' из ' + data.total;
+        document.getElementById('progress-details').textContent = '{{ __('shop_import.progress_processed_prefix') }}' + displayed + '{{ __('shop_import.progress_processed_middle') }}' + data.total;
 
         if (data.status === 'cancelled') {
-            document.getElementById('progress-text').textContent = 'Отменено';
+            document.getElementById('progress-text').textContent = '{{ __('shop_import.progress_cancelled_text') }}';
             document.getElementById('progress-bar').style.background = '#e74c3c';
             document.getElementById('cancel-import-btn').style.display = 'none';
         }
     }
 
     document.getElementById('cancel-import-btn').addEventListener('click', function () {
-        if (!confirm('Вы уверены, что хотите отменить импорт?')) {
+        if (!confirm('{{ __('shop_import.confirm_cancel_import') }}')) {
             return;
         }
 
         var btn = this;
         btn.disabled = true;
-        btn.textContent = 'Отмена...';
+        btn.textContent = '{{ __('shop_import.btn_cancelling') }}';
 
         var formData = new FormData();
         var xhr = new XMLHttpRequest();
@@ -1009,13 +1009,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 window.location.reload();
             } else {
                 btn.disabled = false;
-                btn.textContent = 'Отменить';
+                btn.textContent = '{{ __('shop_import.cancel_button') }}';
             }
         };
 
         xhr.onerror = function () {
             btn.disabled = false;
-            btn.textContent = 'Отменить';
+            btn.textContent = '{{ __('shop_import.cancel_button') }}';
         };
 
         xhr.send(formData);
