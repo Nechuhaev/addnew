@@ -159,7 +159,7 @@ Breadcrumbs::for('admin.adCurrencies', function ($trail) {
  * *******************************************************************************
  */
 Breadcrumbs::for('index', function ($trail) {
-    $trail->push('Главная', route('index'));
+    $trail->push(__('front.home'), route('index'));
 });
 
 
@@ -187,7 +187,7 @@ Breadcrumbs::for('profile.ads', function ($trail) {
 // Главная > Список магазинов
 Breadcrumbs::for('user.store_list', function ($trail) {
     $trail->parent('index');
-    $trail->push('Список магазинов', route('stores'));
+    $trail->push(__('breadcrumbs.stores_list'), route('stores'));
 });
 
 // Главная > Мой магазин
@@ -232,7 +232,7 @@ Breadcrumbs::for('profile.shop.product.edit', function ($trail, $product) {
 // Главная > Блог
 Breadcrumbs::for('blog', function ($trail) {
     $trail->parent('index');
-    $trail->push('Блог', route('blog.index'));
+    $trail->push(__('front.blog'), route('blog.index'));
 });
 // Главная > Блог > Категория
 Breadcrumbs::for('blog.category', function ($trail, \App\ArticleCategory $category) {
@@ -251,7 +251,7 @@ Breadcrumbs::for('blog.category.article', function ($trail, \App\Article $articl
 // Главная > Страны
 Breadcrumbs::for('countries', function ($trail) {
     $trail->parent('index');
-    $trail->push('Страны', route('countries'));
+    $trail->push(__('breadcrumbs.countries'), route('countries'));
 });
 
 // Главная > Страны > Страна
@@ -283,7 +283,7 @@ Breadcrumbs::for('city.page', function ($trail, $city = null) {
 // Главная > Объявление с меткой "..."
 Breadcrumbs::for('ad_tag', function ($trail, $tag) {
     $trail->parent('index');
-    $trail->push('Объявление с меткой "' . $tag->name . '"', route('tag', ['slug' => $tag->slug]));
+    $trail->push(__('breadcrumbs.tag_ads_prefix') . '"' . $tag->name . '"', route('tag', ['slug' => $tag->slug]));
 });
 
 /**
@@ -292,7 +292,7 @@ Breadcrumbs::for('ad_tag', function ($trail, $tag) {
 // Главная > Объявления пользователя "..."
 Breadcrumbs::for('ad_user', function ($trail, $entity) {
     $trail->parent('index');
-    $trail->push('Объявления пользователя ' . $entity->username, route('author', ['id', $entity->id]));
+    $trail->push(__('breadcrumbs.user_ads_prefix') . $entity->username, route('author', ['id', $entity->id]));
 });
 
 

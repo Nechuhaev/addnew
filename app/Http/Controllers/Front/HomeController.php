@@ -21,7 +21,7 @@ class HomeController extends Controller
 
     public function index(Localization $localization)
     {
-        $categories = Cache::remember('home_categories', 43200, function () {
+        $categories = Cache::remember('home_categories_' . app()->getLocale(), 43200, function () {
             $parents = AdCategory::where('parent_id', 0)
                 ->orderBy('sort_order', 'ASC')->get();
 
