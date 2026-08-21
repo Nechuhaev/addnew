@@ -10,8 +10,11 @@ class AdCategory extends Model
         'name_uk',
         'slug',
         'content',
+        'content_uk',
         'meta_title',
+        'meta_title_uk',
         'meta_description',
+        'meta_description_uk',
         'sort_order'
     ];
 
@@ -26,6 +29,36 @@ class AdCategory extends Model
     {
         if (app()->getLocale() === 'uk' && !empty($this->attributes['name_uk'] ?? null)) {
             return $this->attributes['name_uk'];
+        }
+        return $value;
+    }
+
+    /**
+     * Той самий підхід для SEO-полів — meta_title, meta_description,
+     * content. Якщо переклад ще не заповнено (нова категорія чи ще не
+     * дійшли руки перекласти) — тихо падає назад на російську версію,
+     * нічого не ламається.
+     */
+    public function getMetaTitleAttribute($value)
+    {
+        if (app()->getLocale() === 'uk' && !empty($this->attributes['meta_title_uk'] ?? null)) {
+            return $this->attributes['meta_title_uk'];
+        }
+        return $value;
+    }
+
+    public function getMetaDescriptionAttribute($value)
+    {
+        if (app()->getLocale() === 'uk' && !empty($this->attributes['meta_description_uk'] ?? null)) {
+            return $this->attributes['meta_description_uk'];
+        }
+        return $value;
+    }
+
+    public function getContentAttribute($value)
+    {
+        if (app()->getLocale() === 'uk' && !empty($this->attributes['content_uk'] ?? null)) {
+            return $this->attributes['content_uk'];
         }
         return $value;
     }

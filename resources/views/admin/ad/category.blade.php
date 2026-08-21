@@ -47,13 +47,25 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="name">Название категории</label>
+                            <label for="name">Название категории (RU)</label>
                             <div>
                                 <input type="text"
                                        name="name"
                                        id="name"
-                                       value="{{ old('name') ?? $category->name ?? '' }}"
+                                       value="{{ old('name') ?? optional($category)->getOriginal('name') ?? '' }}"
                                        placeholder=""
+                                       class="form-control form-control-line">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="name_uk" style="color:#2e7d32;">Назва категорії (UK)</label>
+                            <div>
+                                <input type="text"
+                                       name="name_uk"
+                                       id="name_uk"
+                                       value="{{ old('name_uk') ?? optional($category)->getOriginal('name_uk') ?? '' }}"
+                                       placeholder="Якщо порожньо — покаже RU-версію"
                                        class="form-control form-control-line">
                             </div>
                         </div>
@@ -71,34 +83,65 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="content">Описание категории</label>
+                            <label for="content">Описание категории (RU)</label>
                             <div>
                                 <textarea name="content"
                                           id="content"
-                                          class="content form-control form-control-line">{{ old('content') ?? $category->content ?? '' }}</textarea>
+                                          class="content form-control form-control-line">{{ old('content') ?? optional($category)->getOriginal('content') ?? '' }}</textarea>
 
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label for="meta_title">Meta-тег title</label>
+                            <label for="content_uk" style="color:#2e7d32;">Опис категорії (UK)</label>
+                            <div>
+                                <textarea name="content_uk"
+                                          id="content_uk"
+                                          class="content form-control form-control-line">{{ old('content_uk') ?? optional($category)->getOriginal('content_uk') ?? '' }}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="meta_title">Meta-тег title (RU)</label>
                             <div>
                                 <input type="text"
                                        name="meta_title"
                                        id="meta_title"
-                                       value="{{ old('meta_title') ?? $category->meta_title ?? '' }}"
+                                       value="{{ old('meta_title') ?? optional($category)->getOriginal('meta_title') ?? '' }}"
                                        placeholder=""
                                        class="form-control form-control-line">
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label for="meta_description">Meta-тег description</label>
+                            <label for="meta_title_uk" style="color:#2e7d32;">Meta-тег title (UK)</label>
+                            <div>
+                                <input type="text"
+                                       name="meta_title_uk"
+                                       id="meta_title_uk"
+                                       value="{{ old('meta_title_uk') ?? optional($category)->getOriginal('meta_title_uk') ?? '' }}"
+                                       placeholder=""
+                                       class="form-control form-control-line">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="meta_description">Meta-тег description (RU)</label>
                             <div>
                                 <textarea name="meta_description"
                                           rows="5"
                                           id="meta_description"
-                                          class="form-control form-control-line">{{ old('meta_description') ?? $category->meta_description ?? '' }}</textarea>
+                                          class="form-control form-control-line">{{ old('meta_description') ?? optional($category)->getOriginal('meta_description') ?? '' }}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="meta_description_uk" style="color:#2e7d32;">Meta-тег description (UK)</label>
+                            <div>
+                                <textarea name="meta_description_uk"
+                                          rows="5"
+                                          id="meta_description_uk"
+                                          class="form-control form-control-line">{{ old('meta_description_uk') ?? optional($category)->getOriginal('meta_description_uk') ?? '' }}</textarea>
                             </div>
                         </div>
 
