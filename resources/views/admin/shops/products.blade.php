@@ -83,6 +83,9 @@
                                             @else
                                                 <span class="badge badge-secondary">Архів</span>
                                             @endif
+                                            @if($product->monitoring_skipped)
+                                                <br><span class="badge badge-light" style="border:1px solid #ccc;" title="Джерело захищене від ботів — моніторинг цін/наявності для цього товару не спрацьовує">🚫 без моніторингу</span>
+                                            @endif
                                         </td>
                                         <td>{{ $product->seo_optimized ? '✅' : '—' }}</td>
                                         <td>{{ $product->updated_at ? $product->updated_at->format('d.m.Y H:i') : '—' }}</td>

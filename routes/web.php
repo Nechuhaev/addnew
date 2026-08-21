@@ -22,7 +22,11 @@ Route::get('/system/cron-runner/{token}', 'CronRunnerController@run');
 Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::get('/', 'AdminPageController@index')->name('admin.index');
     
+    Route::post('/shops/skipped-domains', 'Admin\Shop\SkippedDomainController@store')->name('admin.shops.skippedDomains.store');
+    Route::delete('/shops/skipped-domains/{id}', 'Admin\Shop\SkippedDomainController@destroy')->name('admin.shops.skippedDomains.destroy');
+    
     Route::get('/shops', 'Admin\Shop\ShopController@index')->name('admin.shops');
+    Route::get('/shops/skipped-domains', 'Admin\Shop\SkippedDomainController@index')->name('admin.shops.skippedDomains');
     Route::get('/shops/{id}', 'Admin\Shop\ShopController@edit')->name('admin.shops.edit');
     Route::post('/shops/{id}/update', 'Admin\Shop\ShopController@update')->name('admin.shops.update');
     Route::get('/shops/{id}/products', 'Admin\Shop\ShopController@products')->name('admin.shops.products');
@@ -31,6 +35,7 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::delete('/shops/{id}', 'Admin\Shop\ShopController@destroy')->name('admin.shops.destroy');
     Route::delete('/shops/{id}/products/delete-inactive', 'Admin\Shop\ShopController@bulkDeleteInactive')->name('admin.shops.products.deleteInactive');
     Route::post('/shops/{id}/message', 'Admin\Shop\ShopController@sendMessage')->name('admin.shops.message');
+    
     
     
         Route::get('/translations', 'Admin\Translation\TranslationController@index')->name('admin.translations');

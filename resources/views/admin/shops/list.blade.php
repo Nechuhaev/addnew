@@ -34,7 +34,9 @@
                         @endif
                     </form>
 
-                    <div class="table-responsive">
+                    <a href="{{ route('admin.shops.skippedDomains') }}" class="btn btn-sm btn-secondary mb-3">Виключені домени (моніторинг)</a>
+
+                                                                                <div class="table-responsive">
                         <table class="table">
                             <thead>
                                 <tr>

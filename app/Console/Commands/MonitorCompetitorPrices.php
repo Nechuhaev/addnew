@@ -7,6 +7,7 @@ use App\AdCurrency;
 use App\ProductPriceCheck;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
+use Illuminate\Support\Str;
 
 class MonitorCompetitorPrices extends Command
 {
@@ -21,7 +22,7 @@ class MonitorCompetitorPrices extends Command
      * наявності" — виставляє stock=out_of_stock (і навпаки, якщо товар
      * знову з'явився). Кожна перевірка логується в product_price_checks.
      */
-    protected $signature = 'products:monitor-prices {--limit=}';
+    protected $signature = 'products:monitor-prices {--limit=} {--shop=}';
 
     protected $description = 'Перевіряє ціну й наявність товару в магазині-джерелі та синхронізує з дошкою';
 
@@ -34,11 +35,26 @@ class MonitorCompetitorPrices extends Command
         $this->http = new Client();
     }
 
+    protected function isSkippedDomain(string $url): bool
+    {
+        $host = parse_url($url, PHP_URL_HOST);
+        if (!$host) {
+            return false;
+        }
+        foreach (\App\SkippedDomain::list() as $domain) {
+            if (Str::contains($host, $domain)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function handle()
     {
         $limit = (int) ($this->option('limit') ?: env('PRICE_MONITOR_PER_RUN', 30));
+        $shopId = $this->option('shop');
 
-        $products = Ad::where('is_product', 1)
+        $query = Ad::where('is_product', 1)
             ->where('status', 1) // тільки активні оголошення — призупинені й архівні
             // не показуються покупцям, моніторити їх немає сенсу
             ->where(function ($q) {
@@ -46,11 +62,21 @@ class MonitorCompetitorPrices extends Command
                   ->orWhere(function ($q2) {
                       $q2->whereNotNull('url')->where('url', '!=', '');
                   });
-            })
-            ->orderByRaw('(SELECT MAX(checked_at) FROM product_price_checks WHERE product_price_checks.ad_id = ads.id) IS NOT NULL')
-            ->orderByRaw('(SELECT MAX(checked_at) FROM product_price_checks WHERE product_price_checks.ad_id = ads.id) ASC')
-            ->limit($limit)
-            ->get();
+            });
+
+        if ($shopId) {
+            // Ручна перевірка ОДНОГО магазину — беремо всі його товари,
+            // ігноруючи чергу "давно не перевірені" (яка застосовується
+            // тільки для загального автоматичного прогону).
+            $query->where('user_id', $shopId);
+            $this->info("Перевіряю магазин ID={$shopId} (усі товари з посиланням, без ліміту черги)");
+        } else {
+            $query->orderByRaw('(SELECT MAX(checked_at) FROM product_price_checks WHERE product_price_checks.ad_id = ads.id) IS NOT NULL')
+                ->orderByRaw('(SELECT MAX(checked_at) FROM product_price_checks WHERE product_price_checks.ad_id = ads.id) ASC')
+                ->limit($limit);
+        }
+
+        $products = $query->get();
 
         if ($products->isEmpty()) {
             $this->info('Немає товарів з посиланням для перевірки.');
@@ -66,6 +92,11 @@ class MonitorCompetitorPrices extends Command
             $sourceUrl = $product->competitor_url ?: $product->getOriginal('url');
 
             if (empty($sourceUrl)) {
+                continue;
+            }
+
+            if ($this->isSkippedDomain($sourceUrl)) {
+                $this->info('[' . ($i + 1) . '/' . $products->count() . "] ID={$product->id}: пропущено (захищений від ботів домен)");
                 continue;
             }
 

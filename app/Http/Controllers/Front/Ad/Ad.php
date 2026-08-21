@@ -39,10 +39,7 @@ class Ad extends Controller
         $user = User::where('id', '=', $ad['user_id'])->first();
         if (!$user) abort(404);
 
-        $allowed_country_ids = [62];
-        if (!in_array($ad->city->region->country->id, $allowed_country_ids)) {
-            return redirect('/', 301);
-        }
+        // Обмеження "тільки Україна" прибрано — сайт тепер показує товари з будь-якої країни.
 
         // Обновляем счетчик просмотров объявлений
         // Просмотры сегодня

@@ -172,8 +172,7 @@ class Category extends Controller
         //dd($this->filter);
         $results = Ad::getAds()->whereIn('ad_categories.id', $this->included_categories);
                 
-        // только Украина
-        $results->where('country_id', '62');
+        // Обмеження "тільки Україна" прибрано — категорії тепер показують товари з будь-якої країни.
         if ($this->filter) {
             if (!$entity) abort(404);
             $results->where($condition, $entity->id);

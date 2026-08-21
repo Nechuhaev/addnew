@@ -226,6 +226,26 @@ class ShopController extends Controller
             ->where('stock', '!=', 'in_stock')
             ->count();
 
+        // Позначаємо товари, чиє джерело виключено з моніторингу цін
+        // (захищені від ботів сайти) — щоб було видно в списку одразу,
+        // а не тільки в логах команди products:monitor-prices.
+        $skippedDomains = \App\SkippedDomain::list();
+        foreach ($products as $product) {
+            $sourceUrl = $product->competitor_url ?: $product->getOriginal('url');
+            $product->monitoring_skipped = false;
+            if ($sourceUrl) {
+                $host = parse_url($sourceUrl, PHP_URL_HOST);
+                if ($host) {
+                    foreach ($skippedDomains as $domain) {
+                        if (\Illuminate\Support\Str::contains($host, $domain)) {
+                            $product->monitoring_skipped = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
         return view('admin.shops.products', [
             'shop' => $shop,
             'products' => $products,
