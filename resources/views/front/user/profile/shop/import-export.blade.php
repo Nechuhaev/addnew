@@ -14,7 +14,7 @@
 
             <div class="columns columns-nowrap">
                 <div class="column-content">
-                    <h1>Импорт/экспорт товаров</h1>
+                    <h1>{{ __('shop.import_export_heading') }}</h1>
 
                     @if(session()->has('success'))
                         <div class="alert success">
@@ -45,9 +45,9 @@
                                         <polyline points="25,30 30,36 35,30" stroke="#3b5998" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
                                     </svg>
                                 </div>
-                                <h2 style="margin: 0 0 10px; font-size: 18px;">Импорт товаров</h2>
-                                <p style="color: #727272; font-size: 14px; line-height: 1.5; margin-bottom: 22px;">Загрузите прайс-лист или CSV-файл с товарами для массового добавления на площадку.</p>
-                                <span class="btn">Перейти</span>
+                                <h2 style="margin: 0 0 10px; font-size: 18px;">{{ __('shop_import.heading') }}</h2>
+                                <p style="color: #727272; font-size: 14px; line-height: 1.5; margin-bottom: 22px;">{{ __('shop.import_card_text') }}</p>
+                                <span class="btn">{{ __('shop.go_link') }}</span>
                             </a>
                         </div>
 
@@ -63,9 +63,9 @@
                                         <polyline points="25,10 30,4 35,10" stroke="#3b5998" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
                                     </svg>
                                 </div>
-                                <h2 style="margin: 0 0 10px; font-size: 18px;">Экспорт товаров</h2>
-                                <p style="color: #727272; font-size: 14px; line-height: 1.5; margin-bottom: 22px;">Выгрузите данные о ваших товарах в формате CSV для использования в Google Merchant Center.</p>
-                                <span class="btn">Перейти</span>
+                                <h2 style="margin: 0 0 10px; font-size: 18px;">{{ __('shop.export_heading') }}</h2>
+                                <p style="color: #727272; font-size: 14px; line-height: 1.5; margin-bottom: 22px;">{{ __('shop.export_card_text') }}</p>
+                                <span class="btn">{{ __('shop.go_link') }}</span>
                             </a>
                         </div>
                     </div>

@@ -14,7 +14,7 @@
 
             <div class="columns columns-nowrap">
                 <div class="column-content">
-                    <h1>Экспорт товаров</h1>
+                    <h1>{{ __('shop.export_heading') }}</h1>
 
                     @if(session()->has('success'))
                         <div class="alert success">
@@ -29,12 +29,12 @@
                         </div>
                     @endif
 
-                    <p>Экспорт формирует CSV-файл в формате <strong>Google Merchant Center</strong> со всеми вашими товарами. Файл обновляется при каждом запуске экспорта.</p>
+                    <p>{!! __('shop_export.intro_text') !!}</p>
 
                     <div class="form-group">
                         @if($fileUrl)
                             <p style="margin-bottom: 8px; color: #727272; font-size: 13px;">
-                                Последний экспорт: <strong>{{ $lastGeneratedAt }}</strong>
+                                {{ __('shop_export.last_export_label') }} <strong>{{ $lastGeneratedAt }}</strong>
                             </p>
                             <div style="position: relative;">
                                 <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
@@ -44,43 +44,43 @@
                                            value="{{ $fileUrl }}"
                                            readonly
                                            style="flex: 1; min-width: 200px; cursor: pointer;"
-                                           title="Нажмите, чтобы скопировать ссылку">
+                                           title="{{ __('shop_export.copy_link_title') }}">
                                     <a href="{{ $fileUrl }}" class="btn" download style="white-space: nowrap;">
-                                        Скачать CSV
+                                        {{ __('shop_export.download_csv_button') }}
                                     </a>
                                     @if($hasChanges)
                                         <form action="{{ route('profile.shop.export.generate') }}" method="POST" style="margin: 0;">
                                             @csrf
                                             <button type="submit" class="btn" style="white-space: nowrap;">
-                                                Сгенерировать заново
+                                                {{ __('shop_export.regenerate_button') }}
                                             </button>
                                         </form>
                                     @endif
                                 </div>
                                 <span id="copy-feedback" style="display: none; position: absolute; top: 100%; left: 0; margin-top: 4px; color: #27ae60; font-size: 13px;">
-                                    Ссылка скопирована!
+                                    {{ __('shop_export.copied_feedback') }}
                                 </span>
                             </div>
                         @else
                             <p style="margin-bottom: 10px; color: #727272;">
-                                Файл ещё не сгенерирован. Нажмите кнопку ниже, чтобы запустить экспорт.
+                                {{ __('shop_export.not_generated_yet') }}
                             </p>
                             <form action="{{ route('profile.shop.export.generate') }}" method="POST">
                                 @csrf
-                                <button type="submit" class="btn">Запустить экспорт</button>
+                                <button type="submit" class="btn">{{ __('shop_export.run_export_button') }}</button>
                             </form>
                         @endif
                     </div>
 
-                    <h2 style="margin-top: 30px; font-size: 18px;">Поля в файле экспорта</h2>
-                    <p>В файл выгружаются следующие поля для каждого товара:</p>
+                    <h2 style="margin-top: 30px; font-size: 18px;">{{ __('shop_export.fields_heading') }}</h2>
+                    <p>{{ __('shop_export.fields_intro') }}</p>
 
                     <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
                         <thead>
                             <tr style="background: #f5f5f5;">
-                                <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left;">Поле</th>
-                                <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left;">Название</th>
-                                <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left;">Описание</th>
+                                <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left;">{{ __('shop_import.th_field') }}</th>
+                                <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left;">{{ __('shop_import.th_field_name') }}</th>
+                                <th style="border: 1px solid #ddd; padding: 8px 12px; text-align: left;">{{ __('shop_import.th_field_description') }}</th>
                             </tr>
                         </thead>
                         <tbody>
