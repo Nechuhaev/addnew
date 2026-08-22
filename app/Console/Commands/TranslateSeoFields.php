@@ -119,7 +119,7 @@ class TranslateSeoFields extends Command
                 'max_tokens' => $maxTokens,
                 'messages' => [['role' => 'user', 'content' => $prompt]],
             ],
-            'timeout' => 90,
+            'timeout' => 180,
         ]);
 
         $data = json_decode((string) $response->getBody(), true);

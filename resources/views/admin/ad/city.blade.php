@@ -1,5 +1,4 @@
 @extends('admin.layout')
-
 @section('breadcrumbs')
     <div class="page-breadcrumb">
         <div class="row">
@@ -14,7 +13,6 @@
         </div>
     </div>
 @endsection
-
 @section('content')
     <div class="row">
         <div class="col-4">
@@ -22,11 +20,9 @@
                 <div class="card-body">
                     <form action="{{ $action }}" method="POST" class="category-form">
                         @csrf
-
                         @if ($city)
                             <input type="hidden" name="city_id" value="{{ $city->id }}">
                         @endif
-
                         <div class="form-group">
                             <label>Страна</label>
                             <div>
@@ -44,8 +40,6 @@
                                 </select>
                             </div>
                         </div>
-
-
                         <div class="form-group">
                             <label>Область</label>
                             <div>
@@ -65,19 +59,28 @@
                                 </select>
                             </div>
                         </div>
-
                         <div class="form-group">
-                            <label>Город</label>
+                            <label>Город (RU)</label>
                             <div>
                                 <input type="text"
                                        name="name"
                                        id="name"
-                                       value="{{ old('name') ?? $city->name ?? '' }}"
+                                       value="{{ old('name') ?? optional($city)->getOriginal('name') ?? '' }}"
                                        placeholder=""
                                        class="form-control form-control-line">
                             </div>
                         </div>
-
+                        <div class="form-group">
+                            <label for="name_uk" style="color:#2e7d32;">Місто (UK)</label>
+                            <div>
+                                <input type="text"
+                                       name="name_uk"
+                                       id="name_uk"
+                                       value="{{ old('name_uk') ?? optional($city)->getOriginal('name_uk') ?? '' }}"
+                                       placeholder="Якщо порожньо — покаже RU-версію"
+                                       class="form-control form-control-line">
+                            </div>
+                        </div>
                         <div class="form-group">
                             <label for="slug">Slug</label>
                             <div>
@@ -89,39 +92,62 @@
                                        class="form-control form-control-line">
                             </div>
                         </div>
-
                         <div class="form-group">
-                            <label for="content">Описание для города</label>
+                            <label for="content">Описание для города (RU)</label>
                             <div>
                                 <textarea name="content"
                                           id="content"
-                                          class="content form-control form-control-line">{{ old('content') ?? $city->content ?? '' }}</textarea>
-
+                                          class="content form-control form-control-line">{{ old('content') ?? optional($city)->getOriginal('content') ?? '' }}</textarea>
                             </div>
                         </div>
-
                         <div class="form-group">
-                            <label for="meta_title">Meta-тег title</label>
+                            <label for="content_uk" style="color:#2e7d32;">Опис міста (UK)</label>
+                            <div>
+                                <textarea name="content_uk"
+                                          id="content_uk"
+                                          class="content form-control form-control-line">{{ old('content_uk') ?? optional($city)->getOriginal('content_uk') ?? '' }}</textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="meta_title">Meta-тег title (RU)</label>
                             <div>
                                 <input type="text"
                                        name="meta_title"
                                        id="meta_title"
-                                       value="{{ old('meta_title') ?? $city->meta_title ?? '' }}"
+                                       value="{{ old('meta_title') ?? optional($city)->getOriginal('meta_title') ?? '' }}"
                                        placeholder=""
                                        class="form-control form-control-line">
                             </div>
                         </div>
-
                         <div class="form-group">
-                            <label for="meta_description">Meta-тег description</label>
+                            <label for="meta_title_uk" style="color:#2e7d32;">Meta-тег title (UK)</label>
+                            <div>
+                                <input type="text"
+                                       name="meta_title_uk"
+                                       id="meta_title_uk"
+                                       value="{{ old('meta_title_uk') ?? optional($city)->getOriginal('meta_title_uk') ?? '' }}"
+                                       placeholder=""
+                                       class="form-control form-control-line">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="meta_description">Meta-тег description (RU)</label>
                             <div>
                                 <textarea name="meta_description"
                                           rows="5"
                                           id="meta_description"
-                                          class="form-control form-control-line">{{ old('meta_description') ?? $city->meta_description ?? '' }}</textarea>
+                                          class="form-control form-control-line">{{ old('meta_description') ?? optional($city)->getOriginal('meta_description') ?? '' }}</textarea>
                             </div>
                         </div>
-
+                        <div class="form-group">
+                            <label for="meta_description_uk" style="color:#2e7d32;">Meta-тег description (UK)</label>
+                            <div>
+                                <textarea name="meta_description_uk"
+                                          rows="5"
+                                          id="meta_description_uk"
+                                          class="form-control form-control-line">{{ old('meta_description_uk') ?? optional($city)->getOriginal('meta_description_uk') ?? '' }}</textarea>
+                            </div>
+                        </div>
                         <div class="form-group">
                             <label for="sort_order">Порядок сортировки</label>
                             <div>
@@ -133,7 +159,6 @@
                                        class="form-control form-control-line">
                             </div>
                         </div>
-
                         <hr>
                         <div class="form-group text-center">
                             <button class="btn btn-success">Сохранить</button>
@@ -142,7 +167,6 @@
                 </div>
             </div>
         </div>
-
         <div class="col-8">
             <div class="card">
                 <div class="card-body">
@@ -173,7 +197,6 @@
                                 <th><a style="color: black" href="?order=ads_count&direction={{ ($direction == 'asc') ? 'desc' : 'asc'  }}">Кол-во</a> {!! ($order == 'ads_count') ? ($direction != 'asc') ? '<i class="mdi mdi-arrow-down"></i>' : '<i class="mdi mdi-arrow-up"></i>' : '';   !!}</th>
                                 <th></th>
                             </tr>
-
                             @foreach($cities as $city_item)
                                 <tr>
                                     <td style="width: 30px"><input type="checkbox" name="id[]" value="{{ $city_item->id }}"></td>
@@ -193,11 +216,8 @@
                     @else
                         <p>Города не найдены</p>
                     @endif
-
-
                 </div>
             </div>
         </div>
-
     </div>
 @endsection

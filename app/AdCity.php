@@ -9,8 +9,11 @@ class AdCity extends Model
         'name_uk',
         'slug',
         'content',
+        'content_uk',
         'meta_title',
+        'meta_title_uk',
         'meta_description',
+        'meta_description_uk',
         'sort_order'
     ];
 
@@ -21,6 +24,30 @@ class AdCity extends Model
     {
         if (app()->getLocale() === 'uk' && !empty($this->attributes['name_uk'] ?? null)) {
             return $this->attributes['name_uk'];
+        }
+        return $value;
+    }
+
+    public function getMetaTitleAttribute($value)
+    {
+        if (app()->getLocale() === 'uk' && !empty($this->attributes['meta_title_uk'] ?? null)) {
+            return $this->attributes['meta_title_uk'];
+        }
+        return $value;
+    }
+
+    public function getMetaDescriptionAttribute($value)
+    {
+        if (app()->getLocale() === 'uk' && !empty($this->attributes['meta_description_uk'] ?? null)) {
+            return $this->attributes['meta_description_uk'];
+        }
+        return $value;
+    }
+
+    public function getContentAttribute($value)
+    {
+        if (app()->getLocale() === 'uk' && !empty($this->attributes['content_uk'] ?? null)) {
+            return $this->attributes['content_uk'];
         }
         return $value;
     }
