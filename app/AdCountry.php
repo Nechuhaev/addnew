@@ -1,21 +1,57 @@
 <?php
-
 namespace App;
-
 use App\Http\Controllers\Front\Ad\Country;
 use Illuminate\Database\Eloquent\Model;
-
 class AdCountry extends Model
 {
     protected $fillable = [
         'name',
+        'name_uk',
         'image',
         'slug',
         'content',
+        'content_uk',
         'meta_title',
+        'meta_title_uk',
         'meta_description',
+        'meta_description_uk',
         'sort_order'
     ];
+
+    /**
+     * Мовні аксесори — той самий підхід, що в AdCategory/AdCity/AdRegion/AdTag.
+     */
+    public function getNameAttribute($value)
+    {
+        if (app()->getLocale() === 'uk' && !empty($this->attributes['name_uk'] ?? null)) {
+            return $this->attributes['name_uk'];
+        }
+        return $value;
+    }
+
+    public function getMetaTitleAttribute($value)
+    {
+        if (app()->getLocale() === 'uk' && !empty($this->attributes['meta_title_uk'] ?? null)) {
+            return $this->attributes['meta_title_uk'];
+        }
+        return $value;
+    }
+
+    public function getMetaDescriptionAttribute($value)
+    {
+        if (app()->getLocale() === 'uk' && !empty($this->attributes['meta_description_uk'] ?? null)) {
+            return $this->attributes['meta_description_uk'];
+        }
+        return $value;
+    }
+
+    public function getContentAttribute($value)
+    {
+        if (app()->getLocale() === 'uk' && !empty($this->attributes['content_uk'] ?? null)) {
+            return $this->attributes['content_uk'];
+        }
+        return $value;
+    }
 
     /**
      * Слаг должен содержать английские символы
@@ -25,9 +61,7 @@ class AdCountry extends Model
     public function setSlugAttribute($value) {
         if (!isset($value)) {
             // Похожите
-
             $slug = str_slug($this->attributes['name']);
-
             if (isset($this->attributes['id'])) {
                 $all_slugs = AdCountry::select('slug')
                     ->where('slug', 'LIKE', $slug . '%')
@@ -38,7 +72,6 @@ class AdCountry extends Model
                     ->where('slug', 'LIKE', $slug . '%')
                     ->get();
             }
-
             if ($all_slugs->contains('slug', $slug)) {
                 for ($i = 1; $i < 100; $i++) {
                     $new_slug = $slug.'-'.$i;
@@ -46,22 +79,17 @@ class AdCountry extends Model
                         $this->attributes['slug'] = $new_slug;
                         break;
                     }
-
                     if ($i == 99) {
                         $this->attributes['slug'] = $slug . time();
                     }
                 }
-
             } else {
                 $this->attributes['slug'] = $slug;
             }
-
-
         } else {
             $this->attributes['slug'] = $value;
         }
     }
-
     public function getImageAttribute() {
         if (env('APP_ENV') == 'local') {
             return 'http://placehold.it/100x100';
@@ -69,7 +97,6 @@ class AdCountry extends Model
             return $this->attributes['image'];
         }
     }
-
     /**
      * Полный адресс
      * @return string
@@ -77,17 +104,14 @@ class AdCountry extends Model
     public function getAddressFormatAttribute() {
         return $this->name;
     }
-
     /**
      * Ссылка на запись страны
      * @return string
      */
     public function getUrlAttribute() {
-
         return route('country.page', [
             'country' => $this->slug,
         ]);
-
     }
     /**
      * Связь с областями
@@ -96,11 +120,9 @@ class AdCountry extends Model
     public function regions() {
         return $this->hasMany(AdRegion::class, 'country_id');
     }
-
     public function cities() {
         return $this->hasManyThrough(AdCity::class, AdRegion::class, 'country_id', 'region_id');
     }
-
     /**
      * Получает все объявления внутри страны
      * @return \Illuminate\Database\Eloquent\Builder
@@ -110,10 +132,8 @@ class AdCountry extends Model
         $cities_ids = $this->cities->map(function ($city) {
             return $city->id;
         });
-
         return Ad::query()->whereIn('city_id', $cities_ids);
     }
-
     /**
      * Количество городов, которые отнесены к стране
      * @return int
@@ -121,16 +141,12 @@ class AdCountry extends Model
     public function getTotalCitiesAttribute()
     {
         $total_cities = 0;
-
         $this->regions()->each(function ($region) use (&$total_cities) {
             $total_cities += $region->cities->count();
         });
-
         return $total_cities;
     }
-
     public static function getCurrentCountry() {
         return AdCountry::where('id', 62)->first(); // пока-что украина, но дальше...
     }
-
 }

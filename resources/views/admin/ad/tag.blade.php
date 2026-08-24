@@ -1,5 +1,4 @@
 @extends('admin.layout')
-
 @section('breadcrumbs')
     <div class="page-breadcrumb">
         <div class="row">
@@ -14,7 +13,6 @@
         </div>
     </div>
 @endsection
-
 @section('content')
     <div class="row">
         <div class="col-4">
@@ -25,18 +23,26 @@
                         @if($tag)
                             <input type="hidden" name="tag_id" value="{{ $tag->id }}">
                         @endif
-
                         <div class="form-group">
-                            <label>Метка</label>
+                            <label>Метка (RU)</label>
                             <div>
                                 <input type="text"
                                        name="name"
-                                       value="{{ old('name') ?? $tag->name ?? '' }}"
+                                       value="{{ old('name') ?? optional($tag)->getOriginal('name') ?? '' }}"
                                        placeholder=""
                                        class="form-control form-control-line">
                             </div>
                         </div>
-
+                        <div class="form-group">
+                            <label style="color:#2e7d32;">Мітка (UK)</label>
+                            <div>
+                                <input type="text"
+                                       name="name_uk"
+                                       value="{{ old('name_uk') ?? optional($tag)->getOriginal('name_uk') ?? '' }}"
+                                       placeholder="Якщо порожньо — покаже RU-версію"
+                                       class="form-control form-control-line">
+                            </div>
+                        </div>
                         <div class="form-group">
                             <label>Slug</label>
                             <div>
@@ -47,39 +53,62 @@
                                        class="form-control form-control-line">
                             </div>
                         </div>
-
                         <div class="form-group">
-                            <label for="content">Описание категории</label>
+                            <label for="content">Описание категории (RU)</label>
                             <div>
                                 <textarea name="content"
                                           id="content"
-                                          class="content form-control form-control-line">{{ old('content') ?? $tag->content ?? '' }}</textarea>
-
+                                          class="content form-control form-control-line">{{ old('content') ?? optional($tag)->getOriginal('content') ?? '' }}</textarea>
                             </div>
                         </div>
-
                         <div class="form-group">
-                            <label for="meta_title">Meta-тег title</label>
+                            <label for="content_uk" style="color:#2e7d32;">Опис мітки (UK)</label>
+                            <div>
+                                <textarea name="content_uk"
+                                          id="content_uk"
+                                          class="content form-control form-control-line">{{ old('content_uk') ?? optional($tag)->getOriginal('content_uk') ?? '' }}</textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="meta_title">Meta-тег title (RU)</label>
                             <div>
                                 <input type="text"
                                        name="meta_title"
                                        id="meta_title"
-                                       value="{{ old('meta_title') ?? $tag->meta_title ?? '' }}"
+                                       value="{{ old('meta_title') ?? optional($tag)->getOriginal('meta_title') ?? '' }}"
                                        placeholder=""
                                        class="form-control form-control-line">
                             </div>
                         </div>
-
                         <div class="form-group">
-                            <label for="meta_description">Meta-тег description</label>
+                            <label for="meta_title_uk" style="color:#2e7d32;">Meta-тег title (UK)</label>
+                            <div>
+                                <input type="text"
+                                       name="meta_title_uk"
+                                       id="meta_title_uk"
+                                       value="{{ old('meta_title_uk') ?? optional($tag)->getOriginal('meta_title_uk') ?? '' }}"
+                                       placeholder=""
+                                       class="form-control form-control-line">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="meta_description">Meta-тег description (RU)</label>
                             <div>
                                 <textarea name="meta_description"
                                           rows="5"
                                           id="meta_description"
-                                          class="form-control form-control-line">{{ old('meta_description') ?? $tag->meta_description ?? '' }}</textarea>
+                                          class="form-control form-control-line">{{ old('meta_description') ?? optional($tag)->getOriginal('meta_description') ?? '' }}</textarea>
                             </div>
                         </div>
-
+                        <div class="form-group">
+                            <label for="meta_description_uk" style="color:#2e7d32;">Meta-тег description (UK)</label>
+                            <div>
+                                <textarea name="meta_description_uk"
+                                          rows="5"
+                                          id="meta_description_uk"
+                                          class="form-control form-control-line">{{ old('meta_description_uk') ?? optional($tag)->getOriginal('meta_description_uk') ?? '' }}</textarea>
+                            </div>
+                        </div>
                         <hr>
                         <div class="form-group text-center">
                             <button class="btn btn-success">Сохранить</button>
@@ -88,7 +117,6 @@
                 </div>
             </div>
         </div>
-
         <div class="col-8">
             <div class="card">
                 <div class="card-body">
@@ -107,9 +135,7 @@
                             </div>
                         </div>
                     </form>
-
                     <hr>
-
                     @if($tags->items())
                         <table class="table table-bordered table-hover table-middle-cell">
                             <tr>
@@ -137,6 +163,5 @@
                 </div>
             </div>
         </div>
-
     </div>
 @endsection

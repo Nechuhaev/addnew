@@ -1,5 +1,4 @@
 @extends('admin.layout')
-
 @section('breadcrumbs')
     <div class="page-breadcrumb">
         <div class="row">
@@ -14,7 +13,6 @@
         </div>
     </div>
 @endsection
-
 @section('content')
     <div class="row">
         <div class="col-4">
@@ -25,7 +23,6 @@
                         @if ($region)
                             <input type="hidden" name="region_id" value="{{ $region->id }}">
                         @endif
-
                         <div class="form-group">
                             <label>Страна</label>
                             <div>
@@ -45,19 +42,28 @@
                                 </select>
                             </div>
                         </div>
-
                         <div class="form-group">
-                            <label>Область</label>
+                            <label>Область (RU)</label>
                             <div>
                                 <input type="text"
                                        name="name"
                                        id="name"
-                                       value="{{ old('name') ?? $region->name ?? '' }}"
+                                       value="{{ old('name') ?? optional($region)->getOriginal('name') ?? '' }}"
                                        placeholder=""
                                        class="form-control form-control-line">
                             </div>
                         </div>
-
+                        <div class="form-group">
+                            <label for="name_uk" style="color:#2e7d32;">Область (UK)</label>
+                            <div>
+                                <input type="text"
+                                       name="name_uk"
+                                       id="name_uk"
+                                       value="{{ old('name_uk') ?? optional($region)->getOriginal('name_uk') ?? '' }}"
+                                       placeholder="Якщо порожньо — покаже RU-версію"
+                                       class="form-control form-control-line">
+                            </div>
+                        </div>
                         <div class="form-group">
                             <label for="slug">Slug</label>
                             <div>
@@ -69,39 +75,62 @@
                                        class="form-control form-control-line">
                             </div>
                         </div>
-
                         <div class="form-group">
-                            <label for="content">Описание для области</label>
+                            <label for="content">Описание для области (RU)</label>
                             <div>
                                 <textarea name="content"
                                           id="content"
-                                          class="content form-control form-control-line">{{ old('content') ?? $region->content ?? '' }}</textarea>
-
+                                          class="content form-control form-control-line">{{ old('content') ?? optional($region)->getOriginal('content') ?? '' }}</textarea>
                             </div>
                         </div>
-
                         <div class="form-group">
-                            <label for="meta_title">Meta-тег title</label>
+                            <label for="content_uk" style="color:#2e7d32;">Опис області (UK)</label>
+                            <div>
+                                <textarea name="content_uk"
+                                          id="content_uk"
+                                          class="content form-control form-control-line">{{ old('content_uk') ?? optional($region)->getOriginal('content_uk') ?? '' }}</textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="meta_title">Meta-тег title (RU)</label>
                             <div>
                                 <input type="text"
                                        name="meta_title"
                                        id="meta_title"
-                                       value="{{ old('meta_title') ?? $region->meta_title ?? '' }}"
+                                       value="{{ old('meta_title') ?? optional($region)->getOriginal('meta_title') ?? '' }}"
                                        placeholder=""
                                        class="form-control form-control-line">
                             </div>
                         </div>
-
                         <div class="form-group">
-                            <label for="meta_description">Meta-тег description</label>
+                            <label for="meta_title_uk" style="color:#2e7d32;">Meta-тег title (UK)</label>
+                            <div>
+                                <input type="text"
+                                       name="meta_title_uk"
+                                       id="meta_title_uk"
+                                       value="{{ old('meta_title_uk') ?? optional($region)->getOriginal('meta_title_uk') ?? '' }}"
+                                       placeholder=""
+                                       class="form-control form-control-line">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="meta_description">Meta-тег description (RU)</label>
                             <div>
                                 <textarea name="meta_description"
                                           rows="5"
                                           id="meta_description"
-                                          class="form-control form-control-line">{{ old('meta_description') ?? $region->meta_description ?? '' }}</textarea>
+                                          class="form-control form-control-line">{{ old('meta_description') ?? optional($region)->getOriginal('meta_description') ?? '' }}</textarea>
                             </div>
                         </div>
-
+                        <div class="form-group">
+                            <label for="meta_description_uk" style="color:#2e7d32;">Meta-тег description (UK)</label>
+                            <div>
+                                <textarea name="meta_description_uk"
+                                          rows="5"
+                                          id="meta_description_uk"
+                                          class="form-control form-control-line">{{ old('meta_description_uk') ?? optional($region)->getOriginal('meta_description_uk') ?? '' }}</textarea>
+                            </div>
+                        </div>
                         <div class="form-group">
                             <label for="sort_order">Порядок сортировки</label>
                             <div>
@@ -113,7 +142,6 @@
                                        class="form-control form-control-line">
                             </div>
                         </div>
-
                         <hr>
                         <div class="form-group text-center">
                             <button class="btn btn-success">Сохранить</button>
@@ -122,7 +150,6 @@
                 </div>
             </div>
         </div>
-
         <div class="col-8">
             <div class="card">
                 <div class="card-body">
@@ -141,9 +168,7 @@
                             </div>
                         </div>
                     </form>
-
                     <hr>
-
                     @if ($regions)
                     <table class="table table-bordered table-hover table-middle-cell">
                         <tr>
@@ -156,7 +181,6 @@
                             <th class="text-center cell-actions">
                             </th>
                         </tr>
-
                         @foreach($regions as $region_item)
                             <tr>
                                 <td style="width: 40px" class="text-center"><input type="checkbox" name="id[]" value="{{ $region_item->id }}"></td>
@@ -177,6 +201,5 @@
                 </div>
             </div>
         </div>
-
     </div>
 @endsection
