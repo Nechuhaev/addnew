@@ -2,7 +2,7 @@
     <div class="container">
         <form class="search" method="get" action="{{ $config['action'] }}">
             <div class="form-group">
-                <input type="text" id="autocomplete_i" class="form-control" name="s" value="{{ $config['search_term'] }}" placeholder="Что ищем?">
+                <input type="text" id="autocomplete_i" class="form-control" name="s" value="{{ $config['search_term'] }}" placeholder="{{ __('front.search_placeholder') }}">
             </div>
             <!-- <div class="search-mob">
                 <div class="form-group">
@@ -29,8 +29,8 @@
                 </div>
             </div> -->
             <div class="search-button">
-                <button class="btn btn-search">Поиск</button>
-                <a href="#" class="view-more">Уточнить поиск</a>
+                <button class="btn btn-search">{{ __('front.search_button') }}</button>
+                <a href="#" class="view-more">{{ __('front.refine_search') }}</a>
             </div>
         </form>
     </div>
