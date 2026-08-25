@@ -41,6 +41,11 @@ class Ad extends Controller
 
         // Обмеження "тільки Україна" прибрано — сайт тепер показує товари з будь-якої країни.
 
+        // Новий, дедуплікований облік переглядів (для статистики магазину) —
+        // окремо від старого простого лічильника нижче, який лишаємо без
+        // змін, бо він уже показується на сторінці.
+        \App\ProductView::record($ad->id, request()->ip(), 'view');
+
         // Обновляем счетчик просмотров объявлений
         // Просмотры сегодня
         if(!Carbon::now()->isSameAs('d.m.Y', $ad->updated_at)) {
@@ -137,6 +142,24 @@ class Ad extends Controller
             'prices' => $prices,
             'meta' => $meta
         ]);
+    }
+
+    /**
+     * Трекінг кліку "Перейти в інтернет-магазин" з гарантованим редиректом
+     * на реальне джерело товару. Обгортка навколо прямого посилання —
+     * так клік фіксується надійно на сервері, незалежно від того, чи
+     * спрацює клієнтський JS.
+     */
+    public function trackShopLinkRedirect($id)
+    {
+        $ad = \App\Ad::find($id);
+        if (!$ad || empty($ad->source_url)) {
+            abort(404);
+        }
+
+        \App\ProductView::record($ad->id, request()->ip(), 'click_shop_link');
+
+        return redirect($ad->source_url);
     }
 
     /**

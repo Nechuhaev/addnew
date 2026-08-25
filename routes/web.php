@@ -38,6 +38,7 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     
     
     
+    
         Route::get('/translations', 'Admin\Translation\TranslationController@index')->name('admin.translations');
     Route::post('/translations', 'Admin\Translation\TranslationController@store')->name('admin.translations.store');
     Route::post('/translations/update', 'Admin\Translation\TranslationController@update')->name('admin.translations.update');
@@ -49,6 +50,7 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
         Route::get('/articles', 'Admin\Stat\ArticleStatController@index')->name('admin.stat.articles');
         Route::get('/indexing', 'Admin\Stat\IndexingStatController@index')->name('admin.stat.indexing');
     });
+
 
     // Список запрещенных email адресов
     Route::get('/blocked-emails', 'Admin\BlockedEmails\BlockedEmailsController@showEmailsList')->name('admin.blocked-emails');
@@ -183,6 +185,11 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::get('/seo/shop-list', 'Admin\Seo\ShopList@form')->name('admin.seo.shop-list');
 });
 
+// Публічний трекінг статистики товарів/магазину (без auth, без CSRF -- див. VerifyCsrfToken::except).
+Route::post('/api/track/product/{id}', 'Api\TrackingController@trackProductEvent');
+Route::post('/api/track/product/{id}/duration', 'Api\TrackingController@trackProductDuration');
+Route::post('/api/track/shop/{userId}', 'Api\TrackingController@trackShopView');
+
 
 
 /**
@@ -240,6 +247,7 @@ $frontRoutes = function () {
         Route::get('/profile/type', 'Front\User\ProfileTypeController@index');
         Route::post('/profile/type', 'Front\User\ProfileTypeController@switchIsShopOwner')->name('switch-profile-type');
         Route::get('/profile/shop', 'Front\User\Shop\ShopDashboardController@index')->name('profile.shop.dashboard');
+        Route::get('/profile/shop/stats', 'Front\User\Shop\ShopStatsController@index')->name('profile.shop.stats');
         Route::get('/profile/shop/import-export', 'Front\User\Shop\AllActionsController@index')->name('profile.shop');
         Route::get('/profile/shop/import', 'Front\User\Shop\ProductImportController@index')->name('profile.shop.import')->middleware('shop_owner');
         Route::post('/profile/shop/import/upload', 'Front\User\Shop\ProductImportController@upload')->name('profile.shop.import.upload')->middleware('shop_owner');
@@ -264,6 +272,7 @@ $frontRoutes = function () {
 
 // Объявление
     Route::get('/ads/{slug}', 'Front\Ad\Ad@page')->name('ad.page');
+    Route::get('/ads/{id}/goto-shop', 'Front\Ad\Ad@trackShopLinkRedirect')->name('ad.trackShopLink')->where('id', '[0-9]+');
     Route::post('/ads/{slug}', 'Front\Ad\Ad@message');
     Route::get('/ad/edit/{id}', 'Front\Ad\Ad@edit')->name('ad.edit');
     Route::post('/ad/edit/{id}', 'Front\Ad\Ad@update')->name('ad.update');

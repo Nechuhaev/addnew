@@ -164,7 +164,7 @@
                     @if( $ad->is_product )
                         <div class="shop_product">
                             <h2 class="display-inline-block">{{ __('ad_page.buy_prefix') }} <b>{{ $ad->name }}</b> {{ __('ad_page.buy_suffix') }}</h2>
-                            <a href="{{ $ad->source_url }}" target="_blank" rel="nofollow noopener" class="btn btn-success pull-right">{{ __('ad_page.goto_shop_button') }}</a>
+                            <a href="{{ route('ad.trackShopLink', ['id' => $ad->id]) }}" target="_blank" rel="nofollow noopener" class="btn btn-success pull-right">{{ __('ad_page.goto_shop_button') }}</a>
 
 
                             <p style="padding-top: 20px">{{ __('ad_page.other_sellers_prefix') }} <b>{{ $ad->name }}</b></p>
@@ -321,4 +321,48 @@
         init_google_map('{{ $ad->city->region->country->name }}, {{ $ad->city->region->name }}, {{ $ad->city->name }}', '{{ $ad->name }}');
     </script>
     @endif
+    <script>
+        (function () {
+            var adId = {{ $ad->id }};
+
+            // Клік "Показати контакти" — трекінг, без впливу на існуючу
+            // поведінку кнопки (просто одна додаткова fetch-подія поруч).
+            var contactsBtn = document.querySelector('.btn-notice');
+            if (contactsBtn) {
+                contactsBtn.addEventListener('click', function () {
+                    fetch('/api/track/product/' + adId, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ event: 'click_contacts' })
+                    }).catch(function () {});
+                });
+            }
+
+            // Орієнтовний час на сторінці — надсилається через sendBeacon
+            // при виході (надійніше за звичайний AJAX, бо гарантовано
+            // встигає відправитись навіть коли сторінка вже закривається).
+            var startTime = Date.now();
+            var sent = false;
+
+            function sendDuration() {
+                if (sent) return;
+                sent = true;
+                var seconds = Math.round((Date.now() - startTime) / 1000);
+                if (seconds < 1) return;
+
+                var data = JSON.stringify({ seconds: seconds });
+                if (navigator.sendBeacon) {
+                    var blob = new Blob([data], { type: 'application/json' });
+                    navigator.sendBeacon('/api/track/product/' + adId + '/duration', blob);
+                }
+            }
+
+            document.addEventListener('visibilitychange', function () {
+                if (document.visibilityState === 'hidden') {
+                    sendDuration();
+                }
+            });
+            window.addEventListener('pagehide', sendDuration);
+        })();
+    </script>
 @endsection

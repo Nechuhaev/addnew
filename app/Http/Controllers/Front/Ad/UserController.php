@@ -18,6 +18,8 @@ class UserController extends Controller
 
         if (!$user) abort(404);
 
+        \App\ShopView::record($user->id, request()->ip());
+
         $seo_field = SeoField::where('index', 'ad-user')->first();
 
         if ($seo_field) {

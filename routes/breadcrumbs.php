@@ -196,6 +196,12 @@ Breadcrumbs::for('profile.shop.dashboard', function ($trail) {
     $trail->push(__('front.my_shop'), route('profile.shop.dashboard'));
 });
 
+// Главная > Мой магазин > Статистика
+Breadcrumbs::for('profile.shop.stats', function ($trail) {
+    $trail->parent('profile.shop.dashboard');
+    $trail->push(__('shop_stats.heading'), route('profile.shop.stats'));
+});
+
 // Главная > Информация о магазине
 Breadcrumbs::for('profile.shop.info', function ($trail) {
     $trail->parent('index');
