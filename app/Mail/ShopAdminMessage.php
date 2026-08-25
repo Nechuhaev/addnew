@@ -22,6 +22,6 @@ class ShopAdminMessage extends Mailable
     public function build()
     {
         return $this->subject($this->subjectLine)
-            ->view('emails.shop-admin-message');
+            ->view('mail.shop-admin-message');
     }
 }
