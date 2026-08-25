@@ -113,16 +113,16 @@
             <div class="country-wrap">
                 <a href="https://addnew.biz/regions/ukraina" class="country-name"><img src="{{ asset('assets/front/img/flags/ukrane.png') }}"> <span>{{ __('front.country_ukraine') }}</span> <span class="btn-toggle"><i class="icon icon-plus"></i></span></a>
                 <ul class="cities-list">
-                    <li><a href="https://addnew.biz/regions/ukraina/kievskaya-obl/kiev">Киев <span class="city-rate">2384</span></a></li>
-                    <li><a href="https://addnew.biz/regions/ukraina/harkovskaya-obl/harkov">Харьков <span class="city-rate">959</span></a></li>
-                    <li><a href="https://addnew.biz/regions/ukraina/dnepropetrovskaya-obl/dnepropetrovsk">Днепропетровск <span class="city-rate">520</span></a></li>
-                    <li><a href="https://addnew.biz/regions/ukraina/odesskaya-obl/odessa">Одесса <span class="city-rate">506</span></a></li>
-                    <li><a href="https://addnew.biz/regions/ukraina/zaporozhskaya-obl/zaporozhe">Запорожье <span class="city-rate">276</span></a></li>
-                    <li><a href="https://addnew.biz/regions/ukraina/lvovskaya-obl/lvov">Львов <span class="city-rate">244</span></a></li>
-                    <li><a href="https://addnew.biz/regions/ukraina/sumskaya-obl/sumi">Сумы <span class="city-rate">158</span></a></li>
-                    <li><a href="https://addnew.biz/regions/ukraina/hmelnitckaya-obl/hmelnitckij">Хмельницкий <span class="city-rate">143</span></a></li>
-                    <li><a href="https://addnew.biz/regions/ukraina/nikolaevskaya-obl/nikolaev">Николаев <span class="city-rate">137</span></a></li>
-                    <li><a href="https://addnew.biz/regions/ukraina/vinnitckaya-obl/vinnitca">Винница <span class="city-rate">113</span></a></li>
+                    <li><a href="https://addnew.biz/regions/ukraina/kievskaya-obl/kiev">{{ __('sidebar_cities.kiev') }} <span class="city-rate">2384</span></a></li>
+                    <li><a href="https://addnew.biz/regions/ukraina/harkovskaya-obl/harkov">{{ __('sidebar_cities.harkov') }} <span class="city-rate">959</span></a></li>
+                    <li><a href="https://addnew.biz/regions/ukraina/dnepropetrovskaya-obl/dnepropetrovsk">{{ __('sidebar_cities.dnepr') }} <span class="city-rate">520</span></a></li>
+                    <li><a href="https://addnew.biz/regions/ukraina/odesskaya-obl/odessa">{{ __('sidebar_cities.odessa') }} <span class="city-rate">506</span></a></li>
+                    <li><a href="https://addnew.biz/regions/ukraina/zaporozhskaya-obl/zaporozhe">{{ __('sidebar_cities.zaporozhe') }} <span class="city-rate">276</span></a></li>
+                    <li><a href="https://addnew.biz/regions/ukraina/lvovskaya-obl/lvov">{{ __('sidebar_cities.lvov') }} <span class="city-rate">244</span></a></li>
+                    <li><a href="https://addnew.biz/regions/ukraina/sumskaya-obl/sumi">{{ __('sidebar_cities.sumy') }} <span class="city-rate">158</span></a></li>
+                    <li><a href="https://addnew.biz/regions/ukraina/hmelnitckaya-obl/hmelnitckij">{{ __('sidebar_cities.hmelnitskiy') }} <span class="city-rate">143</span></a></li>
+                    <li><a href="https://addnew.biz/regions/ukraina/nikolaevskaya-obl/nikolaev">{{ __('sidebar_cities.nikolaev') }} <span class="city-rate">137</span></a></li>
+                    <li><a href="https://addnew.biz/regions/ukraina/vinnitckaya-obl/vinnitca">{{ __('sidebar_cities.vinnitsa') }} <span class="city-rate">113</span></a></li>
                 </ul>
             </div>
             <div class="country-wrap">
@@ -132,16 +132,16 @@
                     <span class="btn-toggle"><i class="icon icon-plus"></i></span>
                 </a>
                 <ul class="cities-list">
-                    <li><a href="https://addnew.biz/regions/rossiya/moskva-i-moskovskaya-obl/moskva">Москва <span class="city-rate">81</span></a></li>
-                    <li><a href="https://addnew.biz/regions/rossiya/lipetckaya-obl/lipetck">Липецк <span class="city-rate">68</span></a></li>
-                    <li><a href="https://addnew.biz/regions/rossiya/rostovskaya-obl/rostov-na-donu">Ростов-на-Дону <span class="city-rate">41</span></a></li>
-                    <li><a href="https://addnew.biz/regions/rossiya/sankt-peterburg-i-oblast/sankt-peterburg">Санкт-Петербург <span class="city-rate">27</span></a></li>
-                    <li><a href="https://addnew.biz/regions/rossiya/novosibirskaya-obl/novosibirsk">Новосибирск <span class="city-rate">14</span></a></li>
-                    <li><a href="https://addnew.biz/regions/rossiya/krasnodarskij-kraj/sochi">Сочи <span class="city-rate">14</span></a></li>
-                    <li><a href="https://addnew.biz/regions/rossiya/ryazanskaya-obl/ryazan">Рязань <span class="city-rate">10</span></a></li>
-                    <li><a href="https://addnew.biz/regions/rossiya/sverdlovskaya-obl/ekaterinburg">Екатеринбург <span class="city-rate">10</span></a></li>
-                    <li><a href="https://addnew.biz/regions/rossiya/moskva-i-moskovskaya-obl/noginsk">Ногинск <span class="city-rate">8</span></a></li>
-                    <li><a href="https://addnew.biz/regions/rossiya/tatarstan/naberezhnie-chelni">Набережные Челны <span class="city-rate">8</span></a></li>
+                    <li><a href="https://addnew.biz/regions/rossiya/moskva-i-moskovskaya-obl/moskva">{{ __('sidebar_cities.moskva') }} <span class="city-rate">81</span></a></li>
+                    <li><a href="https://addnew.biz/regions/rossiya/lipetckaya-obl/lipetck">{{ __('sidebar_cities.lipetsk') }} <span class="city-rate">68</span></a></li>
+                    <li><a href="https://addnew.biz/regions/rossiya/rostovskaya-obl/rostov-na-donu">{{ __('sidebar_cities.rostov') }} <span class="city-rate">41</span></a></li>
+                    <li><a href="https://addnew.biz/regions/rossiya/sankt-peterburg-i-oblast/sankt-peterburg">{{ __('sidebar_cities.spb') }} <span class="city-rate">27</span></a></li>
+                    <li><a href="https://addnew.biz/regions/rossiya/novosibirskaya-obl/novosibirsk">{{ __('sidebar_cities.novosibirsk') }} <span class="city-rate">14</span></a></li>
+                    <li><a href="https://addnew.biz/regions/rossiya/krasnodarskij-kraj/sochi">{{ __('sidebar_cities.sochi') }} <span class="city-rate">14</span></a></li>
+                    <li><a href="https://addnew.biz/regions/rossiya/ryazanskaya-obl/ryazan">{{ __('sidebar_cities.ryazan') }} <span class="city-rate">10</span></a></li>
+                    <li><a href="https://addnew.biz/regions/rossiya/sverdlovskaya-obl/ekaterinburg">{{ __('sidebar_cities.ekaterinburg') }} <span class="city-rate">10</span></a></li>
+                    <li><a href="https://addnew.biz/regions/rossiya/moskva-i-moskovskaya-obl/noginsk">{{ __('sidebar_cities.noginsk') }} <span class="city-rate">8</span></a></li>
+                    <li><a href="https://addnew.biz/regions/rossiya/tatarstan/naberezhnie-chelni">{{ __('sidebar_cities.chelny') }} <span class="city-rate">8</span></a></li>
                 </ul>
             </div>
             <div class="country-wrap">
@@ -151,11 +151,11 @@
                     <span class="btn-toggle"><i class="icon icon-plus"></i></span>
                 </a>
                 <ul class="cities-list">
-                    <li><a href="https://addnew.biz/regions/kitaj/hejluntczyan/harbin">Харбин <span class="city-rate">214</span></a></li>
-                    <li><a href="https://addnew.biz/regions/kitaj/gansu/lanchzhou">Ланьчжоу <span class="city-rate">9</span></a></li>
-                    <li><a href="https://addnew.biz/regions/kitaj/pekin/pekin">Пекин <span class="city-rate">3</span></a></li>
-                    <li><a href="https://addnew.biz/regions/kitaj/hebej/shihajkvang">Шихайкванг <span class="city-rate">2</span></a></li>
-                    <li><a href="https://addnew.biz/regions/kitaj/guandon/zhenzhen">Женьжень <span class="city-rate">2</span></a></li>
+                    <li><a href="https://addnew.biz/regions/kitaj/hejluntczyan/harbin">{{ __('sidebar_cities.harbin') }} <span class="city-rate">214</span></a></li>
+                    <li><a href="https://addnew.biz/regions/kitaj/gansu/lanchzhou">{{ __('sidebar_cities.lanchzhou') }} <span class="city-rate">9</span></a></li>
+                    <li><a href="https://addnew.biz/regions/kitaj/pekin/pekin">{{ __('sidebar_cities.pekin') }} <span class="city-rate">3</span></a></li>
+                    <li><a href="https://addnew.biz/regions/kitaj/hebej/shihajkvang">{{ __('sidebar_cities.shihajkvang') }} <span class="city-rate">2</span></a></li>
+                    <li><a href="https://addnew.biz/regions/kitaj/guandon/zhenzhen">{{ __('sidebar_cities.zhenzhen') }} <span class="city-rate">2</span></a></li>
                 </ul>
             </div>
         </div>

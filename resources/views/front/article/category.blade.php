@@ -35,7 +35,11 @@
                                     @endif
                                     <p><span style="font-weight: 400;">{!! $article->excerpt !!}</span></p>
                                 </div>
-                                <p class="blog-views">Всего просмотров: 27, за сегодня: 2</p>
+                                <p class="blog-views">
+                                    {{ __('blog.views_stats', ['total' => $article->total_views, 'today' => $article->today_views]) }}
+                                    &nbsp;•&nbsp;
+                                    {{ __('blog.read_time', ['minutes' => $article->read_time_minutes]) }}
+                                </p>
                             </div>
                         @endforeach
                     @endif
