@@ -205,6 +205,27 @@ class CheckShopEmails extends Command
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return false;
         }
+
+        // Захист від хибних спрацювань на іменах файлів зображень типу
+        // "footer_logo@2x.png" чи "banner@4x.jpg" — структурно валідні
+        // email, але явно не email. Retina-суфікси (@1x/@2x/@3x/@4x) і
+        // типові розширення зображень/шрифтів як "домен" — відсікаємо.
+        if (preg_match('/@[0-9]+x\.(png|jpe?g|gif|webp|svg|ico|bmp|woff2?|ttf|eot)$/i', $email)) {
+            return false;
+        }
+        $imageExtensions = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'ico', 'bmp', 'woff', 'woff2', 'ttf', 'eot'];
+        $ext = strtolower(pathinfo($email, PATHINFO_EXTENSION));
+        if (in_array($ext, $imageExtensions, true)) {
+            return false;
+        }
+
+        // Захист від власного домену — якщо магазин помилково вказав
+        // site_url на addnew.biz (тестові дані), не даємо йому "знайти"
+        // наш власний контактний email і записати як свій.
+        if (Str::contains(strtolower($email), 'addnew.biz')) {
+            return false;
+        }
+
         foreach ($blocklist as $blocked) {
             if (Str::contains(strtolower($email), $blocked)) {
                 return false;

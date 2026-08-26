@@ -27,6 +27,7 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     
     Route::get('/shops', 'Admin\Shop\ShopController@index')->name('admin.shops');
     Route::get('/shops/skipped-domains', 'Admin\Shop\SkippedDomainController@index')->name('admin.shops.skippedDomains');
+    Route::get('/shops/stats', 'Admin\Shop\ShopStatsController@index')->name('admin.shops.stats');
     Route::get('/shops/{id}', 'Admin\Shop\ShopController@edit')->name('admin.shops.edit');
     Route::post('/shops/{id}/update', 'Admin\Shop\ShopController@update')->name('admin.shops.update');
     Route::get('/shops/{id}/products', 'Admin\Shop\ShopController@products')->name('admin.shops.products');
@@ -35,6 +36,8 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::delete('/shops/{id}', 'Admin\Shop\ShopController@destroy')->name('admin.shops.destroy');
     Route::delete('/shops/{id}/products/delete-inactive', 'Admin\Shop\ShopController@bulkDeleteInactive')->name('admin.shops.products.deleteInactive');
     Route::post('/shops/{id}/message', 'Admin\Shop\ShopController@sendMessage')->name('admin.shops.message');
+    
+Route::get('/shops/{id}/stats', 'Admin\Shop\ShopStatsController@show')->name('admin.shops.stats.show');
     
     
     
