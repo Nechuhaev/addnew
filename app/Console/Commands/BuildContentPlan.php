@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\ArticleCategory;
+use App\Console\Commands\Concerns\CallsLlm;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -10,6 +11,8 @@ use Illuminate\Support\Str;
 
 class BuildContentPlan extends Command
 {
+    use CallsLlm;
+
     /**
      * php artisan content:build-plan
      */
@@ -163,33 +166,8 @@ class BuildContentPlan extends Command
     }
 
     // -----------------------------------------------------------------
-    // Anthropic (Claude) API
+    // Anthropic (Claude) API — сам метод тепер у трейті CallsLlm
     // -----------------------------------------------------------------
-
-    protected function callClaude(string $prompt, int $maxTokens = 4000): string
-    {
-        $response = $this->http->post('https://api.anthropic.com/v1/messages', [
-            'headers' => [
-                'x-api-key' => env('ANTHROPIC_API_KEY'),
-                'anthropic-version' => '2023-06-01',
-                'content-type' => 'application/json',
-            ],
-            'json' => [
-                'model' => env('ANTHROPIC_MODEL', 'claude-sonnet-4-6'),
-                'max_tokens' => $maxTokens,
-                'messages' => [['role' => 'user', 'content' => $prompt]],
-            ],
-            'timeout' => 180,
-        ]);
-
-        $data = json_decode((string) $response->getBody(), true);
-        $textBlocks = array_filter($data['content'] ?? [], function ($b) {
-            return ($b['type'] ?? '') === 'text';
-        });
-        return trim(implode("\n", array_map(function ($b) {
-            return $b['text'];
-        }, $textBlocks)));
-    }
 
     protected function extractJson(string $text, string $openChar, string $closeChar): string
     {
@@ -234,7 +212,7 @@ class BuildContentPlan extends Command
             . "Дай відповідь СТРОГО у форматі JSON-масиву рядків, без пояснень і без "
             . "markdown-розмітки, наприклад:\n[\"слово1\", \"слово2\"]";
 
-        $raw = $this->callClaude($prompt, 500);
+        $raw = $this->callLlm($prompt, 500);
         $json = $this->extractJson($raw, '[', ']');
         return json_decode($json, true) ?: [];
     }
@@ -319,7 +297,7 @@ class BuildContentPlan extends Command
             . "НЕ повторюй ці вже наявні ключі:\n{$existingStr}\n\n"
             . "Дай відповідь СТРОГО у форматі JSON-масиву рядків, без пояснень і без markdown-розмітки.";
 
-        $raw = $this->callClaude($prompt, 3000);
+        $raw = $this->callLlm($prompt, 3000);
         $json = $this->extractJson($raw, '[', ']');
         return json_decode($json, true) ?: [];
     }
@@ -367,7 +345,7 @@ class BuildContentPlan extends Command
             . "[{\"cluster\": \"...\", \"keywords\": [\"...\"], \"topics\": "
             . "[{\"topic\": \"...\", \"focus_keyword_hint\": \"...\", \"category\": \"назва або null\"}]}]";
 
-        $raw = $this->callClaude($prompt, 8000);
+        $raw = $this->callLlm($prompt, 8000);
         $json = $this->extractJson($raw, '[', ']');
         $clusters = json_decode($json, true) ?: [];
 
