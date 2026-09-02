@@ -75,15 +75,53 @@ trait CallsLlm
         return $text;
     }
 
+    /**
+     * Список моделей Gemini за пріоритетом — env GEMINI_MODEL може містити
+     * кілька назв через кому. Якщо перша модель недоступна (404, "no longer
+     * available") або постійно перевантажена — пробуємо наступну в списку,
+     * а не одразу здаємось. Останній елемент — офіційний аліас "latest",
+     * який Google завжди тримає вказівним на щось робоче (хай і
+     * експериментальне), тому він — надійний останній рубіж.
+     */
     protected function callGemini(string $prompt, int $maxTokens = 4000): string
     {
         $apiKey = env('GEMINI_API_KEY');
-        // gemini-2.5-flash недоступна для нових користувачів і вимикається
-        // 16-20.10.2026 — тому за замовчуванням беремо актуальну gemini-3.7-flash.
-        $model = env('GEMINI_MODEL', 'gemini-3.7-flash');
+        $modelsConfig = env(
+            'GEMINI_MODEL',
+            'gemini-3.7-flash,gemini-3.6-flash,gemini-3.5-flash,gemini-2.5-flash,gemini-flash-latest'
+        );
+        $models = array_values(array_filter(array_map('trim', explode(',', $modelsConfig))));
+
+        if (empty($models)) {
+            throw new \RuntimeException('GEMINI_MODEL порожній після розбору списку моделей');
+        }
+
+        $lastError = null;
+        foreach ($models as $i => $model) {
+            try {
+                return $this->callGeminiModel($prompt, $maxTokens, $model, $apiKey);
+            } catch (\Throwable $e) {
+                $lastError = $e;
+                $hasMore = $i < count($models) - 1;
+                if (method_exists($this, 'warn') && $hasMore) {
+                    $this->warn("Gemini [{$model}] не спрацював (" . $e->getMessage() . '), пробую наступну модель...');
+                }
+                continue;
+            }
+        }
+
+        throw $lastError ?: new \RuntimeException('Жодна модель Gemini не спрацювала');
+    }
+
+    /**
+     * Виклик конкретної моделі Gemini з однією повторною спробою при
+     * тимчасовому перевантаженні (503 "High demand") чи ліміті (429).
+     */
+    protected function callGeminiModel(string $prompt, int $maxTokens, string $model, string $apiKey): string
+    {
         $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent";
 
-        $response = $this->http->post($url, [
+        $payload = [
             'headers' => [
                 'x-goog-api-key' => $apiKey,
                 'content-type' => 'application/json',
@@ -97,15 +135,39 @@ trait CallsLlm
                 ],
             ],
             'timeout' => 180,
-        ]);
+        ];
 
-        $data = json_decode((string) $response->getBody(), true);
-        $text = $data['candidates'][0]['content']['parts'][0]['text'] ?? null;
+        $attempts = 0;
+        $lastError = null;
+        while ($attempts < 2) {
+            $attempts++;
+            try {
+                $response = $this->http->post($url, $payload);
+                $data = json_decode((string) $response->getBody(), true);
+                $text = $data['candidates'][0]['content']['parts'][0]['text'] ?? null;
 
-        if ($text === null || trim($text) === '') {
-            throw new \RuntimeException('Gemini не повернув текст: ' . json_encode($data));
+                if ($text === null || trim($text) === '') {
+                    throw new \RuntimeException('Gemini не повернув текст: ' . json_encode($data));
+                }
+
+                return trim($text);
+            } catch (\Throwable $e) {
+                $lastError = $e;
+                $isTransient = strpos($e->getMessage(), '503') !== false
+                    || strpos($e->getMessage(), '429') !== false
+                    || strpos($e->getMessage(), 'high demand') !== false;
+                if ($isTransient && $attempts < 2) {
+                    if (method_exists($this, 'warn')) {
+                        $this->warn("Gemini [{$model}] тимчасово перевантажений, чекаю 3 сек і пробую ще раз...");
+                    }
+                    sleep(3);
+                    continue;
+                }
+                throw $lastError;
+            }
         }
 
-        return trim($text);
+        throw $lastError;
     }
+
 }
