@@ -78,7 +78,9 @@ trait CallsLlm
     protected function callGemini(string $prompt, int $maxTokens = 4000): string
     {
         $apiKey = env('GEMINI_API_KEY');
-        $model = env('GEMINI_MODEL', 'gemini-2.5-flash');
+        // gemini-2.5-flash недоступна для нових користувачів і вимикається
+        // 16-20.10.2026 — тому за замовчуванням беремо актуальну gemini-3.7-flash.
+        $model = env('GEMINI_MODEL', 'gemini-3.7-flash');
         $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent";
 
         $response = $this->http->post($url, [
