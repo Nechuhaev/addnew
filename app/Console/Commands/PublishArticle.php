@@ -240,7 +240,7 @@ class PublishArticle extends Command
             . "жодного посилання.\n\n"
             . "Пам'ятай: вся твоя відповідь — це один JSON-об'єкт, що починається з { і закінчується }.";
 
-        $raw = $this->callLlm($prompt, 4000);
+        $raw = $this->callLlm($prompt, 4000, $this->validatesAsJsonObject());
         $json = $this->extractJsonObject($raw);
         $data = json_decode($json, true);
         if (!is_array($data)) {
