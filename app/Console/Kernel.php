@@ -76,7 +76,7 @@ class Kernel extends ConsoleKernel
 
     // Раз на день — SEO-оптимізація карток товарів через Claude API.
     $schedule->command('products:seo-optimize')
-        ->dailyAt('11:00')
+        ->weeklyOn(2, '11:00')
         ->withoutOverlapping()
         ->appendOutputTo(storage_path('logs/products-seo-optimize.log'));
         
@@ -90,14 +90,14 @@ class Kernel extends ConsoleKernel
         
         // Раз на день — SEO-оптимізація назви й опису звичайних оголошень.
     $schedule->command('ads:seo-optimize')
-        ->dailyAt('12:00')
+        ->weeklyOn(3, '12:00')
         ->withoutOverlapping()
         ->appendOutputTo(storage_path('logs/ads-seo-optimize.log'));
         
             // Раз на день — звіряє email магазинів з тим, що реально вказано
     // на їхніх сайтах, автоматично оновлює при розбіжності.
     $schedule->command('shops:check-email --limit=50')
-        ->dailyAt('13:00')
+        ->weeklyOn(5, '13:00')
         ->withoutOverlapping()
         ->appendOutputTo(storage_path('logs/shops-check-email.log'));
 
