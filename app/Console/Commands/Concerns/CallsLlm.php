@@ -25,8 +25,16 @@ trait CallsLlm
     /**
      * Головна точка входу — саме її треба викликати замість callClaude()
      * напряму, щоб автоматично отримати повний ланцюжок фолбеків.
+     *
+     * $validator (необов'язково) — функція виду fn(string $text): bool.
+     * Якщо задана і повертає false для відповіді провайдера — ця відповідь
+     * НЕ приймається як успіх: замість того щоб повернути "сирий" текст,
+     * який викликач потім не зможе розпарсити (наприклад, JSON-парсер не
+     * знайде дужок), ми одразу переходимо до наступного провайдера. Без
+     * цього провайдер, що "успішно" відповів прозою замість JSON, псував
+     * би результат мовчки, хоча наступний провайдер міг би впоратись.
      */
-    protected function callLlm(string $prompt, int $maxTokens = 4000): string
+    protected function callLlm(string $prompt, int $maxTokens = 4000, ?callable $validator = null): string
     {
         $providers = [
             ['name' => 'Claude', 'method' => 'callClaude'],
@@ -40,6 +48,11 @@ trait CallsLlm
         foreach ($providers as $i => $provider) {
             try {
                 $text = $this->{$provider['method']}($prompt, $maxTokens);
+
+                if ($validator !== null && !$validator($text)) {
+                    throw new \RuntimeException('Відповідь не пройшла валідацію очікуваного формату');
+                }
+
                 if ($i > 0 && method_exists($this, 'info')) {
                     $this->info("Використано резервного провайдера: {$provider['name']}.");
                 }
@@ -54,6 +67,30 @@ trait CallsLlm
         }
 
         throw new \RuntimeException('Усі LLM-провайдери недоступні: ' . implode(' | ', $errors));
+    }
+
+    /**
+     * Готовий валідатор для callLlm(): відповідь має містити хоча б одну
+     * пару { ... } (JSON-об'єкт). Використовуй, коли очікуєш від моделі
+     * JSON-об'єкт (наприклад, дані статті).
+     */
+    protected function validatesAsJsonObject(): callable
+    {
+        return function (string $text): bool {
+            return strpos($text, '{') !== false && strpos($text, '}') !== false;
+        };
+    }
+
+    /**
+     * Готовий валідатор для callLlm(): відповідь має містити хоча б одну
+     * пару [ ... ] (JSON-масив). Використовуй, коли очікуєш від моделі
+     * JSON-масив (наприклад, список тем чи ключів).
+     */
+    protected function validatesAsJsonArray(): callable
+    {
+        return function (string $text): bool {
+            return strpos($text, '[') !== false && strpos($text, ']') !== false;
+        };
     }
 
     // -----------------------------------------------------------------
