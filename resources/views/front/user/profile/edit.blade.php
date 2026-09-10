@@ -12,7 +12,7 @@
                 <div class="column-content">
                     <h1 style="display:flex; align-items:center; justify-content:space-between;">
                         {{ __('profile.edit_heading') }}
-                        @if($user->email === 'a.nechuhaev@gmail.com')
+                        @if($user->is_admin)
                             <a href="{{ route('admin.index') }}" class="btn" style="font-size:14px;">Адмінпанель</a>
                         @endif
                     </h1>
