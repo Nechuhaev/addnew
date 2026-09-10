@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Article;
 use App\Console\Commands\Concerns\CallsLlm;
+use App\Console\Commands\Concerns\FetchesImages;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -12,6 +13,7 @@ use Illuminate\Support\Str;
 class PublishArticle extends Command
 {
     use CallsLlm;
+    use FetchesImages;
 
     /**
      * php artisan content:publish
@@ -106,7 +108,7 @@ class PublishArticle extends Command
         // --- Головна картинка (обкладинка) ---
         $mainImagePath = null;
         try {
-            $mainImagePath = $this->fetchAndSaveUnsplashImage($article['image_keywords'] ?? $topic, Str::slug($article['title']));
+            $mainImagePath = $this->fetchAndSaveImage($article['image_keywords'] ?? $topic, Str::slug($article['title']));
             $this->info("Головна картинка збережена: {$mainImagePath}");
         } catch (\Throwable $e) {
             $this->warn('Не вдалося отримати/зберегти головну картинку: ' . $e->getMessage());
@@ -115,7 +117,7 @@ class PublishArticle extends Command
         // --- Друга картинка (вставляється всередину тексту) ---
         $contentHtml = $article['content_html'];
         try {
-            $secondImagePath = $this->fetchAndSaveUnsplashImage(
+            $secondImagePath = $this->fetchAndSaveImage(
                 $article['second_image_keywords'] ?? ($article['image_keywords'] ?? $topic),
                 Str::slug($article['title']) . '-2'
             );
@@ -248,39 +250,8 @@ class PublishArticle extends Command
     }
 
     // -----------------------------------------------------------------
-    // Unsplash
+    // Картинки — сам код тепер у трейті FetchesImages
     // -----------------------------------------------------------------
-
-    /**
-     * Качає випадкове фото з Unsplash за ключовими словами і зберігає
-     * у public/images/shares/Posts/. Повертає відносний шлях у форматі,
-     * ідентичному тому, що вже використовується на сайті
-     * (наприклад "/images/shares/Posts/moje-foto-abc123.jpg").
-     */
-    protected function fetchAndSaveUnsplashImage(string $query, string $baseName): ?string
-    {
-        $response = $this->http->get('https://api.unsplash.com/photos/random', [
-            'query' => ['query' => $query, 'orientation' => 'landscape'],
-            'headers' => ['Authorization' => 'Client-ID ' . env('UNSPLASH_ACCESS_KEY')],
-            'timeout' => 30,
-        ]);
-        $data = json_decode((string) $response->getBody(), true);
-        $imageUrl = $data['urls']['regular'] ?? null;
-        if (!$imageUrl) {
-            return null;
-        }
-
-        $imgResponse = $this->http->get($imageUrl, ['timeout' => 60]);
-        $bytes = (string) $imgResponse->getBody();
-
-        $filename = Str::limit($baseName, 60, '') . '-' . substr(md5(uniqid('', true)), 0, 8) . '.jpg';
-        $filename = preg_replace('/[^a-z0-9\-\.]/i', '', $filename);
-        $destination = public_path('images/shares/Posts/' . $filename);
-
-        file_put_contents($destination, $bytes);
-
-        return '/images/shares/Posts/' . $filename;
-    }
 
     /**
      * Прибирає посилання на /blog/..., яких немає серед реально існуючих
