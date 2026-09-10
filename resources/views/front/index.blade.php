@@ -64,7 +64,23 @@
                     @endforeach
 
             @endif
-
+            
+            @if($blog_articles && $blog_articles->count())
+                <h2 class="last-advs-header">Останні статті в блозі</h2>
+                <div class="related-ads">
+                    @foreach($blog_articles as $article)
+                        <div class="related-ad">
+                            <div class="image">
+                                <a href="{{ $article['url'] }}">
+                                    <img src="{{ $article['image'] ?: asset('assets/front/img/placeholder.png') }}" alt="{{ $article['name'] }}" class="img-responsive">
+                                </a>
+                            </div>
+                            <a href="{{ $article['url'] }}" class="ad-heading">{{ $article['name'] }}</a>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+            
             @if($cities)
                 <div class="random-cities">
                     @foreach($cities as $city)
