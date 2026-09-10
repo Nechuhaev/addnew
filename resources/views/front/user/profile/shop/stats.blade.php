@@ -59,7 +59,7 @@
                                     @foreach($products as $product)
                                         <tr style="border-bottom:1px solid #f0f0f0;">
                                             <td style="padding:8px;">
-                                                <a href="{{ $product['url'] }}" style="display:flex; align-items:center; gap:10px;">
+                                                <a href="{{ $product['edit_url'] }}" style="display:flex; align-items:center; gap:10px;">
                                                     <img src="{{ $product['image'] ?: asset('assets/front/img/placeholder.png') }}" alt="" width="40" height="40" style="object-fit:cover; border-radius:4px;">
                                                     <span>{{ $product['name'] }}</span>
                                                 </a>
