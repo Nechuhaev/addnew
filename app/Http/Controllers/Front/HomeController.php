@@ -12,6 +12,7 @@ use App\Localization\Localization;
 use App\SeoField;
 
 use App\User;
+use App\Article;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
@@ -109,7 +110,40 @@ class HomeController extends Controller
 
             return $ads_groups;
         });
+        
+        // Останні статті блогу — пріоритет неіндексованим у Google
+        // (для прискорення індексації), доповнюємо найсвіжішими, якщо треба.
+        $blog_articles = Cache::remember('home_blog_articles', 300, function () {
+            $notIndexedIds = Article::leftJoin('article_index_status', 'article_index_status.article_id', '=', 'articles.id')
+                ->where(function ($q) {
+                    $q->whereNull('article_index_status.verdict')
+                      ->orWhere('article_index_status.verdict', '!=', 'PASS');
+                })
+                ->orderBy('articles.created_at', 'desc')
+                ->limit(6)
+                ->pluck('articles.id');
 
+            $articles = Article::whereIn('id', $notIndexedIds)
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            if ($articles->count() < 6) {
+                $excludeIds = $articles->pluck('id')->toArray();
+                $extra = Article::whereNotIn('id', $excludeIds)
+                    ->orderBy('created_at', 'desc')
+                    ->limit(6 - $articles->count())
+                    ->get();
+                $articles = $articles->concat($extra);
+            }
+
+            return $articles->map(function ($article) {
+                return [
+                    'name' => $article->name,
+                    'url' => $article->url,
+                    'image' => $article->image,
+                ];
+            });
+        });
 
         // Рандомные города
         $cities_cache_key = sprintf('home_cities_%s', $localization->getCountry()->id);
@@ -165,6 +199,7 @@ class HomeController extends Controller
             'categories' => $categories,
             'meta' => $meta,
             'ads_groups' => $ads_groups,
+            'blog_articles' => $blog_articles,
             'cities' => $cities,
             'tags' => $tags,
             'shop_users' => $shop_users,
