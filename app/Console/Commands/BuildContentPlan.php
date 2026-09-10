@@ -212,7 +212,7 @@ class BuildContentPlan extends Command
             . "Дай відповідь СТРОГО у форматі JSON-масиву рядків, без пояснень і без "
             . "markdown-розмітки, наприклад:\n[\"слово1\", \"слово2\"]";
 
-        $raw = $this->callLlm($prompt, 500);
+        $raw = $this->callLlm($prompt, 500, $this->validatesAsJsonArray());
         $json = $this->extractJson($raw, '[', ']');
         return json_decode($json, true) ?: [];
     }
@@ -297,7 +297,7 @@ class BuildContentPlan extends Command
             . "НЕ повторюй ці вже наявні ключі:\n{$existingStr}\n\n"
             . "Дай відповідь СТРОГО у форматі JSON-масиву рядків, без пояснень і без markdown-розмітки.";
 
-        $raw = $this->callLlm($prompt, 3000);
+        $raw = $this->callLlm($prompt, 3000, $this->validatesAsJsonArray());
         $json = $this->extractJson($raw, '[', ']');
         return json_decode($json, true) ?: [];
     }
@@ -345,7 +345,7 @@ class BuildContentPlan extends Command
             . "[{\"cluster\": \"...\", \"keywords\": [\"...\"], \"topics\": "
             . "[{\"topic\": \"...\", \"focus_keyword_hint\": \"...\", \"category\": \"назва або null\"}]}]";
 
-        $raw = $this->callLlm($prompt, 8000);
+        $raw = $this->callLlm($prompt, 8000, $this->validatesAsJsonArray());
         $json = $this->extractJson($raw, '[', ']');
         $clusters = json_decode($json, true) ?: [];
 
