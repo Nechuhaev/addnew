@@ -54,6 +54,7 @@ class ShopStatsService
                 'name' => $product->name,
                 'image' => $product->image,
                 'url' => $product->url,
+                'edit_url' => route('profile.shop.product.edit', ['id' => $product->id]),
                 'views' => $views,
                 'click_contacts' => $clickContacts,
                 'click_shop_link' => $clickShopLink,
