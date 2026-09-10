@@ -2,18 +2,23 @@
 
 namespace App\Console\Commands;
 
+use App\Console\Commands\Concerns\CallsLlm;
 use App\Page;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
 
 class TranslatePagesSeo extends Command
 {
+    use CallsLlm;
+
     /**
      * php artisan pages:translate-seo
      *
      * Перекладає name, meta_title, meta_description, content статичних
-     * сторінок (Page) на українську через Claude API. Той самий підхід,
-     * що й categories:translate-seo — обробляє БУДЬ-ЯКУ сторінку без
+     * сторінок (Page) на українську через Claude API (з фолбеком на
+     * OpenRouter/Groq/Cloudflare/Gemini, якщо Claude недоступний —
+     * див. Concerns\CallsLlm). Той самий підхід, що й
+     * categories:translate-seo — обробляє БУДЬ-ЯКУ сторінку без
      * заповненого content_uk, не тільки конкретні slug'и, тому команда
      * лишається корисною і для майбутніх нових сторінок.
      */
@@ -96,7 +101,7 @@ class TranslatePagesSeo extends Command
             . "Відповідь — ТІЛЬКИ валідний JSON без markdown-обрамлення, формату:\n"
             . "{\"name\": \"...\", \"meta_title\": \"...\", \"meta_description\": \"...\", \"content\": \"...\"}";
 
-        $raw = $this->callClaude($prompt, 4000);
+        $raw = $this->callLlm($prompt, 4000, $this->validatesAsJsonObject());
         $json = $this->extractJsonObject($raw);
         $data = json_decode($json, true);
 
@@ -105,31 +110,6 @@ class TranslatePagesSeo extends Command
         }
 
         return $data;
-    }
-
-    protected function callClaude(string $prompt, int $maxTokens): string
-    {
-        $response = $this->http->post('https://api.anthropic.com/v1/messages', [
-            'headers' => [
-                'x-api-key' => env('ANTHROPIC_API_KEY'),
-                'anthropic-version' => '2023-06-01',
-                'content-type' => 'application/json',
-            ],
-            'json' => [
-                'model' => env('ANTHROPIC_MODEL', 'claude-sonnet-4-6'),
-                'max_tokens' => $maxTokens,
-                'messages' => [['role' => 'user', 'content' => $prompt]],
-            ],
-            'timeout' => 90,
-        ]);
-
-        $data = json_decode((string) $response->getBody(), true);
-        $textBlocks = array_filter($data['content'] ?? [], function ($b) {
-            return ($b['type'] ?? '') === 'text';
-        });
-        return trim(implode("\n", array_map(function ($b) {
-            return $b['text'];
-        }, $textBlocks)));
     }
 
     protected function extractJsonObject(string $text): string
