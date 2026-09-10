@@ -10,7 +10,12 @@
             {{ Breadcrumbs::render('profile.edit') }}
             <div class="columns columns-nowrap">
                 <div class="column-content">
-                    <h1>{{ __('profile.edit_heading') }}</h1>
+                    <h1 style="display:flex; align-items:center; justify-content:space-between;">
+                        {{ __('profile.edit_heading') }}
+                        @if($user->email === 'a.nechuhaev@gmail.com')
+                            <a href="{{ route('admin.index') }}" class="btn" style="font-size:14px;">Адмінпанель</a>
+                        @endif
+                    </h1>
                     @if(session()->has('success'))
                         <div class="alert success">
                             {{ session()->get('success') }}
