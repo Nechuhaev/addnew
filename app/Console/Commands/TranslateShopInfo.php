@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Console\Commands\Concerns\CallsLlm;
+use App\Console\Commands\Concerns\UsesPromptTemplates;
 use App\User;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
@@ -10,6 +11,7 @@ use Illuminate\Console\Command;
 class TranslateShopInfo extends Command
 {
     use CallsLlm;
+    use UsesPromptTemplates;
 
     /**
      * php artisan shops:translate-info
@@ -85,10 +87,16 @@ class TranslateShopInfo extends Command
 
     protected function translateOne(string $info): string
     {
-        $prompt = "Ти — професійний перекладач. Переклади опис магазину (дошка оголошень) "
-            . "з російської на українську. Зберігай сенс і тон, адаптуй природно для "
-            . "української мови (не дослівно слово-в-слово). Поверни ТІЛЬКИ переклад, "
-            . "без пояснень і без лапок навколо тексту.\n\nОпис:\n{$info}";
+        $prompt = $this->prompt(
+            'shop_info_translate',
+            'Переклад опису магазину',
+            "Ти — професійний перекладач. Переклади опис магазину (дошка оголошень) "
+                . "з російської на українську. Зберігай сенс і тон, адаптуй природно для "
+                . "української мови (не дослівно слово-в-слово). Поверни ТІЛЬКИ переклад, "
+                . "без пояснень і без лапок навколо тексту.\n\nОпис:\n{{info}}",
+            ['info' => $info],
+            'Перекладає опис магазину (поле info на User) для показу відвідувачам з українською локаллю.'
+        );
 
         return trim($this->callLlm($prompt, 2000));
     }
