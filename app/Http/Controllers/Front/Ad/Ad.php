@@ -656,7 +656,7 @@ class Ad extends Controller
             $ad_model = \App\Ad::create($ad);
 
             // Сохранить теги
-            $all_tags = array_unique(array_map('trim', explode(',', $ad['tags'])));
+            $all_tags = array_unique(array_filter(array_map('trim', explode(',', $ad['tags']))));
             $not_existing_tags = $all_tags;
             $existing_tags = AdTag::whereIn('name', $all_tags)->get();
 
@@ -815,7 +815,7 @@ class Ad extends Controller
 
 
         $ad->tags()->detach();
-        $all_tags = array_unique(array_map('trim', explode(',', $request->get('tags'))));
+        $all_tags = array_unique(array_filter(array_map('trim', explode(',', $request->get('tags')))));
         //dd($all_tags);
         $not_existing_tags = $all_tags;
         $existing_tags = AdTag::whereIn('name', $all_tags)->get();
