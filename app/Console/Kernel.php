@@ -101,6 +101,12 @@ class Kernel extends ConsoleKernel
         ->withoutOverlapping()
         ->appendOutputTo(storage_path('logs/shops-check-email.log'));
 
+            // Раз на день — SEO-генерація тегів оголошень (10 за раз, найпопулярніші спершу).
+    $schedule->command('tags:seo-optimize --limit=10')
+        ->dailyAt('14:00')
+        ->withoutOverlapping()
+        ->appendOutputTo(storage_path('logs/tags-seo-optimize.log'));
+
     }
     
 
