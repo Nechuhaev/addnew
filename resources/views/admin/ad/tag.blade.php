@@ -109,6 +109,18 @@
                                           class="form-control form-control-line">{{ old('meta_description_uk') ?? optional($tag)->getOriginal('meta_description_uk') ?? '' }}</textarea>
                             </div>
                         </div>
+                        @if($tag)
+                            <div class="form-group">
+                                <label>SEO-статус</label>
+                                <div>
+                                    @if($tag->seo_optimized)
+                                        <span class="badge badge-success">Унікальний SEO згенеровано{{ $tag->seo_optimized_at ? ' (' . $tag->seo_optimized_at->format('d.m.Y H:i') . ')' : '' }}</span>
+                                    @else
+                                        <span class="badge badge-warning">Ще старий/шаблонний текст — дочекайтесь щоденного пакетного оновлення чи запустіть вручну</span>
+                                    @endif
+                                </div>
+                            </div>
+                        @endif
                         <hr>
                         <div class="form-group text-center">
                             <button class="btn btn-success">Сохранить</button>
@@ -141,22 +153,36 @@
                             <tr>
                                 <th></th>
                                 <th class="text-center">Метка</th>
-                                <th><a style="color: black; width: 100px" href="?order=ads_count&direction={{ ($direction == 'asc') ? 'desc' : 'asc'  }}">Кол-во</a> {!! ($order == 'ads_count') ? ($direction != 'asc') ? '<i class="mdi mdi-arrow-down"></i>' : '<i class="mdi mdi-arrow-up"></i>' : '';   !!}</th>
+                                <th>
+                                    <a style="color: black; width: 100px"
+                                       href="{{ route('admin.adTags', array_merge(request()->query(), ['order' => 'ads_count', 'direction' => ($direction == 'asc') ? 'desc' : 'asc'])) }}">Кол-во</a>
+                                    {!! ($order == 'ads_count') ? ($direction != 'asc') ? '<i class="mdi mdi-arrow-down"></i>' : '<i class="mdi mdi-arrow-up"></i>' : '';   !!}
+                                </th>
+                                <th class="text-center">SEO</th>
                                 <th class="text-center"></th>
                             </tr>
-                            @foreach($tags as $tag)
+                            @foreach($tags as $tag_row)
                                 <tr>
-                                    <td style="width: 30px"><input type="checkbox" name="id[]" value="{{ $tag->id }}"></td>
-                                    <td>{{ $tag->name }}</td>
-                                    <td style="width: 100px" class="text-center">{{ $tag->ads_count }}</td>
+                                    <td style="width: 30px"><input type="checkbox" name="id[]" value="{{ $tag_row->id }}"></td>
+                                    <td>{{ $tag_row->name }}</td>
+                                    <td style="width: 100px" class="text-center">
+                                        <a href="{{ $tag_row->url }}" target="_blank" title="Переглянути оголошення з цією міткою на сайті">{{ $tag_row->ads_count }}</a>
+                                    </td>
+                                    <td class="text-center" style="width: 40px">
+                                        @if($tag_row->seo_optimized)
+                                            <i class="mdi mdi-check-circle text-success" title="Унікальний SEO згенеровано"></i>
+                                        @else
+                                            <i class="mdi mdi-clock-outline text-muted" title="Ще старий/шаблонний текст"></i>
+                                        @endif
+                                    </td>
                                     <td class="text-center cell-actions">
-                                        <a href="{{ route('admin.adTags.edit', ['id' => $tag->id]) }}"><i class="mdi mdi-18px mdi-table-edit"></i></a>
-                                        <a href="{{ route('admin.adTags.delete', ['id' => $tag->id]) }}" onclick="return confirm('Вы пытаетесь удалить метку {{ $tag->name }}. Подтвердите действие.')" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
+                                        <a href="{{ route('admin.adTags.edit', ['id' => $tag_row->id]) }}"><i class="mdi mdi-18px mdi-table-edit"></i></a>
+                                        <a href="{{ route('admin.adTags.delete', ['id' => $tag_row->id]) }}" onclick="return confirm('Вы пытаетесь удалить метку {{ $tag_row->name }}. Подтвердите действие.')" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
                                     </td>
                                 </tr>
                             @endforeach
                         </table>
-                        {{ $tags->appends($_GET)->links() }}
+                        {{ $tags->appends(request()->query())->links() }}
                     @else
                         <p>Меток не найдено</p>
                     @endif
