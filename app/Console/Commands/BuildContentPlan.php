@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\ArticleCategory;
 use App\Console\Commands\Concerns\CallsLlm;
+use App\Console\Commands\Concerns\UsesPromptTemplates;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -12,6 +13,7 @@ use Illuminate\Support\Str;
 class BuildContentPlan extends Command
 {
     use CallsLlm;
+    use UsesPromptTemplates;
 
     /**
      * php artisan content:build-plan
@@ -204,13 +206,19 @@ class BuildContentPlan extends Command
         $siteTopic = env('SITE_TOPIC', 'дошка оголошень');
         $seedCount = (int) env('SERPSTAT_SEED_COUNT', 10);
 
-        $prompt = "Ти — SEO-спеціаліст. Тема сайту: \"{$siteTopic}\".\n\n"
-            . "Дай {$seedCount} КОРОТКИХ кореневих пошукових запитів (1-2 слова кожен) — "
-            . "базових тем, які реально шукають в Google люди, зацікавлені цією темою. "
-            . "Це будуть \"затравки\" для подальшого пошуку пов'язаних запитів, тому обирай "
-            . "саме широкі, популярні кореневі слова, а не вузькі фрази.\n\n"
-            . "Дай відповідь СТРОГО у форматі JSON-масиву рядків, без пояснень і без "
-            . "markdown-розмітки, наприклад:\n[\"слово1\", \"слово2\"]";
+        $prompt = $this->prompt(
+            'content_seed_keywords',
+            'Контент-план — кореневі ключі для Serpstat',
+            "Ти — SEO-спеціаліст. Тема сайту: \"{{site_topic}}\".\n\n"
+                . "Дай {{seed_count}} КОРОТКИХ кореневих пошукових запитів (1-2 слова кожен) — "
+                . "базових тем, які реально шукають в Google люди, зацікавлені цією темою. "
+                . "Це будуть \"затравки\" для подальшого пошуку пов'язаних запитів, тому обирай "
+                . "саме широкі, популярні кореневі слова, а не вузькі фрази.\n\n"
+                . "Дай відповідь СТРОГО у форматі JSON-масиву рядків, без пояснень і без "
+                . "markdown-розмітки, наприклад:\n[\"слово1\", \"слово2\"]",
+            ['site_topic' => $siteTopic, 'seed_count' => $seedCount],
+            'Генерує короткі кореневі запити, якими потім опитується Serpstat API для пошуку реальних пов\'язаних ключів.'
+        );
 
         $raw = $this->callLlm($prompt, 500, $this->validatesAsJsonArray());
         $json = $this->extractJson($raw, '[', ']');
@@ -290,12 +298,23 @@ class BuildContentPlan extends Command
             ? implode(', ', array_slice($existingKeywords, -300))
             : '(поки що немає)';
 
-        $prompt = "Ти — SEO-спеціаліст. Тема сайту: \"{$siteTopic}\".\nМова: {$language}.\n\n"
-            . "Згенеруй {$target} НОВИХ пошукових ключових фраз (семантичне ядро) для цього сайту — "
-            . "конкретні фрази, які реально могли б вводити в Google люди, зацікавлені цією темою. "
-            . "Включай суміш: короткі (2-3 слова) і довші (4-6 слів) запити, різні наміри пошуку.\n\n"
-            . "НЕ повторюй ці вже наявні ключі:\n{$existingStr}\n\n"
-            . "Дай відповідь СТРОГО у форматі JSON-масиву рядків, без пояснень і без markdown-розмітки.";
+        $prompt = $this->prompt(
+            'content_fallback_keywords',
+            'Контент-план — резервна генерація ключів (без Serpstat)',
+            "Ти — SEO-спеціаліст. Тема сайту: \"{{site_topic}}\".\nМова: {{language}}.\n\n"
+                . "Згенеруй {{target}} НОВИХ пошукових ключових фраз (семантичне ядро) для цього сайту — "
+                . "конкретні фрази, які реально могли б вводити в Google люди, зацікавлені цією темою. "
+                . "Включай суміш: короткі (2-3 слова) і довші (4-6 слів) запити, різні наміри пошуку.\n\n"
+                . "НЕ повторюй ці вже наявні ключі:\n{{existing_keywords}}\n\n"
+                . "Дай відповідь СТРОГО у форматі JSON-масиву рядків, без пояснень і без markdown-розмітки.",
+            [
+                'site_topic' => $siteTopic,
+                'language' => $language,
+                'target' => $target,
+                'existing_keywords' => $existingStr,
+            ],
+            'Використовується, лише якщо SERPSTAT_API_TOKEN не задано — Claude вигадує ключі зі своїх знань замість реальних даних Serpstat.'
+        );
 
         $raw = $this->callLlm($prompt, 3000, $this->validatesAsJsonArray());
         $json = $this->extractJson($raw, '[', ']');
@@ -332,18 +351,31 @@ class BuildContentPlan extends Command
         }, $categories);
         $categoriesStr = implode(', ', $categoryNames);
 
-        $prompt = "Ти — SEO-спеціаліст і контент-стратег. Тема сайту: \"{$siteTopic}\" (дошка оголошень).\n"
-            . "Мова контенту: {$language}.\n\n"
-            . "Ось семантичне ядро сайту:\n{$keywordsStr}\n\n{$volumeNote}\n\n"
-            . "На сайті вже є ТАКІ категорії блогу: {$categoriesStr}.\n\n"
-            . "Завдання:\n"
-            . "1. Згрупуй ключі в 5-15 тематичних КЛАСТЕРІВ.\n"
-            . "2. Для КОЖНОГО кластера запропонуй {$topicsPerCluster} конкретні теми статей.\n"
-            . "3. Для кожної теми вкажи, ДО ЯКОЇ З ІСНУЮЧИХ КАТЕГОРІЙ вище вона найбільше підходить "
-            . "(використовуй назву категорії ТОЧНО як у списку). Якщо жодна не підходить — напиши null.\n\n"
-            . "Дай відповідь СТРОГО у форматі JSON-масиву, без пояснень, за структурою:\n"
-            . "[{\"cluster\": \"...\", \"keywords\": [\"...\"], \"topics\": "
-            . "[{\"topic\": \"...\", \"focus_keyword_hint\": \"...\", \"category\": \"назва або null\"}]}]";
+        $prompt = $this->prompt(
+            'content_cluster_plan',
+            'Контент-план — кластеризація семантики й побудова тем',
+            "Ти — SEO-спеціаліст і контент-стратег. Тема сайту: \"{{site_topic}}\" (дошка оголошень).\n"
+                . "Мова контенту: {{language}}.\n\n"
+                . "Ось семантичне ядро сайту:\n{{keywords}}\n\n{{volume_note}}\n\n"
+                . "На сайті вже є ТАКІ категорії блогу: {{categories}}.\n\n"
+                . "Завдання:\n"
+                . "1. Згрупуй ключі в 5-15 тематичних КЛАСТЕРІВ.\n"
+                . "2. Для КОЖНОГО кластера запропонуй {{topics_per_cluster}} конкретні теми статей.\n"
+                . "3. Для кожної теми вкажи, ДО ЯКОЇ З ІСНУЮЧИХ КАТЕГОРІЙ вище вона найбільше підходить "
+                . "(використовуй назву категорії ТОЧНО як у списку). Якщо жодна не підходить — напиши null.\n\n"
+                . "Дай відповідь СТРОГО у форматі JSON-масиву, без пояснень, за структурою:\n"
+                . "[{\"cluster\": \"...\", \"keywords\": [\"...\"], \"topics\": "
+                . "[{\"topic\": \"...\", \"focus_keyword_hint\": \"...\", \"category\": \"назва або null\"}]}]",
+            [
+                'site_topic' => $siteTopic,
+                'language' => $language,
+                'keywords' => $keywordsStr,
+                'volume_note' => $volumeNote,
+                'categories' => $categoriesStr,
+                'topics_per_cluster' => $topicsPerCluster,
+            ],
+            'Найважливіший промпт контент-плану: групує весь пул ключів у тематичні кластери й формулює конкретні теми статей із прив\'язкою до категорій.'
+        );
 
         $raw = $this->callLlm($prompt, 8000, $this->validatesAsJsonArray());
         $json = $this->extractJson($raw, '[', ']');
