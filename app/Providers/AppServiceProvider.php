@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\AdTag;
+use App\Observers\AdTagObserver;
 use App\Page;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
@@ -31,5 +33,9 @@ class AppServiceProvider extends ServiceProvider
 
         });
         Schema::defaultStringLength(191);
+
+        // Одразу генерує унікальний SEO-текст для щойно створеного тега
+        // (наприклад, коли відвідувач додає оголошення з новою міткою).
+        AdTag::observe(AdTagObserver::class);
     }
 }
