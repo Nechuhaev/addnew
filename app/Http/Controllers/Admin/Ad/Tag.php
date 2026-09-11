@@ -20,8 +20,13 @@ class Tag extends Controller
         $direction = $request->get('direction') ?? 'asc';
         $order = $request->get('order') ?? 'name';
 
+        // withPath() — ВАЖЛИВО: без цього пагінація "ламається", коли
+        // сторінка відкрита за адресою редагування тега (/adTags/{id}),
+        // бо базовий шлях для посилань "page=N" інакше визначається
+        // з ПОТОЧНОГО URL (з ID у ньому), а не зі списку тегів.
         $tags = AdTag::withCount('ads')->orderBy($order, $direction)
-            ->paginate($this->per_page);
+            ->paginate($this->per_page)
+            ->withPath(route('admin.adTags'));
 
         $tag = null;
         if ($tag_id) {
@@ -54,7 +59,8 @@ class Tag extends Controller
         $requested_tag = $request->name;
 
         $tags = AdTag::withCount('ads')->where('name', 'like', '%' . $requested_tag . '%')->orderBy($order, $direction)
-            ->paginate($this->per_page);
+            ->paginate($this->per_page)
+            ->withPath(route('admin.adTags'));
 
         $tag = null;
 
