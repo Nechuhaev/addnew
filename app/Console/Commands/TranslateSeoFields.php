@@ -2,12 +2,15 @@
 
 namespace App\Console\Commands;
 
+use App\Console\Commands\Concerns\UsesPromptTemplates;
 use App\SeoField;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
 
 class TranslateSeoFields extends Command
 {
+    use UsesPromptTemplates;
+
     /**
      * php artisan seo-fields:translate
      *
@@ -80,20 +83,30 @@ class TranslateSeoFields extends Command
         $metaDescription = $field->getOriginal('meta_description') ?? '';
         $description = $field->getOriginal('description') ?? '';
 
-        $prompt = "Ти — професійний перекладач і SEO-копірайтер. Переклади наступний SEO-шаблон "
-            . "з російської на українську.\n\n"
-            . "КРИТИЧНО ВАЖЛИВО: текст містить службові плейсхолдери у форматі "
-            . "---якесь_слово--- (наприклад ---filtered_name---, ---city_name---, "
-            . "---region_name---, ---country_name---, ---full_filtered_name---, "
-            . "---user_name---, ---ads_count---, ---shop_count---). Ці плейсхолдери "
-            . "ПОТРІБНО залишити ТОЧНО як є, без жодних змін і без перекладу — вони "
-            . "автоматично підставляються кодом після твого перекладу. Переклади лише "
-            . "звичайний текст навколо них.\n\n"
-            . "Meta title: \"{$metaTitle}\"\n\n"
-            . "Meta description: \"{$metaDescription}\"\n\n"
-            . "Description:\n{$description}\n\n"
-            . "Відповідь — ТІЛЬКИ валідний JSON без markdown-обрамлення, формату:\n"
-            . "{\"meta_title\": \"...\", \"meta_description\": \"...\", \"description\": \"...\"}";
+        $prompt = $this->prompt(
+            'seo_fields_translate',
+            'Переклад SEO-шаблонів (SeoField) зі збереженням плейсхолдерів',
+            "Ти — професійний перекладач і SEO-копірайтер. Переклади наступний SEO-шаблон "
+                . "з російської на українську.\n\n"
+                . "КРИТИЧНО ВАЖЛИВО: текст містить службові плейсхолдери у форматі "
+                . "---якесь_слово--- (наприклад ---filtered_name---, ---city_name---, "
+                . "---region_name---, ---country_name---, ---full_filtered_name---, "
+                . "---user_name---, ---ads_count---, ---shop_count---). Ці плейсхолдери "
+                . "ПОТРІБНО залишити ТОЧНО як є, без жодних змін і без перекладу — вони "
+                . "автоматично підставляються кодом після твого перекладу. Переклади лише "
+                . "звичайний текст навколо них.\n\n"
+                . "Meta title: \"{{meta_title}}\"\n\n"
+                . "Meta description: \"{{meta_description}}\"\n\n"
+                . "Description:\n{{description}}\n\n"
+                . "Відповідь — ТІЛЬКИ валідний JSON без markdown-обрамлення, формату:\n"
+                . "{\"meta_title\": \"...\", \"meta_description\": \"...\", \"description\": \"...\"}",
+            [
+                'meta_title' => $metaTitle,
+                'meta_description' => $metaDescription,
+                'description' => $description,
+            ],
+            'Перекладає 13 SEO-шаблонів сайту (index, ad-city, ad-category тощо), зберігаючи службові плейсхолдери ---назва--- без змін.'
+        );
 
         $raw = $this->callClaude($prompt, 4000);
         $json = $this->extractJsonObject($raw);
