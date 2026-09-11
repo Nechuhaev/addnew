@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Console\Commands\Concerns\CallsLlm;
+use App\Console\Commands\Concerns\UsesPromptTemplates;
 use App\Page;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
@@ -10,6 +11,7 @@ use Illuminate\Console\Command;
 class TranslatePagesSeo extends Command
 {
     use CallsLlm;
+    use UsesPromptTemplates;
 
     /**
      * php artisan pages:translate-seo
@@ -90,16 +92,27 @@ class TranslatePagesSeo extends Command
         $metaDescription = $page->getOriginal('meta_description') ?? '';
         $content = $page->getOriginal('content') ?? '';
 
-        $prompt = "Ти — професійний перекладач і SEO-копірайтер. Переклади наступні поля "
-            . "статичної сторінки сайту-дошки оголошень з російської на українську. Зберігай "
-            . "структуру й сенс, адаптуй природно для української мови (не дослівний переклад "
-            . "слово-в-слово), зберігай HTML-теги в content без змін, якщо вони є.\n\n"
-            . "Назва сторінки: \"{$name}\"\n\n"
-            . "Meta title: \"{$metaTitle}\"\n\n"
-            . "Meta description: \"{$metaDescription}\"\n\n"
-            . "Content:\n{$content}\n\n"
-            . "Відповідь — ТІЛЬКИ валідний JSON без markdown-обрамлення, формату:\n"
-            . "{\"name\": \"...\", \"meta_title\": \"...\", \"meta_description\": \"...\", \"content\": \"...\"}";
+        $prompt = $this->prompt(
+            'page_translate_seo',
+            'Переклад статичних сторінок (Page)',
+            "Ти — професійний перекладач і SEO-копірайтер. Переклади наступні поля "
+                . "статичної сторінки сайту-дошки оголошень з російської на українську. Зберігай "
+                . "структуру й сенс, адаптуй природно для української мови (не дослівний переклад "
+                . "слово-в-слово), зберігай HTML-теги в content без змін, якщо вони є.\n\n"
+                . "Назва сторінки: \"{{name}}\"\n\n"
+                . "Meta title: \"{{meta_title}}\"\n\n"
+                . "Meta description: \"{{meta_description}}\"\n\n"
+                . "Content:\n{{content}}\n\n"
+                . "Відповідь — ТІЛЬКИ валідний JSON без markdown-обрамлення, формату:\n"
+                . "{\"name\": \"...\", \"meta_title\": \"...\", \"meta_description\": \"...\", \"content\": \"...\"}",
+            [
+                'name' => $name,
+                'meta_title' => $metaTitle,
+                'meta_description' => $metaDescription,
+                'content' => $content,
+            ],
+            'Перекладає статичні сторінки (Умови користування, Про сайт, Заборонені товари тощо) на українську.'
+        );
 
         $raw = $this->callLlm($prompt, 4000, $this->validatesAsJsonObject());
         $json = $this->extractJsonObject($raw);
