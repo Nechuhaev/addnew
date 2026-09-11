@@ -160,5 +160,10 @@
             <span class="hide-menu">Стоп-слова</span>
         </a>
     </li>
-
+    <li class="sidebar-item">
+        <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{{ route('admin.prompts') }}" aria-expanded="false">
+            <i class="mdi mdi-message-text"></i>
+            <span class="hide-menu">Промпти</span>
+        </a>
+    </li>
 </ul>
