@@ -3,11 +3,14 @@
 namespace App\Console\Commands;
 
 use App\AdCountry;
+use App\Console\Commands\Concerns\UsesPromptTemplates;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
 
 class TranslateCountries extends Command
 {
+    use UsesPromptTemplates;
+
     /**
      * php artisan countries:translate
      *
@@ -81,14 +84,20 @@ class TranslateCountries extends Command
             return $country->id . ': ' . $country->name;
         })->implode("\n");
 
-        $prompt = "Ти — довідник з української топоніміки. Нижче список країн світу "
-            . "у форматі \"ID: Назва російською/оригіналом\".\n\n"
-            . "Для кожної дай ОФІЦІЙНУ українську назву цієї країни, як вона "
-            . "використовується в українських документах і ЗМІ (напр. Сполучені Штати "
-            . "Америки, Велика Британія, Німеччина).\n\n"
-            . "Список:\n{$list}\n\n"
-            . "Відповідь — ТІЛЬКИ валідний JSON-об'єкт формату {\"ID\": \"Назва\", ...}, "
-            . "без жодного додаткового тексту чи пояснень, без markdown-обрамлення.";
+        $prompt = $this->prompt(
+            'countries_translate',
+            'Переклад назв країн',
+            "Ти — довідник з української топоніміки. Нижче список країн світу "
+                . "у форматі \"ID: Назва російською/оригіналом\".\n\n"
+                . "Для кожної дай ОФІЦІЙНУ українську назву цієї країни, як вона "
+                . "використовується в українських документах і ЗМІ (напр. Сполучені Штати "
+                . "Америки, Велика Британія, Німеччина).\n\n"
+                . "Список:\n{{list}}\n\n"
+                . "Відповідь — ТІЛЬКИ валідний JSON-об'єкт формату {\"ID\": \"Назва\", ...}, "
+                . "без жодного додаткового тексту чи пояснень, без markdown-обрамлення.",
+            ['list' => $list],
+            'Пакетний переклад назв країн на офіційну українську.'
+        );
 
         $raw = $this->callClaude($prompt, 3000);
         $json = $this->extractJsonObject($raw);
