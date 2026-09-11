@@ -111,8 +111,18 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="info">Опис магазину</label>
-                            <textarea name="info" id="info" class="form-control" rows="6">{{ old('info', $shop->info) }}</textarea>
+                            <label for="info">Опис магазину (оригінал)</label>
+                            <textarea name="info" id="info" class="form-control" rows="6">{{ old('info', $shop->getOriginal('info')) }}</textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="info_uk">Опис магазину (українською)</label>
+                            <textarea name="info_uk" id="info_uk" class="form-control" rows="6">{{ old('info_uk', $shop->getOriginal('info_uk')) }}</textarea>
+                            <small class="form-text text-muted">
+                                Якщо заповнено — відвідувачі з українською локаллю побачать цей варіант
+                                замість оригіналу. Можна заповнити вручну або автоматично командою
+                                <code>php artisan shops:translate-info</code>.
+                            </small>
                         </div>
 
                         <button type="submit" class="btn btn-success">Зберегти зміни</button>
