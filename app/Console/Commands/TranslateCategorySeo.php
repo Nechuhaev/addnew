@@ -3,11 +3,14 @@
 namespace App\Console\Commands;
 
 use App\AdCategory;
+use App\Console\Commands\Concerns\UsesPromptTemplates;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
 
 class TranslateCategorySeo extends Command
 {
+    use UsesPromptTemplates;
+
     /**
      * php artisan categories:translate-seo
      *
@@ -82,15 +85,25 @@ class TranslateCategorySeo extends Command
         $metaDescription = $category->getOriginal('meta_description') ?? '';
         $content = $category->getOriginal('content') ?? '';
 
-        $prompt = "Ти — професійний перекладач і SEO-копірайтер. Переклади наступні SEO-поля "
-            . "категорії дошки оголошень з російської на українську. Зберігай структуру й сенс, "
-            . "адаптуй природно для української мови (не дослівний переклад слово-в-слово), "
-            . "зберігай HTML-теги в content без змін, якщо вони є.\n\n"
-            . "Meta title: \"{$metaTitle}\"\n\n"
-            . "Meta description: \"{$metaDescription}\"\n\n"
-            . "Content:\n{$content}\n\n"
-            . "Відповідь — ТІЛЬКИ валідний JSON без markdown-обрамлення, формату:\n"
-            . "{\"meta_title\": \"...\", \"meta_description\": \"...\", \"content\": \"...\"}";
+        $prompt = $this->prompt(
+            'category_seo_translate',
+            'Переклад SEO-полів категорій оголошень',
+            "Ти — професійний перекладач і SEO-копірайтер. Переклади наступні SEO-поля "
+                . "категорії дошки оголошень з російської на українську. Зберігай структуру й сенс, "
+                . "адаптуй природно для української мови (не дослівний переклад слово-в-слово), "
+                . "зберігай HTML-теги в content без змін, якщо вони є.\n\n"
+                . "Meta title: \"{{meta_title}}\"\n\n"
+                . "Meta description: \"{{meta_description}}\"\n\n"
+                . "Content:\n{{content}}\n\n"
+                . "Відповідь — ТІЛЬКИ валідний JSON без markdown-обрамлення, формату:\n"
+                . "{\"meta_title\": \"...\", \"meta_description\": \"...\", \"content\": \"...\"}",
+            [
+                'meta_title' => $metaTitle,
+                'meta_description' => $metaDescription,
+                'content' => $content,
+            ],
+            'Перекладає SEO-поля категорій оголошень (по одній категорії за раз).'
+        );
 
         $raw = $this->callClaude($prompt, 4000);
         $json = $this->extractJsonObject($raw);
