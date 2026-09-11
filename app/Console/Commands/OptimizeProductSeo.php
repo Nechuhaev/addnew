@@ -3,23 +3,28 @@
 namespace App\Console\Commands;
 
 use App\Ad;
+use App\Console\Commands\Concerns\CallsLlm;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
 
 class OptimizeProductSeo extends Command
 {
+    use CallsLlm;
+
     /**
      * php artisan products:seo-optimize
      *
      * Переписує назву й опис товарів (тільки тих, що продавець сам
-     * імпортував/додав — is_product=1) через Claude API для кращого SEO,
-     * НЕ вигадуючи нових характеристик — тільки покращуючи структуру,
-     * читабельність і природне входження ключових слів на основі того,
-     * що вже вказано (назва, бренд, наявний опис, категорія).
+     * імпортував/додав — is_product=1) через Claude API (з фолбеком на
+     * OpenRouter/Groq/Cloudflare Workers AI/Gemini — див.
+     * Concerns\CallsLlm) для кращого SEO, НЕ вигадуючи нових
+     * характеристик — тільки покращуючи структуру, читабельність і
+     * природне входження ключових слів на основі того, що вже вказано
+     * (назва, бренд, наявний опис, категорія).
      */
     protected $signature = 'products:seo-optimize {--limit=}';
 
-    protected $description = 'SEO-оптимізація назви й опису товарів через Claude API';
+    protected $description = 'SEO-оптимізація назви й опису товарів через Claude API (з фолбеком на інші LLM)';
 
     /** @var Client */
     protected $http;
@@ -109,7 +114,7 @@ class OptimizeProductSeo extends Command
             . "  \"content\": \"оптимізований опис товару, звичайний текст без HTML-тегів\"\n"
             . "}";
 
-        $raw = $this->callClaude($prompt, 1500);
+        $raw = $this->callLlm($prompt, 1500, $this->validatesAsJsonObject());
         $json = $this->extractJsonObject($raw);
         $data = json_decode($json, true);
 
@@ -118,31 +123,6 @@ class OptimizeProductSeo extends Command
         }
 
         return $data;
-    }
-
-    protected function callClaude(string $prompt, int $maxTokens = 1500): string
-    {
-        $response = $this->http->post('https://api.anthropic.com/v1/messages', [
-            'headers' => [
-                'x-api-key' => env('ANTHROPIC_API_KEY'),
-                'anthropic-version' => '2023-06-01',
-                'content-type' => 'application/json',
-            ],
-            'json' => [
-                'model' => env('ANTHROPIC_MODEL', 'claude-sonnet-4-6'),
-                'max_tokens' => $maxTokens,
-                'messages' => [['role' => 'user', 'content' => $prompt]],
-            ],
-            'timeout' => 60,
-        ]);
-
-        $data = json_decode((string) $response->getBody(), true);
-        $textBlocks = array_filter($data['content'] ?? [], function ($b) {
-            return ($b['type'] ?? '') === 'text';
-        });
-        return trim(implode("\n", array_map(function ($b) {
-            return $b['text'];
-        }, $textBlocks)));
     }
 
     protected function extractJsonObject(string $text): string
