@@ -47,6 +47,11 @@ Route::get('/shops/{id}/stats', 'Admin\Shop\ShopStatsController@show')->name('ad
     Route::post('/translations/update', 'Admin\Translation\TranslationController@update')->name('admin.translations.update');
     Route::delete('/translations', 'Admin\Translation\TranslationController@destroy')->name('admin.translations.destroy');
 
+        Route::get('/prompts', 'Admin\Prompt\PromptController@index')->name('admin.prompts');
+    Route::get('/prompts/{id}/edit', 'Admin\Prompt\PromptController@edit')->name('admin.prompts.edit');
+    Route::post('/prompts/{id}', 'Admin\Prompt\PromptController@update')->name('admin.prompts.update');
+    Route::post('/prompts/{id}/reset', 'Admin\Prompt\PromptController@reset')->name('admin.prompts.reset');
+
     Route::prefix('stat')->group(function () {
         Route::get('/ads', 'Admin\Stat\AdStatController@index')->name('admin.stat.ads');
         Route::get('/ad-categories', 'Admin\Stat\AdCategoryStatController@index')->name('admin.stat.adCategories');
