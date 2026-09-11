@@ -184,6 +184,7 @@ class ShopController extends Controller
             'telephone' => 'nullable|string|max:100',
             'email' => 'required|email|max:255',
             'info' => 'nullable|string|max:5000',
+            'info_uk' => 'nullable|string|max:5000',
             'site_url' => 'nullable|url|max:255',
             'country' => 'nullable|string|max:100',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
