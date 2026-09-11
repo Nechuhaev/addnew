@@ -39,7 +39,7 @@
                             <label for="template">Текст промпту</label>
                             <textarea name="template" id="template" class="form-control" rows="20" style="font-family: monospace;">{{ old('template', $prompt->template) }}</textarea>
                             <small class="form-text text-muted">
-                                Плейсхолдери у форматі <code>{{ '{{назва}}' }}</code> підставляються кодом
+                                Плейсхолдери у форматі <code>@{{назва}}</code> підставляються кодом
                                 автоматично при кожному запуску — не видаляйте й не перейменовуйте їх,
                                 інакше відповідні дані просто не потраплять у запит до моделі.
                             </small>
