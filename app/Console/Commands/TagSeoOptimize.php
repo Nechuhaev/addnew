@@ -54,12 +54,18 @@ class TagSeoOptimize extends Command
                 $this->error("Тег ID={$onlyId} не знайдено");
                 return 1;
             }
+            if (empty($tag->getOriginal('name'))) {
+                $this->info("Тег ID={$onlyId} має порожню назву — пропускаю SEO-генерацію.");
+                return 0;
+            }
             $tags = collect([$tag]);
         } else {
             $limit = (int) ($this->option('limit') ?: env('TAG_SEO_PER_RUN', 10));
 
             $tags = AdTag::withCount('ads')
                 ->where('seo_optimized', false)
+                ->whereNotNull('name')
+                ->where('name', '!=', '')
                 ->orderByDesc('ads_count') // найпопулярніші (найбільше оголошень) — спершу
                 ->limit($limit)
                 ->get();
