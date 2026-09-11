@@ -66,6 +66,14 @@ class User extends Authenticatable
         'telephone', 'info', 'info_uk', 'image',
     ];
 
+        public function getInfoAttribute($value)
+    {
+        if (app()->getLocale() === 'uk' && !empty($this->attributes['info_uk'] ?? null)) {
+            return $this->attributes['info_uk'];
+        }
+        return $value;
+    }
+
     /**
      * The attributes that should be hidden for arrays.
      *
