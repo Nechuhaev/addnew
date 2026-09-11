@@ -3,11 +3,14 @@
 namespace App\Console\Commands;
 
 use App\AdCity;
+use App\Console\Commands\Concerns\UsesPromptTemplates;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
 
 class TranslateCitySeo extends Command
 {
+    use UsesPromptTemplates;
+
     /**
      * php artisan cities:translate-seo
      *
@@ -99,13 +102,19 @@ class TranslateCitySeo extends Command
                 . "Content: " . ($city->getOriginal('content') ?? '');
         })->implode("\n\n");
 
-        $prompt = "Ти — професійний перекладач і SEO-копірайтер. Переклади SEO-поля "
-            . "(meta title, meta description, content) для кожного з наведених нижче міст "
-            . "з російської на українську. Зберігай структуру й сенс, адаптуй природно для "
-            . "української мови, зберігай HTML-теги в content без змін, якщо вони є.\n\n"
-            . "{$itemsText}\n\n"
-            . "Відповідь — ТІЛЬКИ валідний JSON без markdown-обрамлення, формату:\n"
-            . "{\"ID\": {\"meta_title\": \"...\", \"meta_description\": \"...\", \"content\": \"...\"}, ...}";
+        $prompt = $this->prompt(
+            'city_seo_translate',
+            'Переклад SEO-полів міст (пакетами)',
+            "Ти — професійний перекладач і SEO-копірайтер. Переклади SEO-поля "
+                . "(meta title, meta description, content) для кожного з наведених нижче міст "
+                . "з російської на українську. Зберігай структуру й сенс, адаптуй природно для "
+                . "української мови, зберігай HTML-теги в content без змін, якщо вони є.\n\n"
+                . "{{items}}\n\n"
+                . "Відповідь — ТІЛЬКИ валідний JSON без markdown-обрамлення, формату:\n"
+                . "{\"ID\": {\"meta_title\": \"...\", \"meta_description\": \"...\", \"content\": \"...\"}, ...}",
+            ['items' => $itemsText],
+            'Пакетний переклад SEO-полів (meta_title, meta_description, content) для міст.'
+        );
 
         $raw = $this->callClaude($prompt, 4000);
         $json = $this->extractJsonObject($raw);
