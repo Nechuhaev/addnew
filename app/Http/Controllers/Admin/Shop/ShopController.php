@@ -106,6 +106,20 @@ class ShopController extends Controller
                 : null; // null = ще не перевірялось
         }
 
+        // Дата останнього надісланого запрошення на реєстрацію/підключення
+        // (лист із темою "Запрошення підключити...") — щоб бачити в списку,
+        // кому вже писали, а кому ще ні, і не дублювати розсилку.
+        $inviteSentByShop = DB::table('shop_messages')
+            ->whereIn('shop_user_id', $shopIds)
+            ->where('subject', 'LIKE', '%Запрошення підключити%')
+            ->select('shop_user_id', DB::raw('MAX(created_at) as last_sent'))
+            ->groupBy('shop_user_id')
+            ->pluck('last_sent', 'shop_user_id');
+
+        foreach ($shops as $shop) {
+            $shop->invite_sent_at = $inviteSentByShop->get($shop->id);
+        }
+
         return view('admin.shops.list', [
             'shops' => $shops,
             'order' => $order,
