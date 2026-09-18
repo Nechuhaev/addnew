@@ -206,7 +206,7 @@
     </div>
 @endsection
 
-@section('script')
+@section('footer-scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const logoInput = document.getElementById('logo');
