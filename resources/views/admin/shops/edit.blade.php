@@ -21,6 +21,7 @@
             <div class="card">
                 <div class="card-body">
                     <a href="{{ route('admin.shops') }}" class="btn btn-sm btn-secondary mb-3">&larr; До списку магазинів</a>
+                    <a href="{{ route('admin.shopMessageTemplates') }}" class="btn btn-sm btn-secondary mb-3">Шаблони листів</a>
                     <a href="{{ route('admin.shops.products', $shop->id) }}" class="btn btn-sm btn-secondary mb-3">Товари цього магазину</a>
                     <a href="{{ route('admin.shops.impersonate', $shop->id) }}" class="btn btn-sm btn-warning mb-3"
                        onclick="return confirm('Увійти в акаунт магазину «{{ $shop->username }}»?');">
@@ -147,6 +148,15 @@
                         @csrf
                         <div class="form-group">
                             <label for="subject">Тема</label>
+                            <div class="form-group">
+    <label>Готовий шаблон (необов'язково)</label>
+    <select id="message_template_select" class="form-control">
+        <option value="">— Обрати шаблон —</option>
+        @foreach($messageTemplates as $t)
+            <option value="{{ $t->id }}">{{ $t->name }}</option>
+        @endforeach
+    </select>
+</div>
                             <input type="text" name="subject" id="subject" class="form-control" required>
                         </div>
                         <div class="form-group">
@@ -229,6 +239,60 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+});
+</script>
+<script>
+var shopMessageTemplates = {!! $messageTemplates->map(function($t) {
+    return ['id' => $t->id, 'subject' => $t->subject, 'body' => $t->body];
+})->values()->toJson() !!};
+
+var shopMessageVars = {
+    shop_name: {!! json_encode($shop->username) !!},
+    shop_id: {{ $shop->id }},
+    shop_url: {!! json_encode(route('author', $shop->id)) !!},
+    password_reset_url: {!! json_encode(route('password.request')) !!}
+};
+
+document.addEventListener('DOMContentLoaded', function () {
+    var select = document.getElementById('message_template_select');
+    if (!select) {
+        return;
+    }
+
+    select.addEventListener('change', function () {
+        var id = this.value;
+        if (!id) {
+            return;
+        }
+
+        var tpl = null;
+        for (var i = 0; i < shopMessageTemplates.length; i++) {
+            if (shopMessageTemplates[i].id == id) {
+                tpl = shopMessageTemplates[i];
+                break;
+            }
+        }
+        if (!tpl) {
+            return;
+        }
+
+        var subject = tpl.subject;
+        var body = tpl.body;
+
+        Object.keys(shopMessageVars).forEach(function (key) {
+            var re = new RegExp('\\{\\{\\s*' + key + '\\s*\\}\\}', 'g');
+            subject = subject.replace(re, shopMessageVars[key]);
+            body = body.replace(re, shopMessageVars[key]);
+        });
+
+        document.getElementById('subject').value = subject;
+
+        if (typeof tinymce !== 'undefined' && tinymce.get('body')) {
+            tinymce.get('body').setContent(body);
+        } else {
+            document.getElementById('body').value = body;
+        }
+    });
 });
 </script>
 @endsection
