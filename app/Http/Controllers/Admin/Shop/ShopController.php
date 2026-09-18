@@ -140,7 +140,13 @@ class ShopController extends Controller
             ->limit(20)
             ->get();
 
-        return view('admin.shops.edit', ['shop' => $shop, 'messages' => $messages]);
+        $messageTemplates = \App\ShopMessageTemplate::orderBy('name')->get();
+
+        return view('admin.shops.edit', [
+            'shop' => $shop,
+            'messages' => $messages,
+            'messageTemplates' => $messageTemplates,
+        ]);
     }
 
     /**
