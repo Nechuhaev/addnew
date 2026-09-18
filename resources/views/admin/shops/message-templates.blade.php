@@ -54,10 +54,10 @@
                             <small class="form-text text-muted">
                                 Доступні плейсхолдери (підставляються автоматично при виборі шаблону
                                 на сторінці конкретного магазину):<br>
-                                <code>{{ '{{shop_name}}' }}</code> — назва магазину<br>
-                                <code>{{ '{{shop_id}}' }}</code> — ID магазину<br>
-                                <code>{{ '{{shop_url}}' }}</code> — посилання на публічну сторінку магазину<br>
-                                <code>{{ '{{password_reset_url}}' }}</code> — посилання на відновлення пароля
+                                <code>@{{shop_name}}</code> — назва магазину<br>
+                                <code>@{{shop_id}}</code> — ID магазину<br>
+                                <code>@{{shop_url}}</code> — посилання на публічну сторінку магазину<br>
+                                <code>@{{password_reset_url}}</code> — посилання на відновлення пароля
                             </small>
                         </div>
                         <button class="btn btn-success">{{ $template ? 'Зберегти зміни' : 'Створити шаблон' }}</button>
