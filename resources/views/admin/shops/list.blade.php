@@ -48,6 +48,7 @@
                                     <th>Товарів</th>
                                     <th>Страна</th>
                                     <th>Реєстрація</th>
+                                    <th>Запрошення</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -72,6 +73,15 @@
                                         <td>{{ $shop->products_count }}</td>
                                         <td>{{ $shop->countries_display }}</td>
                                         <td>{{ $shop->created_date }}</td>
+                                        <td>
+                                            @if($shop->invite_sent_at)
+                                                <span class="badge badge-success" title="Дата останнього надісланого запрошення">
+                                                    {{ \Illuminate\Support\Carbon::parse($shop->invite_sent_at)->format('d.m.Y') }}
+                                                </span>
+                                            @else
+                                                <span class="badge badge-secondary">не надіслано</span>
+                                            @endif
+                                        </td>
                                         <td class="text-right">
                                             <a href="{{ route('admin.shops.edit', $shop->id) }}" class="btn btn-sm btn-secondary">Опис</a>
                                             <a href="{{ route('admin.shops.products', $shop->id) }}" class="btn btn-sm btn-secondary">Товари</a>
@@ -89,7 +99,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="8">Магазинів поки немає</td>
+                                        <td colspan="9">Магазинів поки немає</td>
                                     </tr>
                                 @endforelse
                             </tbody>
