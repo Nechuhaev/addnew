@@ -151,7 +151,7 @@
                         </div>
                         <div class="form-group">
                             <label for="body">Текст листа</label>
-                            <textarea name="body" id="body" class="form-control" rows="6" required></textarea>
+                            <textarea name="body" id="body" class="form-control content" rows="10" required></textarea>
                         </div>
                         <button type="submit" class="btn btn-success">Надіслати</button>
                     </form>
