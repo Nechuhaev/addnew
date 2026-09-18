@@ -36,6 +36,12 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::delete('/shops/{id}', 'Admin\Shop\ShopController@destroy')->name('admin.shops.destroy');
     Route::delete('/shops/{id}/products/delete-inactive', 'Admin\Shop\ShopController@bulkDeleteInactive')->name('admin.shops.products.deleteInactive');
     Route::post('/shops/{id}/message', 'Admin\Shop\ShopController@sendMessage')->name('admin.shops.message');
+
+    Route::get('/shop-message-templates', 'Admin\Shop\ShopMessageTemplateController@showForm')->name('admin.shopMessageTemplates');
+    Route::get('/shop-message-templates/{id}', 'Admin\Shop\ShopMessageTemplateController@showForm')->name('admin.shopMessageTemplates.edit');
+    Route::post('/shop-message-templates/create', 'Admin\Shop\ShopMessageTemplateController@create')->name('admin.shopMessageTemplates.create');
+    Route::post('/shop-message-templates/update', 'Admin\Shop\ShopMessageTemplateController@update')->name('admin.shopMessageTemplates.update');
+    Route::get('/shop-message-templates/delete/{id}', 'Admin\Shop\ShopMessageTemplateController@delete')->name('admin.shopMessageTemplates.delete');
     
 Route::get('/shops/{id}/stats', 'Admin\Shop\ShopStatsController@show')->name('admin.shops.stats.show');
     
