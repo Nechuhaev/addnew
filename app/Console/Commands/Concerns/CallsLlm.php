@@ -50,7 +50,8 @@ trait CallsLlm
                 $text = $this->{$provider['method']}($prompt, $maxTokens);
 
                 if ($validator !== null && !$validator($text)) {
-                    throw new \RuntimeException('Відповідь не пройшла валідацію очікуваного формату');
+                    $snippet = mb_substr(trim($text), 0, 200);
+                    throw new \RuntimeException("Відповідь не пройшла валідацію очікуваного формату. Отримано: \"{$snippet}\"");
                 }
 
                 if ($i > 0 && method_exists($this, 'info')) {
@@ -253,7 +254,15 @@ trait CallsLlm
         $data = json_decode((string) $response->getBody(), true);
         $text = $data['result']['response'] ?? null;
 
-        if ($text === null || trim($text) === '') {
+        // Деякі моделі Cloudflare для певних запитів повертають
+        // структурований масив (наприклад, якщо модель вирішила, що
+        // це виклик інструменту) замість простого рядка тексту —
+        // раніше це валило trim() з фатальною помилкою типу.
+        if (is_array($text)) {
+            throw new \RuntimeException('Cloudflare Workers AI повернув структуру замість тексту: ' . json_encode($text));
+        }
+
+        if ($text === null || !is_string($text) || trim($text) === '') {
             throw new \RuntimeException('Cloudflare Workers AI не повернув текст: ' . json_encode($data));
         }
 
