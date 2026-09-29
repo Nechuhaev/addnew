@@ -10,7 +10,8 @@ namespace App\Console\Commands\Concerns;
  *   2. OpenRouter
  *   3. Groq
  *   4. Cloudflare Workers AI
- *   5. Gemini (сам всередині ще й перебирає кілька моделей за пріоритетом)
+ *   5. Kimi (Moonshot AI)
+ *   6. Gemini (сам всередині ще й перебирає кілька моделей за пріоритетом)
  *
  * Кожен провайдер, для якого не задано потрібний ключ у .env, сам кидає
  * зрозумілу помилку "не задано" — вона обробляється так само, як і будь-яка
@@ -41,6 +42,7 @@ trait CallsLlm
             ['name' => 'OpenRouter', 'method' => 'callOpenRouter'],
             ['name' => 'Groq', 'method' => 'callGroq'],
             ['name' => 'Cloudflare Workers AI', 'method' => 'callCloudflareAi'],
+            ['name' => 'Kimi (Moonshot)', 'method' => 'callKimi'],
             ['name' => 'Gemini', 'method' => 'callGemini'],
         ];
 
@@ -270,7 +272,47 @@ trait CallsLlm
     }
 
     // -----------------------------------------------------------------
-    // 5. Gemini — останній рубіж, сам перебирає кілька моделей за пріоритетом
+    // 5. Kimi (Moonshot AI) — OpenAI-сумісний формат
+    // -----------------------------------------------------------------
+
+    protected function callKimi(string $prompt, int $maxTokens = 4000): string
+    {
+        $apiKey = env('MOONSHOT_API_KEY');
+        if (empty($apiKey)) {
+            throw new \RuntimeException('MOONSHOT_API_KEY не задано в .env');
+        }
+
+        // За замовчуванням загальна модель kimi-k2.6 — швидша й дешевша,
+        // ніж флагманська kimi-k3, якій за замовчуванням reasoning_effort=max
+        // (набагато повільніше й дорожче для наших SEO/перекладацьких задач).
+        $model = env('MOONSHOT_MODEL', 'kimi-k2.6');
+        $baseUrl = env('MOONSHOT_BASE_URL', 'https://api.moonshot.ai/v1');
+
+        $response = $this->http->post(rtrim($baseUrl, '/') . '/chat/completions', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $apiKey,
+                'Content-Type' => 'application/json',
+            ],
+            'json' => [
+                'model' => $model,
+                'messages' => [['role' => 'user', 'content' => $prompt]],
+                'max_tokens' => $maxTokens,
+            ],
+            'timeout' => 180,
+        ]);
+
+        $data = json_decode((string) $response->getBody(), true);
+        $text = $data['choices'][0]['message']['content'] ?? null;
+
+        if ($text === null || trim($text) === '') {
+            throw new \RuntimeException('Kimi не повернув текст: ' . json_encode($data));
+        }
+
+        return trim($text);
+    }
+
+    // -----------------------------------------------------------------
+    // 6. Gemini — останній рубіж, сам перебирає кілька моделей за пріоритетом
     // -----------------------------------------------------------------
 
     protected function callGemini(string $prompt, int $maxTokens = 4000): string
