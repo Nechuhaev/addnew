@@ -70,26 +70,40 @@ trait CallsLlm
     }
 
     /**
-     * Готовий валідатор для callLlm(): відповідь має містити хоча б одну
-     * пару { ... } (JSON-об'єкт). Використовуй, коли очікуєш від моделі
-     * JSON-об'єкт (наприклад, дані статті).
+     * Готовий валідатор для callLlm(): відповідь має містити валідний
+     * JSON-об'єкт { ... } — перевіряється РЕАЛЬНИМ json_decode() того
+     * самого фрагмента, який потім витягне extractJsonObject(), а не
+     * просто наявністю символів { }. Без цього провайдер, що повернув
+     * фігурні дужки десь у звичайній прозі (не справжній JSON), хибно
+     * проходив би перевірку як "успіх".
      */
     protected function validatesAsJsonObject(): callable
     {
         return function (string $text): bool {
-            return strpos($text, '{') !== false && strpos($text, '}') !== false;
+            $start = strpos($text, '{');
+            $end = strrpos($text, '}');
+            if ($start === false || $end === false || $end < $start) {
+                return false;
+            }
+            json_decode(substr($text, $start, $end - $start + 1), true);
+            return json_last_error() === JSON_ERROR_NONE;
         };
     }
 
     /**
-     * Готовий валідатор для callLlm(): відповідь має містити хоча б одну
-     * пару [ ... ] (JSON-масив). Використовуй, коли очікуєш від моделі
-     * JSON-масив (наприклад, список тем чи ключів).
+     * Те саме, але для JSON-масиву [ ... ] — теж через реальний
+     * json_decode(), а не наївну перевірку наявності дужок.
      */
     protected function validatesAsJsonArray(): callable
     {
         return function (string $text): bool {
-            return strpos($text, '[') !== false && strpos($text, ']') !== false;
+            $start = strpos($text, '[');
+            $end = strrpos($text, ']');
+            if ($start === false || $end === false || $end < $start) {
+                return false;
+            }
+            json_decode(substr($text, $start, $end - $start + 1), true);
+            return json_last_error() === JSON_ERROR_NONE;
         };
     }
 
