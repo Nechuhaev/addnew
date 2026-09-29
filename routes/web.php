@@ -45,7 +45,7 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     
 Route::get('/shops/{id}/stats', 'Admin\Shop\ShopStatsController@show')->name('admin.shops.stats.show');
     
-    
+    Route::get('/reports/daily', 'Admin\Report\DailyReportController@index')->name('admin.reports.daily');
     
     
         Route::get('/translations', 'Admin\Translation\TranslationController@index')->name('admin.translations');
