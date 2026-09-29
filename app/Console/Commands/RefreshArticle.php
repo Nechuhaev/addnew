@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Article;
+use App\Console\Commands\Concerns\CallsLlm;
 use App\Console\Commands\Concerns\UpdatesDailyReport;
 use App\Console\Commands\Concerns\UsesPromptTemplates;
 use GuzzleHttp\Client;
@@ -12,6 +13,7 @@ use Illuminate\Support\Str;
 
 class RefreshArticle extends Command
 {
+    use CallsLlm;
     use UpdatesDailyReport;
     use UsesPromptTemplates;
 
@@ -128,33 +130,8 @@ class RefreshArticle extends Command
     }
 
     // -----------------------------------------------------------------
-    // Anthropic (Claude) API — ідентично PublishArticle
+    // Anthropic API — сам метод callClaude тепер у трейті CallsLlm
     // -----------------------------------------------------------------
-
-    protected function callClaude(string $prompt, int $maxTokens = 4000): string
-    {
-        $response = $this->http->post('https://api.anthropic.com/v1/messages', [
-            'headers' => [
-                'x-api-key' => env('ANTHROPIC_API_KEY'),
-                'anthropic-version' => '2023-06-01',
-                'content-type' => 'application/json',
-            ],
-            'json' => [
-                'model' => env('ANTHROPIC_MODEL', 'claude-sonnet-4-6'),
-                'max_tokens' => $maxTokens,
-                'messages' => [['role' => 'user', 'content' => $prompt]],
-            ],
-            'timeout' => 180,
-        ]);
-
-        $data = json_decode((string) $response->getBody(), true);
-        $textBlocks = array_filter($data['content'] ?? [], function ($b) {
-            return ($b['type'] ?? '') === 'text';
-        });
-        return trim(implode("\n", array_map(function ($b) {
-            return $b['text'];
-        }, $textBlocks)));
-    }
 
     protected function extractJsonObject(string $text): string
     {
@@ -231,7 +208,7 @@ class RefreshArticle extends Command
             'Переписує старі малопереглядові статті: освіжує факти, покращує SEO, зберігаючи URL і вбудовані картинки.'
         );
 
-        $raw = $this->callClaude($prompt, 4000);
+        $raw = $this->callLlm($prompt, 4000, $this->validatesAsJsonObject());
         $json = $this->extractJsonObject($raw);
         $data = json_decode($json, true);
         if (!is_array($data)) {
