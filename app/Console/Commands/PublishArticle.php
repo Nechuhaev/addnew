@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Article;
 use App\Console\Commands\Concerns\CallsLlm;
+use App\Console\Commands\Concerns\UpdatesDailyReport;
 use App\Console\Commands\Concerns\FetchesImages;
 use App\Console\Commands\Concerns\UsesPromptTemplates;
 use GuzzleHttp\Client;
@@ -14,6 +15,7 @@ use Illuminate\Support\Str;
 class PublishArticle extends Command
 {
     use CallsLlm;
+    use UpdatesDailyReport;
     use UsesPromptTemplates;
     use FetchesImages;
 
@@ -163,6 +165,14 @@ class PublishArticle extends Command
         }
 
         $this->info("Стаття створена: ID={$newArticle->id}, URL={$newArticle->url}");
+
+        $charsCount = mb_strlen(strip_tags($contentHtml));
+        $this->appendDailyReportStat(
+            'articles_published_count',
+            1,
+            'articles_published_summary',
+            "{$newArticle->name} ({$charsCount} символів)"
+        );
 
         if ($planEntry) {
             DB::table('content_plan_items')->where('id', $planEntry->id)->update([
