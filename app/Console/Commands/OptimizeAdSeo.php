@@ -3,12 +3,14 @@
 namespace App\Console\Commands;
 
 use App\Ad;
+use App\Console\Commands\Concerns\UpdatesDailyReport;
 use App\Console\Commands\Concerns\UsesPromptTemplates;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
 
 class OptimizeAdSeo extends Command
 {
+    use UpdatesDailyReport;
     use UsesPromptTemplates;
 
     /**
@@ -82,6 +84,8 @@ class OptimizeAdSeo extends Command
         $ad->save();
 
         $this->info('  -> ' . $ad->name);
+
+        $this->appendDailyReportStat('ads_seo_optimized_count', 1);
     }
 
     protected function generateSeoContent(Ad $ad): array
