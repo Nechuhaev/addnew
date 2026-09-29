@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\AdTag;
 use App\Console\Commands\Concerns\CallsLlm;
+use App\Console\Commands\Concerns\UpdatesDailyReport;
 use App\Console\Commands\Concerns\UsesPromptTemplates;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
@@ -11,6 +12,7 @@ use Illuminate\Console\Command;
 class TagSeoOptimize extends Command
 {
     use CallsLlm;
+    use UpdatesDailyReport;
     use UsesPromptTemplates;
 
     /**
@@ -105,6 +107,13 @@ class TagSeoOptimize extends Command
         $tag->seo_optimized = true;
         $tag->seo_optimized_at = now();
         $tag->save();
+
+        $this->appendDailyReportStat(
+            'tags_seo_optimized_count',
+            1,
+            'tags_seo_optimized_summary',
+            $tag->getOriginal('name')
+        );
     }
 
     protected function generateSeoContent(AdTag $tag): array
