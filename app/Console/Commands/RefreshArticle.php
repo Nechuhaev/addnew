@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Article;
+use App\Console\Commands\Concerns\UpdatesDailyReport;
 use App\Console\Commands\Concerns\UsesPromptTemplates;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
@@ -11,6 +12,7 @@ use Illuminate\Support\Str;
 
 class RefreshArticle extends Command
 {
+    use UpdatesDailyReport;
     use UsesPromptTemplates;
 
     /**
@@ -116,6 +118,13 @@ class RefreshArticle extends Command
         ]);
 
         $this->info("Стаття ID={$articleId} оновлена. URL={$article->url}");
+
+        $this->appendDailyReportStat(
+            'articles_refreshed_count',
+            1,
+            'articles_refreshed_summary',
+            $article->getOriginal('name')
+        );
     }
 
     // -----------------------------------------------------------------
