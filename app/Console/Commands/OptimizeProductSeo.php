@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Ad;
 use App\Console\Commands\Concerns\CallsLlm;
+use App\Console\Commands\Concerns\UpdatesDailyReport;
 use App\Console\Commands\Concerns\UsesPromptTemplates;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
@@ -11,6 +12,7 @@ use Illuminate\Console\Command;
 class OptimizeProductSeo extends Command
 {
     use CallsLlm;
+    use UpdatesDailyReport;
     use UsesPromptTemplates;
 
     /**
@@ -85,6 +87,8 @@ class OptimizeProductSeo extends Command
         $product->save();
 
         $this->info('  -> ' . $product->name);
+
+        $this->appendDailyReportStat('products_seo_optimized_count', 1);
     }
 
     protected function generateSeoContent(Ad $product): array
