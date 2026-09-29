@@ -3,12 +3,14 @@
 namespace App\Console\Commands;
 
 use App\AdTag;
+use App\Console\Commands\Concerns\CallsLlm;
 use App\Console\Commands\Concerns\UsesPromptTemplates;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
 
 class TranslateTags extends Command
 {
+    use CallsLlm;
     use UsesPromptTemplates;
 
     /**
@@ -113,7 +115,7 @@ class TranslateTags extends Command
             'Пакетний переклад тегів оголошень (ключових слів/фраз) на природну українську.'
         );
 
-        $raw = $this->callClaude($prompt, 3000);
+        $raw = $this->callLlm($prompt, 3000, $this->validatesAsJsonObject());
         $json = $this->extractJsonObject($raw);
         $data = json_decode($json, true);
 
@@ -127,31 +129,6 @@ class TranslateTags extends Command
         }
 
         return $result;
-    }
-
-    protected function callClaude(string $prompt, int $maxTokens): string
-    {
-        $response = $this->http->post('https://api.anthropic.com/v1/messages', [
-            'headers' => [
-                'x-api-key' => env('ANTHROPIC_API_KEY'),
-                'anthropic-version' => '2023-06-01',
-                'content-type' => 'application/json',
-            ],
-            'json' => [
-                'model' => env('ANTHROPIC_MODEL', 'claude-sonnet-4-6'),
-                'max_tokens' => $maxTokens,
-                'messages' => [['role' => 'user', 'content' => $prompt]],
-            ],
-            'timeout' => 120,
-        ]);
-
-        $data = json_decode((string) $response->getBody(), true);
-        $textBlocks = array_filter($data['content'] ?? [], function ($b) {
-            return ($b['type'] ?? '') === 'text';
-        });
-        return trim(implode("\n", array_map(function ($b) {
-            return $b['text'];
-        }, $textBlocks)));
     }
 
     protected function extractJsonObject(string $text): string
