@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Article;
+use App\Console\Commands\Concerns\UpdatesDailyReport;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
@@ -11,6 +12,8 @@ use Carbon\Carbon;
 
 class CheckArticleIndexing extends Command
 {
+    use UpdatesDailyReport;
+
     /**
      * php artisan content:check-index
      *
@@ -76,6 +79,11 @@ class CheckArticleIndexing extends Command
 
         $this->info('Перевіряю індексацію для ' . $articleIds->count() . ' статей(тю)');
 
+        // Підрахунок за вердиктами (PASS/NEUTRAL/FAIL/...) — саме це
+        // потрапить у щоденний звіт як короткий підсумок перевірки.
+        $verdictCounts = [];
+        $checkedCount = 0;
+
         foreach ($articleIds as $i => $articleId) {
             $article = Article::find($articleId);
             if (!$article) {
@@ -89,6 +97,9 @@ class CheckArticleIndexing extends Command
                 $this->storeResult($articleId, $result);
                 $verdict = $result['inspectionResult']['indexStatusResult']['verdict'] ?? 'UNKNOWN';
                 $this->info('[' . ($i + 1) . '/' . $articleIds->count() . "] {$url} → {$verdict}");
+
+                $checkedCount++;
+                $verdictCounts[$verdict] = ($verdictCounts[$verdict] ?? 0) + 1;
             } catch (\Throwable $e) {
                 $this->error("Помилка перевірки {$url}: " . $e->getMessage());
             }
@@ -96,6 +107,19 @@ class CheckArticleIndexing extends Command
             // 600 запитів/хв ліміт — невелика пауза про всяк випадок,
             // якщо колись піднімемо $limit значно вище.
             usleep(150000); // 0.15 сек
+        }
+
+        if ($checkedCount > 0) {
+            $summaryParts = [];
+            foreach ($verdictCounts as $verdict => $count) {
+                $summaryParts[] = "{$verdict}: {$count}";
+            }
+            $this->appendDailyReportStat(
+                'indexing_checked_count',
+                $checkedCount,
+                'indexing_summary',
+                implode(', ', $summaryParts)
+            );
         }
 
         return 0;
