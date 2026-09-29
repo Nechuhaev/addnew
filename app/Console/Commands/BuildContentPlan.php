@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\ArticleCategory;
 use App\Console\Commands\Concerns\CallsLlm;
+use App\Console\Commands\Concerns\UpdatesDailyReport;
 use App\Console\Commands\Concerns\UsesPromptTemplates;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
@@ -13,6 +14,7 @@ use Illuminate\Support\Str;
 class BuildContentPlan extends Command
 {
     use CallsLlm;
+    use UpdatesDailyReport;
     use UsesPromptTemplates;
 
     /**
@@ -163,6 +165,19 @@ class BuildContentPlan extends Command
 
         $totalPlanned = DB::table('content_plan_items')->where('status', 'planned')->count();
         $this->info('Додано ' . count($rows) . " нових тем у контент-план. Всього запланованих тем: {$totalPlanned}");
+
+        // Записуємо власну частину щоденного звіту (адмінка "Звіт") —
+        // скільки семантики й тем додано САМЕ СЬОГОДНІ. У дні, коли ця
+        // команда не запускається (не понеділок), ці поля лишаються
+        // NULL — так адмінка одразу видно, коли реально був запуск.
+        $clustersSummary = collect($newEntries)->pluck('cluster')->unique()->values()->implode(', ');
+        $this->appendDailyReportStat('semantics_added_count', count($newKeywords));
+        $this->appendDailyReportStat(
+            'topics_added_count',
+            count($rows),
+            'clusters_summary',
+            Str::limit($clustersSummary, 500, '…')
+        );
 
         return 0;
     }
