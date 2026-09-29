@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Ad;
+use App\Console\Commands\Concerns\CallsLlm;
 use App\Console\Commands\Concerns\UpdatesDailyReport;
 use App\Console\Commands\Concerns\UsesPromptTemplates;
 use GuzzleHttp\Client;
@@ -10,6 +11,7 @@ use Illuminate\Console\Command;
 
 class OptimizeAdSeo extends Command
 {
+    use CallsLlm;
     use UpdatesDailyReport;
     use UsesPromptTemplates;
 
@@ -131,7 +133,7 @@ class OptimizeAdSeo extends Command
             'SEO-переписування назви й опису звичайних оголошень (is_product=0), без вигадування деталей.'
         );
 
-        $raw = $this->callClaude($prompt, 1500);
+        $raw = $this->callLlm($prompt, 1500, $this->validatesAsJsonObject());
         $json = $this->extractJsonObject($raw);
         $data = json_decode($json, true);
 
@@ -140,31 +142,6 @@ class OptimizeAdSeo extends Command
         }
 
         return $data;
-    }
-
-    protected function callClaude(string $prompt, int $maxTokens = 1500): string
-    {
-        $response = $this->http->post('https://api.anthropic.com/v1/messages', [
-            'headers' => [
-                'x-api-key' => env('ANTHROPIC_API_KEY'),
-                'anthropic-version' => '2023-06-01',
-                'content-type' => 'application/json',
-            ],
-            'json' => [
-                'model' => env('ANTHROPIC_MODEL', 'claude-sonnet-4-6'),
-                'max_tokens' => $maxTokens,
-                'messages' => [['role' => 'user', 'content' => $prompt]],
-            ],
-            'timeout' => 60,
-        ]);
-
-        $data = json_decode((string) $response->getBody(), true);
-        $textBlocks = array_filter($data['content'] ?? [], function ($b) {
-            return ($b['type'] ?? '') === 'text';
-        });
-        return trim(implode("\n", array_map(function ($b) {
-            return $b['text'];
-        }, $textBlocks)));
     }
 
     protected function extractJsonObject(string $text): string
