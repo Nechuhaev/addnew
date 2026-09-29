@@ -107,6 +107,13 @@ class Kernel extends ConsoleKernel
         ->withoutOverlapping()
         ->appendOutputTo(storage_path('logs/tags-seo-optimize.log'));
 
+            // Щоночі о 00:10 — рахує оголошення/нових користувачів/нові
+    // магазини за ВЧОРАШНІЙ день і зберігає в адмінський звіт.
+    $schedule->command('report:daily')
+        ->dailyAt('00:10')
+        ->withoutOverlapping()
+        ->appendOutputTo(storage_path('logs/report-daily.log'));
+
     }
     
 
