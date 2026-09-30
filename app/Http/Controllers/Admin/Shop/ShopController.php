@@ -93,17 +93,19 @@ class ShopController extends Controller
         }
 
         // Статус останньої перевірки email — для зеленого підсвічування
-        // (збігається) чи жовтої іконки-попередження (щойно автоматично
-        // виправлено на актуальний з сайту магазину).
+        // (збігається), жовтої іконки-попередження (автоматично виправлено)
+        // чи окремої позначки "домен недоступний" (сайт узагалі не відповідає,
+        // на відміну від "сайт живий, email просто не знайдено").
         $emailCheckStatus = DB::table('shop_email_checks as t1')
             ->whereIn('user_id', $shopIds)
             ->whereRaw('t1.checked_at = (SELECT MAX(t2.checked_at) FROM shop_email_checks t2 WHERE t2.user_id = t1.user_id)')
-            ->pluck('matched', 'user_id');
+            ->get(['user_id', 'matched', 'status'])
+            ->keyBy('user_id');
 
         foreach ($shops as $shop) {
-            $shop->email_matched = $emailCheckStatus->has($shop->id)
-                ? (bool) $emailCheckStatus->get($shop->id)
-                : null; // null = ще не перевірялось
+            $checkRow = $emailCheckStatus->get($shop->id);
+            $shop->email_matched = $checkRow ? (bool) $checkRow->matched : null; // null = ще не перевірялось
+            $shop->email_check_status = $checkRow->status ?? null;
         }
 
         // Дата останнього надісланого запрошення на реєстрацію/підключення
