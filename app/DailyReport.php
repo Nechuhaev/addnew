@@ -22,6 +22,7 @@ class DailyReport extends Model
         'indexing_summary',
         'products_seo_optimized_count',
         'ads_seo_optimized_count',
+        'products_deleted_404_count',
         'tags_seo_optimized_count',
         'tags_seo_optimized_summary',
     ];
