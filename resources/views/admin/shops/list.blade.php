@@ -58,7 +58,12 @@
                                         <td>{{ $shop->id }}</td>
                                         <td>{{ $shop->username }}</td>
                                         <td>
-                                            @if($shop->email_matched === true)
+                                            @if($shop->email_check_status === 'domain_unreachable')
+                                                <span class="text-muted">{{ $shop->email }}</span>
+                                                <span class="badge badge-secondary" title="Сайт магазину не відповідає (DNS-помилка, timeout або відмова з'єднання) під час останньої перевірки">
+                                                    домен недоступний
+                                                </span>
+                                            @elseif($shop->email_matched === true)
                                                 <span class="text-success">{{ $shop->email }}</span>
                                             @elseif($shop->email_matched === false)
                                                 <span class="text-warning">{{ $shop->email }}</span>
