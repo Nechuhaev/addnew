@@ -10,8 +10,11 @@ namespace App\Console\Commands\Concerns;
  *   2. OpenRouter
  *   3. Groq
  *   4. Cloudflare Workers AI
- *   5. Kimi (Moonshot AI)
- *   6. Gemini (сам всередині ще й перебирає кілька моделей за пріоритетом)
+ *   5. Z.AI (GLM)
+ *   6. NVIDIA NIM
+ *   7. Cerebras
+ *   8. Kimi (Moonshot AI)
+ *   9. Gemini (сам всередині ще й перебирає кілька моделей за пріоритетом)
  *
  * Кожен провайдер, для якого не задано потрібний ключ у .env, сам кидає
  * зрозумілу помилку "не задано" — вона обробляється так само, як і будь-яка
@@ -42,6 +45,9 @@ trait CallsLlm
             ['name' => 'OpenRouter', 'method' => 'callOpenRouter'],
             ['name' => 'Groq', 'method' => 'callGroq'],
             ['name' => 'Cloudflare Workers AI', 'method' => 'callCloudflareAi'],
+            ['name' => 'Z.AI (GLM)', 'method' => 'callZaiGlm'],
+            ['name' => 'NVIDIA NIM', 'method' => 'callNvidiaNim'],
+            ['name' => 'Cerebras', 'method' => 'callCerebras'],
             ['name' => 'Kimi (Moonshot)', 'method' => 'callKimi'],
             ['name' => 'Gemini', 'method' => 'callGemini'],
         ];
@@ -272,7 +278,125 @@ trait CallsLlm
     }
 
     // -----------------------------------------------------------------
-    // 5. Kimi (Moonshot AI) — OpenAI-сумісний формат
+    // 5. Z.AI (GLM) — OpenAI-сумісний формат. Модель glm-4.5-flash —
+    // єдина в лінійці, що дійсно безкоштовна (не пробний кредит), але
+    // з обмеженою швидкістю запитів.
+    // -----------------------------------------------------------------
+
+    protected function callZaiGlm(string $prompt, int $maxTokens = 4000): string
+    {
+        $apiKey = env('ZAI_API_KEY');
+        if (empty($apiKey)) {
+            throw new \RuntimeException('ZAI_API_KEY не задано в .env');
+        }
+
+        $model = env('ZAI_MODEL', 'glm-4.5-flash');
+        $baseUrl = env('ZAI_BASE_URL', 'https://api.z.ai/api/paas/v4');
+
+        $response = $this->http->post(rtrim($baseUrl, '/') . '/chat/completions', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $apiKey,
+                'Content-Type' => 'application/json',
+            ],
+            'json' => [
+                'model' => $model,
+                'messages' => [['role' => 'user', 'content' => $prompt]],
+                'max_tokens' => $maxTokens,
+            ],
+            'timeout' => 120,
+        ]);
+
+        $data = json_decode((string) $response->getBody(), true);
+        $text = $data['choices'][0]['message']['content'] ?? null;
+
+        if ($text === null || trim($text) === '') {
+            throw new \RuntimeException('Z.AI (GLM) не повернув текст: ' . json_encode($data));
+        }
+
+        return trim($text);
+    }
+
+    // -----------------------------------------------------------------
+    // 6. NVIDIA NIM — OpenAI-сумісний формат. Безкоштовний рівень:
+    // 40 запитів/хв, потрібна верифікація телефону (без картки).
+    // -----------------------------------------------------------------
+
+    protected function callNvidiaNim(string $prompt, int $maxTokens = 4000): string
+    {
+        $apiKey = env('NVIDIA_API_KEY');
+        if (empty($apiKey)) {
+            throw new \RuntimeException('NVIDIA_API_KEY не задано в .env');
+        }
+
+        $model = env('NVIDIA_MODEL', 'meta/llama-3.3-70b-instruct');
+        $baseUrl = env('NVIDIA_BASE_URL', 'https://integrate.api.nvidia.com/v1');
+
+        $response = $this->http->post(rtrim($baseUrl, '/') . '/chat/completions', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $apiKey,
+                'Content-Type' => 'application/json',
+            ],
+            'json' => [
+                'model' => $model,
+                'messages' => [['role' => 'user', 'content' => $prompt]],
+                'max_tokens' => $maxTokens,
+            ],
+            'timeout' => 120,
+        ]);
+
+        $data = json_decode((string) $response->getBody(), true);
+        $text = $data['choices'][0]['message']['content'] ?? null;
+
+        if ($text === null || trim($text) === '') {
+            throw new \RuntimeException('NVIDIA NIM не повернув текст: ' . json_encode($data));
+        }
+
+        return trim($text);
+    }
+
+    // -----------------------------------------------------------------
+    // 7. Cerebras — OpenAI-сумісний формат, дуже швидка інференція.
+    // УВАГА: за різними джерелами вимоги до безкоштовного рівня
+    // суперечливі (десь без картки, десь уже вимагають прив'язати) —
+    // перевірте актуальні умови на cloud.cerebras.ai перед розрахунком
+    // на цей провайдер.
+    // -----------------------------------------------------------------
+
+    protected function callCerebras(string $prompt, int $maxTokens = 4000): string
+    {
+        $apiKey = env('CEREBRAS_API_KEY');
+        if (empty($apiKey)) {
+            throw new \RuntimeException('CEREBRAS_API_KEY не задано в .env');
+        }
+
+        $model = env('CEREBRAS_MODEL', 'llama-3.3-70b');
+        $baseUrl = env('CEREBRAS_BASE_URL', 'https://api.cerebras.ai/v1');
+
+        $response = $this->http->post(rtrim($baseUrl, '/') . '/chat/completions', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $apiKey,
+                'Content-Type' => 'application/json',
+            ],
+            'json' => [
+                'model' => $model,
+                'messages' => [['role' => 'user', 'content' => $prompt]],
+                'max_tokens' => $maxTokens,
+            ],
+            'timeout' => 60,
+        ]);
+
+        $data = json_decode((string) $response->getBody(), true);
+        $text = $data['choices'][0]['message']['content'] ?? null;
+
+        if ($text === null || trim($text) === '') {
+            throw new \RuntimeException('Cerebras не повернув текст: ' . json_encode($data));
+        }
+
+        return trim($text);
+    }
+
+    // -----------------------------------------------------------------
+    // 8. Kimi (Moonshot AI) — OpenAI-сумісний формат
     // -----------------------------------------------------------------
 
     protected function callKimi(string $prompt, int $maxTokens = 4000): string
@@ -312,7 +436,7 @@ trait CallsLlm
     }
 
     // -----------------------------------------------------------------
-    // 6. Gemini — останній рубіж, сам перебирає кілька моделей за пріоритетом
+    // 9. Gemini — останній рубіж, сам перебирає кілька моделей за пріоритетом
     // -----------------------------------------------------------------
 
     protected function callGemini(string $prompt, int $maxTokens = 4000): string
