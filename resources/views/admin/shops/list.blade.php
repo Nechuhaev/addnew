@@ -41,15 +41,15 @@
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th>#</th>
-                                    <th>Назва магазину</th>
+                                    <th style="white-space: nowrap;">#</th>
+                                    <th style="white-space: nowrap;">Назва магазину</th>
                                     <th>Домен</th>
                                     <th>Email</th>
-                                    <th>Телефон</th>
-                                    <th>Товарів</th>
-                                    <th>Страна</th>
-                                    <th>Реєстрація</th>
-                                    <th>Запрошення</th>
+                                    <th style="white-space: nowrap;">Телефон</th>
+                                    <th style="white-space: nowrap;">Товарів</th>
+                                    <th style="white-space: nowrap;">Страна</th>
+                                    <th style="white-space: nowrap;">Реєстрація</th>
+                                    <th style="white-space: nowrap;">Запрошення</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -84,10 +84,10 @@
                                                 {{ $shop->email }}
                                             @endif
                                         </td>
-                                        <td>{{ $shop->telephone ?? '—' }}</td>
+                                        <td style="white-space: nowrap;">{{ $shop->telephone ?? '—' }}</td>
                                         <td>{{ $shop->products_count }}</td>
                                         <td>{{ $shop->countries_display }}</td>
-                                        <td>{{ $shop->created_date }}</td>
+                                        <td style="white-space: nowrap;">{{ $shop->created_date }}</td>
                                         <td>
                                             @if($shop->invite_sent_at)
                                                 <span class="badge badge-success" title="Дата останнього надісланого запрошення">
