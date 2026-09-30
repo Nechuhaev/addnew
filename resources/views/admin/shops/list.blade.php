@@ -43,6 +43,7 @@
                                 <tr>
                                     <th>#</th>
                                     <th>Назва магазину</th>
+                                    <th>Домен</th>
                                     <th>Email</th>
                                     <th>Телефон</th>
                                     <th>Товарів</th>
@@ -57,6 +58,15 @@
                                     <tr>
                                         <td>{{ $shop->id }}</td>
                                         <td>{{ $shop->username }}</td>
+                                        <td>
+                                            @if($shop->site_url)
+                                                <a href="{{ $shop->site_url }}" target="_blank" rel="noopener noreferrer">
+                                                    {{ parse_url($shop->site_url, PHP_URL_HOST) ?: $shop->site_url }}
+                                                </a>
+                                            @else
+                                                <span class="text-muted">—</span>
+                                            @endif
+                                        </td>
                                         <td>
                                             @if($shop->email_check_status === 'domain_unreachable')
                                                 <span class="text-muted">{{ $shop->email }}</span>
@@ -104,7 +114,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="9">Магазинів поки немає</td>
+                                        <td colspan="10">Магазинів поки немає</td>
                                     </tr>
                                 @endforelse
                             </tbody>
