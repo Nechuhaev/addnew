@@ -104,6 +104,11 @@
                                 </div>
 
                                 <div class="mb-2">
+                                    <strong>Видалено товарів (404 від джерела):</strong>
+                                    {{ $report->products_deleted_404_count !== null ? $report->products_deleted_404_count . ' шт.' : '—' }}
+                                </div>
+
+                                <div class="mb-2">
                                     <strong>10. SEO тегів:</strong>
                                     @if($report->tags_seo_optimized_count !== null)
                                         {{ $report->tags_seo_optimized_count }} шт.
