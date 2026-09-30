@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Ad;
 use App\AdCurrency;
+use App\Console\Commands\Concerns\UpdatesDailyReport;
 use App\ProductPriceCheck;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
@@ -11,6 +12,8 @@ use Illuminate\Support\Str;
 
 class MonitorCompetitorPrices extends Command
 {
+    use UpdatesDailyReport;
+
     /**
      * php artisan products:monitor-prices
      *
@@ -152,13 +155,22 @@ class MonitorCompetitorPrices extends Command
 
     protected function checkOne(Ad $product, string $sourceUrl): void
     {
+        // http_errors=false — щоб самим вирішувати, що робити з 404,
+        // а не отримувати виключення й губити конкретний код статусу
+        // (усі HTTP-помилки інакше зливались би в один generic fetch_error).
         $response = $this->http->get($sourceUrl, [
             'headers' => [
                 'User-Agent' => 'Mozilla/5.0 (compatible; AddnewPriceMonitor/1.0; +https://addnew.biz)',
             ],
             'timeout' => 20,
             'verify' => false,
+            'http_errors' => false,
         ]);
+
+        if ($response->getStatusCode() === 404) {
+            $this->handleProductGone($product, $sourceUrl);
+            return;
+        }
 
         $html = (string) $response->getBody();
         $found = $this->extractProductData($html);
@@ -207,6 +219,27 @@ class MonitorCompetitorPrices extends Command
         $note = implode('; ', $notes);
         $this->logCheck($product, $oldPriceForLog, $found['price'], $foundCurrency, $priceApplied, 'success', $note);
         $this->info('  ' . $note);
+    }
+
+    /**
+     * Джерело підтвердило 404 — сторінки товару вже точно не існує
+     * (на відміну від тимчасового збою чи захисту від ботів, де сайт
+     * просто "мовчить" або віддає щось незрозуміле). Це достатньо
+     * надійна ознака, щоб видалити оголошення одразу, без очікування
+     * кількох невдалих спроб поспіль.
+     */
+    protected function handleProductGone(Ad $product, string $sourceUrl): void
+    {
+        $this->warn("Джерело повернуло 404 (сторінку видалено) — видаляю оголошення ID={$product->id} з бази");
+
+        // Логуємо ПЕРЕД видаленням, щоб історія причини лишилась навіть
+        // після того, як сам товар зникне з таблиці ads.
+        $this->logCheck($product, $product->price, null, null, false, 'deleted_404',
+            "Джерело повернуло 404 Not Found ({$sourceUrl}) — оголошення видалено автоматично");
+
+        $this->appendDailyReportStat('products_deleted_404_count', 1);
+
+        $product->delete();
     }
 
     /**
