@@ -13,13 +13,19 @@ class CheckShopEmails extends Command
     /**
      * php artisan shops:check-email
      *
-     * Для кожного магазину із заповненим site_url завантажує головну
-     * сторінку сайту й шукає реальний контактний email (mailto: посилання
+     * Для кожного магазину із заповненим site_url спершу перевіряє, чи
+     * сайт ВЗАГАЛІ відповідає (окремим швидким запитом) — і тільки якщо
+     * так, шукає на ньому реальний контактний email (mailto: посилання
      * в першу чергу, як найнадійніше джерело). Якщо знайдений email
      * відрізняється від того, що вказаний у нас — автоматично оновлює
      * поле email магазину й позначає це в лозі (звідти список магазинів
      * покаже попереджувальну іконку). Якщо збігається — просто фіксує
      * "OK", і список підсвітить email зеленим.
+     *
+     * Домен, що НЕ відповідає взагалі (DNS-помилка, timeout, відмова
+     * з'єднання), логується окремим статусом domain_unreachable —
+     * раніше це виглядало так само, як "сайт живий, email не знайдено",
+     * і їх неможливо було розрізнити в логах.
      */
     protected $signature = 'shops:check-email {--limit=} {--user=}';
 
@@ -88,23 +94,37 @@ class CheckShopEmails extends Command
 
     protected function checkOne(User $shop): void
     {
-        $foundEmail = $this->fetchAndExtract($shop->site_url);
+        // Один запит на головну сторінку вирішує одразу два питання:
+        // "сайт узагалі відповідає?" і "чи є на ній email?" — раніше
+        // це були два окремих запити на ту саму адресу.
+        $homeBody = $this->fetchBody($shop->site_url);
+
+        if ($homeBody === null) {
+            $this->warn('Домен недоступний — сайт не відповідає (DNS-помилка, timeout або відмова з\'єднання)');
+            $this->logCheck($shop->id, $shop->email, null, false, 'domain_unreachable');
+            return;
+        }
+
+        $foundEmail = $this->extractEmail($homeBody);
 
         if (!$foundEmail) {
             $base = rtrim($shop->site_url, '/');
             foreach (self::CONTACT_PATHS as $path) {
-                $foundEmail = $this->fetchAndExtract($base . $path);
-                if ($foundEmail) {
-                    $this->info("  (знайдено на {$path})");
-                    break;
+                $pageBody = $this->fetchBody($base . $path);
+                if ($pageBody !== null) {
+                    $foundEmail = $this->extractEmail($pageBody);
+                    if ($foundEmail) {
+                        $this->info("  (знайдено на {$path})");
+                        break;
+                    }
                 }
                 usleep(200000);
             }
         }
 
         if (!$foundEmail) {
-            $this->warn('Email не знайдено ані на головній, ані на сторінках контактів');
-            $this->logCheck($shop->id, $shop->email, null, false);
+            $this->warn('Сайт живий, але email не знайдено ані на головній, ані на сторінках контактів');
+            $this->logCheck($shop->id, $shop->email, null, false, 'not_found');
             return;
         }
 
@@ -112,7 +132,7 @@ class CheckShopEmails extends Command
 
         if ($matches) {
             $this->info('Email збігається: OK');
-            $this->logCheck($shop->id, $shop->email, $foundEmail, true);
+            $this->logCheck($shop->id, $shop->email, $foundEmail, true, 'ok');
             return;
         }
 
@@ -126,7 +146,7 @@ class CheckShopEmails extends Command
 
         if ($ownedByOther) {
             $this->warn("Знайдений email '{$foundEmail}' уже належить іншому магазину — ігнорую (схоже на спільний технічний email платформи)");
-            $this->logCheck($shop->id, $shop->email, $foundEmail, false);
+            $this->logCheck($shop->id, $shop->email, $foundEmail, false, 'duplicate_ignored');
             return;
         }
 
@@ -135,16 +155,19 @@ class CheckShopEmails extends Command
         $shop->save();
 
         $this->warn("Email оновлено: {$oldEmail} -> {$foundEmail}");
-        $this->logCheck($shop->id, $oldEmail, $foundEmail, false);
+        $this->logCheck($shop->id, $oldEmail, $foundEmail, false, 'updated');
     }
 
     /**
-     * Завантажує сторінку за URL і намагається знайти email. Повертає
-     * null тихо при будь-якій помилці мережі (сторінка контактів може
-     * просто не існувати за цим шляхом — це нормально, не варто зупиняти
-     * весь прогін через 404 на одному з кандидатів).
+     * Завантажує сторінку за URL, повертає тіло відповіді. Будь-яка
+     * HTTP-відповідь (навіть 404/500) означає, що домен резолвиться і
+     * сервер відповідає — тіло повертаємо в будь-якому разі (навіть
+     * сторінка помилки може містити email у спільному футері шаблону).
+     * null повертається ЛИШЕ при справжньому мережевому збої (DNS,
+     * timeout, відмова з'єднання, SSL) — саме це і є ознакою "домен
+     * недоступний" для checkOne().
      */
-    protected function fetchAndExtract(string $url): ?string
+    protected function fetchBody(string $url): ?string
     {
         try {
             $response = $this->http->get($url, [
@@ -156,11 +179,7 @@ class CheckShopEmails extends Command
                 'http_errors' => false,
             ]);
 
-            if ($response->getStatusCode() >= 400) {
-                return null;
-            }
-
-            return $this->extractEmail((string) $response->getBody());
+            return (string) $response->getBody();
         } catch (\Throwable $e) {
             return null;
         }
@@ -234,13 +253,14 @@ class CheckShopEmails extends Command
         return true;
     }
 
-    protected function logCheck(int $userId, ?string $oldEmail, ?string $foundEmail, bool $matched): void
+    protected function logCheck(int $userId, ?string $oldEmail, ?string $foundEmail, bool $matched, string $status): void
     {
         DB::table('shop_email_checks')->insert([
             'user_id' => $userId,
             'old_email' => $oldEmail,
             'found_email' => $foundEmail,
             'matched' => $matched,
+            'status' => $status,
             'checked_at' => now(),
         ]);
     }
