@@ -262,12 +262,16 @@ trait CallsLlm
         $data = json_decode((string) $response->getBody(), true);
         $text = $data['result']['response'] ?? null;
 
-        // Деякі моделі Cloudflare для певних запитів повертають
-        // структурований масив (наприклад, якщо модель вирішила, що
-        // це виклик інструменту) замість простого рядка тексту —
-        // раніше це валило trim() з фатальною помилкою типу.
+        // Деякі моделі Cloudflare для промптів, що просять JSON, іноді
+        // повертають ВЖЕ РОЗПАРСЕНУ структуру (масив/об'єкт) замість
+        // рядка з тим самим текстом JSON. Це не помилка — це та сама
+        // відповідь, просто в іншому "загорнутому" вигляді, тож
+        // перетворюємо назад у рядок, а не відкидаємо як биту.
         if (is_array($text)) {
-            throw new \RuntimeException('Cloudflare Workers AI повернув структуру замість тексту: ' . json_encode($text));
+            if (empty($text)) {
+                throw new \RuntimeException('Cloudflare Workers AI повернув порожню структуру: ' . json_encode($data));
+            }
+            $text = json_encode($text, JSON_UNESCAPED_UNICODE);
         }
 
         if ($text === null || !is_string($text) || trim($text) === '') {
@@ -319,6 +323,12 @@ trait CallsLlm
     // -----------------------------------------------------------------
     // 6. NVIDIA NIM — OpenAI-сумісний формат. Безкоштовний рівень:
     // 40 запитів/хв, потрібна верифікація телефону (без картки).
+    // Каталог моделей ДУЖЕ нестабільний — моделі регулярно знімають з
+    // підтримки (410 Gone, як сталось із llama-3.3-70b-instruct).
+    // meta/llama-3.1-70b-instruct — стабільна модель, що досі активна
+    // за багатьма незалежними свіжими джерелами. Якщо і вона колись
+    // "піде на пенсію" — актуальний список: build.nvidia.com/models
+    // (фільтр Free Endpoint), або NVIDIA_MODEL в .env перекриє дефолт.
     // -----------------------------------------------------------------
 
     protected function callNvidiaNim(string $prompt, int $maxTokens = 4000): string
@@ -328,7 +338,7 @@ trait CallsLlm
             throw new \RuntimeException('NVIDIA_API_KEY не задано в .env');
         }
 
-        $model = env('NVIDIA_MODEL', 'meta/llama-3.3-70b-instruct');
+        $model = env('NVIDIA_MODEL', 'meta/llama-3.1-70b-instruct');
         $baseUrl = env('NVIDIA_BASE_URL', 'https://integrate.api.nvidia.com/v1');
 
         $response = $this->http->post(rtrim($baseUrl, '/') . '/chat/completions', [
@@ -356,10 +366,11 @@ trait CallsLlm
 
     // -----------------------------------------------------------------
     // 7. Cerebras — OpenAI-сумісний формат, дуже швидка інференція.
-    // УВАГА: за різними джерелами вимоги до безкоштовного рівня
-    // суперечливі (десь без картки, десь уже вимагають прив'язати) —
-    // перевірте актуальні умови на cloud.cerebras.ai перед розрахунком
-    // на цей провайдер.
+    // llama-3.3-70b існує як модель, але на безкоштовному рівні акаунту
+    // може бути недоступна (404 "no access") — llama3.1-8b гарантовано
+    // входить у безкоштовний рівень практично завжди. Повний список
+    // того, що реально доступно САМЕ вашому ключу:
+    // curl https://api.cerebras.ai/v1/models -H "Authorization: Bearer $CEREBRAS_API_KEY"
     // -----------------------------------------------------------------
 
     protected function callCerebras(string $prompt, int $maxTokens = 4000): string
@@ -369,7 +380,7 @@ trait CallsLlm
             throw new \RuntimeException('CEREBRAS_API_KEY не задано в .env');
         }
 
-        $model = env('CEREBRAS_MODEL', 'llama-3.3-70b');
+        $model = env('CEREBRAS_MODEL', 'llama3.1-8b');
         $baseUrl = env('CEREBRAS_BASE_URL', 'https://api.cerebras.ai/v1');
 
         $response = $this->http->post(rtrim($baseUrl, '/') . '/chat/completions', [
