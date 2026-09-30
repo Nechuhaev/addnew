@@ -54,7 +54,7 @@ class MonitorCompetitorPrices extends Command
         $limit = (int) ($this->option('limit') ?: env('PRICE_MONITOR_PER_RUN', 30));
         $shopId = $this->option('shop');
 
-        $query = Ad::where('is_product', 1)
+        $baseQuery = Ad::where('is_product', 1)
             ->where('status', 1) // тільки активні оголошення — призупинені й архівні
             // не показуються покупцям, моніторити їх немає сенсу
             ->where(function ($q) {
@@ -67,16 +67,47 @@ class MonitorCompetitorPrices extends Command
         if ($shopId) {
             // Ручна перевірка ОДНОГО магазину — беремо всі його товари,
             // ігноруючи чергу "давно не перевірені" (яка застосовується
-            // тільки для загального автоматичного прогону).
-            $query->where('user_id', $shopId);
+            // тільки для загального автоматичного прогону), і НЕ
+            // фільтруємо захищені домени — якщо власник просить
+            // перевірити конкретний магазин, хай побачить актуальний
+            // статус, а не тиху відсутність результату.
+            $baseQuery->where('user_id', $shopId);
             $this->info("Перевіряю магазин ID={$shopId} (усі товари з посиланням, без ліміту черги)");
-        } else {
-            $query->orderByRaw('(SELECT MAX(checked_at) FROM product_price_checks WHERE product_price_checks.ad_id = ads.id) IS NOT NULL')
-                ->orderByRaw('(SELECT MAX(checked_at) FROM product_price_checks WHERE product_price_checks.ad_id = ads.id) ASC')
-                ->limit($limit);
-        }
 
-        $products = $query->get();
+            $products = $baseQuery->get();
+        } else {
+            // ВАЖЛИВО: беремо кандидатів БІЛЬШЕ, ніж --limit, і одразу
+            // відсіюємо товари із заздалегідь відомих захищених доменів
+            // (SkippedDomain) — ДО того, як застосовується ліміт. Раніше
+            // такі товари все одно потрапляли у вибірку, "з'їдали" слоти
+            // ліміту на очевидний skip і нічого корисного не перевіряли.
+            // Тепер --limit=30 означає "30 РЕАЛЬНИХ спроб перевірки",
+            // а не "30 товарів, частина з яких завідомо буде пропущена".
+            $candidatePoolSize = min($limit * 5, 500);
+
+            $candidates = $baseQuery
+                ->orderByRaw('(SELECT MAX(checked_at) FROM product_price_checks WHERE product_price_checks.ad_id = ads.id) IS NOT NULL')
+                ->orderByRaw('(SELECT MAX(checked_at) FROM product_price_checks WHERE product_price_checks.ad_id = ads.id) ASC')
+                ->limit($candidatePoolSize)
+                ->get();
+
+            $skippedDomainCount = 0;
+            $products = $candidates->filter(function ($product) use (&$skippedDomainCount) {
+                $sourceUrl = $product->competitor_url ?: $product->getOriginal('url');
+                if (empty($sourceUrl)) {
+                    return false;
+                }
+                if ($this->isSkippedDomain($sourceUrl)) {
+                    $skippedDomainCount++;
+                    return false;
+                }
+                return true;
+            })->take($limit)->values();
+
+            if ($skippedDomainCount > 0) {
+                $this->info("Відфільтровано {$skippedDomainCount} товар(ів) із заздалегідь відомих захищених доменів (не витрачено на них ліміт перевірок)");
+            }
+        }
 
         if ($products->isEmpty()) {
             $this->info('Немає товарів з посиланням для перевірки.');
@@ -95,7 +126,10 @@ class MonitorCompetitorPrices extends Command
                 continue;
             }
 
-            if ($this->isSkippedDomain($sourceUrl)) {
+            // Для ручної перевірки конкретного магазину (--shop) список
+            // не фільтрувався заздалегідь — перевіряємо тут, щоб не
+            // ламати повідомлення про статус для власника магазину.
+            if ($shopId && $this->isSkippedDomain($sourceUrl)) {
                 $this->info('[' . ($i + 1) . '/' . $products->count() . "] ID={$product->id}: пропущено (захищений від ботів домен)");
                 continue;
             }
@@ -334,6 +368,61 @@ class MonitorCompetitorPrices extends Command
             $this->logCheck($product, null, null, null, false, 'auto_suspended',
                 "Оголошення автоматично призупинено після {$threshold} невдалих спроб підряд отримати корисні дані з джерела ({$source})");
             $this->warn("Оголошення ID={$product->id} автоматично ПРИЗУПИНЕНО (джерело недоступне/порожнє {$threshold} рази підряд)");
+
+            $host = parse_url($source, PHP_URL_HOST);
+            if ($host) {
+                $this->maybeAutoSkipDomain($host);
+            }
+        }
+    }
+
+    /**
+     * Якщо кілька РІЗНИХ товарів з одного домену незалежно один від
+     * одного дійшли до auto_suspended — це вже не збіг для конкретного
+     * товару, а ознака, що ввесь домен захищений від ботів (403,
+     * CAPTCHA, Cloudflare-виклик тощо). Автоматично додаємо домен у
+     * "Виключені домени", щоб майбутні прогони більше не витрачали на
+     * нього ліміт перевірок — так само, як домени, додані вручну.
+     */
+    protected function maybeAutoSkipDomain(string $host): void
+    {
+        if (in_array($host, \App\SkippedDomain::list(), true)) {
+            return; // вже в списку
+        }
+
+        $threshold = (int) env('DOMAIN_AUTO_SKIP_AFTER_ADS', 2);
+
+        // Тільки вже призупинені товари з посиланням, що містить цей
+        // хост — набагато вужча (і дешевша) вибірка, ніж перебирати всі
+        // активні товари.
+        $suspendedAdIds = Ad::where('is_product', 1)
+            ->where('status', 0)
+            ->where(function ($q) use ($host) {
+                $q->where('competitor_url', 'LIKE', "%{$host}%")
+                  ->orWhere('url', 'LIKE', "%{$host}%");
+            })
+            ->pluck('id');
+
+        if ($suspendedAdIds->count() < $threshold) {
+            return;
+        }
+
+        $autoSuspendedCount = 0;
+        foreach ($suspendedAdIds as $adId) {
+            $lastCheck = ProductPriceCheck::where('ad_id', $adId)
+                ->orderByDesc('checked_at')
+                ->first();
+            if ($lastCheck && $lastCheck->status === 'auto_suspended') {
+                $autoSuspendedCount++;
+            }
+        }
+
+        if ($autoSuspendedCount >= $threshold) {
+            \App\SkippedDomain::firstOrCreate(
+                ['domain' => $host],
+                ['note' => "Автоматично додано: {$autoSuspendedCount} товар(ів) із цього домену незалежно призупинились через недоступність джерела (products:monitor-prices, " . now()->toDateString() . ')']
+            );
+            $this->warn("Домен {$host} автоматично додано до \"Виключених доменів\" — {$autoSuspendedCount} товар(ів) підряд не вдалось перевірити.");
         }
     }
 
