@@ -109,12 +109,27 @@ class RefreshArticle extends Command
             }
         }
 
+        $ukExcerpt = $refreshed['excerpt'] ?? $article->getOriginal('excerpt_uk') ?? $article->getOriginal('excerpt');
+        $ukMetaTitle = $refreshed['meta_title'] ?? $article->getOriginal('meta_title_uk') ?? $article->getOriginal('meta_title');
+        $ukMetaDescription = $refreshed['meta_description'] ?? $article->getOriginal('meta_description_uk') ?? $article->getOriginal('meta_description');
+
+        try {
+            $ru = $this->translateToRussian($article->getOriginal('name_uk') ?: $article->getOriginal('name'), $ukExcerpt, $newContentHtml, $ukMetaTitle, $ukMetaDescription);
+        } catch (\Throwable $e) {
+            $this->warn('Не вдалося перекласти оновлений текст на російську: ' . $e->getMessage() . ' — сирі колонки лишаться з попереднім текстом.');
+            $ru = null;
+        }
+
         $article->update([
             // name/slug свідомо НЕ чіпаємо — щоб не зламати існуючий URL і SEO-вагу.
-            'excerpt' => $refreshed['excerpt'] ?? $article->excerpt,
-            'content' => $newContentHtml,
-            'meta_title' => $refreshed['meta_title'] ?? $article->meta_title,
-            'meta_description' => $refreshed['meta_description'] ?? $article->meta_description,
+            'excerpt' => $ru['excerpt'] ?? $article->getOriginal('excerpt'),
+            'excerpt_uk' => $ukExcerpt,
+            'content' => $ru['content'] ?? $article->getOriginal('content'),
+            'content_uk' => $newContentHtml,
+            'meta_title' => $ru['meta_title'] ?? $article->getOriginal('meta_title'),
+            'meta_title_uk' => $ukMetaTitle,
+            'meta_description' => $ru['meta_description'] ?? $article->getOriginal('meta_description'),
+            'meta_description_uk' => $ukMetaDescription,
             'focus_keyword' => $refreshed['focus_keyword'] ?? $article->focus_keyword,
             'tags' => $refreshed['tags'] ?? $article->tags,
         ]);
@@ -142,6 +157,112 @@ class RefreshArticle extends Command
             throw new \RuntimeException('У відповіді моделі не знайдено JSON-об\'єкт');
         }
         return substr($text, $start, $end - $start + 1);
+    }
+
+    /**
+     * Перекладає оновлений українською текст на російську — для сирих
+     * колонок (name/content/excerpt/meta_*), які за мовною архітектурою
+     * сайту мають бути саме російською. Ідентично PublishArticle::translateToRussian().
+     */
+    protected function translateToRussian(string $name, string $excerpt, string $contentHtml, string $metaTitle, string $metaDescription): array
+    {
+        $prompt = $this->prompt(
+            'article_translate_to_russian',
+            'Переклад щойно опублікованої статті на російську',
+            "Ти — професійний перекладач і редактор блогу. Переклади наступну статтю "
+                . "на російську мову. Це має бути якісний, природний текст рідною мовою — "
+                . "не дослівний переклад слово-в-слово, а гарний редакторський переклад, що зберігає "
+                . "сенс, тон і структуру оригіналу. Зберігай усі HTML-теги (<h2>, <p>, <ul>, <li>, "
+                . "<a href=\"...\">, <figure>, <img> тощо) БЕЗ ЗМІН, перекладай тільки текстовий "
+                . "вміст усередині тегів. Посилання (href) НЕ чіпай.\n\n"
+                . "КРИТИЧНО ВАЖЛИВО ДЛЯ ФОРМАТУ: у полі content використовуй ОДИНАРНІ лапки для "
+                . "HTML-атрибутів (напр. <a href='...' class='...'>, НЕ <a href=\"...\">). Це "
+                . "обов'язково, бо подвійні лапки в HTML конфліктують із подвійними лапками, якими "
+                . "обрамлений сам JSON-рядок, і ламають структуру відповіді.\n\n"
+                . "ЩЕ ОДНЕ КРИТИЧНО ВАЖЛИВЕ ПРАВИЛО: НІКОЛИ не використовуй символ \" (подвійні лапки) "
+                . "усередині тексту статті для ЖОДНОЇ мети — ні для позначення дюймів, ні для цитат "
+                . "(використовуй лапки-ялинки « » замість прямих \"). Кожен буквальний символ \" "
+                . "усередині JSON-рядка ламає всю відповідь, тому НАДІЙНІШЕ просто ніколи його не "
+                . "використовувати в тексті статті, ніж покладатись на екранування.\n\n"
+                . "Назва: \"{{name}}\"\n\n"
+                . "Короткий опис: \"{{excerpt}}\"\n\n"
+                . "Meta title: \"{{meta_title}}\"\n\n"
+                . "Meta description: \"{{meta_description}}\"\n\n"
+                . "Контент:\n{{content}}\n\n"
+                . "Відповідь — ТІЛЬКИ валідний JSON-об'єкт без markdown-обрамлення, формату:\n"
+                . "{\"name\": \"...\", \"excerpt\": \"...\", \"meta_title\": \"...\", "
+                . "\"meta_description\": \"...\", \"content\": \"...\"}",
+            [
+                'name' => $name,
+                'excerpt' => $excerpt,
+                'meta_title' => $metaTitle,
+                'meta_description' => $metaDescription,
+                'content' => $contentHtml,
+            ],
+            'Перекладає щойно згенеровану українську статтю на російську одразу після публікації (для сирих колонок).'
+        );
+
+        $raw = $this->callLlm($prompt, 8000, $this->validatesAsJsonObject());
+        $raw = $this->sanitizeJsonControlChars($raw);
+        $json = $this->extractJsonObject($raw);
+        $data = json_decode($json, true);
+
+        if (!is_array($data)) {
+            throw new \RuntimeException('Не вдалося розпарсити JSON перекладу на російську');
+        }
+
+        return $data;
+    }
+
+    /**
+     * Захисне "ремонтування" JSON — ідентично PublishArticle::sanitizeJsonControlChars().
+     */
+    protected function sanitizeJsonControlChars(string $text): string
+    {
+        $result = '';
+        $inString = false;
+        $escaped = false;
+        $len = strlen($text);
+
+        for ($i = 0; $i < $len; $i++) {
+            $ch = $text[$i];
+            $ord = ord($ch);
+
+            if ($inString) {
+                if ($escaped) {
+                    $result .= $ch;
+                    $escaped = false;
+                    continue;
+                }
+                if ($ch === '\\') {
+                    $result .= $ch;
+                    $escaped = true;
+                    continue;
+                }
+                if ($ch === '"') {
+                    $inString = false;
+                    $result .= $ch;
+                    continue;
+                }
+                if ($ord < 0x20) {
+                    switch ($ch) {
+                        case "\n": $result .= '\\n'; break;
+                        case "\r": $result .= '\\r'; break;
+                        case "\t": $result .= '\\t'; break;
+                        default:   $result .= sprintf('\\u%04x', $ord);
+                    }
+                    continue;
+                }
+                $result .= $ch;
+            } else {
+                if ($ch === '"') {
+                    $inString = true;
+                }
+                $result .= $ch;
+            }
+        }
+
+        return $result;
     }
 
     protected function generateRefreshedContent(Article $article, string $oldContentHtml, $recentArticles): array
