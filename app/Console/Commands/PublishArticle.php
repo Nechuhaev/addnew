@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Article;
 use App\Console\Commands\Concerns\CallsLlm;
+use App\Console\Commands\Concerns\TranslatesViaDeepL;
 use App\Console\Commands\Concerns\UpdatesDailyReport;
 use App\Console\Commands\Concerns\FetchesImages;
 use App\Console\Commands\Concerns\UsesPromptTemplates;
@@ -15,6 +16,7 @@ use Illuminate\Support\Str;
 class PublishArticle extends Command
 {
     use CallsLlm;
+    use TranslatesViaDeepL;
     use UpdatesDailyReport;
     use UsesPromptTemplates;
     use FetchesImages;
@@ -148,17 +150,34 @@ class PublishArticle extends Command
         // --- Переклад на російську ---
         // Стаття генерується УКРАЇНСЬКОЮ (ARTICLE_LANGUAGE) і йде в _uk-колонки
         // (так влаштована мовна система сайту: сирі колонки = російська,
-        // _uk = українська). Переклад — одразу тут, ще один виклик LLM.
+        // _uk = українська). Спершу пробуємо DeepL (дешевше й надійніше
+        // для цієї пари мов — без ризику битого JSON чи обрізання токенів),
+        // і лише якщо він недоступний — падаємо на переклад через LLM.
         $ukTitle = $article['title'];
         $ukExcerpt = $article['excerpt'];
         $ukMetaTitle = $article['meta_title'] ?? $article['title'];
         $ukMetaDescription = $article['meta_description'] ?? $article['excerpt'];
 
+        $ru = null;
         try {
-            $ru = $this->translateToRussian($ukTitle, $ukExcerpt, $contentHtml, $ukMetaTitle, $ukMetaDescription);
+            [$ruName, $ruExcerpt, $ruContent, $ruMetaTitle, $ruMetaDescription] = $this->translateViaDeepL(
+                [$ukTitle, $ukExcerpt, $contentHtml, $ukMetaTitle, $ukMetaDescription]
+            );
+            $ru = [
+                'name' => $ruName,
+                'excerpt' => $ruExcerpt,
+                'content' => $ruContent,
+                'meta_title' => $ruMetaTitle,
+                'meta_description' => $ruMetaDescription,
+            ];
         } catch (\Throwable $e) {
-            $this->warn('Не вдалося перекласти статтю на російську: ' . $e->getMessage() . ' — стаття буде опублікована БЕЗ російської версії (сирі колонки лишаться порожніми).');
-            $ru = null;
+            $this->warn('DeepL недоступний (' . $e->getMessage() . '), пробую переклад через LLM...');
+            try {
+                $ru = $this->translateToRussian($ukTitle, $ukExcerpt, $contentHtml, $ukMetaTitle, $ukMetaDescription);
+            } catch (\Throwable $e2) {
+                $this->warn('Не вдалося перекласти статтю на російську жодним способом: ' . $e2->getMessage() . ' — стаття буде опублікована БЕЗ російської версії (сирі колонки лишаться порожніми).');
+                $ru = null;
+            }
         }
 
         // slug — ЗАВЖДИ з українського заголовка (історичний стиль URL усіх
