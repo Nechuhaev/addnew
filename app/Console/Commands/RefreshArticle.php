@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Article;
 use App\Console\Commands\Concerns\CallsLlm;
+use App\Console\Commands\Concerns\TranslatesViaDeepL;
 use App\Console\Commands\Concerns\UpdatesDailyReport;
 use App\Console\Commands\Concerns\UsesPromptTemplates;
 use GuzzleHttp\Client;
@@ -14,6 +15,7 @@ use Illuminate\Support\Str;
 class RefreshArticle extends Command
 {
     use CallsLlm;
+    use TranslatesViaDeepL;
     use UpdatesDailyReport;
     use UsesPromptTemplates;
 
@@ -113,11 +115,28 @@ class RefreshArticle extends Command
         $ukMetaTitle = $refreshed['meta_title'] ?? $article->getOriginal('meta_title_uk') ?? $article->getOriginal('meta_title');
         $ukMetaDescription = $refreshed['meta_description'] ?? $article->getOriginal('meta_description_uk') ?? $article->getOriginal('meta_description');
 
+        $ukName = $article->getOriginal('name_uk') ?: $article->getOriginal('name');
+
+        $ru = null;
         try {
-            $ru = $this->translateToRussian($article->getOriginal('name_uk') ?: $article->getOriginal('name'), $ukExcerpt, $newContentHtml, $ukMetaTitle, $ukMetaDescription);
+            [$ruName, $ruExcerpt, $ruContent, $ruMetaTitle, $ruMetaDescription] = $this->translateViaDeepL(
+                [$ukName, $ukExcerpt, $newContentHtml, $ukMetaTitle, $ukMetaDescription]
+            );
+            $ru = [
+                'name' => $ruName,
+                'excerpt' => $ruExcerpt,
+                'content' => $ruContent,
+                'meta_title' => $ruMetaTitle,
+                'meta_description' => $ruMetaDescription,
+            ];
         } catch (\Throwable $e) {
-            $this->warn('Не вдалося перекласти оновлений текст на російську: ' . $e->getMessage() . ' — сирі колонки лишаться з попереднім текстом.');
-            $ru = null;
+            $this->warn('DeepL недоступний (' . $e->getMessage() . '), пробую переклад через LLM...');
+            try {
+                $ru = $this->translateToRussian($ukName, $ukExcerpt, $newContentHtml, $ukMetaTitle, $ukMetaDescription);
+            } catch (\Throwable $e2) {
+                $this->warn('Не вдалося перекласти оновлений текст на російську жодним способом: ' . $e2->getMessage() . ' — сирі колонки лишаться з попереднім текстом.');
+                $ru = null;
+            }
         }
 
         $article->update([
