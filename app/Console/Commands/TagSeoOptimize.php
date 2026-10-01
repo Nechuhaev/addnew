@@ -149,7 +149,7 @@ class TagSeoOptimize extends Command
             'Генерує унікальний meta_title/meta_description/SEO-текст для сторінки конкретного тега (мітки) оголошень.'
         );
 
-        $raw = $this->callLlm($prompt, 1000, $this->validatesAsJsonObject());
+        $raw = $this->callLlm($prompt, 2000, $this->validatesAsJsonObject());
         $json = $this->extractJsonObject($raw);
         $data = json_decode($json, true);
 
