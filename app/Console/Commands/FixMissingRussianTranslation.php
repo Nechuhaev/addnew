@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Article;
 use App\Console\Commands\Concerns\CallsLlm;
+use App\Console\Commands\Concerns\TranslatesViaDeepL;
 use App\Console\Commands\Concerns\UsesPromptTemplates;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
@@ -11,6 +12,7 @@ use Illuminate\Console\Command;
 class FixMissingRussianTranslation extends Command
 {
     use CallsLlm;
+    use TranslatesViaDeepL;
     use UsesPromptTemplates;
 
     /**
@@ -94,7 +96,22 @@ class FixMissingRussianTranslation extends Command
         $ukMetaTitle = $article->getOriginal('meta_title') ?? $ukName;
         $ukMetaDescription = $article->getOriginal('meta_description') ?? '';
 
-        $ru = $this->translateToRussian($ukName, $ukExcerpt, $ukContent, $ukMetaTitle, $ukMetaDescription);
+        $ru = null;
+        try {
+            [$ruName, $ruExcerpt, $ruContent, $ruMetaTitle, $ruMetaDescription] = $this->translateViaDeepL(
+                [$ukName, $ukExcerpt, $ukContent, $ukMetaTitle, $ukMetaDescription]
+            );
+            $ru = [
+                'name' => $ruName,
+                'excerpt' => $ruExcerpt,
+                'content' => $ruContent,
+                'meta_title' => $ruMetaTitle,
+                'meta_description' => $ruMetaDescription,
+            ];
+        } catch (\Throwable $e) {
+            $this->warn('  DeepL недоступний (' . $e->getMessage() . '), пробую переклад через LLM...');
+            $ru = $this->translateToRussian($ukName, $ukExcerpt, $ukContent, $ukMetaTitle, $ukMetaDescription);
+        }
 
         $article->update([
             // slug/URL свідомо НЕ чіпаємо.
