@@ -21,6 +21,14 @@
             {{ Breadcrumbs::render($breadcrumbs, $entity) }}
 
             <p style="font-size: 20px;font-weight: 900;">{{ __('front.all_ads_by_user') }} {{ $entity->username }}</p>
+            @auth
+                @if(auth()->id() != $entity->id)
+                    <form action="{{ route('chat.start', $entity->id) }}" method="POST" style="display:inline-block; margin-bottom:10px;">
+                        @csrf
+                        <button type="submit" class="btn btn-success">Написати продавцю</button>
+                    </form>
+                @endif
+            @endauth
             
 
             <div class="author" style="display:flex; flex-wrap:wrap; gap: 20px; align-items:flex-start;">

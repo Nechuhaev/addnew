@@ -199,6 +199,10 @@
                 <div class="header-account">
                     @if(Auth::check())
                         <span class="header-welcome">{!! __('front.welcome_user', ['email' => e(Auth::user()->email)]) !!}</span>
+                        <a href="{{ route('chat.index') }}" rel="nofollow" class="header-link link-register" style="position:relative;">
+                            Повідомлення
+                            <span id="chat-unread-badge" style="display:none; background:#e74c3c; color:#fff; border-radius:10px; font-size:11px; font-weight:700; padding:1px 6px; margin-left:4px; vertical-align:top;"></span>
+                        </a>
                         @if(Auth::user()->is_shop_owner)
                             <a href="{{ route('profile.shop.dashboard') }}" rel="nofollow" class="header-link link-register">{{ __('front.my_shop') }}</a>
                         @else
@@ -297,5 +301,30 @@
 
 @yield('script')
 
+@auth
+<script>
+(function () {
+    var badge = document.getElementById('chat-unread-badge');
+    if (!badge) return;
+
+    function updateUnread() {
+        fetch('{{ route('chat.unread') }}', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                if (data.count > 0) {
+                    badge.textContent = data.count;
+                    badge.style.display = 'inline-block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            })
+            .catch(function () {});
+    }
+
+    updateUnread();
+    setInterval(updateUnread, 15000);
+})();
+</script>
+@endauth
 </body>
 </html>
