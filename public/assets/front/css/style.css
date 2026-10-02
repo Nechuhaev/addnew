@@ -5483,3 +5483,16 @@ li.active {
         opacity: 1;
     }
 }
+/* Варіант show-more лише для мобільної версії (напр. "Описание" магазину) —
+   на десктопі показує повний текст без обмеження висоти й без кнопки. */
+@media (min-width: 769px) {
+    .show-more--desktop-full {
+        height: auto !important;
+        overflow: visible !important;
+        padding-bottom: 0 !important;
+    }
+    .show-more--desktop-full .show-more__shadow,
+    .show-more--desktop-full .show-more__btn {
+        display: none !important;
+    }
+}

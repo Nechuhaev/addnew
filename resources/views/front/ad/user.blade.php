@@ -21,20 +21,32 @@
             {{ Breadcrumbs::render($breadcrumbs, $entity) }}
 
             <p style="font-size: 20px;font-weight: 900;">Все объявления пользователя {{ $entity->username }}</p>
-            @if($is_shop && $emailVerified)
-                <p><span style="display:inline-block; background-color:#28a745; color:#ffffff; font-weight:700; font-size:15px; padding:8px 16px; border-radius:6px;" title="Email магазину підтверджено звіркою з офіційним сайтом">&#10003; Email підтверджено</span></p>
-            @endif
+            
 
             <div class="author" style="display:flex; flex-wrap:wrap; gap: 20px; align-items:flex-start;">
                 <div class="author-photo"><img alt="Пользователь {{ $entity->username }}" src="{{ $entity->image ?? asset('assets/front/img/placeholder.png') }}" class="author-avatar" height="250" width="250"></div>
                 <div class="author-details" style="flex: 1 1 250px; min-width: 250px;">
                     @if($is_shop)
                         <div class="author-info"><strong>Количество предложений: </strong> {{ $entity->ads()->count() }}</div>
+                        <div class="author-info">
+                            <strong>Рейтинг:</strong>
+                            @if($avgRating)
+                                <span style="color:#f5a623;">{{ str_repeat('★', round($avgRating)) }}{{ str_repeat('☆', 5 - round($avgRating)) }}</span>
+                                {{ $avgRating }} / 5 ({{ $reviews->count() }} {{ $reviews->count() == 1 ? 'відгук' : 'відгуків' }})
+                            @else
+                                <span style="color:#888;">немає відгуків</span>
+                            @endif
+                        </div>
                         @if($entity->telephone)
                         <div class="author-info"><strong>Телефон: </strong> {{ $entity->telephone }}</div>
                         @endif
                         @if($entity->email)
-                            <div class="author-info"><strong>Email :</strong> {{ $entity->email }}</div>
+                            <div class="author-info">
+                                <strong>Email :</strong> {{ $entity->email }}
+                                @if($emailVerified)
+                                    <span style="display:inline-block; background-color:#28a745; color:#fff; font-weight:700; font-size:12px; padding:3px 10px; border-radius:4px; margin-left:8px; vertical-align:middle; white-space:nowrap;">&#10003; Підтверджено</span>
+                                @endif
+                            </div>
                         @endif
                         @if($entity->site_url)
                             <div class="author-info"><strong>Сайт: </strong> {{ $entity->site_url }}</div>
@@ -47,7 +59,13 @@
                     @if ($entity->info)
                         <div class="author-description">
                             <h3>Описание</h3>
-                            <p>{{ $entity->info }}</p>
+                            <div class="show-more show-more--desktop-full">
+                                <section class="show-more__text">
+                                    <p>{{ $entity->info }}</p>
+                                </section>
+                                <div class="show-more__shadow"></div>
+                                <span class="show-more__btn btn-show">Показать</span>
+                            </div>
                         </div>
                     @endif
                 </div>
@@ -79,6 +97,61 @@
                     </div>
 
                     @include('front.loop.ads', ['ads' => $ads])
+
+                    @if($is_shop)
+                        <div style="margin: 25px 0; padding: 20px; background:#f9f9f9; border-radius:8px; box-sizing:border-box;">
+                            <h3 style="margin-top:0;">Рейтинг магазину</h3>
+                            @if($avgRating)
+                                <div style="font-size:22px; color:#f5a623; font-weight:700; margin-bottom:5px;">
+                                    {{ str_repeat('★', round($avgRating)) }}{{ str_repeat('☆', 5 - round($avgRating)) }}
+                                    <span style="font-size:16px; color:#555; font-weight:400;">{{ $avgRating }} / 5 ({{ $reviews->count() }} {{ $reviews->count() == 1 ? 'відгук' : 'відгуків' }})</span>
+                                </div>
+                            @else
+                                <p style="color:#888; margin-bottom:0;">Поки що немає відгуків</p>
+                            @endif
+
+                            @auth
+                                @if(auth()->id() != $entity->id)
+                                    <div style="margin-top:20px; padding:15px; background:#fff; border:1px solid #e0e0e0; border-radius:6px; box-sizing:border-box;">
+                                        <strong>{{ $myReview ? 'Змінити ваш відгук' : 'Залишити відгук' }}</strong>
+                                        <form action="{{ route('shop.review.store', $entity->id) }}" method="POST" style="margin-top:12px;">
+                                            @csrf
+                                            <div style="margin-bottom:12px;">
+                                                <select name="rating" class="form-control" required style="width:100%; max-width:220px; box-sizing:border-box;">
+                                                    <option value="">Оцінка</option>
+                                                    @for($i = 5; $i >= 1; $i--)
+                                                        <option value="{{ $i }}" {{ optional($myReview)->rating == $i ? 'selected' : '' }}>{{ $i }} {{ $i == 1 ? 'зірка' : ($i < 5 ? 'зірки' : 'зірок') }}</option>
+                                                    @endfor
+                                                </select>
+                                            </div>
+                                            <textarea name="comment" rows="3" class="form-control" placeholder="Коментар (необов'язково)" style="width:100%; box-sizing:border-box; margin-bottom:12px;">{{ old('comment', optional($myReview)->comment) }}</textarea>
+                                            <button type="submit" class="btn btn-success" style="width:100%; max-width:220px;">{{ $myReview ? 'Оновити відгук' : 'Надіслати відгук' }}</button>
+                                        </form>
+                                    </div>
+                                @endif
+                            @else
+                                <p style="margin-top:15px; margin-bottom:0;"><a href="{{ route('login') }}">Увійдіть</a>, щоб залишити відгук.</p>
+                            @endauth
+
+                            @if($reviews->isNotEmpty())
+                                <div style="margin-top:25px;">
+                                    <h4>Відгуки ({{ $reviews->count() }})</h4>
+                                    @foreach($reviews as $review)
+                                        <div style="border-bottom:1px solid #e5e5e5; padding:12px 0;">
+                                            <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px;">
+                                                <strong>{{ optional($review->reviewer)->username ?? 'Користувач' }}</strong>
+                                                <span style="color:#f5a623;">{{ str_repeat('★', $review->rating) }}{{ str_repeat('☆', 5 - $review->rating) }}</span>
+                                                <span style="color:#999; font-size:13px;">{{ $review->created_at->format('d.m.Y') }}</span>
+                                            </div>
+                                            @if($review->comment)
+                                                <p style="margin:8px 0 0; word-break:break-word;">{{ $review->comment }}</p>
+                                            @endif
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </div>
+                    @endif
 
                     {!!  $links  !!}
 
