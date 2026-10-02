@@ -36,11 +36,15 @@ class CategoryController extends Controller
 
         $page_title = 'Добавить новую категорию';
         $default['meta_title'] = old('meta_title');
+        $default['meta_title_uk'] = old('meta_title_uk');
         $default['meta_description'] = old('meta_description');
+        $default['meta_description_uk'] = old('meta_description_uk');
         $default['sort_order'] = old('sort_order');
         $default['name'] = old('name');
+        $default['name_uk'] = old('name_uk');
         $default['slug'] = old('slug');
         $default['content'] = old('content');
+        $default['content_uk'] = old('content_uk');
 
 
         $action = route('admin.article.category.create');
@@ -57,6 +61,12 @@ class CategoryController extends Controller
     /**
      * Display form with article category information
      *
+     * ВАЖЛИВО: тут навмисно getOriginal(), а НЕ звичайний аксесор
+     * ($category->name) — аксесор локале-залежний (поверне _uk версію,
+     * якщо поточна локаль адмінки 'uk'), і форма редагування показала б
+     * (і при збереженні переписала б) українським текстом замість
+     * російського сирого поля.
+     *
      * @param Request $request
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
@@ -64,13 +74,17 @@ class CategoryController extends Controller
 
         $category = ArticleCategory::where('id', (int)$request->id)->first();
 
-        $page_title = $category->name;
-        $default['meta_title'] = $category->meta_title;
-        $default['meta_description'] = $category->meta_description;
+        $page_title = $category->getOriginal('name');
+        $default['meta_title'] = $category->getOriginal('meta_title');
+        $default['meta_title_uk'] = $category->getOriginal('meta_title_uk');
+        $default['meta_description'] = $category->getOriginal('meta_description');
+        $default['meta_description_uk'] = $category->getOriginal('meta_description_uk');
         $default['sort_order'] = $category->sort_order;
-        $default['name'] = $category->name;
+        $default['name'] = $category->getOriginal('name');
+        $default['name_uk'] = $category->getOriginal('name_uk');
         $default['slug'] = $category->slug;
-        $default['content'] = $category->content;
+        $default['content'] = $category->getOriginal('content');
+        $default['content_uk'] = $category->getOriginal('content_uk');
 
         $action = route('admin.article.category.update', $category->id);
 
@@ -105,11 +119,15 @@ class CategoryController extends Controller
 
         if ($category) {
             $category->meta_title = $request->get('meta_title');
+            $category->meta_title_uk = $request->get('meta_title_uk');
             $category->meta_description = $request->get('meta_description');
+            $category->meta_description_uk = $request->get('meta_description_uk');
             $category->sort_order = $request->get('sort_order');
             $category->name = $request->get('name');
+            $category->name_uk = $request->get('name_uk');
             $category->slug = $request->get('slug');
             $category->content = $request->get('content');
+            $category->content_uk = $request->get('content_uk');
 
             $category->save();
 
