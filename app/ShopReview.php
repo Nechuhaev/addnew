@@ -11,6 +11,7 @@ class ShopReview extends Model
         'reviewer_user_id',
         'rating',
         'comment',
+        'ip_address',
     ];
 
     public function shop()
