@@ -3,7 +3,7 @@
     <div class="page-breadcrumb">
         <div class="row">
             <div class="col-5 align-self-center">
-                <h4 class="page-title">Діалог: {{ $shop->username }} &harr; {{ optional($conversation->buyer)->username ?? 'видалений акаунт' }}</h4>
+                <h4 class="page-title">Чат: {{ $shop->username }}</h4>
             </div>
         </div>
     </div>
@@ -13,24 +13,52 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <a href="{{ route('admin.shops.messages', $shop->id) }}" class="btn btn-sm btn-secondary mb-3">&larr; До списку діалогів</a>
+                    <a href="{{ route('admin.shops.edit', $shop->id) }}" class="btn btn-sm btn-secondary mb-3">&larr; До магазину</a>
 
-                    @if($conversation->ad)
-                        <p><strong>Оголошення:</strong> <a href="{{ $conversation->ad->url }}" target="_blank">{{ $conversation->ad->name }}</a></p>
+                    @if($conversations->isEmpty())
+                        <p>У цього магазину поки немає жодного діалогу.</p>
+                    @else
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Покупець</th>
+                                        <th>Оголошення</th>
+                                        <th>Повідомлень</th>
+                                        <th>Останнє повідомлення</th>
+                                        <th>Дата</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($conversations as $c)
+                                        <tr>
+                                            <td>
+                                                {{ optional($c->buyer)->username ?? '— (видалений акаунт)' }}
+                                                @if($c->buyer_user_id)
+                                                    <br><small class="text-muted">ID={{ $c->buyer_user_id }}</small>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if($c->ad)
+                                                    <a href="{{ $c->ad->url }}" target="_blank">{{ \Illuminate\Support\Str::limit($c->ad->name, 40) }}</a>
+                                                @else
+                                                    <span class="text-muted">—</span>
+                                                @endif
+                                            </td>
+                                            <td class="text-center">{{ $c->messagesCount }}</td>
+                                            <td>{{ $c->lastMessage ? \Illuminate\Support\Str::limit($c->lastMessage->body, 60) : '—' }}</td>
+                                            <td style="white-space: nowrap;">{{ $c->last_message_at ? $c->last_message_at->format('d.m.Y H:i') : '—' }}</td>
+                                            <td>
+                                                <a href="{{ route('admin.shops.messages.show', [$shop->id, $c->id]) }}" class="btn btn-sm btn-primary">Переглянути</a>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                        {{ $conversations->links() }}
                     @endif
-
-                    <div style="max-width:700px; display:flex; flex-direction:column; gap:10px; border:1px solid #e0e0e0; border-radius:8px; padding:16px; background:#fff;">
-                        @forelse($messages as $m)
-                            @php $isShop = $m->sender_id == $shop->id; @endphp
-                            <div style="max-width:75%; padding:10px 14px; border-radius:14px; word-break:break-word;
-                                        {{ $isShop ? 'align-self:flex-end; background:#dcf8c6;' : 'align-self:flex-start; background:#f1f0f0;' }}">
-                                <div><strong>{{ optional($m->sender)->username ?? '—' }}:</strong> {{ $m->body }}</div>
-                                <div style="font-size:11px; color:#888; margin-top:4px; text-align:right;">{{ $m->created_at->format('d.m.Y H:i') }}</div>
-                            </div>
-                        @empty
-                            <p class="text-muted">Повідомлень немає.</p>
-                        @endforelse
-                    </div>
                 </div>
             </div>
         </div>
