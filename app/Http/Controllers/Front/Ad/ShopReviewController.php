@@ -34,7 +34,11 @@ class ShopReviewController extends Controller
 
         ShopReview::updateOrCreate(
             ['shop_user_id' => $shop->id, 'reviewer_user_id' => Auth::id()],
-            ['rating' => $validated['rating'], 'comment' => $validated['comment'] ?? null]
+            [
+                'rating' => $validated['rating'],
+                'comment' => $validated['comment'] ?? null,
+                'ip_address' => $request->ip(),
+            ]
         );
 
         return redirect(route('author', $shop->id))->with('success', 'Дякуємо за відгук!');
