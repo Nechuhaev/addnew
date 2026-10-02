@@ -75,10 +75,23 @@ class UserController extends Controller
             $emailVerified = $lastCheck ? (bool) $lastCheck->matched : false;
         }
 
+        // Рейтинг і відгуки магазину.
+        $reviews = \App\ShopReview::where('shop_user_id', $user->id)
+            ->with('reviewer')
+            ->orderByDesc('created_at')
+            ->get();
+        $avgRating = $reviews->isNotEmpty() ? round($reviews->avg('rating'), 1) : null;
+        $myReview = auth()->check()
+            ? \App\ShopReview::where('shop_user_id', $user->id)->where('reviewer_user_id', auth()->id())->first()
+            : null;
+
         return view('front.ad.user')->with([
             'entity' => $user,
             'is_shop' => $is_shop,
             'emailVerified' => $emailVerified,
+            'reviews' => $reviews ?? collect(),
+            'avgRating' => $avgRating ?? null,
+            'myReview' => $myReview ?? null,
             'ads' => $ads,
             'links' => $results->onEachSide(1)->links('front.widgets.paginate'),
             'tags' => AdTag::getAdsTags($ads),
