@@ -63,9 +63,22 @@ class UserController extends Controller
 
         $is_shop = $user->ads()->where('is_product', 1)->count();
 
+        // Бейдж "Email підтверджено" — за останнім результатом
+        // shops:check-email (яка звіряє email магазину з тим, що
+        // реально вказано на його власному сайті).
+        $emailVerified = false;
+        if ($is_shop) {
+            $lastCheck = DB::table('shop_email_checks')
+                ->where('user_id', $user->id)
+                ->orderByDesc('checked_at')
+                ->first();
+            $emailVerified = $lastCheck ? (bool) $lastCheck->matched : false;
+        }
+
         return view('front.ad.user')->with([
             'entity' => $user,
             'is_shop' => $is_shop,
+            'emailVerified' => $emailVerified,
             'ads' => $ads,
             'links' => $results->onEachSide(1)->links('front.widgets.paginate'),
             'tags' => AdTag::getAdsTags($ads),
