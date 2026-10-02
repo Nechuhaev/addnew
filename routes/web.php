@@ -24,6 +24,8 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     
     Route::post('/shops/skipped-domains', 'Admin\Shop\SkippedDomainController@store')->name('admin.shops.skippedDomains.store');
     Route::delete('/shops/skipped-domains/{id}', 'Admin\Shop\SkippedDomainController@destroy')->name('admin.shops.skippedDomains.destroy');
+    Route::get('/shops/{id}/reviews', 'Admin\Shop\ShopController@reviews')->name('admin.shops.reviews');
+    Route::delete('/shops/{shopId}/reviews/{reviewId}', 'Admin\Shop\ShopController@deleteReview')->name('admin.shops.reviews.delete');
     
     Route::get('/shops', 'Admin\Shop\ShopController@index')->name('admin.shops');
     Route::get('/shops/skipped-domains', 'Admin\Shop\SkippedDomainController@index')->name('admin.shops.skippedDomains');
