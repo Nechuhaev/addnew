@@ -6,6 +6,7 @@ use App\Ad;
 use App\Http\Controllers\Controller;
 use App\Mail\ShopAdminMessage;
 use App\ShopMessage;
+use App\ShopReview;
 use App\Services\ShopInfoService;
 use App\User;
 use Illuminate\Http\Request;
@@ -274,6 +275,50 @@ class ShopController extends Controller
             'products' => $products,
             'inactiveCount' => $inactiveCount,
         ]);
+    }
+
+    /**
+     * Відгуки конкретного магазину — з IP того, хто залишив, щоб
+     * помітити накручування (кілька відгуків з однієї адреси тощо).
+     */
+    public function reviews($id)
+    {
+        $shop = User::findOrFail($id);
+
+        $reviews = ShopReview::where('shop_user_id', $shop->id)
+            ->with('reviewer')
+            ->orderByDesc('created_at')
+            ->paginate(30);
+
+        // Позначаємо відгуки, чия IP зустрічається БІЛЬШЕ ОДНОГО РАЗУ
+        // серед відгуків ЦЬОГО магазину — явна ознака накрутки з одного
+        // пристрою/мережі під різними акаунтами.
+        $ipCounts = ShopReview::where('shop_user_id', $shop->id)
+            ->whereNotNull('ip_address')
+            ->selectRaw('ip_address, COUNT(*) as cnt')
+            ->groupBy('ip_address')
+            ->havingRaw('COUNT(*) > 1')
+            ->pluck('cnt', 'ip_address');
+
+        foreach ($reviews as $review) {
+            $review->suspicious_ip = $review->ip_address && $ipCounts->has($review->ip_address);
+        }
+
+        return view('admin.shops.reviews', [
+            'shop' => $shop,
+            'reviews' => $reviews,
+        ]);
+    }
+
+    /**
+     * Видалити один відгук (накручений/образливий/спам).
+     */
+    public function deleteReview($shopId, $reviewId)
+    {
+        $review = ShopReview::where('id', $reviewId)->where('shop_user_id', $shopId)->firstOrFail();
+        $review->delete();
+
+        return redirect(route('admin.shops.reviews', $shopId))->with('success', 'Відгук видалено.');
     }
 
     /**
