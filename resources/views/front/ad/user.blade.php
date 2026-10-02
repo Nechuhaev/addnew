@@ -20,14 +20,14 @@
 
             {{ Breadcrumbs::render($breadcrumbs, $entity) }}
 
-            <p style="font-size: 20px;font-weight: 900;">Все объявления пользователя {{ $entity->username }}</p>
+            <p style="font-size: 20px;font-weight: 900;">{{ __('front.all_ads_by_user') }} {{ $entity->username }}</p>
             
 
             <div class="author" style="display:flex; flex-wrap:wrap; gap: 20px; align-items:flex-start;">
                 <div class="author-photo"><img alt="Пользователь {{ $entity->username }}" src="{{ $entity->image ?? asset('assets/front/img/placeholder.png') }}" class="author-avatar" height="250" width="250"></div>
                 <div class="author-details" style="flex: 1 1 250px; min-width: 250px;">
                     @if($is_shop)
-                        <div class="author-info"><strong>Количество предложений: </strong> {{ $entity->ads()->count() }}</div>
+                        <div class="author-info"><strong>{{ __('front.offers_count') }} </strong> {{ $entity->ads()->count() }}</div>
                         <div class="author-info">
                             <strong>Рейтинг:</strong>
                             @if($avgRating)
@@ -38,27 +38,27 @@
                             @endif
                         </div>
                         @if($entity->telephone)
-                        <div class="author-info"><strong>Телефон: </strong> {{ $entity->telephone }}</div>
+                        <div class="author-info"><strong>{{ __('front.phone_label') }} </strong> {{ $entity->telephone }}</div>
                         @endif
                         @if($entity->email)
                             <div class="author-info">
-                                <strong>Email :</strong> {{ $entity->email }}
+                                <strong>{{ __('front.email_label') }}</strong> {{ $entity->email }}
                                 @if($emailVerified)
                                     <span style="display:inline-block; background-color:#28a745; color:#fff; font-weight:700; font-size:12px; padding:3px 10px; border-radius:4px; margin-left:8px; vertical-align:middle; white-space:nowrap;">&#10003; Підтверджено</span>
                                 @endif
                             </div>
                         @endif
                         @if($entity->site_url)
-                            <div class="author-info"><strong>Сайт: </strong> {{ $entity->site_url }}</div>
+                            <div class="author-info"><strong>{{ __('front.site_label') }} </strong> {{ $entity->site_url }}</div>
                         @endif
 
                     @else
-                    <div class="author-info"><strong>Дата регистрации:</strong> {{ $entity->created_at }}</div>
-                    <div class="author-info"><strong>Всего объявлений автора:</strong> {{ $entity->ads()->count() }}</div>
+                    <div class="author-info"><strong>{{ __('front.registration_date_label') }}</strong> {{ $entity->created_at }}</div>
+                    <div class="author-info"><strong>{{ __('front.total_ads_by_author') }}</strong> {{ $entity->ads()->count() }}</div>
                     @endif
                     @if ($entity->info)
                         <div class="author-description">
-                            <h3>Описание</h3>
+                            <h3>{{ __('front.description_heading') }}</h3>
                             <div class="show-more show-more--desktop-full">
                                 <section class="show-more__text">
                                     <p>{{ $entity->info }}</p>
