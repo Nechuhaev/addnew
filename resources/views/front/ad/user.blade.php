@@ -22,7 +22,7 @@
 
             <p style="font-size: 20px;font-weight: 900;">Все объявления пользователя {{ $entity->username }}</p>
             @if($is_shop && $emailVerified)
-                <p><span class="badge badge-success" style="font-size: 14px; padding: 6px 12px;" title="Email магазину підтверджено звіркою з офіційним сайтом">&#10003; Email підтверджено</span></p>
+                <p><span style="display:inline-block; background-color:#28a745; color:#ffffff; font-weight:700; font-size:15px; padding:8px 16px; border-radius:6px;" title="Email магазину підтверджено звіркою з офіційним сайтом">&#10003; Email підтверджено</span></p>
             @endif
 
             <div class="author" style="display:flex; flex-wrap:wrap; gap: 20px; align-items:flex-start;">
