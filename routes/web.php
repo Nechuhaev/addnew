@@ -48,6 +48,15 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
 Route::get('/shops/{id}/stats', 'Admin\Shop\ShopStatsController@show')->name('admin.shops.stats.show');
     
     Route::get('/reports/daily', 'Admin\Report\DailyReportController@index')->name('admin.reports.daily');
+
+    Route::middleware('auth')->group(function () {
+    Route::get('/messages', 'Front\Chat\ChatController@index')->name('chat.index');
+    Route::get('/messages/{id}', 'Front\Chat\ChatController@show')->name('chat.show');
+    Route::post('/messages/start/{shopId}', 'Front\Chat\ChatController@start')->name('chat.start');
+    Route::post('/messages/{id}/send', 'Front\Chat\ChatController@send')->name('chat.send');
+    Route::get('/messages/{id}/poll', 'Front\Chat\ChatController@poll')->name('chat.poll');
+    Route::get('/api/chat/unread-count', 'Front\Chat\ChatController@unreadCount')->name('chat.unread');
+});
     
     
         Route::get('/translations', 'Admin\Translation\TranslationController@index')->name('admin.translations');
@@ -59,6 +68,8 @@ Route::get('/shops/{id}/stats', 'Admin\Shop\ShopStatsController@show')->name('ad
     Route::get('/prompts/{id}/edit', 'Admin\Prompt\PromptController@edit')->name('admin.prompts.edit');
     Route::post('/prompts/{id}', 'Admin\Prompt\PromptController@update')->name('admin.prompts.update');
     Route::post('/prompts/{id}/reset', 'Admin\Prompt\PromptController@reset')->name('admin.prompts.reset');
+        Route::get('/shops/{id}/messages', 'Admin\Shop\ShopController@messages')->name('admin.shops.messages');
+    Route::get('/shops/{shopId}/messages/{conversationId}', 'Admin\Shop\ShopController@messagesShow')->name('admin.shops.messages.show');
 
     Route::prefix('stat')->group(function () {
         Route::get('/ads', 'Admin\Stat\AdStatController@index')->name('admin.stat.ads');
