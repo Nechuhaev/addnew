@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Mail\ShopAdminMessage;
 use App\ShopMessage;
 use App\ShopReview;
+use App\Conversation;
 use App\Services\ShopInfoService;
 use App\User;
 use Illuminate\Http\Request;
@@ -307,6 +308,52 @@ class ShopController extends Controller
         return view('admin.shops.reviews', [
             'shop' => $shop,
             'reviews' => $reviews,
+        ]);
+    }
+
+    /**
+     * Усі діалоги чату цього магазину (як продавця) — для модерації й
+     * перегляду переписки з покупцями. Сортовано за свіжістю, з
+     * повним текстом останнього повідомлення для огляду без кліку.
+     */
+    public function messages($id)
+    {
+        $shop = User::findOrFail($id);
+
+        $conversations = Conversation::where('shop_user_id', $shop->id)
+            ->with(['buyer', 'ad'])
+            ->orderByDesc('last_message_at')
+            ->paginate(30);
+
+        foreach ($conversations as $c) {
+            $c->lastMessage = $c->messages()->orderByDesc('id')->first();
+            $c->messagesCount = $c->messages()->count();
+        }
+
+        return view('admin.shops.messages', [
+            'shop' => $shop,
+            'conversations' => $conversations,
+        ]);
+    }
+
+    /**
+     * Повна переписка одного діалогу — для адміністратора, лише
+     * перегляд (без можливості відповісти від імені когось).
+     */
+    public function messagesShow($shopId, $conversationId)
+    {
+        $shop = User::findOrFail($shopId);
+        $conversation = Conversation::where('id', $conversationId)
+            ->where('shop_user_id', $shop->id)
+            ->with(['buyer', 'ad'])
+            ->firstOrFail();
+
+        $messages = $conversation->messages()->with('sender')->get();
+
+        return view('admin.shops.messages-show', [
+            'shop' => $shop,
+            'conversation' => $conversation,
+            'messages' => $messages,
         ]);
     }
 
