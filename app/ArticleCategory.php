@@ -9,33 +9,67 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @property int $id
  * @property string $name
+ * @property string|null $name_uk
  * @property string $slug
  * @property string|null $content
+ * @property string|null $content_uk
  * @property string|null $meta_title
+ * @property string|null $meta_title_uk
  * @property string|null $meta_description
+ * @property string|null $meta_description_uk
  * @property int $sort_order
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @method static \Illuminate\Database\Eloquent\Builder|\App\ArticleCategory newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\ArticleCategory newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\ArticleCategory query()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\ArticleCategory whereContent($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\ArticleCategory whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\ArticleCategory whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\ArticleCategory whereMetaDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\ArticleCategory whereMetaTitle($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\ArticleCategory whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\ArticleCategory whereSlug($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\ArticleCategory whereSortOrder($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\ArticleCategory whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class ArticleCategory extends Model
 {
-    protected $fillable = ['name', 'slug', 'content', 'sort_order'];
+    protected $fillable = [
+        'name', 'name_uk',
+        'slug',
+        'content', 'content_uk',
+        'meta_title', 'meta_title_uk',
+        'meta_description', 'meta_description_uk',
+        'sort_order',
+    ];
 
     public function articles() {
         return $this->belongsToMany(Article::class);
+    }
+
+    /**
+     * Мовні аксесори — той самий підхід, що в AdCategory/AdTag/AdCity.
+     */
+    public function getNameAttribute($value)
+    {
+        if (app()->getLocale() === 'uk' && !empty($this->attributes['name_uk'] ?? null)) {
+            return $this->attributes['name_uk'];
+        }
+        return $value;
+    }
+
+    public function getContentAttribute($value)
+    {
+        if (app()->getLocale() === 'uk' && !empty($this->attributes['content_uk'] ?? null)) {
+            return $this->attributes['content_uk'];
+        }
+        return $value;
+    }
+
+    public function getMetaTitleAttribute($value)
+    {
+        if (app()->getLocale() === 'uk' && !empty($this->attributes['meta_title_uk'] ?? null)) {
+            return $this->attributes['meta_title_uk'];
+        }
+        return $value;
+    }
+
+    public function getMetaDescriptionAttribute($value)
+    {
+        if (app()->getLocale() === 'uk' && !empty($this->attributes['meta_description_uk'] ?? null)) {
+            return $this->attributes['meta_description_uk'];
+        }
+        return $value;
     }
 
     /**
