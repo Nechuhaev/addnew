@@ -66,7 +66,7 @@
             @endif
             
             @if($blog_articles && $blog_articles->count())
-                <h2 class="last-advs-header">Останні статті в блозі</h2>
+                <h2 class="last-advs-header">{{ __('front.latest_blog_posts') }}</h2>
                 <div class="related-ads">
                     @foreach($blog_articles as $article)
                         <div class="related-ad">
