@@ -23,6 +23,7 @@
                     <a href="{{ route('admin.shops') }}" class="btn btn-sm btn-secondary mb-3">&larr; До списку магазинів</a>
                     <a href="{{ route('admin.shopMessageTemplates') }}" class="btn btn-sm btn-secondary mb-3">Шаблони листів</a>
                     <a href="{{ route('admin.shops.products', $shop->id) }}" class="btn btn-sm btn-secondary mb-3">Товари цього магазину</a>
+                    <a href="{{ route('admin.shops.reviews', $shop->id) }}" class="btn btn-sm btn-secondary mb-3">Відгуки</a>
                     <a href="{{ route('admin.shops.impersonate', $shop->id) }}" class="btn btn-sm btn-warning mb-3"
                        onclick="return confirm('Увійти в акаунт магазину «{{ $shop->username }}»?');">
                         Увійти як магазин
