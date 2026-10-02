@@ -36,13 +36,20 @@ trait TranslatesViaDeepL
         $isFree = filter_var(env('DEEPL_API_FREE', true), FILTER_VALIDATE_BOOLEAN);
         $baseUrl = env('DEEPL_BASE_URL', $isFree ? 'https://api-free.deepl.com' : 'https://api.deepl.com');
 
-        $multipart = [];
+        // ВАЖЛИВО: DeepL НЕ приймає multipart/form-data для перекладу
+        // (повертає оманливе "text field is required" замість чіткої
+        // помилки формату). Потрібен саме application/x-www-form-urlencoded,
+        // причому для КІЛЬКОХ текстів — ПОВТОРЮВАНИЙ параметр text=...&text=...,
+        // а не text[0]=...&text[1]=... (так Guzzle серіалізував би звичайний
+        // асоціативний масив через 'form_params') — тому формуємо body вручну.
+        $bodyParts = [];
         foreach ($texts as $text) {
-            $multipart[] = ['name' => 'text', 'contents' => $text];
+            $bodyParts[] = 'text=' . urlencode($text);
         }
-        $multipart[] = ['name' => 'source_lang', 'contents' => $sourceLang];
-        $multipart[] = ['name' => 'target_lang', 'contents' => $targetLang];
-        $multipart[] = ['name' => 'tag_handling', 'contents' => 'html'];
+        $bodyParts[] = 'source_lang=' . urlencode($sourceLang);
+        $bodyParts[] = 'target_lang=' . urlencode($targetLang);
+        $bodyParts[] = 'tag_handling=html';
+        $body = implode('&', $bodyParts);
 
         $client = property_exists($this, 'http') && $this->http instanceof Client
             ? $this->http
@@ -51,8 +58,9 @@ trait TranslatesViaDeepL
         $response = $client->post(rtrim($baseUrl, '/') . '/v2/translate', [
             'headers' => [
                 'Authorization' => 'DeepL-Auth-Key ' . $apiKey,
+                'Content-Type' => 'application/x-www-form-urlencoded',
             ],
-            'multipart' => $multipart,
+            'body' => $body,
             'timeout' => 30,
         ]);
 
