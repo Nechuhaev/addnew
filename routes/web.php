@@ -331,6 +331,7 @@ $frontRoutes = function () {
 
 // Автор объявлений
     Route::get('/author/{id}', 'Front\Ad\UserController@page')->name('author');
+    Route::post('/author/{id}/review', 'Front\Ad\ShopReviewController@store')->name('shop.review.store')->middleware('auth');
     Route::get('/stores', 'Front\User\StoreController@index')->name('stores');
 
 // Бренды
