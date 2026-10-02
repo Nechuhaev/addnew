@@ -21,6 +21,9 @@
             {{ Breadcrumbs::render($breadcrumbs, $entity) }}
 
             <p style="font-size: 20px;font-weight: 900;">Все объявления пользователя {{ $entity->username }}</p>
+            @if($is_shop && $emailVerified)
+                <p><span class="badge badge-success" style="font-size: 14px; padding: 6px 12px;" title="Email магазину підтверджено звіркою з офіційним сайтом">&#10003; Email підтверджено</span></p>
+            @endif
 
             <div class="author" style="display:flex; flex-wrap:wrap; gap: 20px; align-items:flex-start;">
                 <div class="author-photo"><img alt="Пользователь {{ $entity->username }}" src="{{ $entity->image ?? asset('assets/front/img/placeholder.png') }}" class="author-avatar" height="250" width="250"></div>
