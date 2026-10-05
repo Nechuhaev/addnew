@@ -67,7 +67,9 @@ class TagSeoText
             ->all();
         $cityNames = $this->namesById(AdCity::class, $cityIds);
 
-        list($minLabel, $maxLabel) = $this->priceRange($tag);
+        $range = PriceRange::summarize(function ($q) use ($tag) {
+            $q->join('ad_tag', 'ad_tag.ad_id', '=', 'ads.id')->where('ad_tag.tag_id', $tag->id);
+        });
 
         // --- Текст ---
         $nameE = e($name);
@@ -86,10 +88,11 @@ class TagSeoText
         }
 
         $p3 = '';
-        if ($minLabel && $maxLabel) {
-            $p3 = $ru
-                ? 'Цены — от ' . e($minLabel) . ' до ' . e($maxLabel) . '.'
-                : 'Ціни — від ' . e($minLabel) . ' до ' . e($maxLabel) . '.';
+        if ($range) {
+            $lead = $range['approx']
+                ? ($ru ? 'Большинство цен — от ' : 'Більшість цін — від ')
+                : ($ru ? 'Цены — от ' : 'Ціни — від ');
+            $p3 = $lead . e($range['lo']) . ' до ' . e($range['hi']) . '.';
         }
 
         $html = '<h2>' . ($ru ? 'Объявления по тегу «' : 'Оголошення за тегом «') . $nameE . '»</h2>';
@@ -116,50 +119,6 @@ class TagSeoText
             }
         }
         return $out;
-    }
-
-    /**
-     * Мінімальна й максимальна ціна в домінантній валюті оголошень тегу.
-     */
-    protected function priceRange(AdTag $tag): array
-    {
-        $cur = DB::table('ad_tag')
-            ->join('ads', 'ads.id', '=', 'ad_tag.ad_id')
-            ->where('ad_tag.tag_id', $tag->id)
-            ->where('ads.price', '>', 0)
-            ->whereNotNull('ads.currency_id')
-            ->select('ads.currency_id', DB::raw('COUNT(*) AS c'))
-            ->groupBy('ads.currency_id')
-            ->orderByDesc('c')
-            ->first();
-        if (!$cur) {
-            return [null, null];
-        }
-
-        $base = Ad::join('ad_tag', 'ad_tag.ad_id', '=', 'ads.id')
-            ->where('ad_tag.tag_id', $tag->id)
-            ->where('ads.price', '>', 0)
-            ->where('ads.currency_id', $cur->currency_id)
-            ->select('ads.*');
-        $min = (clone $base)->orderBy('ads.price')->first();
-        $max = (clone $base)->orderByDesc('ads.price')->first();
-        if (!$min || !$max || (float) $min->price == (float) $max->price) {
-            return [null, null];
-        }
-
-        return [$this->priceLabel($min), $this->priceLabel($max)];
-    }
-
-    protected function priceLabel(Ad $ad): ?string
-    {
-        try {
-            $label = html_entity_decode(strip_tags((string) $ad->formatted_price), ENT_QUOTES, 'UTF-8');
-        } catch (\Throwable $e) {
-            return null;
-        }
-        $label = trim(preg_replace('/\s+/u', ' ', str_replace("\xC2\xA0", ' ', $label)));
-
-        return $label !== '' ? $label : null;
     }
 
     protected function plural(int $n, array $forms): string
