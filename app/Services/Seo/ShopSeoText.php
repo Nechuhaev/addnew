@@ -71,8 +71,10 @@ class ShopSeoText
             ->get();
         $cityNames = $this->namesById(AdCity::class, $cityRows->pluck('city_id')->all());
 
-        // --- Діапазон цін (у домінантній валюті) ---
-        list($minLabel, $maxLabel) = $this->priceRange($shop);
+        // --- Діапазон цін (стійкий до сміттєвих значень типу 2147483647) ---
+        $range = PriceRange::summarize(function ($q) use ($shop) {
+            $q->where('ads.user_id', $shop->id);
+        });
 
         // --- Довіра ---
         $reviewCount = ShopReview::where('shop_user_id', $shop->id)->count();
@@ -112,10 +114,11 @@ class ShopSeoText
         if ($cityNames) {
             $p2 .= ($ru ? 'География объявлений: ' : 'Географія оголошень: ') . e(implode(', ', $cityNames)) . '. ';
         }
-        if ($minLabel && $maxLabel) {
-            $p2 .= $ru
-                ? 'Цены — от ' . e($minLabel) . ' до ' . e($maxLabel) . '.'
-                : 'Ціни — від ' . e($minLabel) . ' до ' . e($maxLabel) . '.';
+        if ($range) {
+            $lead = $range['approx']
+                ? ($ru ? 'Большинство цен — от ' : 'Більшість цін — від ')
+                : ($ru ? 'Цены — от ' : 'Ціни — від ');
+            $p2 .= $lead . e($range['lo']) . ' до ' . e($range['hi']) . '.';
         }
 
         $p3 = '';
@@ -167,46 +170,6 @@ class ShopSeoText
             }
         }
         return $out;
-    }
-
-    /**
-     * Мінімальна й максимальна ціна в тій валюті, у якій у магазину найбільше
-     * товарів. Якщо ціна однакова або не визначена, повертає [null, null].
-     */
-    protected function priceRange(User $shop): array
-    {
-        $cur = DB::table('ads')
-            ->where('user_id', $shop->id)
-            ->where('price', '>', 0)
-            ->whereNotNull('currency_id')
-            ->select('currency_id', DB::raw('COUNT(*) AS c'))
-            ->groupBy('currency_id')
-            ->orderByDesc('c')
-            ->first();
-        if (!$cur) {
-            return [null, null];
-        }
-
-        $base = Ad::where('user_id', $shop->id)->where('price', '>', 0)->where('currency_id', $cur->currency_id);
-        $min = (clone $base)->orderBy('price')->first();
-        $max = (clone $base)->orderByDesc('price')->first();
-        if (!$min || !$max || (float) $min->price == (float) $max->price) {
-            return [null, null];
-        }
-
-        return [$this->priceLabel($min), $this->priceLabel($max)];
-    }
-
-    protected function priceLabel(Ad $ad): ?string
-    {
-        try {
-            $label = html_entity_decode(strip_tags((string) $ad->formatted_price), ENT_QUOTES, 'UTF-8');
-        } catch (\Throwable $e) {
-            return null;
-        }
-        $label = trim(preg_replace('/\s+/u', ' ', str_replace("\xC2\xA0", ' ', $label)));
-
-        return $label !== '' ? $label : null;
     }
 
     protected function host($url): ?string
