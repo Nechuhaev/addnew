@@ -49,14 +49,6 @@ Route::get('/shops/{id}/stats', 'Admin\Shop\ShopStatsController@show')->name('ad
     
     Route::get('/reports/daily', 'Admin\Report\DailyReportController@index')->name('admin.reports.daily');
 
-    Route::middleware('auth')->group(function () {
-    Route::get('/messages', 'Front\Chat\ChatController@index')->name('chat.index');
-    Route::get('/messages/{id}', 'Front\Chat\ChatController@show')->name('chat.show');
-    Route::post('/messages/start/{shopId}', 'Front\Chat\ChatController@start')->name('chat.start');
-    Route::post('/messages/{id}/send', 'Front\Chat\ChatController@send')->name('chat.send');
-    Route::get('/messages/{id}/poll', 'Front\Chat\ChatController@poll')->name('chat.poll');
-    Route::get('/api/chat/unread-count', 'Front\Chat\ChatController@unreadCount')->name('chat.unread');
-});
     
     
         Route::get('/translations', 'Admin\Translation\TranslationController@index')->name('admin.translations');
@@ -345,6 +337,14 @@ $frontRoutes = function () {
 // Автор объявлений
     Route::get('/author/{id}', 'Front\Ad\UserController@page')->name('author');
     Route::post('/author/{id}/review', 'Front\Ad\ShopReviewController@store')->name('shop.review.store')->middleware('auth');
+    Route::middleware('auth')->group(function () {
+        Route::get('/messages', 'Front\Chat\ChatController@index')->name('chat.index');
+        Route::get('/messages/{id}', 'Front\Chat\ChatController@show')->name('chat.show');
+        Route::post('/messages/start/{shopId}', 'Front\Chat\ChatController@start')->name('chat.start');
+        Route::post('/messages/{id}/send', 'Front\Chat\ChatController@send')->name('chat.send');
+        Route::get('/messages/{id}/poll', 'Front\Chat\ChatController@poll')->name('chat.poll');
+        Route::get('/api/chat/unread-count', 'Front\Chat\ChatController@unreadCount')->name('chat.unread');
+    });
     Route::get('/stores', 'Front\User\StoreController@index')->name('stores');
 
 // Бренды
