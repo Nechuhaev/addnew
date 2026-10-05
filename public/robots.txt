@@ -1,6 +1,40 @@
 User-agent: *
+
+# Службові й приватні розділи (UA і RU версії)
 Disallow: /admin
+Disallow: /login
+Disallow: /register
+Disallow: /password
+Disallow: /profile
+Disallow: /messages
+Disallow: /api/
+Disallow: /create-listing
+Disallow: /search
+Disallow: /ulogin
+Disallow: /laravel-filemanager/
+Disallow: /ad/edit/
+Disallow: /ads/delete/
+Disallow: /ads/*/goto-shop
+Disallow: /ru/login
+Disallow: /ru/register
+Disallow: /ru/password
+Disallow: /ru/profile
+Disallow: /ru/messages
+Disallow: /ru/api/
+Disallow: /ru/create-listing
+Disallow: /ru/search
+Disallow: /ru/ad/edit/
+Disallow: /ru/ads/delete/
+Disallow: /ru/ads/*/goto-shop
+
+# Внутрішній пошук: порожні й дубльовані сторінки (/?s=...&sa=search)
+Disallow: /*?s=
+
+# УВАГА: /ad-tag/ тут навмисно НЕ закрито. Тонкі теги мають <meta name="robots"
+# content="noindex, follow">, і краулер мусить мати змогу зайти на сторінку, щоб
+# цей noindex побачити. Заборона в robots.txt лишила б їх у індексі порожніми.
 Allow: /
-Host: https://addnew.biz
+
 Sitemap: https://addnew.biz/sitemap.xml
 Sitemap: https://addnew.biz/sitemapf.xml
+Sitemap: https://addnew.biz/sitemap-images.xml
