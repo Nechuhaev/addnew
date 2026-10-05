@@ -1,6 +1,30 @@
 @extends('front.layout')
 @section('meta_title', $article->meta_title ?? $article->name);
 @section('meta_description', $article->meta_description ?? strip_tags($article->excerpt) ?? strip_tags($article->description));
+@php
+    $ogPub = $article->getOriginal('created_at');
+    $ogMod = $article->getOriginal('updated_at');
+    $ogTags = $article->tags;
+    if (is_string($ogTags)) { $ogTags = json_decode($ogTags, true); }
+    $ogTags = is_array($ogTags) ? array_slice(array_filter($ogTags, 'is_scalar'), 0, 8) : [];
+@endphp
+@section('og_type', 'article')
+@section('og_image', (string) ($article->image ?? ''))
+@push('og_extra')
+@if($ogPub)
+<meta property="article:published_time" content="{{ \Carbon\Carbon::parse($ogPub)->toAtomString() }}">
+@endif
+@if($ogMod)
+<meta property="article:modified_time" content="{{ \Carbon\Carbon::parse($ogMod)->toAtomString() }}">
+@endif
+@foreach($article->categories as $ogCat)
+<meta property="article:section" content="{{ $ogCat->name }}">
+@endforeach
+@foreach($ogTags as $ogTag)
+<meta property="article:tag" content="{{ $ogTag }}">
+@endforeach
+@endpush
+
 @section('content')
     <main class="post-page">
         <div class="container">

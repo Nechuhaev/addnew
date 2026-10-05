@@ -53,6 +53,7 @@
     </script>
 
     @include('front.partials.og')
+    @include('front.partials.hreflang')
 </head>
 <body class=""> <!-- fixed -->
 <!-- Google Tag Manager (noscript) -->
