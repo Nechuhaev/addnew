@@ -62,6 +62,24 @@ class Tag extends Controller
             ->first();
 
 
+        // SEO-текст: власний (AI) текст тегу, якщо він є; інакше короткий фактичний
+        // вступ із даних (TagSeoText). Універсального шаблону більше немає.
+        $total = $results->total();
+        $ownContent = trim((string) $entity->content);
+        if (request()->get('page')) {
+            $meta['description'] = false;
+        } elseif ($ownContent !== '') {
+            $meta['description'] = $entity->content;
+        } elseif ($total > 0) {
+            $meta['description'] = app(\App\Services\Seo\TagSeoText::class)->build($entity, $total);
+        } else {
+            $meta['description'] = false;
+        }
+
+        // Тонкі теги (менше 5 оголошень і без власного тексту) не індексуємо,
+        // але посилання з них лишаються доступними (noindex, follow).
+        $noindex = ($ownContent === '' && $total < 5);
+
         return view('front.ad.country')->with([
             'entity' => $entity,
             'ads' => $ads,
@@ -70,6 +88,7 @@ class Tag extends Controller
             'tags' => AdTag::getAdsTags($ads),
             'microdata' => $microdata_info,
             'breadcrumbs' => 'ad_tag',
+            'noindex' => $noindex,
             'meta' => $meta
         ]);
     }

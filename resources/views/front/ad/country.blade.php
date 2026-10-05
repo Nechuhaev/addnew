@@ -5,7 +5,7 @@
 @section('meta_description', $meta['meta_description'] ?? $entity->content)
 
 @section('style')
-    @if(empty($ads))
+    @if(empty($ads) || !empty($noindex))
         <meta name="robots" content="noindex, follow" />
     @endif
 @endsection
