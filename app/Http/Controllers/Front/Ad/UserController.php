@@ -85,6 +85,14 @@ class UserController extends Controller
             ? \App\ShopReview::where('shop_user_id', $user->id)->where('reviewer_user_id', auth()->id())->first()
             : null;
 
+        // SEO-текст під списком: для магазинів збирається з реальних даних
+        // (ShopSeoText), для звичайних користувачів блоку немає взагалі.
+        if (request()->get('page') || !$is_shop) {
+            $meta['description'] = false;
+        } else {
+            $meta['description'] = app(\App\Services\Seo\ShopSeoText::class)->build($user);
+        }
+
         return view('front.ad.user')->with([
             'entity' => $user,
             'is_shop' => $is_shop,

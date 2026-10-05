@@ -23,7 +23,7 @@
 
             {{ Breadcrumbs::render($breadcrumbs, $entity) }}
 
-            <p style="font-size: 20px;font-weight: 900;">{{ __('front.all_ads_by_user') }} {{ $entity->username }}</p>
+            <h1 style="font-size: 20px; font-weight: 900; margin: 1em 0;">{{ __('front.all_ads_by_user') }} {{ $entity->username }}</h1>
             @auth
                 @if(auth()->id() != $entity->id)
                     <form action="{{ route('chat.start', $entity->id) }}" method="POST" style="display:inline-block; margin-bottom:10px;">
