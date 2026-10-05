@@ -8,6 +8,67 @@
     <script type="text/javascript" charset="UTF-8" src="https://maps.googleapis.com/maps/api/js?language=ru&region=RU&key=AIzaSyCndp-qqA81hIeD45u32313k_MUY3um2Ds&ver=3.0"></script>
 @endsection
 
+@php
+    $ogImgs = [];
+    try {
+        $ogImgs = is_array($ad->images) ? $ad->images : [];
+    } catch (\Throwable $ogErr) {
+        $ogImgs = [];
+    }
+    $ogPhoto = '';
+    $ogMain = trim((string) ($ad->image ?? ''));
+    if ($ogMain !== '' && stripos($ogMain, 'placeholder') === false) {
+        $ogPhoto = $ogMain;
+    }
+    foreach ($ogImgs as $ogI) {
+        if ($ogPhoto !== '') {
+            break;
+        }
+        $ogI = trim((string) $ogI);
+        if ($ogI !== '' && stripos($ogI, 'placeholder') === false) {
+            $ogPhoto = $ogI;
+            break;
+        }
+    }
+
+    $ogPrice = is_numeric($ad->price ?? null) ? (float) $ad->price : 0;
+    $ogCur = null;
+    try {
+        $ogCur = $ad->currency ?? null;
+    } catch (\Throwable $ogErr) {
+        $ogCur = null;
+    }
+    if (is_object($ogCur)) {
+        $ogCur = $ogCur->code ?? ($ogCur->name ?? ($ogCur->symbol ?? null));
+    }
+    $ogCur = is_string($ogCur) ? trim($ogCur) : null;
+    if ($ogCur !== null && $ogCur !== '') {
+        $ogCurMap = ['грн' => 'UAH', 'грн.' => 'UAH', '₴' => 'UAH', '$' => 'USD', '€' => 'EUR', 'руб' => 'RUB', 'руб.' => 'RUB', '₽' => 'RUB'];
+        $ogCur = $ogCurMap[mb_strtolower($ogCur)] ?? strtoupper($ogCur);
+    }
+    if (!$ogCur || !preg_match('/^[A-Z]{3}$/', $ogCur)) {
+        $ogCur = null;
+    }
+    $ogHasPrice = ($ogPrice > 0 && !empty($ogCur));
+
+    $ogBody = trim(preg_replace('/\s+/u', ' ', strip_tags(html_entity_decode((string) ($ad->content ?: ($ad->description ?? '')), ENT_QUOTES, 'UTF-8'))));
+    $ogAdDesc = $ogBody !== '' ? \Illuminate\Support\Str::limit($ogBody, 160, '…') : '';
+    if ($ogHasPrice) {
+        $ogPriceText = number_format($ogPrice, 0, ',', ' ') . ' ' . $ogCur;
+        $ogAdDesc = (app()->getLocale() === 'ru' ? 'Цена: ' : 'Ціна: ') . $ogPriceText . ($ogAdDesc !== '' ? '. ' . $ogAdDesc : '.');
+    }
+@endphp
+@section('og_type', 'product')
+@section('og_title', (string) ($ad->name ?? ''))
+@section('og_description', $ogAdDesc)
+@section('og_image', $ogPhoto)
+@push('og_extra')
+@if($ogHasPrice)
+<meta property="product:price:amount" content="{{ number_format($ogPrice, 2, '.', '') }}">
+<meta property="product:price:currency" content="{{ $ogCur }}">
+@endif
+@endpush
+
 @section('content')
     <main class="adv-page">
         <div class="container">
