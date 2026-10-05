@@ -5,10 +5,15 @@ namespace App\Http\Controllers\Front\Chat;
 use App\Ad;
 use App\Conversation;
 use App\Http\Controllers\Controller;
+use App\Mail\NewChatMessage;
 use App\Message;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class ChatController extends Controller
 {
@@ -52,6 +57,13 @@ class ChatController extends Controller
             ->where('sender_id', '!=', $userId)
             ->whereNull('read_at')
             ->update(['read_at' => now()]);
+
+        // Користувач відкрив діалог: (1) позначаємо його "активним" —
+        // поки він тут, листи про нові повідомлення зайві; (2) скидаємо
+        // ліміт листів — якщо він піде, а йому ще напишуть, лист знову
+        // зможе піти.
+        Cache::forget("chat_notified:{$conversation->id}:{$userId}");
+        Cache::put("chat_active:{$conversation->id}:{$userId}", 1, now()->addSeconds(15));
 
         $other = $conversation->otherParty($userId);
         $messages = $conversation->messages()->with('sender')->get();
@@ -123,6 +135,13 @@ class ChatController extends Controller
 
         $conversation->update(['last_message_at' => now()]);
 
+        // Лист одержувачу — ПІСЛЯ того, як відповідь пішла в браузер
+        // (terminating), щоб SMTP не затримував чат і щоб не залежати
+        // від налаштованої черги/воркера на хостингу.
+        app()->terminating(function () use ($conversation, $message, $userId) {
+            $this->notifyRecipient($conversation, $message, $userId);
+        });
+
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
                 'id' => $message->id,
@@ -148,6 +167,9 @@ class ChatController extends Controller
             abort(403);
         }
 
+        // Сторінка діалогу відкрита й опитує сервер — користувач "тут".
+        Cache::put("chat_active:{$conversation->id}:{$userId}", 1, now()->addSeconds(15));
+
         $afterId = (int) $request->input('after_id', 0);
 
         $newMessages = $conversation->messages()
@@ -170,6 +192,62 @@ class ChatController extends Controller
                 'created_at' => $m->created_at->format('H:i'),
             ];
         }));
+    }
+
+    /**
+     * Лист одержувачу про нове повідомлення. Запобіжники від спаму:
+     *  - вимикач CHAT_EMAIL_NOTIFICATIONS=false в .env;
+     *  - не надсилаємо, якщо одержувач ЗАРАЗ у цьому діалозі
+     *    (відкрита сторінка опитує сервер кожні 4 сек);
+     *  - не частіше ніж раз на 30 хв на діалог (скидається, коли
+     *    одержувач відкриває діалог).
+     * Будь-яка помилка пошти лише логується — повідомлення в чаті
+     * вже збережене й не має страждати через проблеми з SMTP.
+     */
+    protected function notifyRecipient(Conversation $conversation, Message $message, int $senderId): void
+    {
+        try {
+            if (!filter_var(env('CHAT_EMAIL_NOTIFICATIONS', true), FILTER_VALIDATE_BOOLEAN)) {
+                return;
+            }
+
+            $recipientId = $conversation->shop_user_id == $senderId
+                ? $conversation->buyer_user_id
+                : $conversation->shop_user_id;
+
+            if (Cache::has("chat_active:{$conversation->id}:{$recipientId}")) {
+                return;
+            }
+
+            $throttleKey = "chat_notified:{$conversation->id}:{$recipientId}";
+            if (!Cache::add($throttleKey, 1, now()->addMinutes(30))) {
+                return;
+            }
+
+            $recipient = User::find($recipientId);
+            if (!$recipient || empty($recipient->email)) {
+                Cache::forget($throttleKey);
+                return;
+            }
+
+            $sender = User::find($senderId);
+            $senderName = ($sender && $sender->username) ? $sender->username : 'Користувач';
+
+            $adTitle = null;
+            if ($conversation->ad_id) {
+                $ad = Ad::find($conversation->ad_id);
+                $adTitle = $ad ? Str::limit($ad->name, 80) : null;
+            }
+
+            Mail::to($recipient->email)->send(new NewChatMessage(
+                $senderName,
+                Str::limit($message->body, 300),
+                route('chat.show', $conversation->id),
+                $adTitle
+            ));
+        } catch (\Throwable $e) {
+            Log::warning('Chat: не вдалося надіслати лист про нове повідомлення: ' . $e->getMessage());
+        }
     }
 
     /**
