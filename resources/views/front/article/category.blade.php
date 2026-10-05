@@ -1,6 +1,28 @@
 @extends('front.layout')
-@section('meta_title', $category->meta_title ?? 'Блог | Доска объявлений AddNew.Biz');
-@section('meta_description', $category->meta_description ?? '☑️ Блог доски объявлений addnew.biz - новости, статьи, полезные материалы как сделать ваше объявление эффективным.');
+@php
+    $blogIsRu = app()->getLocale() === 'ru';
+    $blogCat = (isset($category) && $category) ? $category : null;
+    if ($blogCat) {
+        $blogTitle = !empty($blogCat->meta_title)
+            ? $blogCat->meta_title
+            : ($blogIsRu ? $blogCat->name . ' — статьи блога | AddNew.biz' : $blogCat->name . ' — статті блогу | AddNew.biz');
+        $blogDesc = !empty($blogCat->meta_description)
+            ? $blogCat->meta_description
+            : ($blogIsRu
+                ? 'Статьи рубрики «' . $blogCat->name . '» в блоге доски объявлений AddNew.biz: советы, обзоры и полезные материалы.'
+                : 'Статті рубрики «' . $blogCat->name . '» у блозі дошки оголошень AddNew.biz: поради, огляди та корисні матеріали.');
+    } else {
+        $blogTitle = $blogIsRu
+            ? 'Блог доски объявлений AddNew.biz: статьи и советы'
+            : 'Блог дошки оголошень AddNew.biz: статті та поради';
+        $blogDesc = $blogIsRu
+            ? 'Блог доски объявлений AddNew.biz: новости, статьи и полезные материалы о том, как сделать ваше объявление эффективным.'
+            : 'Блог дошки оголошень AddNew.biz: новини, статті та корисні матеріали про те, як зробити ваше оголошення ефективним.';
+    }
+@endphp
+@section('meta_title', $blogTitle)
+@section('meta_description', $blogDesc)
+
 @section('content')
     <main class="blog-page">
         <div class="container">
