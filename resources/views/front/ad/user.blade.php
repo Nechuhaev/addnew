@@ -4,6 +4,9 @@
 
 @section('meta_description', $meta['meta_description'] ?? $entity->content)
 
+@section('og_image', (string) ($entity->image ?? ''))
+@section('og_card', !empty($entity->image) ? 'summary' : '')
+
 @section('style')
     @if(empty($ads))
         <meta name="robots" content="noindex, follow" />

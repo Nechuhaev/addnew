@@ -52,6 +52,7 @@
     }
     </script>
 
+    @include('front.partials.og')
 </head>
 <body class=""> <!-- fixed -->
 <!-- Google Tag Manager (noscript) -->
