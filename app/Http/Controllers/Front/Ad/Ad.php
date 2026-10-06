@@ -135,7 +135,15 @@ class Ad extends Controller
             $same_products = collect([]);
 
         }
+        // Дата останньої успішної перевірки ціни (для імпортованих товарів)
+        $priceCheckedAt = null;
+        if ($ad->is_product) {
+            $ts = \App\ProductPriceCheck::where('ad_id', $ad->id)->where('status', 'success')->max('checked_at');
+            $priceCheckedAt = $ts ? \Carbon\Carbon::parse($ts) : null;
+        }
+
         return view('front.ad.ad')->with([
+            'price_checked_at' => $priceCheckedAt,
             'ad' => $ad,
             'same_products' => $same_products,
             'related' => $related_ads,

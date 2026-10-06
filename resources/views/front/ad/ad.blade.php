@@ -199,6 +199,9 @@
                             <li><span>{{ __('ad_create.author_short_label') }}:</span><a href="{{ route('author', ['id'=>$ad->user->id]) }}">{{ $ad->user->username }}</a></li>
                             <li><span>{{ __('ad_create.city_label') }}:</span><a href="{{ $ad->category->getFilteredUrl($ad->city->slug) }}">{{ $ad->city->name }}</a></li>
                             <li><span>{{ __('ad_create.date_created_label') }}:</span>{{ $ad->date_created}}</li>
+                            @if(!empty($price_checked_at))
+                                <li><span>{{ app()->getLocale() === 'ru' ? 'Цена проверена' : 'Ціну перевірено' }}:</span>{{ $price_checked_at->format('d.m.Y') }}</li>
+                            @endif
                             <li><span>{{ __('ad_create.district_label') }}:</span><a href="{{ $ad->category->getFilteredUrl($ad->city->region->slug) }}">{{ $ad->city->region->name }}</a></li>
                             @if($ad->status == 'active')
                                 <li><span>{{ __('ad_create.valid_until_label') }}:</span>{{ $ad->date_end }}</li>
