@@ -11,17 +11,21 @@ use Illuminate\Support\Facades\DB;
  * Переклад назв тегів RU → UK через DeepL (заповнює ad_tags.name_uk).
  *
  * - За замовчуванням ТІЛЬКИ ЗВІТ (скільки назв, скільки символів, кілька
- *   пробних перекладів для оцінки якості). Запис лише з --apply.
- * - Пріоритет: спершу теги, що є в sitemap (їх бачать люди й Google),
- *   потім решта за id. Бюджет символів на запуск: --max-chars.
- * - Пропускає назви без кирилиці (цифри, латиниця) і назви, що вже містять
- *   українські літери (і/ї/є/ґ): вони вже українські.
+ *   пробних перекладів з вердиктом). Запис лише з --apply.
+ * - Пріоритет: спершу теги з sitemap, потім решта за id. Бюджет символів
+ *   на запуск: --max-chars (однослівні назви коштують удвічі, див. нижче).
+ * - ПЕРЕВІРКА ЗВОРОТНИМ ПЕРЕКЛАДОМ для однослівних назв: без контексту DeepL
+ *   плутає омоніми («входные» → «вихідні» замість «вхідні»). Для однослівної
+ *   назви переклад приймається, лише якщо зворотний переклад UK→RU збігається
+ *   з оригіналом (без урахування регістру та е/ё). Відхилені лишаються без
+ *   name_uk (на UA-сторінці показується оригінал) і пишуться в окремий CSV.
+ *   Багатослівні назви контекст визначає самі, їх приймаємо без перевірки.
+ * - Пропускає назви без кирилиці і ті, що вже містять і/ї/є/ґ.
  * - Не чіпає name, slug та вже заповнені name_uk. Регістр першої літери
- *   узгоджується з оригіналом (DeepL любить робити велику).
- * - Запобіжник квоти: --apply відмовляється працювати, якщо після запуску
- *   у квоті DeepL лишиться менше RESERVE символів (резерв для статей блогу).
- * - Кожен запис пишеться в CSV-журнал; --rollback=ФАЙЛ обнуляє name_uk,
- *   які записав саме цей запуск.
+ *   узгоджується з оригіналом; “ялинки” додані DeepL прибираються.
+ * - Запобіжник квоти: --apply відмовляється, якщо після запуску лишиться
+ *   менше RESERVE символів (резерв для статей блогу).
+ * - Журнал записаного (CSV); --rollback=ФАЙЛ обнуляє записане тим запуском.
  */
 class TranslateTagNamesDeepL extends Command
 {
@@ -29,11 +33,11 @@ class TranslateTagNamesDeepL extends Command
 
     protected $signature = 'tags:translate-deepl
         {--apply : Записати переклади (без цього лише звіт)}
-        {--max-chars=60000 : Максимум символів джерела за один запуск}
-        {--sample=8 : Скільки назв перекласти для перегляду якості у звіті}
+        {--max-chars=60000 : Максимум символів за один запуск (з урахуванням зворотної перевірки)}
+        {--sample=10 : Скільки назв перекласти для перегляду якості у звіті}
         {--rollback= : Шлях до CSV-журналу: обнулити name_uk, записані тим запуском}';
 
-    protected $description = 'Перекладає назви тегів RU→UK через DeepL (name_uk); за замовчуванням лише звіт';
+    protected $description = 'Перекладає назви тегів RU→UK через DeepL (name_uk) із перевіркою зворотним перекладом; за замовчуванням лише звіт';
 
     const BATCH = 40;          // назв в одному запиті DeepL (ліміт 50)
     const RESERVE = 150000;    // символів квоти, які лишаємо для статей блогу
@@ -79,31 +83,37 @@ class TranslateTagNamesDeepL extends Command
         }
         $all = array_merge($prio, $rest);
 
-        // План запуску: унікальні назви (без урахування регістру) в межах бюджету
+        // План запуску: унікальні назви (без урахування регістру) в межах бюджету.
+        // Однослівні коштують удвічі (переклад + зворотна перевірка).
         $plan = [];
         $chars = 0;
         $totalUniqueChars = 0;
         $seen = [];
+        $single = 0;
         foreach ($all as $it) {
             $key = mb_strtolower($it['name']);
             $len = mb_strlen($it['name']);
             if (!isset($seen[$key])) {
                 $seen[$key] = true;
                 $totalUniqueChars += $len;
+                if ($this->isSingleWord($it['name'])) {
+                    $single++;
+                }
             }
             if (!isset($plan[$key])) {
-                if ($chars + $len > $maxChars) {
+                $cost = $this->isSingleWord($it['name']) ? $len * 2 : $len;
+                if ($chars + $cost > $maxChars) {
                     continue;
                 }
-                $plan[$key] = ['src' => $it['name'], 'ids' => []];
-                $chars += $len;
+                $plan[$key] = ['src' => $it['name'], 'cost' => $cost, 'ids' => []];
+                $chars += $cost;
             }
             $plan[$key]['ids'][] = ['id' => $it['id'], 'name' => $it['name']];
         }
 
-        $this->info('Назв тегів без name_uk, що потребують перекладу: ' . count($all) . ' (унікальних: ' . count($seen) . ', ≈' . $totalUniqueChars . ' символів)');
+        $this->info('Назв тегів без name_uk, що потребують перекладу: ' . count($all) . ' (унікальних: ' . count($seen) . ', однослівних: ' . $single . ', ≈' . $totalUniqueChars . ' символів без перевірки)');
         $this->line('  з них у sitemap (пріоритет): ' . count($prio));
-        $this->line('План цього запуску (ліміт ' . $maxChars . '): ' . count($plan) . ' унікальних назв, ≈' . $chars . ' символів');
+        $this->line('План цього запуску (ліміт ' . $maxChars . '): ' . count($plan) . ' унікальних назв, ≈' . $chars . ' символів з урахуванням перевірки');
 
         $usage = $this->usage();
         if ($usage) {
@@ -128,11 +138,16 @@ class TranslateTagNamesDeepL extends Command
             return 1;
         }
 
-        $logPath = storage_path('app/tag_names_deepl_' . date('Ymd_His') . '.csv');
+        $stamp = date('Ymd_His');
+        $logPath = storage_path('app/tag_names_deepl_' . $stamp . '.csv');
+        $rejPath = storage_path('app/tag_names_deepl_rejected_' . $stamp . '.csv');
         $log = fopen($logPath, 'w');
+        $rej = fopen($rejPath, 'w');
         fputcsv($log, ['id', 'name', 'name_uk']);
+        fputcsv($rej, ['id', 'name', 'candidate', 'back_translation']);
 
         $written = 0;
+        $rejected = 0;
         $charsUsed = 0;
         $batches = array_chunk($plan, self::BATCH, true);
         foreach ($batches as $bi => $batch) {
@@ -142,15 +157,21 @@ class TranslateTagNamesDeepL extends Command
                 $texts[] = $batch[$k]['src'];
             }
             try {
-                $out = $this->translateViaDeepL($texts, 'RU', 'UK');
+                $res = $this->translateChecked($texts);
             } catch (\Throwable $e) {
                 $this->error('DeepL: ' . $e->getMessage());
                 break;
             }
             foreach ($keys as $i => $k) {
+                $r = $res[$i];
                 foreach ($batch[$k]['ids'] as $pair) {
-                    $uk = $this->matchCase($pair['name'], isset($out[$i]) ? $out[$i] : '');
+                    $uk = $this->matchCase($pair['name'], $r['raw']);
                     if ($uk === null) {
+                        continue;
+                    }
+                    if (!$r['ok']) {
+                        fputcsv($rej, [$pair['id'], $pair['name'], $uk, (string) $r['back']]);
+                        $rejected++;
                         continue;
                     }
                     DB::table('ad_tags')
@@ -162,22 +183,61 @@ class TranslateTagNamesDeepL extends Command
                     fputcsv($log, [$pair['id'], $pair['name'], $uk]);
                     $written++;
                 }
-                $charsUsed += mb_strlen($batch[$k]['src']);
+                $charsUsed += $batch[$k]['cost'];
             }
-            $this->line('порція ' . ($bi + 1) . '/' . count($batches) . ': записано тегів ' . $written . ', символів DeepL ≈' . $charsUsed);
+            $this->line('порція ' . ($bi + 1) . '/' . count($batches) . ': записано ' . $written . ', відхилено перевіркою ' . $rejected . ', символів DeepL ≈' . $charsUsed);
             usleep(250000);
         }
         fclose($log);
+        fclose($rej);
 
-        $this->info("Готово. Записано name_uk для {$written} тегів, символів DeepL ≈{$charsUsed}.");
+        $this->info("Готово. Записано name_uk для {$written} тегів, відхилено зворотною перевіркою {$rejected}, символів DeepL ≈{$charsUsed}.");
         $this->line("Журнал: {$logPath}");
+        $this->line("Відхилені (лишились без name_uk): {$rejPath}");
         $this->line("Відкат цього запуску: php artisan tags:translate-deepl --rollback={$logPath}");
 
         return 0;
     }
 
     /**
-     * Пробні переклади для оцінки якості (рівномірна вибірка з плану).
+     * Переклад RU→UK. Для однослівних назв (де DeepL плутає омоніми) робить
+     * зворотний переклад UK→RU і приймає результат, лише якщо він збігається
+     * з оригіналом. Повертає по кожній назві: raw (відповідь DeepL), back, ok.
+     */
+    protected function translateChecked(array $srcs)
+    {
+        $out = $this->translateViaDeepL($srcs, 'RU', 'UK');
+        $res = [];
+        $backIdx = [];
+        $backTexts = [];
+        foreach ($srcs as $i => $src) {
+            $raw = isset($out[$i]) ? $out[$i] : '';
+            $uk = $this->matchCase($src, $raw);
+            $ok = $uk !== null;
+            $res[$i] = ['raw' => $raw, 'uk' => $uk, 'back' => null, 'ok' => $ok];
+            if (!$ok || !$this->isSingleWord($src)) {
+                continue;
+            }
+            if ($this->norm($uk) === $this->norm($src)) {
+                continue;   // написання однакове в обох мовах: перевіряти нема що
+            }
+            $backIdx[] = $i;
+            $backTexts[] = $uk;
+        }
+        if ($backTexts) {
+            $back = $this->translateViaDeepL($backTexts, 'UK', 'RU');
+            foreach ($backIdx as $j => $i) {
+                $b = isset($back[$j]) ? trim(html_entity_decode((string) $back[$j], ENT_QUOTES, 'UTF-8')) : '';
+                $res[$i]['back'] = $b;
+                $res[$i]['ok'] = $this->norm($b) === $this->norm($srcs[$i]);
+            }
+        }
+
+        return $res;
+    }
+
+    /**
+     * Пробні переклади з вердиктом (рівномірна вибірка з плану).
      */
     protected function showSample(array $plan, $n)
     {
@@ -191,27 +251,48 @@ class TranslateTagNamesDeepL extends Command
             $texts[] = $plan[$keys[$i]]['src'];
         }
         try {
-            $out = $this->translateViaDeepL($texts, 'RU', 'UK');
+            $res = $this->translateChecked($texts);
         } catch (\Throwable $e) {
             $this->error('Не вдалося отримати пробні переклади: ' . $e->getMessage());
 
             return;
         }
-        $this->line('Пробні переклади (у БД нічого не пишеться):');
+        $this->line('Пробні переклади з перевіркою (у БД нічого не пишеться):');
         foreach ($texts as $i => $src) {
-            $this->line('  ' . $src . '  →  ' . $this->matchCase($src, isset($out[$i]) ? $out[$i] : ''));
+            $r = $res[$i];
+            $verdict = $r['ok'] ? 'прийнято' : 'ВІДХИЛЕНО' . ($r['back'] !== null ? ', зворотний переклад «' . $r['back'] . '»' : '');
+            $this->line('  ' . $src . '  →  ' . $r['uk'] . '   [' . $verdict . ']');
         }
     }
 
+    protected function isSingleWord($s)
+    {
+        return !preg_match('/\s/u', trim((string) $s));
+    }
+
+    protected function norm($s)
+    {
+        $s = mb_strtolower(trim((string) $s));
+        $s = str_replace('ё', 'е', $s);
+
+        return rtrim($s, ".,!?;: ");
+    }
+
     /**
-     * Регістр першої літери як в оригіналі; розкодовує HTML-сутності
-     * (DeepL у режимі html може повернути &amp; тощо).
+     * Регістр першої літери як в оригіналі; розкодовує HTML-сутності;
+     * прибирає лапки, яких не було в оригіналі (DeepL любить додавати «»).
      */
     protected function matchCase($src, $dst)
     {
         $dst = trim(html_entity_decode((string) $dst, ENT_QUOTES, 'UTF-8'));
         if ($dst === '') {
             return null;
+        }
+        if (mb_strpos($src, '«') === false && mb_strpos($src, '"') === false) {
+            $dst = trim(str_replace(['«', '»', '"', '„', '“', '”'], '', $dst));
+            if ($dst === '') {
+                return null;
+            }
         }
         $s1 = mb_substr($src, 0, 1);
         if (mb_strtolower($s1) === $s1 && mb_strtoupper($s1) !== $s1) {
