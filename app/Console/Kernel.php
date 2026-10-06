@@ -33,7 +33,7 @@ class Kernel extends ConsoleKernel
             }
         })->mondays()->at('17:00');
 
-        $schedule->command('sitemap:update')->fridays()->at('17:00')->runInBackground();
+        $schedule->command('sitemap:rebuild')->fridays()->at('17:00')->runInBackground();
     // Раз на тиждень (понеділок, 05:00) — поповнює семантику й контент-план,
     // якщо запланованих тем лишилось мало (MIN_PLANNED_ARTICLES).
     $schedule->command('content:build-plan')
