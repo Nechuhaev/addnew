@@ -93,7 +93,7 @@
                 $mobileRouteParams = request()->route() ? request()->route()->parameters() : [];
                 $mobileIsRu = $mobileCurrentRouteName && starts_with($mobileCurrentRouteName, 'ru.');
                 $mobileUkRouteName = $mobileIsRu ? substr($mobileCurrentRouteName, 3) : $mobileCurrentRouteName;
-                $mobileRuRouteName = $mobileIsRu ? $mobileCurrentRouteName : 'ru.' . $mobileCurrentRouteName;
+                $mobileRuRouteName = $mobileIsRu ? $mobileCurrentRouteName : ($mobileCurrentRouteName ? 'ru.' . $mobileCurrentRouteName : null);
             @endphp
             <div style="margin-top:10px;">
                 @if($mobileUkRouteName && \Route::has($mobileUkRouteName))
