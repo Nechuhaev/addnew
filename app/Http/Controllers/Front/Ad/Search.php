@@ -93,8 +93,8 @@ class Search extends Controller
             ];
         } else {
             $meta = [
-                'meta_title' => "Результаты поиска на доске объевлений ADDNEW.BIZ",
-                'meta_description' => "Результаты поиска на доске объевлений ADDNEW.BIZ",
+                'meta_title' => "Результаты поиска на доске объявлений Addnew.biz",
+                'meta_description' => "Результаты поиска на доске объявлений Addnew.biz",
                 'description' => false,
             ];
         }

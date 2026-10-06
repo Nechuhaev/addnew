@@ -42,7 +42,7 @@
       "@type": "Organization",
       "url": "https://addnew.biz",
       "email": "info@addnew.biz",
-      "name": "ADDNEW.BIZ",
+      "name": "Addnew.biz",
       "logo": "https://addnew.biz/assets/front/img/logo.png",
       "potentialAction": [{
           "@type": "SearchAction",
