@@ -43,12 +43,7 @@
       "url": "https://addnew.biz",
       "email": "info@addnew.biz",
       "name": "Addnew.biz",
-      "logo": "https://addnew.biz/assets/front/img/logo.png",
-      "potentialAction": [{
-          "@type": "SearchAction",
-          "target": "https://addnew.biz//search?s={search_term_string}&cat_id=0&sub_cat_id=0&city_id=0",
-          "query-input": "required name=search_term_string"
-      }]
+      "logo": "https://addnew.biz/assets/front/img/logo.png"
     }
     </script>
 

@@ -23,6 +23,43 @@
 @foreach($ogTags as $ogTag)
 <meta property="article:tag" content="{{ $ogTag }}">
 @endforeach
+@php
+    $ldImg = null;
+    if (!empty($article->image)) {
+        $ldImg = preg_match('~^https?://~i', $article->image) ? $article->image : url($article->image);
+        $ldImg = preg_replace_callback('/[^\x21-\x7E]/', function ($m) {
+            return rawurlencode($m[0]);
+        }, $ldImg);
+    }
+    $ldDesc = trim(preg_replace('/\s+/u', ' ', strip_tags(html_entity_decode((string) ($article->meta_description ?: $article->excerpt), ENT_QUOTES, 'UTF-8'))));
+    $ldCat = $article->categories->first();
+    $ldData = [
+        '@context' => 'https://schema.org',
+        '@type' => 'BlogPosting',
+        'mainEntityOfPage' => ['@type' => 'WebPage', '@id' => url()->current()],
+        'headline' => \Illuminate\Support\Str::limit(trim(strip_tags((string) $article->name)), 110, ''),
+        'description' => \Illuminate\Support\Str::limit($ldDesc, 200, '…'),
+        'inLanguage' => app()->getLocale() === 'ru' ? 'ru' : 'uk',
+        'author' => ['@type' => 'Organization', 'name' => 'Addnew.biz', 'url' => url('/')],
+        'publisher' => ['@type' => 'Organization', 'name' => 'Addnew.biz', 'logo' => ['@type' => 'ImageObject', 'url' => asset('assets/front/img/logo.png')]],
+    ];
+    if ($ldImg) {
+        $ldData['image'] = [$ldImg];
+    }
+    if ($ogPub) {
+        $ldData['datePublished'] = \Carbon\Carbon::parse($ogPub)->toAtomString();
+    }
+    if ($ogMod || $ogPub) {
+        $ldData['dateModified'] = \Carbon\Carbon::parse($ogMod ?: $ogPub)->toAtomString();
+    }
+    if ($ldCat) {
+        $ldData['articleSection'] = $ldCat->name;
+    }
+    if (!empty($ogTags)) {
+        $ldData['keywords'] = implode(', ', $ogTags);
+    }
+@endphp
+<script type="application/ld+json">{!! json_encode($ldData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) !!}</script>
 @endpush
 
 @section('content')
@@ -46,6 +83,9 @@
                                 @endforeach
                             </span>
                             <span><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/clock.svg') }}" /> <span>{{ $article->created_at }}</span></span>
+                            @if($ogMod && $ogPub && \Carbon\Carbon::parse($ogMod)->toDateString() !== \Carbon\Carbon::parse($ogPub)->toDateString())
+                                <span>{{ app()->getLocale() === 'ru' ? 'Обновлено' : 'Оновлено' }}: {{ \Carbon\Carbon::parse($ogMod)->format('d.m.Y') }}</span>
+                            @endif
                         </div>
                         <div class="blog-intro">
                             @if($article->image)
