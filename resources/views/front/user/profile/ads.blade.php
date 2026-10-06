@@ -56,7 +56,7 @@
                                         <a title="{{ __('ad_create.edit_ad_button') }}" href="{{ route('ad.edit', ['id' => $ad->id]) }}" class="edit">
                                             <img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/edit.svg') }}" />
                                         </a>
-                                        <a title="{{ __('profile.delete_ad_title') }}" href="{{ route('ad.delete', ['id' => $ad->id]) }}" onclick="return confirm('{{ __('profile.delete_confirm') }}');" class="delete">
+                                        <a title="{{ __('profile.delete_ad_title') }}" href="{{ route('ad.delete', ['id' => $ad->id]) }}" onclick="if(!confirm('{{ __('profile.delete_confirm') }}')){return false;}var f=document.createElement('form');f.method='POST';f.action=this.href;var t=document.createElement('input');t.type='hidden';t.name='_token';t.value='{{ csrf_token() }}';f.appendChild(t);document.body.appendChild(f);f.submit();return false;" class="delete">
                                             <img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/trash.svg') }}" />
                                         </a>
                                         @if ($ad->status == 'active')

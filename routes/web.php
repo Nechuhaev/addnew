@@ -295,7 +295,7 @@ $frontRoutes = function () {
     Route::post('/ads/{slug}', 'Front\Ad\Ad@message');
     Route::get('/ad/edit/{id}', 'Front\Ad\Ad@edit')->name('ad.edit');
     Route::post('/ad/edit/{id}', 'Front\Ad\Ad@update')->name('ad.update');
-    Route::get('/ads/delete/{id}', 'Front\Ad\Ad@delete')->name('ad.delete');
+    Route::post('/ads/delete/{id}', 'Front\Ad\Ad@delete')->middleware('auth')->name('ad.delete');
     Route::get('/ads/status/{ad_id}/{status_id}', 'Front\Ad\Ad@changeStatus')->name('ad.changeStatus');
 
 
