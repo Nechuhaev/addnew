@@ -79,8 +79,8 @@ class Category extends Controller
             $entity_values = [
                 '---category_name---'  => $entity->name,
                 '---parent_name---'    => ($parent) ? $entity->parent->name : '',
-                '---filtered_name---'  => $filter_entity->name ?? "доска бесплатных объявлений Addnew.biz в Украине",
-                '---full_filtered_name---'    => $filter_entity->address_format ?? "доска бесплатных объявлений Addnew.biz в Украине",
+                '---filtered_name---'  => $filter_entity->name ?? (app()->getLocale() === 'ru' ? 'Украине' : 'Україні'),
+                '---full_filtered_name---'    => $filter_entity->address_format ?? (app()->getLocale() === 'ru' ? 'Украине' : 'Україні'),
             ];
             $meta = [
                 'meta_title' => strtr($entity->meta_title, $entity_values) ?? strtr($seo_field->meta_title, $entity_values),
@@ -89,8 +89,8 @@ class Category extends Controller
             ];
         } else {
             $entity_values = [
-                '---filtered_name---'  => $filter_entity->name ?? "доска бесплатных объявлений Addnew.biz в Украине",
-                '---full_filtered_name---'    => $filter_entity->address_format ?? "доска бесплатных объявлений Addnew.biz в Украине",
+                '---filtered_name---'  => $filter_entity->name ?? (app()->getLocale() === 'ru' ? 'Украине' : 'Україні'),
+                '---full_filtered_name---'    => $filter_entity->address_format ?? (app()->getLocale() === 'ru' ? 'Украине' : 'Україні'),
             ];
 
             $meta = [
