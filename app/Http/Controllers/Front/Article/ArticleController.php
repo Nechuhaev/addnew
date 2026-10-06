@@ -29,8 +29,8 @@ class ArticleController extends Controller
             );
 
             $data['article'] = $article;
-            $data['randomProducts'] = $this->randomAds(true, 6);
-            $data['randomListings'] = $this->randomAds(false, 6);
+            $data['randomProducts'] = $this->relevantAds($article, true, 6);
+            $data['randomListings'] = $this->relevantAds($article, false, 6);
 
             return view('front.article.article')->with($data);
         }
@@ -62,5 +62,107 @@ class ArticleController extends Controller
         $randomIds = (array) array_rand(array_flip($ids), min($count, count($ids)));
 
         return Ad::with('currency')->whereIn('id', $randomIds)->get();
+    }
+
+    /**
+     * Слова в назві, за якими оголошення не потрапляють у блоки на редакційних сторінках.
+     */
+    protected $widgetStopWords = ['донор', 'эскорт', 'интим', 'рецептурн'];
+
+    /**
+     * Категорії (разом із вкладеними), яких не показуємо в блоках статей.
+     */
+    protected $widgetBlockedSlugs = ['znakomstva-i-kontaktyi', 'medikamenty-i-meditsinskie-tovary', 'eroticheskaya-odezhda', 'tovary-dlya-vzroslykh'];
+
+    /**
+     * Рубрика блогу → категорія верхнього рівня на дошці.
+     */
+    protected $widgetCategoryMap = [
+        'blog-transport' => 'transport',
+        'elektronika' => 'elektronika',
+        'rabota' => 'rabota',
+        'nedvizhimost' => 'nedvizhimost-2',
+        'stroitelstvo' => 'stroitelstvo-i-remont',
+        'oborudovanie' => 'oborudovanie-2',
+        'zhivotnye' => 'zhivotnyie',
+        'biznes-i-uslugi' => 'biznes-i-uslugi',
+        'dom-i-sad' => 'dom-i-sad',
+        'detskiy-mir' => 'detskiy-mir',
+        'moda-i-stil' => 'moda-i-stil',
+    ];
+
+    /**
+     * Блоки на сторінці статті: оголошення/товари тієї ж тематики, що й рубрика
+     * статті (а не випадкові з усього сайту). Чутливі категорії й слова виключені.
+     * Немає підходящих: порожня колекція (шаблон тоді ховає блок).
+     */
+    protected function relevantAds($article, bool $isProduct, int $count)
+    {
+        $catIds = $this->widgetCategoryIds($article);
+        if (empty($catIds)) {
+            return collect();
+        }
+
+        $stop = $this->widgetStopWords;
+        $key = 'article_widget_ids_' . ($isProduct ? 'p' : 'l') . '_' . md5(implode(',', $catIds));
+        $ids = Cache::remember($key, 1800, function () use ($isProduct, $catIds, $stop) {
+            $q = DB::table('ads')
+                ->whereIn('category_id', $catIds)
+                ->where('is_product', $isProduct ? 1 : 0)
+                ->where('status', 1)
+                ->whereNotNull('image')
+                ->where('image', '!=', '')
+                ->orderBy('id', 'desc')
+                ->limit(1500);
+            foreach ($stop as $w) {
+                $q->where('name', 'not like', '%' . $w . '%');
+            }
+
+            return $q->pluck('id')->all();
+        });
+
+        if (empty($ids)) {
+            return collect();
+        }
+        $pick = (array) array_rand(array_flip($ids), min($count, count($ids)));
+
+        return Ad::with('currency')->whereIn('id', $pick)->get();
+    }
+
+    protected function widgetCategoryIds($article)
+    {
+        $slugs = [];
+        foreach ($article->categories as $c) {
+            if (isset($this->widgetCategoryMap[$c->slug])) {
+                $slugs[] = $this->widgetCategoryMap[$c->slug];
+            }
+        }
+        if (empty($slugs)) {
+            return [];
+        }
+        sort($slugs);
+        $blocked = $this->widgetBlockedSlugs;
+
+        return Cache::remember('article_widget_cats_' . md5(implode(',', $slugs)), 3600, function () use ($slugs, $blocked) {
+            $top = DB::table('ad_categories')->whereIn('slug', $slugs)->pluck('id')->all();
+            $bad = DB::table('ad_categories')->whereIn('slug', $blocked)->pluck('id')->all();
+
+            return array_values(array_diff($this->categoryTree($top), $this->categoryTree($bad)));
+        });
+    }
+
+    protected function categoryTree(array $roots)
+    {
+        $all = $roots;
+        $frontier = $roots;
+        while (!empty($frontier)) {
+            $frontier = array_values(array_diff(
+                DB::table('ad_categories')->whereIn('parent_id', $frontier)->pluck('id')->all(),
+                $all
+            ));
+            $all = array_merge($all, $frontier);
+        }
+
+        return $all;
     }
 }
