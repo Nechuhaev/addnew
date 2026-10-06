@@ -206,7 +206,13 @@ class TranslateTagNamesDeepL extends Command
      */
     protected function translateChecked(array $srcs)
     {
-        $out = $this->translateViaDeepL($srcs, 'RU', 'UK');
+        // ВЕЛИКІ літери DeepL повертає великими: перекладаємо нижній регістр,
+        // а регістр відновлюємо в matchCase за оригіналом кожного тегу.
+        $send = [];
+        foreach ($srcs as $i => $s) {
+            $send[$i] = $this->isAllCaps($s) ? mb_strtolower($s) : $s;
+        }
+        $out = $this->translateViaDeepL($send, 'RU', 'UK');
         $res = [];
         $backIdx = [];
         $backTexts = [];
@@ -270,6 +276,13 @@ class TranslateTagNamesDeepL extends Command
         return !preg_match('/\s/u', trim((string) $s));
     }
 
+    protected function isAllCaps($s)
+    {
+        $s = trim((string) $s);
+
+        return mb_strlen($s) > 1 && mb_strtoupper($s) === $s && mb_strtolower($s) !== $s;
+    }
+
     protected function norm($s)
     {
         $s = mb_strtolower(trim((string) $s));
@@ -293,6 +306,9 @@ class TranslateTagNamesDeepL extends Command
             if ($dst === '') {
                 return null;
             }
+        }
+        if ($this->isAllCaps($src)) {
+            return mb_strtoupper($dst);
         }
         $s1 = mb_substr($src, 0, 1);
         if (mb_strtolower($s1) === $s1 && mb_strtoupper($s1) !== $s1) {
