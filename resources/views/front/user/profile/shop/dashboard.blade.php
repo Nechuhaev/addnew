@@ -67,9 +67,9 @@
                                             <a href="{{ route('profile.shop.product.edit', ['id' => $product->id]) }}" class="shop-action shop-action--edit">{{ __('shop.edit_link') }}</a>
                                             <a href="{{ route('ad.delete', ['id' => $product->id]) }}" onclick="if(!confirm('{{ __('shop.delete_product_confirm') }}')){return false;}var f=document.createElement('form');f.method='POST';f.action=this.href;var t=document.createElement('input');t.type='hidden';t.name='_token';t.value='{{ csrf_token() }}';f.appendChild(t);document.body.appendChild(f);f.submit();return false;" class="shop-action shop-action--delete">{{ __('shop.delete_link') }}</a>
                                             @if ($product->status == 'active')
-                                                <a href="{{ route('ad.changeStatus', ['ad_id' => $product->id, 'status_id' => 0]) }}" class="shop-action shop-action--suspend">{{ __('shop.suspend_link') }}</a>
+                                                <a href="{{ route('ad.changeStatus', ['ad_id' => $product->id, 'status_id' => 0]) }}" class="shop-action shop-action--suspend" onclick="var f=document.createElement('form');f.method='POST';f.action=this.href;var t=document.createElement('input');t.type='hidden';t.name='_token';t.value='{{ csrf_token() }}';f.appendChild(t);document.body.appendChild(f);f.submit();return false;">{{ __('shop.suspend_link') }}</a>
                                             @elseif ($product->status == 'suspend')
-                                                <a href="{{ route('ad.changeStatus', ['ad_id' => $product->id, 'status_id' => 1]) }}" class="shop-action shop-action--resume">{{ __('shop.resume_link') }}</a>
+                                                <a href="{{ route('ad.changeStatus', ['ad_id' => $product->id, 'status_id' => 1]) }}" class="shop-action shop-action--resume" onclick="var f=document.createElement('form');f.method='POST';f.action=this.href;var t=document.createElement('input');t.type='hidden';t.name='_token';t.value='{{ csrf_token() }}';f.appendChild(t);document.body.appendChild(f);f.submit();return false;">{{ __('shop.resume_link') }}</a>
                                             @endif
                                         </div>
                                     </div>

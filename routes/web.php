@@ -296,7 +296,7 @@ $frontRoutes = function () {
     Route::get('/ad/edit/{id}', 'Front\Ad\Ad@edit')->name('ad.edit');
     Route::post('/ad/edit/{id}', 'Front\Ad\Ad@update')->name('ad.update');
     Route::post('/ads/delete/{id}', 'Front\Ad\Ad@delete')->middleware('auth')->name('ad.delete');
-    Route::get('/ads/status/{ad_id}/{status_id}', 'Front\Ad\Ad@changeStatus')->name('ad.changeStatus');
+    Route::post('/ads/status/{ad_id}/{status_id}', 'Front\Ad\Ad@changeStatus')->middleware('auth')->name('ad.changeStatus');
 
 
 // Теги объявлений

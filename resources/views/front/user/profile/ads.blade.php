@@ -60,17 +60,17 @@
                                             <img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/trash.svg') }}" />
                                         </a>
                                         @if ($ad->status == 'active')
-                                        <a title="{{ __('profile.pause_ad_title') }}" href="{{ route('ad.changeStatus', ['ad_id' => $ad->id, 'status_id' => 0]) }}" class="restart">
+                                        <a title="{{ __('profile.pause_ad_title') }}" href="{{ route('ad.changeStatus', ['ad_id' => $ad->id, 'status_id' => 0]) }}" class="restart" onclick="var f=document.createElement('form');f.method='POST';f.action=this.href;var t=document.createElement('input');t.type='hidden';t.name='_token';t.value='{{ csrf_token() }}';f.appendChild(t);document.body.appendChild(f);f.submit();return false;">
                                             <img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/controls-pause.svg') }}" />
                                         </a>
                                         @else
-                                        <a title="{{ __('profile.resume_ad_title') }}" href="{{ route('ad.changeStatus', ['ad_id' => $ad->id, 'status_id' => 1]) }}" class="restart">
+                                        <a title="{{ __('profile.resume_ad_title') }}" href="{{ route('ad.changeStatus', ['ad_id' => $ad->id, 'status_id' => 1]) }}" class="restart" onclick="var f=document.createElement('form');f.method='POST';f.action=this.href;var t=document.createElement('input');t.type='hidden';t.name='_token';t.value='{{ csrf_token() }}';f.appendChild(t);document.body.appendChild(f);f.submit();return false;">
                                             <img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/update.svg') }}" />
                                         </a>
                                         @endif
                                     </li>
                                     @if ($ad->status != 'archive')
-                                        <li><a title="{{ __('profile.mark_outdated_title') }}" href="{{ route('ad.changeStatus', ['ad_id' => $ad->id, 'status_id' => 2]) }}">{{ __('profile.mark_outdated_title') }}</a></li>
+                                        <li><a title="{{ __('profile.mark_outdated_title') }}" href="{{ route('ad.changeStatus', ['ad_id' => $ad->id, 'status_id' => 2]) }}" onclick="var f=document.createElement('form');f.method='POST';f.action=this.href;var t=document.createElement('input');t.type='hidden';t.name='_token';t.value='{{ csrf_token() }}';f.appendChild(t);document.body.appendChild(f);f.submit();return false;">{{ __('profile.mark_outdated_title') }}</a></li>
                                     @endif
                                 </ul>
                             </td>
