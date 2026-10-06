@@ -6,7 +6,8 @@ use Closure;
 
 /**
  * Додає loading="lazy" decoding="async" до <img> у HTML-відповідях, крім
- * перших SKIP_FIRST у документі (логотип, прапорці, перші картки: кандидати
+ * службової графіки (будь-який src зі шляхом /assets/: логотип, прапорці,
+ * іконки) і перших SKIP_FIRST контентних зображень (картки, фото: кандидати
  * на LCP, їх лишаємо як є).
  *
  * Навіщо: головна віддає ≈3,5 МБ зображень (58 файлів, оригінали 800–1600 px
@@ -22,7 +23,7 @@ use Closure;
  */
 class LazyLoadImages
 {
-    const SKIP_FIRST = 10;
+    const SKIP_FIRST = 4;
 
     public function handle($request, Closure $next)
     {
@@ -43,10 +44,16 @@ class LazyLoadImages
             return $response;
         }
 
-        $n = 0;
+        $n = 0;   // лічильник КОНТЕНТНИХ зображень (службова графіка не рахується)
         $new = preg_replace_callback('/<img\b[^>]*>/i', function ($m) use (&$n) {
-            $n++;
             $tag = $m[0];
+            if (!preg_match('/\ssrc\s*=\s*["\']([^"\']*)/i', $tag, $sm)) {
+                return $tag;
+            }
+            if (strpos($sm[1], '/assets/') !== false || strpos($sm[1], 'data:') === 0) {
+                return $tag;   // логотип, прапорці, іконки: крихітні, лишаємо як є
+            }
+            $n++;
             if ($n <= self::SKIP_FIRST || preg_match('/\sloading\s*=/i', $tag)) {
                 return $tag;
             }
