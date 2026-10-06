@@ -35,7 +35,8 @@ class TranslateTagNamesDeepL extends Command
         {--apply : Записати переклади (без цього лише звіт)}
         {--max-chars=60000 : Максимум символів за один запуск (з урахуванням зворотної перевірки)}
         {--sample=10 : Скільки назв перекласти для перегляду якості у звіті}
-        {--rollback= : Шлях до CSV-журналу: обнулити name_uk, записані тим запуском}';
+        {--rollback= : Шлях до CSV-журналу: обнулити name_uk, записані тим запуском}
+        {--retry-rejected : Повторно спробувати назви, відхилені зворотною перевіркою раніше}';
 
     protected $description = 'Перекладає назви тегів RU→UK через DeepL (name_uk) із перевіркою зворотним перекладом; за замовчуванням лише звіт';
 
@@ -51,6 +52,7 @@ class TranslateTagNamesDeepL extends Command
         $apply = (bool) $this->option('apply');
         $maxChars = max(1000, (int) $this->option('max-chars'));
         $sitemapSlugs = $this->sitemapSlugs();
+        $skip = $this->option('retry-rejected') ? [] : $this->previouslyRejected();
 
         $rows = DB::table('ad_tags')
             ->where(function ($q) {
@@ -63,6 +65,9 @@ class TranslateTagNamesDeepL extends Command
         $prio = [];
         $rest = [];
         foreach ($rows as $r) {
+            if (isset($skip[$r->id])) {
+                continue;   // відхилена раніше: результат був би той самий, а квота витрачається
+            }
             $n = trim((string) $r->name);
             $len = mb_strlen($n);
             if ($len < 2 || $len > 100) {
@@ -113,6 +118,7 @@ class TranslateTagNamesDeepL extends Command
 
         $this->info('Назв тегів без name_uk, що потребують перекладу: ' . count($all) . ' (унікальних: ' . count($seen) . ', однослівних: ' . $single . ', ≈' . $totalUniqueChars . ' символів без перевірки)');
         $this->line('  з них у sitemap (пріоритет): ' . count($prio));
+        $this->line('  пропущено раніше відхилених: ' . count($skip) . ' (повторити: --retry-rejected)');
         $this->line('План цього запуску (ліміт ' . $maxChars . '): ' . count($plan) . ' унікальних назв, ≈' . $chars . ' символів з урахуванням перевірки');
 
         $usage = $this->usage();
@@ -316,6 +322,26 @@ class TranslateTagNamesDeepL extends Command
         }
 
         return $dst;
+    }
+
+    /**
+     * id тегів, відхилених зворотною перевіркою в попередніх запусках.
+     */
+    protected function previouslyRejected()
+    {
+        $ids = [];
+        foreach (glob(storage_path('app/tag_names_deepl_rejected_*.csv')) ?: [] as $f) {
+            $fh = fopen($f, 'r');
+            fgetcsv($fh);
+            while (($r = fgetcsv($fh)) !== false) {
+                if (isset($r[0]) && ctype_digit((string) $r[0])) {
+                    $ids[(int) $r[0]] = true;
+                }
+            }
+            fclose($fh);
+        }
+
+        return $ids;
     }
 
     protected function sitemapSlugs()
