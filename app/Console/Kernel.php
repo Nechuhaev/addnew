@@ -65,6 +65,12 @@ class Kernel extends ConsoleKernel
         ->dailyAt('08:00')
         ->withoutOverlapping()
         ->appendOutputTo(storage_path('logs/content-sitemap.log'));
+
+    // Щонеділі прибирає осиротілі звʼязки ad_tag (лишаються після видалення товарів/магазинів).
+    $schedule->command('adtags:cleanup-orphans --apply')
+        ->weeklyOn(0, '03:30')
+        ->withoutOverlapping()
+        ->appendOutputTo(storage_path('logs/adtags-cleanup.log'));
         
         // Щогодини — перевіряє ціну/наявність товарів у джерелах (competitor_url/url).
     // Ліміт підвищений порівняно з дефолтом, бо товарів багато тисяч —
