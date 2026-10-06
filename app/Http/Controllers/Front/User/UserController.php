@@ -21,11 +21,14 @@ class UserController extends Controller
 
     public function ads()
     {
+        $query = Auth::user()->ads();
+        // Для магазину тут лише звичайні оголошення (товари живуть у розділі «Мій магазин»)
         if (Auth::user()->is_shop_owner) {
-            return redirect()->route('profile.shop.dashboard');
+            $query->where(function ($q) {
+                $q->where('is_product', 0)->orWhereNull('is_product');
+            });
         }
-
-        $data['ads'] = Auth::user()->ads()->orderBy('created_at')->paginate(15);
+        $data['ads'] = $query->orderBy('created_at')->paginate(15);
         return view('front.user.profile.ads')->with($data);
     }
     public function edit()

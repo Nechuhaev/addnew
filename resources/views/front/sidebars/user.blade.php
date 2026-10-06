@@ -3,6 +3,7 @@
     <ul class="account-menu">
         @is_shop_owner
             <li><a href="{{ route('profile.shop.dashboard') }}">{{ __('front.my_shop') }}</a></li>
+            <li><a href="{{ route('profile.ads') }}">{{ __('profile.my_ads_heading') }}</a></li>
             <li><a href="{{ route('profile.shop.stats') }}">{{ __('shop_stats.heading') }}</a></li>
             <li><a href="{{ route('profile.shop') }}">{{ __('shop.import_export_heading') }}</a></li>
             <li><a href="{{ route('profile.shop.info') }}">{{ __('shop.info_heading') }}</a></li>

@@ -174,7 +174,7 @@
                     $routeParams = request()->route() ? request()->route()->parameters() : [];
                     $isRu = $currentRouteName && starts_with($currentRouteName, 'ru.');
                     $ukRouteName = $isRu ? substr($currentRouteName, 3) : $currentRouteName;
-                    $ruRouteName = $isRu ? $currentRouteName : 'ru.' . $currentRouteName;
+                    $ruRouteName = $isRu ? $currentRouteName : ($currentRouteName ? 'ru.' . $currentRouteName : null);
                 @endphp
                 <style>
                     /* Перемикач мов у десктопній шапці — ховаємо на мобільних,

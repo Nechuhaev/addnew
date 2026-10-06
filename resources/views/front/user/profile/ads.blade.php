@@ -42,7 +42,7 @@
                             <td class="td-adv">
                                 <h3><a href="{{ $ad->url }}">{{ $ad->name }}</a></h3>
                                 <p class="td-meta">
-                                    <span class="meta-tag"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/editor-ul.svg') }}" />&nbsp;<a href="{{ $ad->category->url }}" rel="tag" class="">{{ $ad->category->path }}</a></span>
+                                    <span class="meta-tag"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/editor-ul.svg') }}" />&nbsp;<a href="{{ optional($ad->category)->url }}" rel="tag" class="">{{ optional($ad->category)->path }}</a></span>
                                     <span class="meta-date"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/clock.svg') }}" />&nbsp;<span>{{ $ad->date_start }}</span></span>
                                 </p>
                             </td>
