@@ -71,6 +71,7 @@ class Kernel extends ConsoleKernel
         ->weeklyOn(0, '03:30')
         ->withoutOverlapping()
         ->appendOutputTo(storage_path('logs/adtags-cleanup.log'));
+    $schedule->command('ads:moderate --apply --no-block')->weeklyOn(1, '04:00')->withoutOverlapping()->appendOutputTo(storage_path('logs/moderation.log'));
         
         // Щогодини — перевіряє ціну/наявність товарів у джерелах (competitor_url/url).
     // Ліміт підвищений порівняно з дефолтом, бо товарів багато тисяч —
