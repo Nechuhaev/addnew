@@ -175,6 +175,7 @@ class RebuildSitemap extends Command
         $adsCount = 0;
         Ad::query()
             ->select('id', 'slug')
+            ->where('status', 1)
             ->whereIn('city_id', $cityIds)
             ->chunk(self::CHUNK, function ($ads, $page) use ($index, &$adsCount) {
                 $sm = Sitemap::create();
