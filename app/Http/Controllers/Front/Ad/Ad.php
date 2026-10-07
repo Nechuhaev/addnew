@@ -306,9 +306,11 @@ class Ad extends Controller
                 if ($request->session()->has('ad.images')) {
                     $request->session()->remove('ad.images');
                 }
-                $dir = 'ads/' . time();
+                // Унікальна папка: інакше два оголошення, створені в одну
+                // секунду, перезаписували б фото одне одного (0.jpg, 1.jpg…).
+                $dir = 'ads/' . time() . '-' . Str::random(8);
                 foreach ($request->file('image') as $key => $image) {
-                    $filename = $key . '.' . $image->getClientOriginalExtension();
+                    $filename = $key . '.' . $image->extension();
                     $filepath = $dir . '/' . $filename;
                     $image->storeAs('public', $filepath);
                     $request->session()->push('ad.images', $filepath);
@@ -842,15 +844,12 @@ class Ad extends Controller
 
             $images = [];
 
-            $dir = 'ads/' . time();
+            $dir = 'ads/' . time() . '-' . Str::random(8);
             foreach ($request->file('image') as $key => $image) {
+                $filename = $key . '.' . $image->extension();
+                $filepath = $dir . '/' . $filename;
 
-                if (!$disk->exists($image)) {
-                    $filename = $key . '.' . $image->getClientOriginalExtension();
-                    $filepath = $dir.'/'.$filename;
-
-                    $disk->putFileAs($dir, $image, $filename, 'public');
-                }
+                $disk->putFileAs($dir, $image, $filename, 'public');
 
                 if ($key == 0) {
                     $ad->image = $disk->url($filepath);

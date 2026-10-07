@@ -185,13 +185,13 @@ class ProductEditService
      */
     protected function uploadSlotImages($disk, array $files): array
     {
-        $dir = 'ads/' . time();
+        $dir = 'ads/' . time() . '-' . \Illuminate\Support\Str::random(8);
 
         $main = null;
         $additional = [];
 
         foreach ($files as $key => $file) {
-            $filename = $key . '.' . $file->getClientOriginalExtension();
+            $filename = $key . '.' . $file->extension();
             $filepath = $dir . '/' . $filename;
 
             $disk->putFileAs($dir, $file, $filename, 'public');
