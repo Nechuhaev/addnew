@@ -42,12 +42,6 @@ class GenerateFilterSitemap extends Command
     {
         parent::__construct();
         $this->sitemapIndex = SitemapIndex::create();
-
-        $this->categories = DB::select("SELECT cat.slug as category_slug,
-                        cat2.slug as parent_category_slug
-                      FROM ad_categories cat
-                        LEFT JOIN ad_categories cat2
-                        ON (cat2.id = cat.parent_id)");
     }
 
     /**
@@ -58,6 +52,14 @@ class GenerateFilterSitemap extends Command
     public function handle()
     {
         $this->line('Начинаем создавать карту сайта');
+
+        // Запит у handle(), а не в конструкторі: конструктор виконується при
+        // старті БУДЬ-ЯКОЇ artisan-команди (cron, queue:work, migrate).
+        $this->categories = DB::select("SELECT cat.slug as category_slug,
+                        cat2.slug as parent_category_slug
+                      FROM ad_categories cat
+                        LEFT JOIN ad_categories cat2
+                        ON (cat2.id = cat.parent_id)");
 
         ini_set('memory_limit', '-1');
 
