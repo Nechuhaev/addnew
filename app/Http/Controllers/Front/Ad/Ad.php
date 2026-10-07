@@ -15,7 +15,6 @@ use App\Mail\AdDetails;
 use App\Mail\UserPasswordDetails;
 use App\SeoField;
 use App\User;
-use App\BlockedEmail;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -94,30 +93,7 @@ class Ad extends Controller
             ];
         }
         // Стоимость
-        $currencies = AdCurrency::all();
-        $price = 0;
-        if ($ad['price']) {
-            foreach ($currencies as $currency) {
-                if ($currency->id == $ad['currency_id']) {
-                    $price = (float)$ad['price'] * (float)$currency->rate;
-                }
-            }
-        }
-
-
-        $prices = [];
-        if ($price) {
-            foreach ($currencies as $currency) {
-                if ($price) {
-                    $prices[] = [
-                        'currency' => $currency['code'],
-                        'symbol' => $currency['symbol'],
-                        'value' => (int) ($price / $currency['rate']),
-                        'selected' => ($currency->id == $ad['currency_id'])
-                    ];
-                }
-            }
-        }
+        $prices = $this->pricesInCurrencies($ad['price'], $ad['currency_id'], AdCurrency::all());
 
         $related_ads = \App\Ad::with(['user', 'currency'])
             ->where('category_id', $ad->category_id)
@@ -195,7 +171,6 @@ class Ad extends Controller
             return redirect(route('ad.step.details'));
         }
 
-        //$request->session()->has('ad');
         $data['parent_categories'] = AdCategory::select(['id', 'name'])
             ->where('parent_id', 0)
             ->get()
@@ -239,46 +214,7 @@ class Ad extends Controller
         }
 
         if ($request->method() == 'POST') {
-
-            Validator::extend('not_from_block_list',function($attribute, $value, $parameters){
-                $emails = BlockedEmail::all();
-                $mailbox = stristr($value, '@');
-                foreach ($emails as $email) {
-                    if ('@'.$email->mailbox === $mailbox) {
-                        return false;
-                    }
-                }
-                return true;
-            }, "Почтовые адреса этого сервиса не поддерживается нашим сайтом. Пожалуйста, воспользуйтесь другим почтовым сервисом.");
-
-            Validator::extend('not_stop_word', function ($attribute, $value, $parameters) {
-                return \App\StopWord::findMatchIn($value) === null;
-            }, "Текст содержит запрещенное слово и не может быть опубликован.");
-
-            $errors = [
-                'author.required' => 'Введите имя автора объявления',
-                'author.min' => 'Имя автора не может быть короче :min символов',
-                'telephone.required' => 'Введите номер телефона',
-                'telephone.min' => 'Номер телефона не может быть короче :min символов',
-                'city_id.required' => 'Выберите страну, регион и город!',
-                'city_id.exists' => 'Ошибка выбора города.',
-                'email.required' => 'Введите свой email!',
-                'email.email' => 'Введите свой email!',
-                'name.required' => 'Введите название объявления!',
-                'name.min' => 'Минимальная длина названия объявления не может быть короче :min символов',
-                'name.not_stop_word' => 'Название объявления содержит запрещенное слово.',
-                'content.required' => 'Введите описание объявления!',
-                'content.min' => 'Минимальная длина описания не может быть короче :min символов',
-                'content.not_stop_word' => 'Описание объявления содержит запрещенное слово.',
-                'tags.required' => 'Введите метки объявления!',
-                'tags.min' => 'Минимальная длина метки не может быть короче :min символов',
-                'image.required' => 'Выберите минимум одно изображение!',
-                'image.*.image' => 'Недопустимый формат изображения!',
-                'image.*.mimes' => 'Недопустимый формат изображения!',
-                'image.*.max' => 'Недопустимый размер файла. Максимально доступный размер :min байт',
-                'price.*' => 'Введите цену товара / услуги или установите 0, если оно бесплатно!',
-                'currency_id.*' => 'Выберите валюту из списка!',
-            ];
+            $errors = $this->validationMessages();
 
             $request->validate([
                 'author' => 'sometimes|required|min:3',
@@ -301,7 +237,6 @@ class Ad extends Controller
             $request->session()->put('ad.name', $request->get('name'));
             $request->session()->put('ad.tags', $request->get('tags'));
             $request->session()->put('ad.content', $request->get('content'));
-            $request->session()->put('ad.tags', $request->get('tags'));
             $request->session()->put('ad.price', $request->get('price'));
             $request->session()->put('ad.currency_id', $request->get('currency_id'));
 
@@ -324,80 +259,18 @@ class Ad extends Controller
         }
 
         $data['category'] = AdCategory::find($request->session()->get('ad.category_id'));
-        //dd($request->get('author'));
-        if ($request->session()->has('ad.author')) {
-            $data['author'] = $request->session()->get('ad.author');
-        } elseif (old('author')) {
-            $data['author'] = old('author');
-        } elseif (Auth::check()) {
-            $data['author'] = Auth::user()->username;
-        } else {
-            $data['author'] = '';
-        }
 
-        if ($request->session()->has('ad.telephone')) {
-            $data['telephone'] = $request->session()->get('ad.telephone');
-        } elseif (old('telephone')) {
-            $data['telephone'] = old('telephone');
-        } elseif (Auth::check()) {
-            $data['telephone'] = Auth::user()->telephone;
-        } else {
-            $data['telephone'] = '';
-        }
+        $user = Auth::user();
+        $data['author'] = $this->stepValue($request, 'author', $user ? $user->username : '');
+        $data['telephone'] = $this->stepValue($request, 'telephone', $user ? $user->telephone : '');
+        $data['email'] = $this->stepValue($request, 'email', $user ? $user->email : '');
+        $data['name'] = $this->stepValue($request, 'name');
+        $data['content'] = $this->stepValue($request, 'content');
+        $data['price'] = $this->stepValue($request, 'price');
+        $data['currency_id'] = $this->stepValue($request, 'currency_id');
 
-
-        if ($request->session()->has('ad.email')) {
-            $data['email'] = $request->session()->get('ad.email');
-        } elseif (old('email')) {
-            $data['email'] = old('email');
-        } elseif (Auth::check()) {
-            $data['email'] = Auth::user()->email;
-        } else {
-            $data['email'] = '';
-        }
-
-
-        if ($request->session()->has('ad.name')) {
-            $data['name'] = $request->session()->get('ad.name');
-        } elseif (old('name')) {
-            $data['name'] = old('name');
-        } else {
-            $data['name'] = '';
-        }
-
-        if ($request->session()->has('ad.tags')) {
-            $tags = json_encode(explode(',', $request->session()->get('ad.tags')));
-        } elseif (old('tags')) {
-            $tags = json_encode(explode(',', old('tags')));
-        } else {
-            $tags = '';
-        }
-
-        $data['tags'] = $tags;
-
-        if ($request->session()->has('ad.content')) {
-            $data['content'] = $request->session()->get('ad.content');
-        } elseif (old('content')) {
-            $data['content'] = old('content');
-        } else {
-            $data['content'] = '';
-        }
-
-        if ($request->session()->has('ad.price')) {
-            $data['price'] = $request->session()->get('ad.price');
-        } elseif (old('price')) {
-            $data['price'] = old('price');
-        } else {
-            $data['price'] = '';
-        }
-
-        if ($request->session()->has('ad.currency_id')) {
-            $data['currency_id'] = $request->session()->get('ad.currency_id');
-        } elseif (old('currency_id')) {
-            $data['currency_id'] = old('currency_id');
-        } else {
-            $data['currency_id'] = '';
-        }
+        $tags = $this->stepValue($request, 'tags');
+        $data['tags'] = $tags !== '' ? json_encode(explode(',', $tags)) : '';
 
         $data['currencies'] = AdCurrency::select(['id', 'code'])->get()->toArray();
 
@@ -466,33 +339,8 @@ class Ad extends Controller
 
 
         $currencies = AdCurrency::all();
-
-
         $data['preview']['currencies'] = $currencies;
-
-        $price = 0;
-        if ($ad['price']) {
-            foreach ($currencies as $currency) {
-                if ($currency->id == $ad['currency_id']) {
-                    $price = (float)$ad['price'] * (float)$currency->rate;
-                }
-            }
-        }
-
-
-        $data['preview']['prices'] = [];
-        if ($price) {
-            foreach ($currencies as $currency) {
-                if ($price) {
-                    $data['preview']['prices'][] = [
-                        'currency' => $currency['code'],
-                        'symbol' => $currency['symbol'],
-                        'value' => (int) ($price / $currency['rate']),
-                        'selected' => ($currency->id == $ad['currency_id'])
-                    ];
-                }
-            }
-        }
+        $data['preview']['prices'] = $this->pricesInCurrencies($ad['price'], $ad['currency_id'], $currencies);
 
 
         $data['preview']['image'] = '';
@@ -545,43 +393,9 @@ class Ad extends Controller
         $ad['author'] = (Auth::check()) ? Auth::user()->username : $ad['author'];
 
 
-        $errors = [
-            'author.required' => 'Введите имя автора объявления',
-            'author.min' => 'Имя автора не может быть короче :min символов',
-            'telephone.required' => 'Введите номер телефона',
-            'telephone.min' => 'Номер телефона не может быть короче :min символов',
-            'city_id.required' => 'Выберите страну, регион и город!',
-            'city_id.exists' => 'Ошибка выбора города.',
-            'email.required' => 'Введите свой email!',
-            'email.email' => 'Введите свой email!',
-            'name.required' => 'Введите название объявления!',
-            'name.min' => 'Минимальная длина названия объявления не может быть короче :min символов',
-            'name.not_stop_word' => 'Название объявления содержит запрещенное слово.',
-            'content.required' => 'Введите описание объявления!',
-            'content.min' => 'Минимальная длина описания не может быть короче :min символов',
-            'content.not_stop_word' => 'Описание объявления содержит запрещенное слово.',
-            'image.required' => 'Выберите минимум одно изображение!',
-            'image.*.image' => 'Недопустимый формат изображения!',
-            'image.*.mimes' => 'Недопустимый формат изображения!',
-            'image.*.max' => 'Недопустимый размер файла. Максимально доступный размер :min байт',
-            'price.*' => 'Введите цену товара / услуги или установите 0, если оно бесплатно!',
-            'currency_id.*' => 'Выберите валюту из списка!',
-        ];
+        $errors = $this->validationMessages();
 
-        Validator::extend('not_from_block_list',function($attribute, $value, $parameters){
-            $emails = BlockedEmail::all();
-            $mailbox = stristr($value, '@');
-            foreach ($emails as $email) {
-                if ('@'.$email->mailbox === $mailbox) {
-                    return false;
-                }
-            }
-            return true;
-        }, "Почтовые адреса этого сервиса не поддерживается нашим сайтом. Пожалуйста, воспользуйтесь другим почтовым сервисом.");
 
-        Validator::extend('not_stop_word', function ($attribute, $value, $parameters) {
-            return \App\StopWord::findMatchIn($value) === null;
-        }, "Текст содержит запрещенное слово и не может быть опубликован.");
 
         $validator = Validator::make($ad, [
             'category_id' => 'required|integer|exists:ad_categories,id',
@@ -627,7 +441,7 @@ class Ad extends Controller
             // Добавить в MailChimp
             $email = $ad['email'];
 
-            $httpCode = \App\Services\MailchimpSubscriber::subscribe($email);
+            \App\Services\MailchimpSubscriber::subscribe($email);
             
             // Добавить объявление
             $ad['user_id'] = $user->id;
@@ -650,7 +464,7 @@ class Ad extends Controller
                 if ($key == 0) {
                     $ad['image'] = $disk->url($image);
                 } else {
-                    $images[] = $disk->url($image);;
+                    $images[] = $disk->url($image);
                 }
             }
 
@@ -659,21 +473,7 @@ class Ad extends Controller
             $ad_model = \App\Ad::create($ad);
 
             // Сохранить теги
-            $all_tags = array_unique(array_filter(array_map('trim', explode(',', $ad['tags']))));
-            $not_existing_tags = $all_tags;
-            $existing_tags = AdTag::whereIn('name', $all_tags)->get();
-
-            foreach ($existing_tags as $existing_tag) {
-                if (($key = array_search($existing_tag->name, $not_existing_tags)) !== false) {
-                    unset($not_existing_tags[$key]);
-                }
-            }
-
-            foreach ($not_existing_tags as $not_existing_tag) {
-                AdTag::create(['name' => $not_existing_tag, 'slug' => null]);
-            }
-
-            $tags_to_attach = AdTag::whereIn('name', $all_tags)->pluck('id')->toArray();
+            $tags_to_attach = $this->tagIdsFromString($ad['tags']);
 
             if ($tags_to_attach) {
                 $ad_model->tags()->attach($tags_to_attach);
@@ -735,7 +535,6 @@ class Ad extends Controller
      * @return $this
      */
     public function changeStatus($ad_id, $status_id) {
-        //dd($ad_id);
         // 0 — призупинено, 1 — активне, 2 — архів; інші значення не приймаємо
         if ($ad_id && in_array((int) $status_id, [0, 1, 2], true)) {
             $ad = Auth::user()->ads()->whereId($ad_id)->first();
@@ -773,27 +572,8 @@ class Ad extends Controller
 
     public function update($ad_id, Request $request) {
 
-        Validator::extend('not_stop_word', function ($attribute, $value, $parameters) {
-            return \App\StopWord::findMatchIn($value) === null;
-        }, "Текст содержит запрещенное слово и не может быть опубликован.");
 
-        $errors = [
-            'telephone.required' => 'Введите номер телефона',
-            'telephone.min' => 'Номер телефона не может быть короче :min символов',
-            'email.required' => 'Введите свой email!',
-            'email.email' => 'Введите свой email!',
-            'name.required' => 'Введите название объявления!',
-            'name.min' => 'Минимальная длина названия объявления не может быть короче :min символов',
-            'name.not_stop_word' => 'Название объявления содержит запрещенное слово.',
-            'content.required' => 'Введите описание объявления!',
-            'content.min' => 'Минимальная длина описания не может быть короче :min символов',
-            'content.not_stop_word' => 'Описание объявления содержит запрещенное слово.',
-            'image.*.image' => 'Недопустимый формат изображения!',
-            'image.*.mimes' => 'Недопустимый формат изображения!',
-            'image.*.max' => 'Недопустимый размер файла. Максимально доступный размер :min байт',
-            'price.*' => 'Введите цену товара / услуги или установите 0, если оно бесплатно!',
-            'currency_id.*' => 'Выберите валюту из списка!',
-        ];
+        $errors = $this->validationMessages();
 
         $request->validate([
             'telephone' => 'required|min:6',
@@ -822,23 +602,7 @@ class Ad extends Controller
 
 
         $ad->tags()->detach();
-        $all_tags = array_unique(array_filter(array_map('trim', explode(',', $request->get('tags')))));
-        //dd($all_tags);
-        $not_existing_tags = $all_tags;
-        $existing_tags = AdTag::whereIn('name', $all_tags)->get();
-
-        foreach ($existing_tags as $existing_tag) {
-            if (($key = array_search($existing_tag->name, $not_existing_tags)) !== false) {
-                unset($not_existing_tags[$key]);
-            }
-        }
-
-        foreach ($not_existing_tags as $not_existing_tag) {
-            AdTag::create(['name' => $not_existing_tag, 'slug' => null]);
-        }
-
-        $tags_to_attach = AdTag::whereIn('name', $all_tags)->pluck('id')->toArray();
-
+        $tags_to_attach = $this->tagIdsFromString($request->get('tags'));
 
         if ($tags_to_attach) {
             $ad->tags()->attach($tags_to_attach);
@@ -868,7 +632,7 @@ class Ad extends Controller
                 if ($key == 0) {
                     $ad->image = $disk->url($filepath);
                 } else {
-                    $images[] = $disk->url($filepath);;
+                    $images[] = $disk->url($filepath);
                 }
             }
 
@@ -896,5 +660,95 @@ class Ad extends Controller
         }
 
         return redirect()->back()->with('error', 'Ошибка удаления объявления!');
+    }
+
+    /**
+     * Значення поля форми кроку 2: збережене в сесії → old() → $fallback
+     */
+    private function stepValue(Request $request, string $field, $fallback = '')
+    {
+        if ($request->session()->has('ad.' . $field)) {
+            return $request->session()->get('ad.' . $field);
+        }
+
+        return old($field) ?: $fallback;
+    }
+
+    /**
+     * Ціна оголошення в усіх валютах (для перемикача валют на сторінці)
+     */
+    private function pricesInCurrencies($price, $currencyId, $currencies): array
+    {
+        $base = 0;
+        if ($price) {
+            foreach ($currencies as $currency) {
+                if ($currency->id == $currencyId) {
+                    $base = (float) $price * (float) $currency->rate;
+                }
+            }
+        }
+
+        $prices = [];
+        if ($base) {
+            foreach ($currencies as $currency) {
+                $prices[] = [
+                    'currency' => $currency['code'],
+                    'symbol' => $currency['symbol'],
+                    'value' => (int) ($base / $currency['rate']),
+                    'selected' => ($currency->id == $currencyId)
+                ];
+            }
+        }
+
+        return $prices;
+    }
+
+    /**
+     * ID тегів з рядка «тег1, тег2»; відсутні теги створюються
+     */
+    private function tagIdsFromString($tags): array
+    {
+        $names = array_unique(array_filter(array_map('trim', explode(',', (string) $tags))));
+        if (!$names) {
+            return [];
+        }
+
+        $existing = AdTag::whereIn('name', $names)->pluck('name')->all();
+        foreach (array_diff($names, $existing) as $name) {
+            AdTag::create(['name' => $name, 'slug' => null]);
+        }
+
+        return AdTag::whereIn('name', $names)->pluck('id')->toArray();
+    }
+
+    /**
+     * Повідомлення валідації для форм створення й редагування оголошення
+     */
+    private function validationMessages(): array
+    {
+        return [
+            'author.required' => 'Введите имя автора объявления',
+            'author.min' => 'Имя автора не может быть короче :min символов',
+            'telephone.required' => 'Введите номер телефона',
+            'telephone.min' => 'Номер телефона не может быть короче :min символов',
+            'city_id.required' => 'Выберите страну, регион и город!',
+            'city_id.exists' => 'Ошибка выбора города.',
+            'email.required' => 'Введите свой email!',
+            'email.email' => 'Введите свой email!',
+            'name.required' => 'Введите название объявления!',
+            'name.min' => 'Минимальная длина названия объявления не может быть короче :min символов',
+            'name.not_stop_word' => 'Название объявления содержит запрещенное слово.',
+            'content.required' => 'Введите описание объявления!',
+            'content.min' => 'Минимальная длина описания не может быть короче :min символов',
+            'content.not_stop_word' => 'Описание объявления содержит запрещенное слово.',
+            'tags.required' => 'Введите метки объявления!',
+            'tags.min' => 'Минимальная длина метки не может быть короче :min символов',
+            'image.required' => 'Выберите минимум одно изображение!',
+            'image.*.image' => 'Недопустимый формат изображения!',
+            'image.*.mimes' => 'Недопустимый формат изображения!',
+            'image.*.max' => 'Недопустимый размер файла. Максимально доступный размер :min байт',
+            'price.*' => 'Введите цену товара / услуги или установите 0, если оно бесплатно!',
+            'currency_id.*' => 'Выберите валюту из списка!',
+        ];
     }
 }

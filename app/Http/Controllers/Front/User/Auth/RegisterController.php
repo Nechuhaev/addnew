@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Front\User\Auth;
 use App\Http\Controllers\Controller;
 use App\Mail\UserPasswordDetails;
 use App\User;
-use App\BlockedEmail;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\Request;
@@ -72,16 +71,6 @@ class RegisterController extends Controller
             'email.unique' => __('errors.email.unique'),
         ];
 
-        Validator::extend('not_from_block_list',function($attribute, $value, $parameters){
-            $emails = BlockedEmail::all();
-            $mailbox = stristr($value, '@');
-            foreach ($emails as $email) {
-                if ('@'.$email->mailbox === $mailbox) {
-                    return false;
-                }
-            }
-            return true;
-        }, "Почтовые адреса этого сервиса не поддерживается нашим сайтом. Пожалуйста, воспользуйтесь другим почтовым сервисом.");
 
         return Validator::make($data, [
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users', 'not_from_block_list'],
