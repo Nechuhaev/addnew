@@ -95,7 +95,7 @@
                 <meta itemprop="description" content="{{ $ad->content }}" />
                 <div itemprop="offers" itemtype="http://schema.org/Offer" itemscope>
                     <link itemprop="url" href="{{ $ad->url }}" />
-                    <meta itemprop="availability" content="https://schema.org/InStock" />
+                    <meta itemprop="availability" content="https://schema.org/{{ ($ad->is_product && $ad->stock === 'out_of_stock') ? 'OutOfStock' : 'InStock' }}" />
                     @foreach($prices as $price)
                         @if($price['selected'])
                             <meta itemprop="priceCurrency" content="{{ $price['currency'] }}" />
@@ -179,6 +179,9 @@
                                     </div>
                                 @endif
                             </div>
+                            @if($ad->is_product && $ad->stock === 'out_of_stock')
+                            <div class="adv-out-of-stock" style="display:inline-block;margin:0 0 8px;padding:4px 10px;border-radius:4px;background:#fdecea;color:#c62828;font-weight:600;font-size:14px;">{{ app()->getLocale() === 'ru' ? 'Нет в наличии' : 'Немає в наявності' }}</div>
+                            @endif
                             <div class="adv-price">
                                 @if ($prices)
                                     @foreach($prices as $price)
