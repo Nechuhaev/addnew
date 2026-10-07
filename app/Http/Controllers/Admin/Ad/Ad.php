@@ -191,7 +191,10 @@ class Ad extends Controller
             'email' => 'required|email',
             'meta_title' => 'max:255',
             'meta_description' => 'max:255',
-        ], $errors);
+            'competitor_url' => 'nullable|url|max:500',
+        ], array_merge($errors, [
+            'competitor_url.url' => 'Посилання на конкурента має бути коректним URL (https://...)',
+        ]));
 
 
         // Сохранить теги
@@ -215,7 +218,12 @@ class Ad extends Controller
         $ad = AdModel::find($request->get('ad_id'));
         $request = $request->all();
 
-        $ad->fill($request)->save();
+        $ad->fill($request);
+        // competitor_url не входить у $fillable — задаємо явно, лише якщо поле є у формі (товари)
+        if (array_key_exists('competitor_url', $request)) {
+            $ad->competitor_url = $request['competitor_url'] ?: null;
+        }
+        $ad->save();
 
         if ($tags_to_attach) {
             $ad->tags()->detach();
