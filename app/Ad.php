@@ -149,7 +149,7 @@ class Ad extends Model
      */
     public function getFormattedPriceAttribute() {
         $_currency = AdCurrency::whereId((int)$this->attributes['currency_id'])->first();
-        return $this->attributes['price'] . ' ' . $_currency['symbol'];
+        return $this->attributes['price'] . ' ' . ($_currency->symbol ?? '');
     }
 
     /**
@@ -278,11 +278,15 @@ class Ad extends Model
             ->leftJoin('ad_cities', 'ad_cities.id', '=', 'ads.city_id')
             ->leftJoin('ad_regions', 'ad_cities.region_id', '=', 'ad_regions.id')
             ->leftJoin('ad_countries', 'ad_regions.country_id', '=', 'ad_countries.id')
-            ->whereIn('status', [1, 2])
+            // Лише активні: сторінка оголошення для статусів 0/2 віддає 404,
+            // тож архівні в списках були битими посиланнями.
+            ->where('ads.status', 1)
             ->orderBy('ads.date_active', 'desc');
     }
 
     public function getStatusAttribute() {
+        $status = 'suspend';
+
         if ($this->attributes['status'] == 0) {
             $status = 'suspend';
         }

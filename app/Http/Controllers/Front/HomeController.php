@@ -102,7 +102,7 @@ class HomeController extends Controller
                     $ads_groups[$key][] = [
                         'name' => $ad->name,
                         'url' => $ad->url,
-                        'price' => $ad->formetted_price,
+                        'price' => $ad->formatted_price,
                         'image' => $ad->image
                     ];
                 }
@@ -148,7 +148,7 @@ class HomeController extends Controller
         // Рандомные города
         $cities_cache_key = sprintf('home_cities_%s', $localization->getCountry()->id);
         $cities = Cache::remember($cities_cache_key, 2280, function () use ($localization) {
-            $_cities = $localization->cities()->get()->random(10);
+            $_cities = $localization->cities()->get()->shuffle()->take(10);
 
             if ($_cities) {
                 $cities = [];
@@ -170,7 +170,7 @@ class HomeController extends Controller
                 'ads' => function ($query) use ($localization) {
                     return $query->whereIn('city_id', $localization->citiesIds());
                 }
-            ])->having('ads_count', '>', 15)->get()->random(20);
+            ])->having('ads_count', '>', 15)->get()->shuffle()->take(20);
 
             if ($_tags) {
                 $tags = [];

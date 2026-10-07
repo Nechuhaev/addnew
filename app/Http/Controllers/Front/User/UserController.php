@@ -70,15 +70,18 @@ class UserController extends Controller
             'site_url' => 'nullable|url|max:255',
             'twitter_url' => 'max:255',
             'facebook_url' => 'max:255',
+            'telegram_url' => 'max:255',
+            'instagram_url' => 'max:255',
             'info' => 'max:3000',
         ], $errors);
-        // Remove previous user's thumbnail
-
-        if (Auth::user()->image && File::exists(Auth::user()->image)) {
-            File::delete(Auth::user()->image);
-        }
-
         if ($request->image) {
+            // Старий аватар видаляємо лише коли завантажено новий.
+            // У БД шлях відносний ('/images/avatar-1.jpg'), тому через public_path().
+            $oldAvatar = $user->image ? public_path(ltrim($user->image, '/')) : null;
+            if ($oldAvatar && strpos($user->image, '/images/avatar-') === 0 && File::exists($oldAvatar)) {
+                File::delete($oldAvatar);
+            }
+
             $image_name = 'avatar-' . Auth::id() . '.' . $request->image->extension();
             $request->image->move(public_path('images'), $image_name);
             $user->image = '/images/' . $image_name;
