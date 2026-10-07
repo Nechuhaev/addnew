@@ -85,9 +85,9 @@ class Region extends Controller
             '---country_name---'  => $entity->name
         ];
         $meta = [
-            'meta_title' => strtr($seo_field->meta_title, $entity_values) ?? strtr($seo_field->meta_title, $entity_values),
-            'meta_description' => strtr($seo_field->meta_description, $entity_values) ?? strtr($seo_field->meta_description, $entity_values),
-            'description' => strtr($seo_field->description, $entity_values) ?? strtr($seo_field->description, $entity_values)
+            'meta_title' => strtr($seo_field->meta_title, $entity_values),
+            'meta_description' => strtr($seo_field->meta_description, $entity_values),
+            'description' => strtr($seo_field->description, $entity_values)
         ];
         
         $results = Ad::getAds()

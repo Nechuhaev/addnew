@@ -1,6 +1,5 @@
 <?php
 namespace App;
-use App\Http\Controllers\Front\Ad\Country;
 use Illuminate\Database\Eloquent\Model;
 class AdCountry extends Model
 {

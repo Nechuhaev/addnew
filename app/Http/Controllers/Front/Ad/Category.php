@@ -165,7 +165,6 @@ class Category extends Controller
                 }
             }
         }
-        //dd($this->filter);
         $results = Ad::getAds()->whereIn('ad_categories.id', $this->included_categories);
                 
         // Обмеження "тільки Україна" прибрано — категорії тепер показують товари з будь-якої країни.
@@ -174,7 +173,6 @@ class Category extends Controller
             $results->where($condition, $entity->id);
         }
 
-        //dd($results);
         return $results;
     }
 
@@ -198,7 +196,6 @@ class Category extends Controller
                     ->groupBy('city_id')
                     ->get()->toArray();
 
-                //dd($results);
                 $ids = array_column($results, 'city_id');
                 $ads_counts = array_column($results, 'ads_count', 'city_id');
 
@@ -244,7 +241,6 @@ class Category extends Controller
                 }
 
 
-                //dd($this->category_id);
 
                 $data[] = [
                     'name' => $filter->name,

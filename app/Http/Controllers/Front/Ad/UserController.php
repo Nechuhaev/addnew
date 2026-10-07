@@ -28,9 +28,9 @@ class UserController extends Controller
                 '---ads_count---'  => $user->ads()->count(),
             ];
             $meta = [
-                'meta_title' => $entity->meta_title ?? strtr($seo_field->meta_title, $entity_values),
-                'meta_description' => $entity->meta_description ?? strtr($seo_field->meta_description, $entity_values),
-                'description' => $entity->content ?? strtr($seo_field->description, $entity_values)
+                'meta_title' => strtr($seo_field->meta_title, $entity_values),
+                'meta_description' => strtr($seo_field->meta_description, $entity_values),
+                'description' => strtr($seo_field->description, $entity_values)
             ];
         } else {
             $meta = [

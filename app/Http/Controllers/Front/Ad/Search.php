@@ -12,7 +12,6 @@ use Illuminate\Http\Request;
 class Search extends Controller
 {
     public function page(Request $request) {
-        //dd($request->all());
 
         $results = Ad::getAds();
 
