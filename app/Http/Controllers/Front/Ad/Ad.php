@@ -35,7 +35,7 @@ class Ad extends Controller
     public function page($ad) {
         $ad = \App\Ad::where('slug', '=', $ad)->first();
         if (!$ad) abort(404);
-        if ((int) $ad->status !== 1 && !(Auth::check() && (Auth::id() == $ad->user_id || Auth::user()->is_admin))) abort(404);
+        if ((int) ($ad->getAttributes()['status'] ?? 0) !== 1 && !(Auth::check() && (Auth::id() == $ad->user_id || Auth::user()->is_admin))) abort(404);
 
         $user = User::where('id', '=', $ad['user_id'])->first();
         if (!$user) abort(404);
