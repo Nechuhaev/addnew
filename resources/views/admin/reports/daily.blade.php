@@ -95,12 +95,12 @@
 
                                 <div class="mb-2">
                                     <strong>8. SEO товарів магазинів:</strong>
-                                    {{ $report->products_seo_optimized_count !== null ? $report->products_seo_optimized_count . ' шт.' : '—' }}
+                                    @if($report->products_seo_optimized_count !== null){{ $report->products_seo_optimized_count }} шт.@else<span class="text-muted">не запускалась цього дня</span>@endif
                                 </div>
 
                                 <div class="mb-2">
                                     <strong>9. SEO звичайних оголошень:</strong>
-                                    {{ $report->ads_seo_optimized_count !== null ? $report->ads_seo_optimized_count . ' шт.' : '—' }}
+                                    @if($report->ads_seo_optimized_count !== null){{ $report->ads_seo_optimized_count }} шт.@else<span class="text-muted">не запускалась цього дня</span>@endif
                                 </div>
 
                                 <div class="mb-2">
