@@ -149,7 +149,7 @@ class Ad extends Model
      */
     public function getFormattedPriceAttribute() {
         $_currency = AdCurrency::whereId((int)$this->attributes['currency_id'])->first();
-        return $this->attributes['price'] . ' ' . $_currency['symbol'];
+        return $this->attributes['price'] . ' ' . ($_currency->symbol ?? '');
     }
 
     /**

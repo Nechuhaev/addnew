@@ -102,7 +102,7 @@ class HomeController extends Controller
                     $ads_groups[$key][] = [
                         'name' => $ad->name,
                         'url' => $ad->url,
-                        'price' => $ad->formetted_price,
+                        'price' => $ad->formatted_price,
                         'image' => $ad->image
                     ];
                 }
