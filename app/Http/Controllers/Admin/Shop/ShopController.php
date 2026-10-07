@@ -274,6 +274,7 @@ class ShopController extends Controller
         return view('admin.shops.products', [
             'shop' => $shop,
             'products' => $products,
+            'competitorChecks' => \App\ProductPriceCheck::lastCompetitorChecks($products->pluck('id')->all()),
             'inactiveCount' => $inactiveCount,
         ]);
     }
