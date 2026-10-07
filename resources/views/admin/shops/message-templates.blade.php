@@ -82,6 +82,10 @@
                                 <code>@{{shop_id}}</code> — ID,
                                 <code>@{{shop_url}}</code> — сторінка магазину на addnew,
                                 <code>@{{password_reset_url}}</code> — відновлення пароля.
+                                <br>У листах кандидатам (Магазини → Кандидати): <code>@{{shop_name}}</code>,
+                                <code>@{{goods}}</code> — «товари» або «товари в категорії «…»»,
+                                <code>@{{site_url}}</code>, <code>@{{register_url}}</code> — реєстрація магазину,
+                                <code>@{{sender_name}}</code> — ваше ім'я.
                             </small>
                         </div>
 

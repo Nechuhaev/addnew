@@ -7,6 +7,7 @@ use App\Mail\ShopAdminMessage;
 use App\Services\SiteContactEmailFinder;
 use App\ShopLead;
 use App\ShopLeadMessage;
+use App\ShopMessageTemplate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -18,6 +19,9 @@ use Illuminate\Support\Facades\Mail;
  */
 class ShopLeadController extends Controller
 {
+    /** Шаблон із «Шаблони листів», що підставляється за замовчуванням */
+    const INVITATION_TEMPLATE = 'Запрошення для кандидатів';
+
     public function index(Request $request)
     {
         $status = $request->get('status');
@@ -34,6 +38,8 @@ class ShopLeadController extends Controller
             'leads' => $leads,
             'status' => $status,
             'counts' => ShopLead::selectRaw('status, COUNT(*) AS n')->groupBy('status')->pluck('n', 'status'),
+            'messageTemplates' => ShopMessageTemplate::orderBy('name')->get(),
+            'defaultTemplate' => ShopMessageTemplate::where('name', self::INVITATION_TEMPLATE)->first(),
         ]);
     }
 
@@ -145,18 +151,10 @@ class ShopLeadController extends Controller
             return back()->with('error', "«{$lead->name}» уже підключився або відмовився — лист не надіслано.");
         }
 
-        // Текст пишеться як звичайний лист — перетворюємо на HTML для шаблону
-        // (абзаци й переноси, посилання клікабельні)
-        $html = preg_replace(
-            '~(https?://[^\s<]+)~u',
-            '<a href="$1">$1</a>',
-            nl2br(e($data['body']))
-        );
-
         $sentOk = true;
         $error = null;
         try {
-            Mail::to($lead->email)->send(new ShopAdminMessage($data['subject'], $html));
+            Mail::to($lead->email)->send(new ShopAdminMessage($data['subject'], $data['body']));
         } catch (\Throwable $e) {
             $sentOk = false;
             $error = $e->getMessage();

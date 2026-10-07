@@ -11,6 +11,7 @@
 @section('content')
     @php
         $sender = Auth::user()->firstname ?: 'команда addnew.biz';
+        $sendable = [];
     @endphp
     <div class="row">
         <div class="col-12">
@@ -19,8 +20,9 @@
                     <p class="text-muted">
                         Інтернет-магазини, яких ви хочете запросити на addnew. Додавайте їх вручну (назва й сайт) —
                         контактний email система шукає на сайті <strong>самого магазину</strong> (головна й сторінки контактів).
-                        «Надіслати лист» відкриває вже заповнене запрошення — перевірте й відредагуйте його, лист піде з сайту
-                        (як листи магазинам в «Опис магазину») і збережеться в історії кандидата.
+                        «Надіслати лист» відкриває форму з шаблоном «{{ optional($defaultTemplate)->name ?? 'Запрошення для кандидатів' }}»
+                        (його текст редагується в <a href="{{ route('admin.shopMessageTemplates') }}">Шаблони листів</a>) — перевірте лист,
+                        він піде з сайту (як листи магазинам в «Опис магазину») і збережеться в історії кандидата.
                         Надсилайте невеликими порціями (10–20 на день) і не пишіть повторно тим, хто відмовився.
                     </p>
 
@@ -33,6 +35,35 @@
                         <input type="email" name="email" value="{{ old('email') }}" class="form-control mr-2 mb-2" placeholder="Email (необов'язково)">
                         <button class="btn btn-success mb-2">Додати</button>
                     </form>
+
+                    <div id="lead-send-card" class="card border mb-4" style="display:none;">
+                        <div class="card-body">
+                            <h5>Лист кандидату: <span id="lead-send-name"></span></h5>
+                            <form id="lead-send-form" method="post">
+                                @csrf
+                                <p class="mb-2">Кому: <strong id="lead-send-email"></strong></p>
+                                <div class="form-group">
+                                    <label>Шаблон</label>
+                                    <select id="lead-template-select" class="form-control">
+                                        <option value="">— Без шаблону —</option>
+                                        @foreach($messageTemplates as $t)
+                                            <option value="{{ $t->id }}">{{ $t->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="subject">Тема</label>
+                                    <input type="text" name="subject" id="subject" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="body">Текст листа</label>
+                                    <textarea name="body" id="body" class="form-control content" rows="12"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-success">Надіслати</button>
+                                <button type="button" class="btn btn-link" onclick="document.getElementById('lead-send-card').style.display='none';">Скасувати</button>
+                            </form>
+                        </div>
+                    </div>
 
                     <div class="mb-3">
                         <a href="{{ route('admin.shops.leads') }}" class="btn btn-sm {{ !$status ? 'btn-primary' : 'btn-outline-secondary' }}">Усі ({{ $counts->sum() }})</a>
@@ -55,8 +86,18 @@
                             <tbody>
                                 @forelse($leads as $lead)
                                     @php
-                                        [$subject, $body] = $lead->invitationLetter($sender);
                                         $existingShop = $lead->existingShop();
+                                        $lastMessage = $lead->messages->first();
+                                        $canSend = $lead->email && !in_array($lead->status, ['joined', 'declined']) && !$existingShop;
+                                        if ($canSend) {
+                                            $sendable[$lead->id] = [
+                                                'name' => $lead->name,
+                                                'email' => $lead->email,
+                                                'action' => route('admin.shops.leads.send', $lead->id),
+                                                'vars' => $lead->templateVars($sender),
+                                                'last_sent' => ($lastMessage && $lastMessage->sent_successfully) ? $lastMessage->created_at->format('d.m.Y') : null,
+                                            ];
+                                        }
                                     @endphp
                                     <tr>
                                         <td>
@@ -102,9 +143,8 @@
                                             @endif
                                         </td>
                                         <td class="text-right" style="min-width:150px;">
-                                            @php($lastMessage = $lead->messages->first())
-                                            @if($lead->email && !in_array($lead->status, ['joined', 'declined']) && !$existingShop)
-                                                <button type="button" class="btn btn-sm btn-primary mb-1" onclick="var f=document.getElementById('lead-send-{{ $lead->id }}');f.style.display=f.style.display==='none'?'table-row':'none';">Надіслати лист</button>
+                                            @if($canSend)
+                                                <button type="button" class="btn btn-sm btn-primary mb-1" onclick="openLeadSend({{ $lead->id }});">Надіслати лист</button>
                                             @endif
                                             <form action="{{ route('admin.shops.leads.destroy', $lead->id) }}" method="post" style="display:inline;" onsubmit="return confirm('Видалити «{{ $lead->name }}» зі списку?');">
                                                 @csrf
@@ -120,24 +160,6 @@
                                             @endif
                                         </td>
                                     </tr>
-                                    @if($lead->email && !in_array($lead->status, ['joined', 'declined']) && !$existingShop)
-                                        <tr id="lead-send-{{ $lead->id }}" style="display:none;">
-                                            <td colspan="4" style="border-top:0;">
-                                                <form action="{{ route('admin.shops.leads.send', $lead->id) }}" method="post"
-                                                      @if($lastMessage && $lastMessage->sent_successfully) onsubmit="return confirm('«{{ $lead->name }}» уже отримав лист {{ $lastMessage->created_at->format('d.m.Y') }}. Надіслати ще раз?');" @endif>
-                                                    @csrf
-                                                    <div class="form-group mb-2">
-                                                        <label class="mb-1">Кому: <strong>{{ $lead->email }}</strong></label>
-                                                        <input type="text" name="subject" value="{{ $subject }}" class="form-control" required>
-                                                    </div>
-                                                    <div class="form-group mb-2">
-                                                        <textarea name="body" rows="14" class="form-control" style="font-size:13px;" required>{{ $body }}</textarea>
-                                                    </div>
-                                                    <button class="btn btn-success">Надіслати</button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    @endif
                                 @empty
                                     <tr><td colspan="4">Поки порожньо — додайте перший магазин формою вище.</td></tr>
                                 @endforelse
@@ -149,4 +171,59 @@
             </div>
         </div>
     </div>
+<script>
+var leadTemplates = {!! $messageTemplates->map(function ($t) {
+    return ['id' => $t->id, 'subject' => $t->subject, 'body' => $t->body];
+})->values()->toJson() !!};
+var leadSendable = {!! json_encode($sendable, JSON_UNESCAPED_UNICODE) !!};
+var leadDefaultTemplateId = {!! json_encode(optional($defaultTemplate)->id) !!};
+var currentLead = null;
+
+function fillTemplate(text, vars) {
+    Object.keys(vars).forEach(function (key) {
+        text = text.replace(new RegExp('\\{\\{\\s*' + key + '\\s*\\}\\}', 'g'), vars[key]);
+    });
+    return text;
+}
+
+function applyLeadTemplate(id) {
+    if (!currentLead) return;
+    var tpl = leadTemplates.filter(function (t) { return t.id == id; })[0];
+    if (!tpl) return;
+    document.getElementById('subject').value = fillTemplate(tpl.subject, currentLead.vars);
+    var body = fillTemplate(tpl.body, currentLead.vars);
+    if (typeof tinymce !== 'undefined' && tinymce.get('body')) {
+        tinymce.get('body').setContent(body);
+    } else {
+        document.getElementById('body').value = body;
+    }
+}
+
+function openLeadSend(id) {
+    currentLead = leadSendable[id];
+    if (!currentLead) return;
+    document.getElementById('lead-send-form').action = currentLead.action;
+    document.getElementById('lead-send-name').textContent = currentLead.name;
+    document.getElementById('lead-send-email').textContent = currentLead.email;
+    var select = document.getElementById('lead-template-select');
+    select.value = leadDefaultTemplateId || '';
+    applyLeadTemplate(select.value);
+    var card = document.getElementById('lead-send-card');
+    card.style.display = 'block';
+    card.scrollIntoView({ behavior: 'smooth' });
+}
+
+document.getElementById('lead-template-select').addEventListener('change', function () {
+    applyLeadTemplate(this.value);
+});
+
+document.getElementById('lead-send-form').addEventListener('submit', function (e) {
+    if (typeof tinymce !== 'undefined' && tinymce.get('body')) {
+        tinymce.triggerSave();
+    }
+    if (currentLead && currentLead.last_sent && !confirm('«' + currentLead.name + '» уже отримав лист ' + currentLead.last_sent + '. Надіслати ще раз?')) {
+        e.preventDefault();
+    }
+});
+</script>
 @endsection
