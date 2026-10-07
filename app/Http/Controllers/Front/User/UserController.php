@@ -63,7 +63,7 @@ class UserController extends Controller
             'info.max' => 'Максимальное количество символов для поля "Обо мне" составляет: :max символов.',
         ];
         $request->validate([
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:1024',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:1024',
             'firstname' => 'max:100',
             'lastname' => 'max:100',
             'telephone' => 'max:32',
@@ -79,7 +79,7 @@ class UserController extends Controller
         }
 
         if ($request->image) {
-            $image_name = 'avatar-' . Auth::id() . '.' . $request->image->getClientOriginalExtension();
+            $image_name = 'avatar-' . Auth::id() . '.' . $request->image->extension();
             $request->image->move(public_path('images'), $image_name);
             $user->image = '/images/' . $image_name;
         }

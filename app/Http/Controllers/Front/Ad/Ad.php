@@ -306,9 +306,11 @@ class Ad extends Controller
                 if ($request->session()->has('ad.images')) {
                     $request->session()->remove('ad.images');
                 }
-                $dir = 'ads/' . time();
+                // Унікальна папка: інакше два оголошення, створені в одну
+                // секунду, перезаписували б фото одне одного (0.jpg, 1.jpg…).
+                $dir = 'ads/' . time() . '-' . Str::random(8);
                 foreach ($request->file('image') as $key => $image) {
-                    $filename = $key . '.' . $image->getClientOriginalExtension();
+                    $filename = $key . '.' . $image->extension();
                     $filepath = $dir . '/' . $filename;
                     $image->storeAs('public', $filepath);
                     $request->session()->push('ad.images', $filepath);
@@ -609,32 +611,7 @@ class Ad extends Controller
             // Добавить в MailChimp
             $email = $ad['email'];
 
-            $apiKey = '94492d7246f58de6bdc22950014e9744-us19';
-            $listId = 'b435fcadb5';
-
-            $memberId = md5(strtolower($email));
-            $dataCenter = substr($apiKey,strpos($apiKey,'-')+1);
-            $url = 'https://' . $dataCenter . '.api.mailchimp.com/3.0/lists/' . $listId . '/members/' . $memberId;
-            //dd($url);
-
-            $json = json_encode([
-                'email_address' => $email,
-                'status'        => 'subscribed',
-            ]);
-
-            $ch = curl_init($url);
-
-            curl_setopt($ch, CURLOPT_USERPWD, 'user:' . $apiKey);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
-
-            $result = curl_exec($ch);
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            curl_close($ch);
+            $httpCode = \App\Services\MailchimpSubscriber::subscribe($email);
             
             // Добавить объявление
             $ad['user_id'] = $user->id;
@@ -816,10 +793,12 @@ class Ad extends Controller
 
         if (!$ad) return redirect()->back()->with('error', 'Не удалось найти объявление. Повторите попытку позже!');
 
-        $ad->name = $request->get('name');
-        $ad->telephone = $request->get('telephone');
-        $ad->email = $request->get('email');
-        $ad->content = $request->get('content');
+        // Так само, як при створенні (add): контент виводиться на сторінці
+        // оголошення без екранування, тож HTML-теги прибираємо.
+        $ad->name = strip_tags($request->get('name'));
+        $ad->telephone = strip_tags($request->get('telephone'));
+        $ad->email = strip_tags($request->get('email'));
+        $ad->content = strip_tags($request->get('content'));
         $ad->price = $request->get('price');
         $ad->currency_id = $request->get('currency_id');
 
@@ -865,15 +844,12 @@ class Ad extends Controller
 
             $images = [];
 
-            $dir = 'ads/' . time();
+            $dir = 'ads/' . time() . '-' . Str::random(8);
             foreach ($request->file('image') as $key => $image) {
+                $filename = $key . '.' . $image->extension();
+                $filepath = $dir . '/' . $filename;
 
-                if (!$disk->exists($image)) {
-                    $filename = $key . '.' . $image->getClientOriginalExtension();
-                    $filepath = $dir.'/'.$filename;
-
-                    $disk->putFileAs($dir, $image, $filename, 'public');
-                }
+                $disk->putFileAs($dir, $image, $filename, 'public');
 
                 if ($key == 0) {
                     $ad->image = $disk->url($filepath);

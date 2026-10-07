@@ -51,7 +51,7 @@ class UserController extends Controller
         $adsOld = Ad::getLoopArray($results);
         $ads = [];
         foreach ($adsOld as $ad) {
-            $ad['author_name'] = $user->firstname ? $user->firstname : $user->email;
+            $ad['author_name'] = $user->username;
             $ads[] = $ad;
         }
 
