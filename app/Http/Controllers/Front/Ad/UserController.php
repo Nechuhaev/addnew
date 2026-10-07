@@ -48,12 +48,7 @@ class UserController extends Controller
             ->where('user_id', $user->id)
             ->paginate(15);
 
-        $adsOld = Ad::getLoopArray($results);
-        $ads = [];
-        foreach ($adsOld as $ad) {
-            $ad['author_name'] = $user->username;
-            $ads[] = $ad;
-        }
+        $ads = Ad::getLoopArray($results);
 
         $microdata_info = DB::table('ads')
             ->selectRaw('min(ads.price) as min, max(ads.price) as max, count(ads.id) as ads_count')
