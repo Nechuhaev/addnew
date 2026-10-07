@@ -730,7 +730,8 @@ class Ad extends Controller
      */
     public function changeStatus($ad_id, $status_id) {
         //dd($ad_id);
-        if ($ad_id) {
+        // 0 — призупинено, 1 — активне, 2 — архів; інші значення не приймаємо
+        if ($ad_id && in_array((int) $status_id, [0, 1, 2], true)) {
             $ad = Auth::user()->ads()->whereId($ad_id)->first();
             if ($ad) {
                 $ad->date_active = date('Y-m-d H:i:s');
