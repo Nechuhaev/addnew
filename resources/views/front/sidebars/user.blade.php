@@ -27,7 +27,7 @@
         </div>
         <ul class="author-info">
             <li><strong>{{ Auth()->user()->email }}</strong></li>
-            <li><strong>{{ __('sidebar.registration_date_label') }}</strong> {{ Auth()->user()->created_at->format('d.m.Y H:m') }}</li>
+            <li><strong>{{ __('sidebar.registration_date_label') }}</strong> {{ Auth()->user()->created_at->format('d.m.Y H:i') }}</li>
 {{--            <li><strong>Тип учетной записи:</strong> @if(Auth()->user()->is_shop_owner) магазин @else физ. лицо @endif</li>--}}
         </ul>
     </div>

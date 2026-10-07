@@ -103,3 +103,26 @@ $('.form-control').on("keypress", function() {
         return false;
     }
 });
+// «Показати більше»: якщо текст і так вміщується в блок, прибираємо
+// фіксовану висоту, тінь і кнопку — інакше під коротким (або порожнім)
+// текстом лишалось ~200px порожнечі.
+(function () {
+    function fitShowMore() {
+        var blocks = document.querySelectorAll('.show-more');
+        for (var i = 0; i < blocks.length; i++) {
+            var block = blocks[i];
+            var text = block.querySelector('.show-more__text');
+            if (!text || block.classList.contains('visible')) continue;
+            block.classList.remove('show-more--fits');
+            if (text.scrollHeight <= block.clientHeight - 20) {
+                block.classList.add('show-more--fits');
+            }
+        }
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', fitShowMore);
+    } else {
+        fitShowMore();
+    }
+    window.addEventListener('load', fitShowMore);
+})();
