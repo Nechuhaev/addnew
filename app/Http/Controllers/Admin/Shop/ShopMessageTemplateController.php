@@ -18,7 +18,7 @@ class ShopMessageTemplateController extends Controller
 
         $template = null;
         if ($id) {
-            $template = ShopMessageTemplate::find($id);
+            $template = ShopMessageTemplate::findOrFail($id);
             $action = route('admin.shopMessageTemplates.update');
         } else {
             $action = route('admin.shopMessageTemplates.create');

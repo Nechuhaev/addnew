@@ -2,63 +2,91 @@
 @section('breadcrumbs')
     <div class="page-breadcrumb">
         <div class="row">
-            <div class="col-5 align-self-center">
-                <h4 class="page-title">Чат: {{ $shop->username }}</h4>
+            <div class="col-7 align-self-center">
+                <h4 class="page-title">Шаблони листів магазинам</h4>
             </div>
         </div>
     </div>
 @endsection
 @section('content')
     <div class="row">
-        <div class="col-12">
+        <div class="col-lg-5">
             <div class="card">
                 <div class="card-body">
-                    <a href="{{ route('admin.shops.edit', $shop->id) }}" class="btn btn-sm btn-secondary mb-3">&larr; До магазину</a>
+                    <a href="{{ route('admin.shops') }}" class="btn btn-sm btn-secondary mb-3">&larr; До магазинів</a>
+                    @if($template)
+                        <a href="{{ route('admin.shopMessageTemplates') }}" class="btn btn-sm btn-success mb-3">+ Новий шаблон</a>
+                    @endif
 
-                    @if($conversations->isEmpty())
-                        <p>У цього магазину поки немає жодного діалогу.</p>
+                    @if($templates->isEmpty())
+                        <p>Шаблонів поки немає — створіть перший у формі праворуч.</p>
                     @else
                         <div class="table-responsive">
-                            <table class="table table-bordered">
+                            <table class="table">
                                 <thead>
                                     <tr>
-                                        <th>Покупець</th>
-                                        <th>Оголошення</th>
-                                        <th>Повідомлень</th>
-                                        <th>Останнє повідомлення</th>
-                                        <th>Дата</th>
+                                        <th>Назва</th>
+                                        <th>Тема листа</th>
                                         <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($conversations as $c)
-                                        <tr>
-                                            <td>
-                                                {{ optional($c->buyer)->username ?? '— (видалений акаунт)' }}
-                                                @if($c->buyer_user_id)
-                                                    <br><small class="text-muted">ID={{ $c->buyer_user_id }}</small>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                @if($c->ad)
-                                                    <a href="{{ $c->ad->url }}" target="_blank">{{ \Illuminate\Support\Str::limit($c->ad->name, 40) }}</a>
-                                                @else
-                                                    <span class="text-muted">—</span>
-                                                @endif
-                                            </td>
-                                            <td class="text-center">{{ $c->messagesCount }}</td>
-                                            <td>{{ $c->lastMessage ? \Illuminate\Support\Str::limit($c->lastMessage->body, 60) : '—' }}</td>
-                                            <td style="white-space: nowrap;">{{ $c->last_message_at ? $c->last_message_at->format('d.m.Y H:i') : '—' }}</td>
-                                            <td>
-                                                <a href="{{ route('admin.shops.messages.show', [$shop->id, $c->id]) }}" class="btn btn-sm btn-primary">Переглянути</a>
+                                    @foreach($templates as $t)
+                                        <tr @if($template && $template->id === $t->id) class="table-active" @endif>
+                                            <td><a href="{{ route('admin.shopMessageTemplates.edit', $t->id) }}">{{ $t->name }}</a></td>
+                                            <td class="text-muted" style="font-size:13px;">{{ $t->subject }}</td>
+                                            <td class="text-right" style="white-space:nowrap;">
+                                                <a href="{{ route('admin.shopMessageTemplates.edit', $t->id) }}" class="btn btn-sm btn-secondary">Редагувати</a>
+                                                <a href="{{ route('admin.shopMessageTemplates.delete', $t->id) }}" class="btn btn-sm btn-danger"
+                                                   onclick="return confirm('Видалити шаблон «{{ $t->name }}»?');">&times;</a>
                                             </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
                             </table>
                         </div>
-                        {{ $conversations->links() }}
                     @endif
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">{{ $template ? 'Редагувати шаблон' : 'Новий шаблон' }}</h4>
+
+                    <form action="{{ $action }}" method="post">
+                        @csrf
+                        @if($template)
+                            <input type="hidden" name="template_id" value="{{ $template->id }}">
+                        @endif
+
+                        <div class="form-group">
+                            <label for="name">Назва шаблону (бачите тільки ви)</label>
+                            <input type="text" name="name" id="name" class="form-control" required
+                                   value="{{ old('name', optional($template)->name) }}">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="subject">Тема листа</label>
+                            <input type="text" name="subject" id="subject" class="form-control" required
+                                   value="{{ old('subject', optional($template)->subject) }}">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="body">Текст листа</label>
+                            <textarea name="body" id="body" class="form-control content" rows="12">{{ old('body', optional($template)->body) }}</textarea>
+                            <small class="form-text text-muted">
+                                Підставляються при виборі шаблону на сторінці магазину:
+                                <code>@{{shop_name}}</code> — назва магазину,
+                                <code>@{{shop_id}}</code> — ID,
+                                <code>@{{shop_url}}</code> — сторінка магазину на addnew,
+                                <code>@{{password_reset_url}}</code> — відновлення пароля.
+                            </small>
+                        </div>
+
+                        <button type="submit" class="btn btn-success">{{ $template ? 'Зберегти' : 'Створити' }}</button>
+                    </form>
                 </div>
             </div>
         </div>
