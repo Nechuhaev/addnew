@@ -176,6 +176,10 @@ class RebuildSitemap extends Command
         Ad::query()
             ->select('id', 'slug')
             ->where('status', 1)
+            ->where(function ($q) {
+                // розпродані імпортовані товари — під noindex, у sitemap не потрібні
+                $q->whereNull('is_product')->orWhere('is_product', 0)->orWhereNull('stock')->orWhere('stock', '!=', 'out_of_stock');
+            })
             ->whereIn('city_id', $cityIds)
             ->chunk(self::CHUNK, function ($ads, $page) use ($index, &$adsCount) {
                 $sm = Sitemap::create();
