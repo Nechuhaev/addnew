@@ -255,20 +255,20 @@ class ShopController extends Controller
         // (захищені від ботів сайти) — щоб було видно в списку одразу,
         // а не тільки в логах команди products:monitor-prices.
         $skippedDomains = \App\SkippedDomain::list();
+        // Позначка — коли ЖОДНЕ з джерел (сайт магазину, конкурент) не перевіряється.
         foreach ($products as $product) {
-            $sourceUrl = $product->competitor_url ?: $product->getOriginal('url');
-            $product->monitoring_skipped = false;
-            if ($sourceUrl) {
+            $sources = array_filter([$product->getOriginal('url'), $product->competitor_url]);
+            $skipped = 0;
+            foreach ($sources as $sourceUrl) {
                 $host = parse_url($sourceUrl, PHP_URL_HOST);
-                if ($host) {
-                    foreach ($skippedDomains as $domain) {
-                        if (\Illuminate\Support\Str::contains($host, $domain)) {
-                            $product->monitoring_skipped = true;
-                            break;
-                        }
+                foreach ($skippedDomains as $domain) {
+                    if ($host && \Illuminate\Support\Str::contains($host, $domain)) {
+                        $skipped++;
+                        break;
                     }
                 }
             }
+            $product->monitoring_skipped = $sources && $skipped === count($sources);
         }
 
         return view('admin.shops.products', [

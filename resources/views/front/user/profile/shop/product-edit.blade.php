@@ -161,8 +161,16 @@
                                         {{ __('shop_product_edit.competitor_url_help') }}
                                     </span>
                                     @if($product->competitor_url)
+                                        @php
+                                            $lastCompetitorCheck = $product->priceChecks()->where('status', 'like', 'competitor\_%')->latest('checked_at')->first();
+                                        @endphp
                                         <span class="form-help">
-                                            {{ __('shop_product_edit.last_check_label') }} {{ optional($product->priceChecks()->latest('checked_at')->first())->checked_at ?? __('shop_product_edit.never_checked_text') }}
+                                            {{ __('shop_product_edit.last_check_label') }}
+                                            @if($lastCompetitorCheck)
+                                                {{ $lastCompetitorCheck->checked_at->format('d.m.Y H:i') }} — {{ $lastCompetitorCheck->note }}
+                                            @else
+                                                {{ __('shop_product_edit.never_checked_text') }}
+                                            @endif
                                         </span>
                                     @endif
                                 </div>

@@ -17,13 +17,22 @@ class MonitorCompetitorPrices extends Command
     /**
      * php artisan products:monitor-prices
      *
-     * Для товарів з посиланням на джерело (competitor_url — вручну, або
-     * url — авто з фіда імпорту) перевіряє ЦІНУ і НАЯВНІСТЬ через публічні
-     * структуровані дані сторінки (JSON-LD Product/Offer, Open Graph,
-     * itemprop="price"/"availability" — те, що сайт сам публікує для
-     * Google). При збігу валюти оновлює ціну; при виявленні "немає в
-     * наявності" — виставляє stock=out_of_stock (і навпаки, якщо товар
-     * знову з'явився). Кожна перевірка логується в product_price_checks.
+     * Два різні джерела, які НЕ можна змішувати:
+     *
+     * 1. url — сторінка товару на сайті САМОГО магазину (з фіда імпорту).
+     *    Звідси беремо наявність; 404 означає, що магазин прибрав товар
+     *    (видаляємо оголошення), кілька невдалих спроб поспіль — призупиняємо.
+     *    Ціну беремо звідси лише тоді, коли не задано посилання на конкурента.
+     *
+     * 2. competitor_url — аналогічний товар у ІНШОМУ магазині (вказує власник).
+     *    Звідси беремо ЛИШЕ ціну (рівно як у конкурента, якщо валюта збігається).
+     *    Наявність конкурента, його 404 чи недоступність на наш товар не впливають.
+     *
+     * Дані читаються з публічної розмітки (JSON-LD Product/Offer/AggregateOffer,
+     * Open Graph, itemprop). Ціна, що відрізняється від поточної більш ніж у
+     * PRICE_MONITOR_MAX_RATIO разів (за замовчуванням 2), не застосовується —
+     * захист від помилок розбору й «акцій за 1 грн». Кожна перевірка
+     * логується в product_price_checks (статуси competitor_* — для конкурента).
      */
     protected $signature = 'products:monitor-prices {--limit=} {--shop=}';
 
@@ -96,11 +105,10 @@ class MonitorCompetitorPrices extends Command
 
             $skippedDomainCount = 0;
             $products = $candidates->filter(function ($product) use (&$skippedDomainCount) {
-                $sourceUrl = $product->competitor_url ?: $product->getOriginal('url');
-                if (empty($sourceUrl)) {
-                    return false;
-                }
-                if ($this->isSkippedDomain($sourceUrl)) {
+                $checkable = array_filter($this->sourcesOf($product), function ($url) {
+                    return !$this->isSkippedDomain($url);
+                });
+                if (!$checkable) {
                     $skippedDomainCount++;
                     return false;
                 }
@@ -120,45 +128,63 @@ class MonitorCompetitorPrices extends Command
         $this->info('Перевіряю ' . $products->count() . ' товар(ів)');
 
         foreach ($products as $i => $product) {
-            // ВАЖЛИВО: $product->url пройшло б через аксесор Ad::getUrlAttribute(),
-            // який завжди повертає внутрішній шлях "/ads/slug" — нам потрібне
-            // СИРЕ значення стовпця url з БД (посилання на джерело імпорту).
-            $sourceUrl = $product->competitor_url ?: $product->getOriginal('url');
+            $position = '[' . ($i + 1) . '/' . $products->count() . "] ID={$product->id}";
+            $sources = $this->sourcesOf($product);
 
-            if (empty($sourceUrl)) {
-                continue;
+            if (isset($sources['own'])) {
+                $this->info("{$position}, магазин: {$sources['own']}");
+                if ($this->isSkippedDomain($sources['own'])) {
+                    $this->info('  пропущено (захищений від ботів домен)');
+                } else {
+                    try {
+                        if (!$this->checkOwnSource($product, $sources['own'], !isset($sources['competitor']))) {
+                            continue; // оголошення видалено (404 у магазині)
+                        }
+                    } catch (\Throwable $e) {
+                        $this->logCheck($product, null, null, null, false, 'fetch_error', $e->getMessage());
+                        $this->error('  Помилка: ' . $e->getMessage());
+                        $this->maybeAutoSuspend($product);
+                    }
+                }
+                usleep(300000);
             }
 
-            // Для ручної перевірки конкретного магазину (--shop) список
-            // не фільтрувався заздалегідь — перевіряємо тут, щоб не
-            // ламати повідомлення про статус для власника магазину.
-            if ($shopId && $this->isSkippedDomain($sourceUrl)) {
-                $this->info('[' . ($i + 1) . '/' . $products->count() . "] ID={$product->id}: пропущено (захищений від ботів домен)");
-                continue;
+            if (isset($sources['competitor'])) {
+                $this->info("{$position}, конкурент: {$sources['competitor']}");
+                if ($this->isSkippedDomain($sources['competitor'])) {
+                    $this->info('  пропущено (захищений від ботів домен)');
+                } else {
+                    try {
+                        $this->checkCompetitor($product, $sources['competitor']);
+                    } catch (\Throwable $e) {
+                        $this->logCheck($product, null, null, null, false, 'competitor_fetch_error', $e->getMessage());
+                        $this->error('  Помилка: ' . $e->getMessage());
+                    }
+                }
+                usleep(300000);
             }
-
-            $this->info('[' . ($i + 1) . '/' . $products->count() . "] ID={$product->id}, {$sourceUrl}");
-
-            try {
-                $this->checkOne($product, $sourceUrl);
-            } catch (\Throwable $e) {
-                $this->logCheck($product, null, null, null, false, 'fetch_error', $e->getMessage());
-                $this->error('Помилка: ' . $e->getMessage());
-                $this->maybeAutoSuspend($product);
-            }
-
-            usleep(300000);
         }
 
         return 0;
     }
 
-    protected function checkOne(Ad $product, string $sourceUrl): void
+    /**
+     * Посилання на товар: ['own' => url магазину, 'competitor' => url конкурента]
+     * (ВАЖЛИВО: $product->url — аксесор "/ads/slug", тому сире значення через getOriginal)
+     */
+    protected function sourcesOf(Ad $product): array
+    {
+        return array_filter([
+            'own' => (string) $product->getOriginal('url'),
+            'competitor' => (string) $product->competitor_url,
+        ]);
+    }
+
+    protected function fetch(string $url)
     {
         // http_errors=false — щоб самим вирішувати, що робити з 404,
-        // а не отримувати виключення й губити конкретний код статусу
-        // (усі HTTP-помилки інакше зливались би в один generic fetch_error).
-        $response = $this->http->get($sourceUrl, [
+        // а не отримувати виключення й губити конкретний код статусу.
+        return $this->http->get($url, [
             'headers' => [
                 'User-Agent' => 'Mozilla/5.0 (compatible; AddnewPriceMonitor/1.0; +https://addnew.biz)',
             ],
@@ -166,59 +192,137 @@ class MonitorCompetitorPrices extends Command
             'verify' => false,
             'http_errors' => false,
         ]);
+    }
+
+    /**
+     * Сторінка товару на сайті самого магазину: наявність, 404 → видалення,
+     * ціна — лише якщо немає посилання на конкурента ($applyPrice).
+     *
+     * @return bool false — оголошення видалено
+     */
+    protected function checkOwnSource(Ad $product, string $sourceUrl, bool $applyPrice): bool
+    {
+        $response = $this->fetch($sourceUrl);
 
         if ($response->getStatusCode() === 404) {
             $this->handleProductGone($product, $sourceUrl);
-            return;
+            return false;
         }
 
-        $html = (string) $response->getBody();
-        $found = $this->extractProductData($html);
+        $found = $this->extractProductData((string) $response->getBody());
 
         if (!$found['price'] && !$found['availability']) {
             $this->logCheck($product, $product->price, null, null, false, 'not_found', 'Структуровані дані не знайдено на сторінці (можливо, тихий редирект на іншу сторінку)');
-            $this->warn('Ані ціни, ані наявності не знайдено на сторінці');
+            $this->warn('  Ані ціни, ані наявності не знайдено на сторінці');
             $this->maybeAutoSuspend($product);
-            return;
+            return true;
         }
 
         $notes = [];
-        $priceApplied = false;
-        $oldPriceForLog = (float) $product->price;
+        $oldPrice = (float) $product->price;
 
         if ($found['availability']) {
             if ($found['availability'] !== $product->stock) {
-                $oldStock = $product->stock;
+                $notes[] = "Наявність: {$product->stock} -> {$found['availability']}";
                 $product->stock = $found['availability'];
-                $notes[] = "Наявність: {$oldStock} -> {$found['availability']}";
             } else {
                 $notes[] = 'Наявність без змін (' . $found['availability'] . ')';
             }
         }
 
-        $foundCurrency = null;
-        if ($found['price']) {
-            $productCurrency = strtoupper(optional($product->currency)->code ?? '');
-            $foundCurrency = strtoupper($found['currency'] ?? '');
-
-            if (!$productCurrency || $foundCurrency !== $productCurrency) {
-                $notes[] = "Валюта не збігається (товар={$productCurrency}, джерело={$foundCurrency}) — ціну НЕ оновлено";
-            } else {
-                if (abs($oldPriceForLog - $found['price']) >= 0.01) {
-                    $product->price = $found['price'];
-                    $priceApplied = true;
-                    $notes[] = "Ціна: {$oldPriceForLog} -> {$found['price']} {$foundCurrency}";
-                } else {
-                    $notes[] = 'Ціна без змін';
-                }
-            }
-        }
+        [$priceApplied, $foundCurrency] = $applyPrice
+            ? $this->applyFoundPrice($product, $found, $notes)
+            : [false, $found['currency'] ? strtoupper($found['currency']) : null];
 
         $product->save();
 
         $note = implode('; ', $notes);
-        $this->logCheck($product, $oldPriceForLog, $found['price'], $foundCurrency, $priceApplied, 'success', $note);
+        $this->logCheck($product, $oldPrice, $found['price'], $foundCurrency, $priceApplied, 'success', $note);
         $this->info('  ' . $note);
+
+        return true;
+    }
+
+    /**
+     * Сторінка конкурента: ЛИШЕ ціна. Наявність, 404 і недоступність конкурента
+     * на наш товар не впливають — тільки фіксуються в лозі.
+     */
+    protected function checkCompetitor(Ad $product, string $url): void
+    {
+        $response = $this->fetch($url);
+        $oldPrice = (float) $product->price;
+
+        if ($response->getStatusCode() >= 400) {
+            $status = $response->getStatusCode() === 404 ? 'competitor_404' : 'competitor_fetch_error';
+            $this->logCheck($product, $oldPrice, null, null, false, $status, 'Сторінка конкурента відповіла HTTP ' . $response->getStatusCode() . ' — ціну не змінено');
+            $this->warn('  Сторінка конкурента відповіла HTTP ' . $response->getStatusCode() . ' — ціну не змінено');
+            return;
+        }
+
+        $found = $this->extractProductData((string) $response->getBody());
+
+        if (!$found['price']) {
+            $this->logCheck($product, $oldPrice, null, null, false, 'competitor_not_found', 'Ціну на сторінці конкурента не знайдено — ціну не змінено');
+            $this->warn('  Ціну на сторінці конкурента не знайдено');
+            return;
+        }
+
+        $notes = [];
+        [$priceApplied, $foundCurrency, $suspicious] = $this->applyFoundPrice($product, $found, $notes);
+
+        if ($priceApplied) {
+            $product->save();
+        }
+
+        $note = implode('; ', $notes);
+        $this->logCheck($product, $oldPrice, $found['price'], $foundCurrency, $priceApplied, $suspicious ? 'competitor_suspicious' : 'competitor_success', $note);
+        $this->info('  ' . $note);
+    }
+
+    /**
+     * Застосовує знайдену ціну, якщо збігається валюта і зміна не підозріла.
+     *
+     * @return array [застосовано, валюта джерела, підозріла]
+     */
+    protected function applyFoundPrice(Ad $product, array $found, array &$notes): array
+    {
+        if (!$found['price']) {
+            return [false, null, false];
+        }
+
+        $productCurrency = strtoupper(optional($product->currency)->code ?? '');
+        $foundCurrency = strtoupper($found['currency'] ?? '');
+
+        if (!$productCurrency || $foundCurrency !== $productCurrency) {
+            $notes[] = "Валюта не збігається (товар={$productCurrency}, джерело={$foundCurrency}) — ціну НЕ оновлено";
+            return [false, $foundCurrency, false];
+        }
+
+        // Ціна в БД ціла — порівнюємо вже округлене значення, інакше 1299.50
+        // щогодини виглядала б як «зміна» відносно збережених 1300.
+        $oldPrice = (float) $product->price;
+        $newPrice = (int) round($found['price']);
+
+        if ($newPrice === (int) round($oldPrice)) {
+            $notes[] = 'Ціна без змін';
+            return [false, $foundCurrency, false];
+        }
+
+        $maxRatio = (float) env('PRICE_MONITOR_MAX_RATIO', 2);
+        if ($oldPrice > 0 && $newPrice > 0 && max($newPrice / $oldPrice, $oldPrice / $newPrice) > $maxRatio) {
+            $notes[] = "Знайдена ціна {$newPrice} {$foundCurrency} відрізняється від поточної {$oldPrice} більш ніж у {$maxRatio} рази — НЕ застосовано (перевірте вручну)";
+            return [false, $foundCurrency, true];
+        }
+
+        if ($newPrice <= 0) {
+            $notes[] = "Знайдена ціна {$found['price']} некоректна — НЕ застосовано";
+            return [false, $foundCurrency, true];
+        }
+
+        $product->price = $newPrice;
+        $notes[] = "Ціна: {$oldPrice} -> {$newPrice} {$foundCurrency}";
+
+        return [true, $foundCurrency, false];
     }
 
     /**
@@ -262,23 +366,19 @@ class MonitorCompetitorPrices extends Command
             }
         }
 
-        if (preg_match('/<meta[^>]+property=["\']product:price:amount["\'][^>]+content=["\']([\d.,]+)["\']/i', $html, $m)) {
-            $result['price'] = $this->normalizeNumber($m[1]);
-            $result['currency'] = 'USD';
-            if (preg_match('/<meta[^>]+property=["\']product:price:currency["\'][^>]+content=["\']([A-Za-z]{3})["\']/i', $html, $mc)) {
-                $result['currency'] = $mc[1];
-            }
+        $meta = $this->metaTags($html);
+
+        if (isset($meta['product:price:amount'])) {
+            $result['price'] = $this->normalizeNumber($meta['product:price:amount']);
+            $result['currency'] = $meta['product:price:currency'] ?? 'USD';
         }
-        if (preg_match('/<meta[^>]+property=["\']product:availability["\'][^>]+content=["\']([^"\']+)["\']/i', $html, $ma)) {
-            $result['availability'] = $this->normalizeAvailability($ma[1]);
+        if (isset($meta['product:availability'])) {
+            $result['availability'] = $this->normalizeAvailability($meta['product:availability']);
         }
 
-        if (!$result['price'] && preg_match('/<meta[^>]+itemprop=["\']price["\'][^>]+content=["\']([\d.,]+)["\']/i', $html, $m)) {
-            $result['price'] = $this->normalizeNumber($m[1]);
-            $result['currency'] = 'USD';
-            if (preg_match('/<meta[^>]+itemprop=["\']priceCurrency["\'][^>]+content=["\']([A-Za-z]{3})["\']/i', $html, $mc)) {
-                $result['currency'] = $mc[1];
-            }
+        if (!$result['price'] && isset($meta['price'])) {
+            $result['price'] = $this->normalizeNumber($meta['price']);
+            $result['currency'] = $meta['pricecurrency'] ?? 'USD';
         }
         if (!$result['availability']) {
             if (preg_match('/itemprop=["\']availability["\'][^>]+(?:href|content)=["\']([^"\']+)["\']/i', $html, $ma)) {
@@ -300,8 +400,12 @@ class MonitorCompetitorPrices extends Command
             if (isset($offers[0])) {
                 $offers = $offers[0];
             }
+            // AggregateOffer (маркетплейси): ціни немає, є діапазон lowPrice..highPrice
+            if (!isset($offers['price']) && isset($offers['lowPrice'])) {
+                $offers['price'] = $offers['lowPrice'];
+            }
             if (isset($offers['price']) || isset($offers['availability'])) {
-                $price = isset($offers['price']) ? $this->normalizeNumber((string) $offers['price']) : null;
+                $price = isset($offers['price']) ? $this->normalizeNumber($offers['price']) : null;
                 $currency = $offers['priceCurrency'] ?? null;
                 $availability = isset($offers['availability']) ? $this->normalizeAvailability((string) $offers['availability']) : null;
 
@@ -352,15 +456,60 @@ class MonitorCompetitorPrices extends Command
         return null;
     }
 
-    protected function normalizeNumber(string $raw): ?float
+    /**
+     * Мета-теги сторінки як [property|itemprop|name (lowercase) => content],
+     * незалежно від порядку атрибутів у тезі.
+     */
+    protected function metaTags(string $html): array
     {
-        $raw = trim($raw);
-        $raw = str_replace(' ', '', $raw);
-        if (substr_count($raw, ',') === 1 && substr_count($raw, '.') === 0) {
-            $raw = str_replace(',', '.', $raw);
-        } else {
-            $raw = str_replace(',', '', $raw);
+        $tags = [];
+        if (preg_match_all('/<meta\b[^>]*>/i', $html, $m)) {
+            foreach ($m[0] as $tag) {
+                if (!preg_match('/\bcontent=["\']([^"\']*)["\']/i', $tag, $c)) {
+                    continue;
+                }
+                if (preg_match('/\b(?:property|itemprop|name)=["\']([^"\']+)["\']/i', $tag, $k)) {
+                    $key = strtolower($k[1]);
+                    if (!isset($tags[$key])) {
+                        $tags[$key] = html_entity_decode($c[1], ENT_QUOTES, 'UTF-8');
+                    }
+                }
+            }
         }
+        return $tags;
+    }
+
+    /**
+     * Число з ціни: 1299, 1299.50, "1 299,00", "1.299,00", "1,299.00", "1 299 грн"
+     */
+    protected function normalizeNumber($raw): ?float
+    {
+        if (is_int($raw) || is_float($raw)) {
+            return (float) $raw;
+        }
+
+        // лише цифри й розділювачі (пробіли, нерозривні пробіли, валюта — геть)
+        $raw = preg_replace('/[^\d.,]/u', '', (string) $raw);
+        if ($raw === '') {
+            return null;
+        }
+
+        $lastComma = strrpos($raw, ',');
+        $lastDot = strrpos($raw, '.');
+
+        if ($lastComma !== false && $lastDot !== false) {
+            // обидва є: десятковий — той, що правіше
+            $decimal = $lastComma > $lastDot ? ',' : '.';
+            $thousands = $decimal === ',' ? '.' : ',';
+            $raw = str_replace([$thousands, $decimal], ['', '.'], $raw);
+        } elseif ($lastComma !== false || $lastDot !== false) {
+            $sep = $lastComma !== false ? ',' : '.';
+            $parts = explode($sep, $raw);
+            // "1,299" / "1.299.000" — розділювач тисяч; "1299,5" / "39.99" — десятковий
+            $isThousands = count($parts) > 2 || strlen(end($parts)) === 3;
+            $raw = $isThousands ? str_replace($sep, '', $raw) : str_replace($sep, '.', $raw);
+        }
+
         return is_numeric($raw) ? (float) $raw : null;
     }
 
@@ -381,6 +530,7 @@ class MonitorCompetitorPrices extends Command
         }
 
         $recentStatuses = ProductPriceCheck::where('ad_id', $product->id)
+            ->where('status', 'not like', 'competitor\_%')
             ->orderByDesc('checked_at')
             ->limit($threshold)
             ->pluck('status');
@@ -397,7 +547,7 @@ class MonitorCompetitorPrices extends Command
             $product->status = 0;
             $product->save();
 
-            $source = $product->competitor_url ?: $product->getOriginal('url');
+            $source = $product->getOriginal('url');
             $this->logCheck($product, null, null, null, false, 'auto_suspended',
                 "Оголошення автоматично призупинено після {$threshold} невдалих спроб підряд отримати корисні дані з джерела ({$source})");
             $this->warn("Оголошення ID={$product->id} автоматично ПРИЗУПИНЕНО (джерело недоступне/порожнє {$threshold} рази підряд)");
@@ -431,8 +581,7 @@ class MonitorCompetitorPrices extends Command
         $suspendedAdIds = Ad::where('is_product', 1)
             ->where('status', 0)
             ->where(function ($q) use ($host) {
-                $q->where('competitor_url', 'LIKE', "%{$host}%")
-                  ->orWhere('url', 'LIKE', "%{$host}%");
+                $q->where('url', 'LIKE', "%{$host}%");
             })
             ->pluck('id');
 
