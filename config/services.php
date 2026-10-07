@@ -36,6 +36,11 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
 
+    'mailchimp' => [
+        'key' => env('MAILCHIMP_API_KEY'),
+        'list_id' => env('MAILCHIMP_LIST_ID'),
+    ],
+
     'facebook' => [
         'client_id' => env('FACEBOOK_CLIENT_ID'),
         'client_secret' => env('FACEBOOK_CLIENT_SECRET'),
