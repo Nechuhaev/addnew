@@ -509,7 +509,18 @@ class Ad extends Controller
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function  create_step_success(Request $request) {
-        $data['ad'] = \App\Ad::find($request->session()->get('ad_id'))->first();
+        // Раніше ad_id накопичувався в сесії масивом, і ->first() показував
+        // найстаріше з оголошень; беремо останнє створене.
+        $adId = $request->session()->get('ad_id');
+        if (is_array($adId)) {
+            $adId = end($adId);
+        }
+
+        $data['ad'] = $adId ? \App\Ad::find($adId) : null;
+        if (!$data['ad']) {
+            return redirect(route('ad.step.category'));
+        }
+
         return view('front.ad.create_step_4')->with($data);
     }
 
@@ -665,7 +676,7 @@ class Ad extends Controller
 
             $request->session()->remove('ad');
 
-            $request->session()->push('ad_id', $ad_model->id);
+            $request->session()->put('ad_id', $ad_model->id);
 
             return response()->json(['redirect' => route('ad.step.success')]);
 
