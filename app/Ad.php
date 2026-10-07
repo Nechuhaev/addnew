@@ -148,7 +148,12 @@ class Ad extends Model
      * @return string
      */
     public function getFormattedPriceAttribute() {
-        $_currency = AdCurrency::whereId((int)$this->attributes['currency_id'])->first();
+        // Валюти завантажуються один раз на процес, а не запитом на кожне оголошення
+        static $currencies = null;
+        if ($currencies === null) {
+            $currencies = AdCurrency::all()->keyBy('id');
+        }
+        $_currency = $currencies->get((int) $this->attributes['currency_id']);
         return $this->attributes['price'] . ' ' . ($_currency->symbol ?? '');
     }
 
@@ -215,6 +220,11 @@ class Ad extends Model
 
     public static function getLoopArray($data) : array
     {
+        // Категорії й автори — одним запитом на сторінку, а не по запиту на оголошення
+        $items = collect($data instanceof \Illuminate\Contracts\Pagination\Paginator ? $data->items() : $data);
+        $categories = AdCategory::whereIn('id', $items->pluck('category_id')->unique()->all())->get()->keyBy('id');
+        $authors = User::whereIn('id', $items->pluck('user_id')->unique()->all())->get()->keyBy('id');
+
         $ads = [];
         foreach ($data as $ad) {
             //$city_url_path = $ad->country_slug . '/' . $ad->region_slug . '/'. $ad->city_slug;
@@ -231,19 +241,22 @@ class Ad extends Model
 //            }
             //$image = $ad->image;
 
-            $category = AdCategory::find($ad->category_id);
+            $category = $categories->get($ad->category_id);
+            $author = $authors->get($ad->user_id);
 
             $ads[] = [
                 'id' => $ad->id,
                 'name' => $ad->name,
                 'user_id' => $ad->user_id,
+                // Ім'я без розкриття email (username = ім'я або частина email до «@»)
+                'author_name' => $author ? $author->username : '',
                 'date_active' => date ("Y-m-d H:i", strtotime($ad->date_active)),
                 'url' => route('ad.page', ['slug' => $ad->slug]),
                 'image' => $image,
                 'price' => AdCurrency::convert($ad->price),
                 'content' => Str::words(strip_tags($ad->content), 20, "..."),
                 'city' => $ad->city,
-                'city_url' => $category->getFilteredUrl($ad->city_slug),
+                'city_url' => $category ? $category->getFilteredUrl($ad->city_slug) : '',
                 'country' => $ad->country,
                 'country_url' => route('country.page', ['country' => $ad->country_slug])
             ];

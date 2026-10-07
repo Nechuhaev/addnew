@@ -28,9 +28,9 @@ class UserController extends Controller
                 '---ads_count---'  => $user->ads()->count(),
             ];
             $meta = [
-                'meta_title' => $entity->meta_title ?? strtr($seo_field->meta_title, $entity_values),
-                'meta_description' => $entity->meta_description ?? strtr($seo_field->meta_description, $entity_values),
-                'description' => $entity->content ?? strtr($seo_field->description, $entity_values)
+                'meta_title' => strtr($seo_field->meta_title, $entity_values),
+                'meta_description' => strtr($seo_field->meta_description, $entity_values),
+                'description' => strtr($seo_field->description, $entity_values)
             ];
         } else {
             $meta = [
@@ -48,12 +48,7 @@ class UserController extends Controller
             ->where('user_id', $user->id)
             ->paginate(15);
 
-        $adsOld = Ad::getLoopArray($results);
-        $ads = [];
-        foreach ($adsOld as $ad) {
-            $ad['author_name'] = $user->username;
-            $ads[] = $ad;
-        }
+        $ads = Ad::getLoopArray($results);
 
         $microdata_info = DB::table('ads')
             ->selectRaw('min(ads.price) as min, max(ads.price) as max, count(ads.id) as ads_count')

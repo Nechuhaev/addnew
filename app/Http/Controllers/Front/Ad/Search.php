@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Front\Ad;
 
 use App\Ad;
-use App\User;
 use App\AdCategory;
 use App\AdTag;
 use App\Http\Controllers\Controller;
@@ -13,7 +12,6 @@ use Illuminate\Http\Request;
 class Search extends Controller
 {
     public function page(Request $request) {
-        //dd($request->all());
 
         $results = Ad::getAds();
 
@@ -73,10 +71,6 @@ class Search extends Controller
 
         $ads = Ad::getLoopArray($results);
 
-        for ($i=0; $i < count($ads); $i++) { 
-            $user = User::find($ads[$i]['user_id']);
-            $ads[$i]['author_name'] = $user->firstname ? $user->firstname : $user->email;
-        }
 
         // seo data
         $seo_field = SeoField::where('index', 'search')->first();

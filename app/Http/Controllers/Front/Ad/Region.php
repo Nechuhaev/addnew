@@ -3,19 +3,15 @@
 namespace App\Http\Controllers\Front\Ad;
 
 use App\Ad;
-use App\AdCategory;
 use App\AdCity;
 use App\AdRegion;
 use App\AdCountry;
-use App\AdTag;
 use App\Http\AdSense;
 use App\Http\Controllers\Controller;
 use App\Localization\Localization;
 use App\SeoField;
-use App\User;
-use Illuminate\Http\Request;
+use App\Services\GeoPageBlocks;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 
 class Region extends Controller
 {
@@ -26,44 +22,7 @@ class Region extends Controller
 
         $cache_key = sprintf('region_categories_%s', $entity->id);
         $categories = Cache::remember($cache_key, 43200, function () use ($entity) {
-            $parents = AdCategory::where('parent_id', 0)
-                ->orderBy('sort_order', 'ASC')->get();
-
-            $_category_list = [];
-            foreach ($parents as $parent) {
-                $key = 0;
-
-                // В зависимости от порядка сортировки помещаем в колонку
-                if (in_array($parent['sort_order'], range(0, 99))) {
-                    $key = 0;
-                }
-                if (in_array($parent['sort_order'], range(100, 199))) {
-                    $key = 1;
-                }
-                if (in_array($parent['sort_order'], range(200, 299))) {
-                    $key = 2;
-                }
-                if (in_array($parent['sort_order'], range(300, 399))) {
-                    $key = 3;
-                }
-
-                $_category_list[$key][] = $parent;
-            }
-
-            $categories = [];
-            foreach ($_category_list as $list_item_key => $list_item_value) {
-                foreach ($list_item_value as $parent_category) {
-                    $categories[] = [
-                        'name' => $parent_category->name,
-                        'url' => $parent_category->getFilteredUrl($entity->slug),
-                        'image' => $parent_category->image,
-                    ];
-                }
-            }
-
-
-            $categories = collect($categories);
-            return $categories->toArray();
+            return GeoPageBlocks::filteredCategories($entity->slug);
         });
 
 
@@ -103,13 +62,7 @@ class Region extends Controller
             ];
         }
 
-        $shop_users = User::withCount('ads')
-            ->whereHas('ads', function ($query) use ($localization) {
-                $query->where('is_product', 1)->whereIn('city_id', $localization->citiesIds());
-            })
-            ->orderBy('created_at', 'desc')
-            ->take(12)
-            ->get();
+        $shop_users = GeoPageBlocks::latestShops($localization);
 
         return view('front.ad.filtered-categories')->with([
             'entity' => $entity,
@@ -132,9 +85,9 @@ class Region extends Controller
             '---country_name---'  => $entity->name
         ];
         $meta = [
-            'meta_title' => strtr($seo_field->meta_title, $entity_values) ?? strtr($seo_field->meta_title, $entity_values),
-            'meta_description' => strtr($seo_field->meta_description, $entity_values) ?? strtr($seo_field->meta_description, $entity_values),
-            'description' => strtr($seo_field->description, $entity_values) ?? strtr($seo_field->description, $entity_values)
+            'meta_title' => strtr($seo_field->meta_title, $entity_values),
+            'meta_description' => strtr($seo_field->meta_description, $entity_values),
+            'description' => strtr($seo_field->description, $entity_values)
         ];
         
         $results = Ad::getAds()
