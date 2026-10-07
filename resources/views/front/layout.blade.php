@@ -18,7 +18,7 @@
 
     <link href="{{ asset('assets/front/css/start.min.css') }}" rel="stylesheet">
     <!-- Styles -->
-    <link rel="stylesheet" href="{{ asset('assets/front/css/style.min.css') }}" media="all">
+    <link rel="stylesheet" href="{{ asset('assets/front/css/style.min.css') }}?v={{ filemtime(public_path('assets/front/css/style.min.css')) }}" media="all">
 
     @yield('style')
 
@@ -84,10 +84,33 @@
     </div>
     <div class="nav-inner">
         <div class="nav-account">
-            <span class="nav-h">{!! __('front.welcome_guest') !!}</span><br>
-            <a href="{{ route('ad.step.category') }}" class="header-link">{{ __('front.post_ad') }}</a><br>
-            <a href="/?s=&scat=0&loc_search=&sa=search" class="header-link">{{ __('front.search_ads') }}</a><br>
-            <a href="{{ route('register') }}" rel="nofollow" class="header-link link-register">{{ __('front.register') }}</a><br>
+            @if(Auth::check())
+                <span class="nav-h">{!! __('front.welcome_user', ['email' => e(Auth::user()->email)]) !!}</span>
+                <ul class="nav-mobile-links">
+                    @if(Auth::user()->is_shop_owner)
+                        <li><a href="{{ route('profile.shop.dashboard') }}" rel="nofollow" class="header-link">{{ __('front.my_shop') }}</a></li>
+                    @else
+                        <li><a href="{{ route('profile.ads') }}" rel="nofollow" class="header-link">{{ __('front.cabinet') }}</a></li>
+                    @endif
+                    <li><a href="{{ route('chat.index') }}" rel="nofollow" class="header-link">{{ app()->getLocale() === 'ru' ? 'Сообщения' : 'Повідомлення' }} <span class="chat-unread-badge-mobile" style="display:none;"></span></a></li>
+                    <li><a href="{{ route('ad.step.category') }}" class="header-link">{{ __('front.post_ad') }}</a></li>
+                    <li><a href="{{ route('stores') }}" class="header-link">{{ __('front.all_shops_link') }}</a></li>
+                    <li>
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="header-link nav-mobile-logout">{{ __('sidebar.logout_button') }}</button>
+                        </form>
+                    </li>
+                </ul>
+            @else
+                <span class="nav-h">{!! __('front.welcome_guest') !!}</span>
+                <ul class="nav-mobile-links">
+                    <li><a href="{{ route('login') }}" rel="nofollow" class="header-link">{{ __('front.login') }}</a></li>
+                    <li><a href="{{ route('register') }}" rel="nofollow" class="header-link">{{ __('front.register') }}</a></li>
+                    <li><a href="{{ route('ad.step.category') }}" class="header-link">{{ __('front.post_ad') }}</a></li>
+                    <li><a href="{{ route('stores') }}" class="header-link">{{ __('front.all_shops_link') }}</a></li>
+                </ul>
+            @endif
             @php
                 $mobileCurrentRouteName = \Route::currentRouteName();
                 $mobileRouteParams = request()->route() ? request()->route()->parameters() : [];
@@ -95,65 +118,14 @@
                 $mobileUkRouteName = $mobileIsRu ? substr($mobileCurrentRouteName, 3) : $mobileCurrentRouteName;
                 $mobileRuRouteName = $mobileIsRu ? $mobileCurrentRouteName : ($mobileCurrentRouteName ? 'ru.' . $mobileCurrentRouteName : null);
             @endphp
-            <div style="margin-top:10px;">
+            <div class="nav-mobile-lang">
                 @if($mobileUkRouteName && \Route::has($mobileUkRouteName))
-                    <a href="{{ route($mobileUkRouteName, $mobileRouteParams) }}" class="header-link" style="{{ !$mobileIsRu ? 'font-weight:700; text-decoration:underline;' : 'opacity:0.6;' }}">UA</a>
+                    <a href="{{ route($mobileUkRouteName, $mobileRouteParams) }}" class="header-link{{ !$mobileIsRu ? ' is-active' : '' }}">UA</a>
                 @endif
                 &nbsp;/&nbsp;
                 @if($mobileRuRouteName && \Route::has($mobileRuRouteName))
-                    <a href="{{ route($mobileRuRouteName, $mobileRouteParams) }}" class="header-link" style="{{ $mobileIsRu ? 'font-weight:700; text-decoration:underline;' : 'opacity:0.6;' }}">RU</a>
+                    <a href="{{ route($mobileRuRouteName, $mobileRouteParams) }}" class="header-link{{ $mobileIsRu ? ' is-active' : '' }}">RU</a>
                 @endif
-            </div>
-        </div>
-        <div class="nav-countries">
-            <p class="nav-h">{{ __('front.search_by_countries') }}</p>
-            <div class="country-wrap">
-                <a href="https://addnew.biz/regions/ukraina" class="country-name"><img src="{{ asset('assets/front/img/flags/ukrane.png') }}"> <span>{{ __('front.country_ukraine') }}</span> <span class="btn-toggle"><i class="icon icon-plus"></i></span></a>
-                <ul class="cities-list">
-                    <li><a href="https://addnew.biz/regions/ukraina/kievskaya-obl/kiev">{{ __('sidebar_cities.kiev') }} <span class="city-rate">2384</span></a></li>
-                    <li><a href="https://addnew.biz/regions/ukraina/harkovskaya-obl/harkov">{{ __('sidebar_cities.harkov') }} <span class="city-rate">959</span></a></li>
-                    <li><a href="https://addnew.biz/regions/ukraina/dnepropetrovskaya-obl/dnepropetrovsk">{{ __('sidebar_cities.dnepr') }} <span class="city-rate">520</span></a></li>
-                    <li><a href="https://addnew.biz/regions/ukraina/odesskaya-obl/odessa">{{ __('sidebar_cities.odessa') }} <span class="city-rate">506</span></a></li>
-                    <li><a href="https://addnew.biz/regions/ukraina/zaporozhskaya-obl/zaporozhe">{{ __('sidebar_cities.zaporozhe') }} <span class="city-rate">276</span></a></li>
-                    <li><a href="https://addnew.biz/regions/ukraina/lvovskaya-obl/lvov">{{ __('sidebar_cities.lvov') }} <span class="city-rate">244</span></a></li>
-                    <li><a href="https://addnew.biz/regions/ukraina/sumskaya-obl/sumi">{{ __('sidebar_cities.sumy') }} <span class="city-rate">158</span></a></li>
-                    <li><a href="https://addnew.biz/regions/ukraina/hmelnitckaya-obl/hmelnitckij">{{ __('sidebar_cities.hmelnitskiy') }} <span class="city-rate">143</span></a></li>
-                    <li><a href="https://addnew.biz/regions/ukraina/nikolaevskaya-obl/nikolaev">{{ __('sidebar_cities.nikolaev') }} <span class="city-rate">137</span></a></li>
-                    <li><a href="https://addnew.biz/regions/ukraina/vinnitckaya-obl/vinnitca">{{ __('sidebar_cities.vinnitsa') }} <span class="city-rate">113</span></a></li>
-                </ul>
-            </div>
-            <div class="country-wrap">
-                <a href="https://addnew.biz/regions/rossiya" class="country-name"> <!-- active -->
-                    <img src="{{ asset('assets/front/img/flags/russia.png') }}">
-                    <span>{{ __('front.country_russia') }}</span>
-                    <span class="btn-toggle"><i class="icon icon-plus"></i></span>
-                </a>
-                <ul class="cities-list">
-                    <li><a href="https://addnew.biz/regions/rossiya/moskva-i-moskovskaya-obl/moskva">{{ __('sidebar_cities.moskva') }} <span class="city-rate">81</span></a></li>
-                    <li><a href="https://addnew.biz/regions/rossiya/lipetckaya-obl/lipetck">{{ __('sidebar_cities.lipetsk') }} <span class="city-rate">68</span></a></li>
-                    <li><a href="https://addnew.biz/regions/rossiya/rostovskaya-obl/rostov-na-donu">{{ __('sidebar_cities.rostov') }} <span class="city-rate">41</span></a></li>
-                    <li><a href="https://addnew.biz/regions/rossiya/sankt-peterburg-i-oblast/sankt-peterburg">{{ __('sidebar_cities.spb') }} <span class="city-rate">27</span></a></li>
-                    <li><a href="https://addnew.biz/regions/rossiya/novosibirskaya-obl/novosibirsk">{{ __('sidebar_cities.novosibirsk') }} <span class="city-rate">14</span></a></li>
-                    <li><a href="https://addnew.biz/regions/rossiya/krasnodarskij-kraj/sochi">{{ __('sidebar_cities.sochi') }} <span class="city-rate">14</span></a></li>
-                    <li><a href="https://addnew.biz/regions/rossiya/ryazanskaya-obl/ryazan">{{ __('sidebar_cities.ryazan') }} <span class="city-rate">10</span></a></li>
-                    <li><a href="https://addnew.biz/regions/rossiya/sverdlovskaya-obl/ekaterinburg">{{ __('sidebar_cities.ekaterinburg') }} <span class="city-rate">10</span></a></li>
-                    <li><a href="https://addnew.biz/regions/rossiya/moskva-i-moskovskaya-obl/noginsk">{{ __('sidebar_cities.noginsk') }} <span class="city-rate">8</span></a></li>
-                    <li><a href="https://addnew.biz/regions/rossiya/tatarstan/naberezhnie-chelni">{{ __('sidebar_cities.chelny') }} <span class="city-rate">8</span></a></li>
-                </ul>
-            </div>
-            <div class="country-wrap">
-                <a href="https://addnew.biz/regions/kitaj" class="country-name">
-                    <img src="{{ asset('assets/front/img/flags/china.png') }}">
-                    <span>{{ __('front.country_china') }}</span>
-                    <span class="btn-toggle"><i class="icon icon-plus"></i></span>
-                </a>
-                <ul class="cities-list">
-                    <li><a href="https://addnew.biz/regions/kitaj/hejluntczyan/harbin">{{ __('sidebar_cities.harbin') }} <span class="city-rate">214</span></a></li>
-                    <li><a href="https://addnew.biz/regions/kitaj/gansu/lanchzhou">{{ __('sidebar_cities.lanchzhou') }} <span class="city-rate">9</span></a></li>
-                    <li><a href="https://addnew.biz/regions/kitaj/pekin/pekin">{{ __('sidebar_cities.pekin') }} <span class="city-rate">3</span></a></li>
-                    <li><a href="https://addnew.biz/regions/kitaj/hebej/shihajkvang">{{ __('sidebar_cities.shihajkvang') }} <span class="city-rate">2</span></a></li>
-                    <li><a href="https://addnew.biz/regions/kitaj/guandon/zhenzhen">{{ __('sidebar_cities.zhenzhen') }} <span class="city-rate">2</span></a></li>
-                </ul>
             </div>
         </div>
     </div>
@@ -197,7 +169,7 @@
                     @if(Auth::check())
                         <span class="header-welcome">{!! __('front.welcome_user', ['email' => e(Auth::user()->email)]) !!}</span>
                         <a href="{{ route('chat.index') }}" rel="nofollow" class="header-link link-register" style="position:relative;">
-                            Повідомлення
+                            {{ app()->getLocale() === 'ru' ? 'Сообщения' : 'Повідомлення' }}
                             <span id="chat-unread-badge" style="display:none; background:#e74c3c; color:#fff; border-radius:10px; font-size:11px; font-weight:700; padding:1px 6px; margin-left:4px; vertical-align:top;"></span>
                         </a>
                         @if(Auth::user()->is_shop_owner)
@@ -292,7 +264,7 @@
     }
 </style>
 <script src="{{ asset('assets/front/js/common.js') }}"></script>
-<script src="{{ asset('assets/front/js/global.js') }}"></script>
+<script src="{{ asset('assets/front/js/global.js') }}?v={{ filemtime(public_path('assets/front/js/global.js')) }}"></script>
 <script src="{{ asset('assets/front/js/maps.js') }}"></script>
 @yield('load-scripts')
 
@@ -301,19 +273,23 @@
 @auth
 <script>
 (function () {
-    var badge = document.getElementById('chat-unread-badge');
-    if (!badge) return;
+    var badges = [document.getElementById('chat-unread-badge')]
+        .concat([].slice.call(document.querySelectorAll('.chat-unread-badge-mobile')))
+        .filter(Boolean);
+    if (!badges.length) return;
 
     function updateUnread() {
         fetch('{{ route('chat.unread') }}', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
             .then(function (r) { return r.json(); })
             .then(function (data) {
-                if (data.count > 0) {
-                    badge.textContent = data.count;
-                    badge.style.display = 'inline-block';
-                } else {
-                    badge.style.display = 'none';
-                }
+                badges.forEach(function (badge) {
+                    if (data.count > 0) {
+                        badge.textContent = data.count;
+                        badge.style.display = 'inline-block';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                });
             })
             .catch(function () {});
     }
