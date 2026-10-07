@@ -2,16 +2,13 @@
 
 namespace App\Http\Controllers\Front;
 
-use App\Ad;
-use App\AdCategory;
-use App\AdCity;
 use App\AdTag;
 use App\Http\AdSense;
 use App\Http\Controllers\Controller;
 use App\Localization\Localization;
 use App\SeoField;
+use App\Services\GeoPageBlocks;
 
-use App\User;
 use App\Article;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -23,29 +20,7 @@ class HomeController extends Controller
     public function index(Localization $localization)
     {
         $categories = Cache::remember('home_categories_' . app()->getLocale(), 43200, function () {
-            $parents = AdCategory::where('parent_id', 0)
-                ->orderBy('sort_order', 'ASC')->get();
-
-            $_category_list = [];
-            foreach ($parents as $parent) {
-                $key = 0;
-
-                // В зависимости от порядка сортировки помещаем в колонку
-                if (in_array($parent['sort_order'], range(0, 99))) {
-                    $key = 0;
-                }
-                if (in_array($parent['sort_order'], range(100, 199))) {
-                    $key = 1;
-                }
-                if (in_array($parent['sort_order'], range(200, 299))) {
-                    $key = 2;
-                }
-                if (in_array($parent['sort_order'], range(300, 399))) {
-                    $key = 3;
-                }
-
-                $_category_list[$key][] = $parent;
-            }
+            $_category_list = GeoPageBlocks::parentCategoriesByColumn();
 
             $categories = [];
             foreach ($_category_list as $list_item_key => $list_item_value) {
@@ -94,21 +69,7 @@ class HomeController extends Controller
 
         $ads_cache_key = sprintf('home_ads_%s', $localization->getCountry()->id);
         $ads_groups = Cache::remember($ads_cache_key, 120, function () use ($localization) {
-            $_ads_groups = $localization->ads()->orderBy('created_at', 'desc')->groupBy('user_id')->take(20)->get()->chunk(5);
-
-            $ads_groups = [];
-            foreach ($_ads_groups as $key => $group) {
-                foreach ($group as $ad) {
-                    $ads_groups[$key][] = [
-                        'name' => $ad->name,
-                        'url' => $ad->url,
-                        'price' => $ad->formatted_price,
-                        'image' => $ad->image
-                    ];
-                }
-            }
-
-            return $ads_groups;
+            return GeoPageBlocks::latestAdsGroups($localization->ads());
         });
         
         // Останні статті блогу — пріоритет неіндексованим у Google
@@ -184,15 +145,8 @@ class HomeController extends Controller
                 return $tags;
             }
         });
-//        Cache::forget('home_tags');
 
-        $shop_users = User::withCount('ads')
-            ->whereHas('ads', function ($query) use ($localization) {
-                $query->where('is_product', 1)->whereIn('city_id', $localization->citiesIds());
-            })
-            ->orderBy('created_at', 'desc')
-            ->take(12)
-            ->get();
+        $shop_users = GeoPageBlocks::latestShops($localization);
 
 
         return view('front.index')->with([
