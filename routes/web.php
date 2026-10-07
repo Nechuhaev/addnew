@@ -33,6 +33,7 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::get('/shops/leads', 'Admin\Shop\ShopLeadController@index')->name('admin.shops.leads');
     Route::post('/shops/leads', 'Admin\Shop\ShopLeadController@store')->name('admin.shops.leads.store');
     Route::post('/shops/leads/{id}', 'Admin\Shop\ShopLeadController@update')->name('admin.shops.leads.update');
+    Route::post('/shops/leads/{id}/send', 'Admin\Shop\ShopLeadController@send')->name('admin.shops.leads.send');
     Route::post('/shops/leads/{id}/lookup', 'Admin\Shop\ShopLeadController@lookup')->name('admin.shops.leads.lookup');
     Route::delete('/shops/leads/{id}', 'Admin\Shop\ShopLeadController@destroy')->name('admin.shops.leads.destroy');
     Route::get('/shops/stats', 'Admin\Shop\ShopStatsController@index')->name('admin.shops.stats');

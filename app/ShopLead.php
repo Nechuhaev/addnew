@@ -34,6 +34,11 @@ class ShopLead extends Model
         'contacted_at' => 'datetime',
     ];
 
+    public function messages()
+    {
+        return $this->hasMany(ShopLeadMessage::class)->orderByDesc('created_at');
+    }
+
     /**
      * Домен без www — для пошуку дублікатів і магазинів, що вже є на сайті
      */
@@ -55,8 +60,8 @@ class ShopLead extends Model
     }
 
     /**
-     * Текст листа-запрошення [тема, текст] — підставляється в mailto:,
-     * лист адмін надсилає зі своєї пошти й може відредагувати перед відправкою
+     * Текст листа-запрошення [тема, текст] — підставляється у форму відправки
+     * на сторінці кандидатів, адмін може відредагувати його перед надсиланням
      */
     public function invitationLetter(string $senderName): array
     {

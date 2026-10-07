@@ -28,10 +28,26 @@ class CreateShopLeadsTable extends Migration
 
             $table->index('status');
         });
+
+        // Листи-запрошення, надіслані кандидатам із сайту (як shop_messages для магазинів)
+        Schema::create('shop_lead_messages', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('shop_lead_id');
+            $table->unsignedBigInteger('admin_user_id')->nullable();
+            $table->string('subject');
+            $table->text('body');
+            $table->string('sent_to_email');
+            $table->boolean('sent_successfully')->default(false);
+            $table->text('error_message')->nullable();
+            $table->timestamps();
+
+            $table->foreign('shop_lead_id')->references('id')->on('shop_leads')->onDelete('cascade');
+        });
     }
 
     public function down()
     {
+        Schema::dropIfExists('shop_lead_messages');
         Schema::dropIfExists('shop_leads');
     }
 }

@@ -3,14 +3,18 @@
 namespace App\Http\Controllers\Admin\Shop;
 
 use App\Http\Controllers\Controller;
+use App\Mail\ShopAdminMessage;
 use App\Services\SiteContactEmailFinder;
 use App\ShopLead;
+use App\ShopLeadMessage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 /**
  * Кандидати в магазини: адмін вручну додає інтернет-магазини (назва, сайт),
- * система шукає контактний email на сайті самого магазину, а адмін пише
- * персональний лист зі своєї пошти й веде статус.
+ * система шукає контактний email на сайті самого магазину, адмін надсилає
+ * персональний лист-запрошення з сайту (по одному, з журналом) і веде статус.
  */
 class ShopLeadController extends Controller
 {
@@ -18,7 +22,7 @@ class ShopLeadController extends Controller
     {
         $status = $request->get('status');
 
-        $leads = ShopLead::when($status && isset(ShopLead::STATUSES[$status]), function ($q) use ($status) {
+        $leads = ShopLead::with('messages')->when($status && isset(ShopLead::STATUSES[$status]), function ($q) use ($status) {
                 $q->where('status', $status);
             })
             ->orderByRaw("FIELD(status, 'replied', 'new', 'contacted', 'joined', 'declined')")
@@ -116,6 +120,69 @@ class ShopLeadController extends Controller
         $message = $lead->email ? "Знайдено email: {$lead->email}" : ($lead->email_lookup_status === 'unreachable' ? 'Сайт не відповідає' : 'Email на сайті не знайдено');
 
         return back()->with('success', "«{$lead->name}»: {$message}");
+    }
+
+    /**
+     * Надіслати лист-запрошення одному кандидату — тим самим механізмом,
+     * що й листи магазинам в «Опис магазину» (ShopAdminMessage), із журналом.
+     */
+    public function send($id, Request $request)
+    {
+        $lead = ShopLead::findOrFail($id);
+
+        $data = $request->validate([
+            'subject' => 'required|string|max:255',
+            'body' => 'required|string|max:10000',
+        ], [
+            'subject.required' => 'Введіть тему листа',
+            'body.required' => 'Введіть текст листа',
+        ]);
+
+        if (!$lead->email) {
+            return back()->with('error', "У «{$lead->name}» немає email — спершу знайдіть або вкажіть його.");
+        }
+        if (in_array($lead->status, ['joined', 'declined'], true) || $lead->existingShop()) {
+            return back()->with('error', "«{$lead->name}» уже підключився або відмовився — лист не надіслано.");
+        }
+
+        // Текст пишеться як звичайний лист — перетворюємо на HTML для шаблону
+        // (абзаци й переноси, посилання клікабельні)
+        $html = preg_replace(
+            '~(https?://[^\s<]+)~u',
+            '<a href="$1">$1</a>',
+            nl2br(e($data['body']))
+        );
+
+        $sentOk = true;
+        $error = null;
+        try {
+            Mail::to($lead->email)->send(new ShopAdminMessage($data['subject'], $html));
+        } catch (\Throwable $e) {
+            $sentOk = false;
+            $error = $e->getMessage();
+        }
+
+        ShopLeadMessage::create([
+            'shop_lead_id' => $lead->id,
+            'admin_user_id' => Auth::id(),
+            'subject' => $data['subject'],
+            'body' => $data['body'],
+            'sent_to_email' => $lead->email,
+            'sent_successfully' => $sentOk,
+            'error_message' => $error,
+        ]);
+
+        if (!$sentOk) {
+            return back()->with('error', "Не вдалося надіслати лист «{$lead->name}»: {$error}");
+        }
+
+        if ($lead->status === 'new') {
+            $lead->status = 'contacted';
+        }
+        $lead->contacted_at = $lead->contacted_at ?: now();
+        $lead->save();
+
+        return back()->with('success', "Лист надіслано «{$lead->name}» ({$lead->email}).");
     }
 
     public function destroy($id)

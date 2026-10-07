@@ -19,8 +19,9 @@
                     <p class="text-muted">
                         Інтернет-магазини, яких ви хочете запросити на addnew. Додавайте їх вручну (назва й сайт) —
                         контактний email система шукає на сайті <strong>самого магазину</strong> (головна й сторінки контактів).
-                        «Написати» відкриває лист-запрошення у вашій пошті: перевірте й відредагуйте його перед відправкою.
-                        Пишіть невеликими порціями (10–20 на день) і не надсилайте повторно тим, хто відмовився.
+                        «Надіслати лист» відкриває вже заповнене запрошення — перевірте й відредагуйте його, лист піде з сайту
+                        (як листи магазинам в «Опис магазину») і збережеться в історії кандидата.
+                        Надсилайте невеликими порціями (10–20 на день) і не пишіть повторно тим, хто відмовився.
                     </p>
 
                     <h5>Додати магазин</h5>
@@ -100,21 +101,43 @@
                                                 <span class="text-muted" style="font-size:11px;">написали {{ $lead->contacted_at->format('d.m.Y') }}</span>
                                             @endif
                                         </td>
-                                        <td class="text-right" style="white-space:nowrap;">
+                                        <td class="text-right" style="min-width:150px;">
+                                            @php($lastMessage = $lead->messages->first())
                                             @if($lead->email && !in_array($lead->status, ['joined', 'declined']) && !$existingShop)
-                                                <a href="mailto:{{ $lead->email }}?subject={{ rawurlencode($subject) }}&body={{ rawurlencode($body) }}" class="btn btn-sm btn-primary">Написати</a>
+                                                <button type="button" class="btn btn-sm btn-primary mb-1" onclick="var f=document.getElementById('lead-send-{{ $lead->id }}');f.style.display=f.style.display==='none'?'table-row':'none';">Надіслати лист</button>
                                             @endif
-                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="var t=this.nextElementSibling;t.style.display=t.style.display==='none'?'block':'none';">Текст листа</button>
-                                            <textarea readonly class="form-control mt-1" rows="10" style="display:none;min-width:360px;font-size:12px;">{{ $subject }}
-
-{{ $body }}</textarea>
                                             <form action="{{ route('admin.shops.leads.destroy', $lead->id) }}" method="post" style="display:inline;" onsubmit="return confirm('Видалити «{{ $lead->name }}» зі списку?');">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button class="btn btn-sm btn-outline-danger">&times;</button>
+                                                <button class="btn btn-sm btn-outline-danger mb-1">&times;</button>
                                             </form>
+                                            @if($lastMessage)
+                                                <div style="font-size:11px;" class="{{ $lastMessage->sent_successfully ? 'text-success' : 'text-danger' }}"
+                                                     title="{{ $lastMessage->error_message ?: $lastMessage->subject }}">
+                                                    {{ $lastMessage->sent_successfully ? 'надіслано' : 'помилка' }} {{ $lastMessage->created_at->format('d.m.Y H:i') }}
+                                                    @if($lead->messages->count() > 1) (усього {{ $lead->messages->count() }}) @endif
+                                                </div>
+                                            @endif
                                         </td>
                                     </tr>
+                                    @if($lead->email && !in_array($lead->status, ['joined', 'declined']) && !$existingShop)
+                                        <tr id="lead-send-{{ $lead->id }}" style="display:none;">
+                                            <td colspan="4" style="border-top:0;">
+                                                <form action="{{ route('admin.shops.leads.send', $lead->id) }}" method="post"
+                                                      @if($lastMessage && $lastMessage->sent_successfully) onsubmit="return confirm('«{{ $lead->name }}» уже отримав лист {{ $lastMessage->created_at->format('d.m.Y') }}. Надіслати ще раз?');" @endif>
+                                                    @csrf
+                                                    <div class="form-group mb-2">
+                                                        <label class="mb-1">Кому: <strong>{{ $lead->email }}</strong></label>
+                                                        <input type="text" name="subject" value="{{ $subject }}" class="form-control" required>
+                                                    </div>
+                                                    <div class="form-group mb-2">
+                                                        <textarea name="body" rows="14" class="form-control" style="font-size:13px;" required>{{ $body }}</textarea>
+                                                    </div>
+                                                    <button class="btn btn-success">Надіслати</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @endif
                                 @empty
                                     <tr><td colspan="4">Поки порожньо — додайте перший магазин формою вище.</td></tr>
                                 @endforelse
