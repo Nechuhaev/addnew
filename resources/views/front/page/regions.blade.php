@@ -46,7 +46,7 @@
                             {!! $meta['description']  !!}
                         </section>
                         <div class="show-more__shadow"></div>
-                        <span class="show-more__btn btn-show">Показать</span>
+                        <span class="show-more__btn btn-show">{{ app()->getLocale() === 'ru' ? 'Показать' : 'Показати' }}</span>
                     </div>
                     @endif
 

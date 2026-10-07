@@ -19,7 +19,7 @@
 
                         <div class="filter">
                             <div class="filter__item @if(!$selected_country) active @endif">
-                                <a href="{{ route('stores') }}">Все страны</a>
+                                <a href="{{ route('stores') }}">{{ app()->getLocale() === 'ru' ? 'Все страны' : 'Усі країни' }}</a>
                             </div>
                             @foreach($countries as $country)
                                 <div class="filter__item @if($selected_country && $country->id == $selected_country->id) active @endif">
@@ -60,7 +60,7 @@
                                             {!! $meta['description']  !!}
                                         </section>
                                         <div class="show-more__shadow"></div>
-                                        <span class="show-more__btn btn-show">Показать</span>
+                                        <span class="show-more__btn btn-show">{{ app()->getLocale() === 'ru' ? 'Показать' : 'Показати' }}</span>
                                     </div>
                                 @endif
 

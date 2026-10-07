@@ -34,7 +34,7 @@
                     {!! $meta['description']  !!}
                 </section>
                 <div class="show-more__shadow"></div>
-                <span class="show-more__btn btn-show">Показать</span>
+                <span class="show-more__btn btn-show">{{ app()->getLocale() === 'ru' ? 'Показать' : 'Показати' }}</span>
             </div>
 
             <div class="banner">
@@ -60,7 +60,7 @@
             @endif
 
             @if ($ads_groups)
-                <h2 class="last-advs-header">Последние объявления</h2>
+                <h2 class="last-advs-header">{{ app()->getLocale() === 'ru' ? 'Последние объявления' : 'Останні оголошення' }}</h2>
                 @foreach($ads_groups as $group)
                     <div class="last-advs" {!!  ($loop->iteration != 1) ? 'style="border:none;"' : ''  !!}>
                         @foreach($group as $ad)
@@ -78,7 +78,7 @@
             @endif
 
             <section>
-                <p class="section-heading">Популярные магазины</p>
+                <p class="section-heading">{{ app()->getLocale() === 'ru' ? 'Популярные магазины' : 'Популярні магазини' }}</p>
                 <p class="text-center"><a class="btn" href="{{ route('stores') }}">Перейти к списку всех магазинов</a></p>
                 <div class="related-ads">
                     @foreach($shop_users as $user)
