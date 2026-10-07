@@ -109,9 +109,11 @@ class Category extends Controller
 
         $ads = Ad::getLoopArray($results);
 
-        for ($i=0; $i < count($ads); $i++) { 
-            $user = User::find($ads[$i]['user_id']);
-            $ads[$i]['author_name'] = $user->firstname ? $user->firstname : $user->email;
+        // Ім'я автора без розкриття email (username = ім'я або частина email до «@»)
+        $authors = User::whereIn('id', array_column($ads, 'user_id'))->get()->keyBy('id');
+        for ($i=0; $i < count($ads); $i++) {
+            $user = $authors->get($ads[$i]['user_id']);
+            $ads[$i]['author_name'] = $user ? $user->username : '';
         }
         
         return view('front.ad.category')->with([
