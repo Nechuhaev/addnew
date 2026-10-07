@@ -28,12 +28,12 @@ class ShopInfoService
                 Storage::disk('public')->delete($oldPath);
             }
         }
-        $filename = 'shop-logo-' . $user->id . '.' . $logo->getClientOriginalExtension();
+        $filename = 'shop-logo-' . $user->id . '.' . $logo->extension();
         $logo->storeAs('shop-logos', $filename, 'public');
     }
     protected function getLogoPath(User $user, UploadedFile $logo): string
     {
-        return '/storage/shop-logos/shop-logo-' . $user->id . '.' . $logo->getClientOriginalExtension();
+        return '/storage/shop-logos/shop-logo-' . $user->id . '.' . $logo->extension();
     }
 
     protected function handleBannerUpload(User $user, UploadedFile $banner): void
@@ -44,12 +44,12 @@ class ShopInfoService
                 Storage::disk('public')->delete($oldPath);
             }
         }
-        $filename = 'shop-banner-' . $user->id . '.' . $banner->getClientOriginalExtension();
+        $filename = 'shop-banner-' . $user->id . '.' . $banner->extension();
         $banner->storeAs('shop-banners', $filename, 'public');
     }
     protected function getBannerPath(User $user, UploadedFile $banner): string
     {
-        return '/storage/shop-banners/shop-banner-' . $user->id . '.' . $banner->getClientOriginalExtension();
+        return '/storage/shop-banners/shop-banner-' . $user->id . '.' . $banner->extension();
     }
 
     protected function deleteBannerFile(User $user): void
