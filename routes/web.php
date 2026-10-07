@@ -293,8 +293,8 @@ $frontRoutes = function () {
     Route::get('/ads/{slug}', 'Front\Ad\Ad@page')->name('ad.page');
     Route::get('/ads/{id}/goto-shop', 'Front\Ad\Ad@trackShopLinkRedirect')->name('ad.trackShopLink')->where('id', '[0-9]+');
     Route::post('/ads/{slug}', 'Front\Ad\Ad@message');
-    Route::get('/ad/edit/{id}', 'Front\Ad\Ad@edit')->name('ad.edit');
-    Route::post('/ad/edit/{id}', 'Front\Ad\Ad@update')->name('ad.update');
+    Route::get('/ad/edit/{id}', 'Front\Ad\Ad@edit')->middleware('auth')->name('ad.edit');
+    Route::post('/ad/edit/{id}', 'Front\Ad\Ad@update')->middleware('auth')->name('ad.update');
     Route::post('/ads/delete/{id}', 'Front\Ad\Ad@delete')->middleware('auth')->name('ad.delete');
     Route::post('/ads/status/{ad_id}/{status_id}', 'Front\Ad\Ad@changeStatus')->middleware('auth')->name('ad.changeStatus');
 
