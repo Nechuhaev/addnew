@@ -20,6 +20,9 @@ class Ad extends Controller
                 ->orWhere('content', 'like', '%' . $request->get('search') . '%')
                 ->orWhere('email', 'like', '%' . $request->get('search') . '%')
                 ->orWhere('telephone', 'like', '%' . $request->get('search') . '%')
+                ->orWhereIn('user_id', function ($q) use ($request) {
+                    $q->select('id')->from('users')->where('email', 'like', '%' . $request->get('search') . '%');
+                })
                 ->orderBy('created_at', 'desc')
                 ->paginate(15);
         } else {
