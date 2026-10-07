@@ -139,8 +139,9 @@ class Ad extends Controller
         // Дата останньої успішної перевірки ціни (для імпортованих товарів)
         $priceCheckedAt = null;
         if ($ad->is_product) {
-            $ts = \App\ProductPriceCheck::where('ad_id', $ad->id)->where('status', 'success')->max('checked_at');
-            $priceCheckedAt = $ts ? \Carbon\Carbon::parse($ts) : null;
+            // Показуємо лише якщо в ОСТАННІЙ успішній перевірці ціну реально знайдено (не «розпродано»)
+            $last = \App\ProductPriceCheck::where('ad_id', $ad->id)->where('status', 'success')->orderBy('checked_at', 'desc')->first();
+            $priceCheckedAt = ($last && $last->found_price !== null && $last->checked_at) ? \Carbon\Carbon::parse($last->checked_at) : null;
         }
 
         return view('front.ad.ad')->with([
