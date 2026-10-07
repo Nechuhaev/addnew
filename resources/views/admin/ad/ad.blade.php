@@ -82,11 +82,23 @@
                                 </div>
                             </div>
 
-                            @if($ad->competitor_url)
+                            @if($ad->is_product)
                                 <div class="form-group">
-                                    <label>Конкурент (моніторинг ціни)</label>
+                                    <label for="competitor_url">Конкурент (моніторинг ціни)</label>
                                     <div>
-                                        <a href="{{ $ad->competitor_url }}" target="_blank" rel="noopener noreferrer nofollow">{{ $ad->competitor_url }} &#8599;</a>
+                                        <input type="url"
+                                               name="competitor_url"
+                                               id="competitor_url"
+                                               value="{{ old('competitor_url', $ad->competitor_url) }}"
+                                               placeholder="https://... — аналогічний товар в іншому магазині"
+                                               class="form-control form-control-line">
+                                        <small class="form-text text-muted">
+                                            Щогодини звідси береться лише ціна (рівно як у конкурента, якщо збігається валюта).
+                                            Порожнє поле — моніторинг конкурента вимкнено.
+                                            @if($ad->competitor_url)
+                                                <a href="{{ $ad->competitor_url }}" target="_blank" rel="noopener noreferrer nofollow">Відкрити &#8599;</a>
+                                            @endif
+                                        </small>
                                     </div>
                                 </div>
                             @endif
