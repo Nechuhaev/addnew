@@ -60,7 +60,9 @@
                                 // "/ads/slug". Реальне посилання на сайт-джерело зберігається
                                 // сирим у стовпці url — беремо через getOriginal(), інакше
                                 // отримаємо той самий внутрішній шлях замість зовнішнього.
-                                $sourceUrl = $ad->competitor_url ?: $ad->getOriginal('url');
+                                // competitor_url — це ІНШИЙ магазин (лише для моніторингу ціни),
+                                // тому показуємо його окремо, а не як «сайт магазину».
+                                $sourceUrl = $ad->getOriginal('url');
                             @endphp
                             <div class="form-group">
                                 <label>Посилання на дошці</label>
@@ -79,6 +81,15 @@
                                     @endif
                                 </div>
                             </div>
+
+                            @if($ad->competitor_url)
+                                <div class="form-group">
+                                    <label>Конкурент (моніторинг ціни)</label>
+                                    <div>
+                                        <a href="{{ $ad->competitor_url }}" target="_blank" rel="noopener noreferrer nofollow">{{ $ad->competitor_url }} &#8599;</a>
+                                    </div>
+                                </div>
+                            @endif
                         @endif
 
                         <div class="form-group">
