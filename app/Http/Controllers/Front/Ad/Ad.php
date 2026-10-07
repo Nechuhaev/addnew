@@ -791,10 +791,12 @@ class Ad extends Controller
 
         if (!$ad) return redirect()->back()->with('error', 'Не удалось найти объявление. Повторите попытку позже!');
 
-        $ad->name = $request->get('name');
-        $ad->telephone = $request->get('telephone');
-        $ad->email = $request->get('email');
-        $ad->content = $request->get('content');
+        // Так само, як при створенні (add): контент виводиться на сторінці
+        // оголошення без екранування, тож HTML-теги прибираємо.
+        $ad->name = strip_tags($request->get('name'));
+        $ad->telephone = strip_tags($request->get('telephone'));
+        $ad->email = strip_tags($request->get('email'));
+        $ad->content = strip_tags($request->get('content'));
         $ad->price = $request->get('price');
         $ad->currency_id = $request->get('currency_id');
 

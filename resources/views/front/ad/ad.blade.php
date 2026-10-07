@@ -287,7 +287,7 @@
 
                     <div class="adv-description">
                         <div class="adv-h">{{ __('ad_create.content_label') }}</div>
-                        <p>{!! nl2br($ad->content)  !!}</p>
+                        <p>{!! nl2br(e($ad->content, false)) !!}</p>
                     </div>
 
 
