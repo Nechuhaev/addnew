@@ -264,7 +264,7 @@ class Category extends Controller
             }
 
             usort($data, function ($a, $b) {
-                return $a['ads_count'] < $b['ads_count'];
+                return $b['ads_count'] <=> $a['ads_count'];
             });
 
             return $data;

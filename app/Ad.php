@@ -285,6 +285,8 @@ class Ad extends Model
     }
 
     public function getStatusAttribute() {
+        $status = 'suspend';
+
         if ($this->attributes['status'] == 0) {
             $status = 'suspend';
         }

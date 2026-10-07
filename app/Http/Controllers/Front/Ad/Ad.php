@@ -77,8 +77,8 @@ class Ad extends Controller
                 '---user_description---'    => $ad->content ?? '',
                 '---user_email---'          => $ad->email ?? '',
                 '---user_telephone---'      => $ad->telephone ?? '',
-                '---created_at---'          => $ad->created_at->format('d.m.Y H:m') ?? '',
-                '---updated_at---'          => $ad->updated_at->format('d.m.Y H:m') ?? '',
+                '---created_at---'          => $ad->created_at->format('d.m.Y H:i') ?? '',
+                '---updated_at---'          => $ad->updated_at->format('d.m.Y H:i') ?? '',
             ];
             $meta = [
                 'meta_title' => ((bool)$ad->meta_title) ? $ad->meta_title : strtr($seo_field->meta_title, $entity_values),
@@ -131,7 +131,7 @@ class Ad extends Controller
             $same_products = \App\Ad::where([
                 'code' => $ad->code,
                 'brand' => $ad->brand,
-                ])->get();
+                ])->where('id', '!=', $ad->id)->get();
         } else {
             $same_products = collect([]);
 
@@ -209,7 +209,10 @@ class Ad extends Controller
         if($request->session()->has('ad.category_id')) {
             $selected_category = AdCategory::find($request->session()->get('ad.category_id'));
 
-            if ($selected_category->parent) {
+            if (!$selected_category) {
+                // Категорію видалили, поки користувач заповнював форму
+                $request->session()->forget('ad.category_id');
+            } elseif ($selected_category->parent) {
                 $data['selected_parent_id'] = $selected_category->parent->id;
                 $data['children_categories'] = $selected_category->parent->children->toArray();
                 $data['selected_child_id'] = $selected_category->id;
@@ -406,8 +409,10 @@ class Ad extends Controller
         if ($request->session()->get('ad.city_id') || old('city_id')) {
             $city_id = $request->session()->get('ad.city_id') ?? old('city_id') ?? 9474; // по умолчанию - киев
             $city = AdCity::find($city_id);
-            //dd($city);
-            $country_id = $city->region->country->id;
+            $country_id = optional(optional(optional($city)->region)->country)->id ?? 62;
+            if (!optional($city)->region) {
+                $city = null;
+            }
         } else {
             $country_id = old('country_id') ?? 62; // По умолчанию - украина
         }
@@ -709,6 +714,7 @@ class Ad extends Controller
         ], $errors);
 
         $ad = \App\Ad::where('slug', '=', $slug)->first();
+        if (!$ad || !$ad->email) abort(404);
 
         $data = [
             'ad_name' => $ad->name,
@@ -753,7 +759,7 @@ class Ad extends Controller
         $data['id'] = $ad->id;
         $data['name'] = old('name') ?? $ad->name;
         $data['email'] = old('email') ?? $ad->email;
-        $data['telephone'] = old('telephon') ?? $ad->telephone;
+        $data['telephone'] = old('telephone') ?? $ad->telephone;
         $data['tags'] = $tags;
         $data['content'] = old('content') ?? $ad->content;
         $data['price'] = old('price') ?? $ad->price;
@@ -843,14 +849,10 @@ class Ad extends Controller
         if ($request->hasFile('image')) {
             $disk = Storage::disk('s3');
 
-            if ($disk->exists(parse_url($ad->image)['path'])) {
-                $disk->delete(parse_url($ad->image)['path']);
-            }
-
-
-            foreach ($ad->images as $_image) {
-                if ($disk->exists(parse_url($_image)['path'])) {
-                    $disk->delete(parse_url($_image)['path']);
+            foreach (array_merge([$ad->image], (array) $ad->images) as $_image) {
+                $path = $_image ? parse_url($_image, PHP_URL_PATH) : null;
+                if ($path && $disk->exists($path)) {
+                    $disk->delete($path);
                 }
             }
 
