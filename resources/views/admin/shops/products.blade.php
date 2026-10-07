@@ -44,6 +44,7 @@
                                     <th>Ціна</th>
                                     <th>Наявність</th>
                                     <th>Статус</th>
+                                    <th>Конкурент</th>
                                     <th>SEO</th>
                                     <th>Оновлено</th>
                                     <th></th>
@@ -87,6 +88,20 @@
                                                 <br><span class="badge badge-light" style="border:1px solid #ccc;" title="Джерело захищене від ботів — моніторинг цін/наявності для цього товару не спрацьовує">🚫 без моніторингу</span>
                                             @endif
                                         </td>
+                                        <td>
+                                            @if($product->competitor_url)
+                                                @php($competitorCheck = $competitorChecks->get($product->id))
+                                                <a href="{{ $product->competitor_url }}" target="_blank" rel="noopener noreferrer nofollow" title="{{ $product->competitor_url }}">{{ parse_url($product->competitor_url, PHP_URL_HOST) }}</a>
+                                                @if($competitorCheck)
+                                                    @php([$label, $class] = $competitorCheck->competitorLabel())
+                                                    <br><span class="badge badge-{{ $class }}" title="{{ $competitorCheck->checked_at->format('d.m.Y H:i') }}: {{ $competitorCheck->note }}">{{ $label }}</span>
+                                                @else
+                                                    <br><span class="text-muted" style="font-size:12px;">ще не перевірявся</span>
+                                                @endif
+                                            @else
+                                                —
+                                            @endif
+                                        </td>
                                         <td>{{ $product->seo_optimized ? '✅' : '—' }}</td>
                                         <td>{{ $product->updated_at ? $product->updated_at->format('d.m.Y H:i') : '—' }}</td>
                                         <td class="text-right">
@@ -101,7 +116,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="9">У цього магазину поки немає товарів</td>
+                                        <td colspan="10">У цього магазину поки немає товарів</td>
                                     </tr>
                                 @endforelse
                             </tbody>

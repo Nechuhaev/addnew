@@ -29,6 +29,7 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     
     Route::get('/shops', 'Admin\Shop\ShopController@index')->name('admin.shops');
     Route::get('/shops/skipped-domains', 'Admin\Shop\SkippedDomainController@index')->name('admin.shops.skippedDomains');
+    Route::get('/shops/competitor-monitor', 'Admin\Shop\CompetitorMonitorController@index')->name('admin.shops.competitorMonitor');
     Route::get('/shops/stats', 'Admin\Shop\ShopStatsController@index')->name('admin.shops.stats');
     Route::get('/shops/{id}', 'Admin\Shop\ShopController@edit')->name('admin.shops.edit');
     Route::post('/shops/{id}/update', 'Admin\Shop\ShopController@update')->name('admin.shops.update');

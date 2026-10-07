@@ -34,6 +34,7 @@
                         @endif
                     </form>
 
+                    <a href="{{ route('admin.shops.competitorMonitor') }}" class="btn btn-sm btn-secondary mb-3">Моніторинг конкурентів</a>
                     <a href="{{ route('admin.shops.skippedDomains') }}" class="btn btn-sm btn-secondary mb-3">Виключені домени (моніторинг)</a>
                     <a href="{{ route('admin.shops.stats') }}" class="btn btn-sm btn-secondary mb-3">Статистика магазинів</a>
 
