@@ -128,6 +128,43 @@
                             </small>
                         </div>
 
+                        @php($SD = \App\Services\ShopDelivery::class)
+                        @php($selDelivery = (array) old('delivery_methods', $shop->delivery_methods ?? []))
+                        @php($selPayment = (array) old('payment_methods', $shop->payment_methods ?? []))
+                        <fieldset class="border rounded p-3 mb-3">
+                            <legend class="w-auto px-2 mb-0" style="font-size:1.1rem;">Доставка й оплата</legend>
+                            <small class="form-text text-muted mb-3">Показується на сторінці магазину й на сторінках його товарів (uk/ru підписи підставляються автоматично).</small>
+                            <div class="row">
+                                <div class="col-md-6 form-group">
+                                    <label class="d-block font-weight-bold">Способи доставки</label>
+                                    @foreach($SD::DELIVERY as $key => $pair)
+                                        <div class="form-check">
+                                            <input type="checkbox" name="delivery_methods[]" value="{{ $key }}" id="dm_{{ $key }}" class="form-check-input" {{ in_array($key, $selDelivery, true) ? 'checked' : '' }}>
+                                            <label for="dm_{{ $key }}" class="form-check-label">{{ $pair[0] }}</label>
+                                        </div>
+                                    @endforeach
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    <label class="d-block font-weight-bold">Способи оплати</label>
+                                    @foreach($SD::PAYMENT as $key => $pair)
+                                        <div class="form-check">
+                                            <input type="checkbox" name="payment_methods[]" value="{{ $key }}" id="pm_{{ $key }}" class="form-check-input" {{ in_array($key, $selPayment, true) ? 'checked' : '' }}>
+                                            <label for="pm_{{ $key }}" class="form-check-label">{{ $pair[0] }}</label>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="free_delivery_from">Безкоштовна доставка від, грн</label>
+                                <input type="number" name="free_delivery_from" id="free_delivery_from" class="form-control" style="max-width:220px;" min="1" step="1"
+                                       value="{{ old('free_delivery_from', $shop->free_delivery_from) }}" placeholder="необов'язково">
+                            </div>
+                            <div class="form-group mb-0">
+                                <label for="delivery_note">Примітка (терміни відправлення, повернення тощо)</label>
+                                <textarea name="delivery_note" id="delivery_note" class="form-control" rows="3" maxlength="500">{{ old('delivery_note', $shop->delivery_note) }}</textarea>
+                            </div>
+                        </fieldset>
+
                         <button type="submit" class="btn btn-success">Зберегти зміни</button>
                     </form>
                 </div>

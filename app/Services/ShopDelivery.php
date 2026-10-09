@@ -26,6 +26,31 @@ class ShopDelivery
         'cash'    => ['Готівка при самовивозі', 'Наличные при самовывозе'],
     ];
 
+    /** Правила валідації полів доставки/оплати (кабінет магазину й адмінка) */
+    public static function rules(): array
+    {
+        return [
+            'delivery_methods' => 'nullable|array',
+            'delivery_methods.*' => 'in:' . implode(',', array_keys(self::DELIVERY)),
+            'payment_methods' => 'nullable|array',
+            'payment_methods.*' => 'in:' . implode(',', array_keys(self::PAYMENT)),
+            'free_delivery_from' => 'nullable|integer|min:1|max:10000000',
+            'delivery_note' => 'nullable|string|max:500',
+        ];
+    }
+
+    /**
+     * Незняті чекбокси не приходять у запиті — без цього їх не можна було б зняти.
+     */
+    public static function normalize(array $data): array
+    {
+        $data['delivery_methods'] = array_values(array_unique($data['delivery_methods'] ?? []));
+        $data['payment_methods'] = array_values(array_unique($data['payment_methods'] ?? []));
+        $data['free_delivery_from'] = $data['free_delivery_from'] ?? null;
+        $data['delivery_note'] = $data['delivery_note'] ?? null;
+        return $data;
+    }
+
     public static function label(array $map, string $key): string
     {
         $pair = $map[$key] ?? [$key, $key];
