@@ -90,13 +90,15 @@ class ProductImportService
             'error_count' => 0,
         ]);
 
+        // Статус ставимо ДО dispatch: при QUEUE_CONNECTION=sync пакети виконуються
+        // одразу й останній позначає імпорт завершеним — не можна це перезаписати.
+        $import->update(['status' => Import::STATUS_PROCESSING]);
+
         $offset = 0;
         while ($offset < $total) {
             ProcessImportBatch::dispatch($import->id, $offset, self::BATCH_SIZE);
             $offset += self::BATCH_SIZE;
         }
-
-        $import->update(['status' => Import::STATUS_PROCESSING]);
 
         return $import;
     }

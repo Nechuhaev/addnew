@@ -92,6 +92,7 @@
                     @else
                         <li><a href="{{ route('profile.ads') }}" rel="nofollow" class="header-link">{{ __('front.cabinet') }}</a></li>
                     @endif
+                    <li><a href="{{ route('profile.favorites') }}" rel="nofollow" class="header-link">{{ app()->getLocale() === 'ru' ? 'Избранное' : 'Обране' }} <span class="fav-count" data-count="{{ count(\App\Favorite::idsFor(Auth::id())) }}">{{ count(\App\Favorite::idsFor(Auth::id())) ?: '' }}</span></a></li>
                     <li><a href="{{ route('chat.index') }}" rel="nofollow" class="header-link">{{ app()->getLocale() === 'ru' ? 'Сообщения' : 'Повідомлення' }} <span class="chat-unread-badge-mobile" style="display:none;"></span></a></li>
                     <li><a href="{{ route('ad.step.category') }}" class="header-link">{{ __('front.post_ad') }}</a></li>
                     <li><a href="{{ route('stores') }}" class="header-link">{{ __('front.all_shops_link') }}</a></li>
@@ -168,6 +169,7 @@
                 <div class="header-account">
                     @if(Auth::check())
                         <span class="header-welcome">{!! __('front.welcome_user', ['email' => e(Auth::user()->email)]) !!}</span>
+                        <a href="{{ route('profile.favorites') }}" rel="nofollow" class="header-link link-register header-fav" title="{{ app()->getLocale() === 'ru' ? 'Избранное' : 'Обране' }}">&#9829; <span class="fav-count" data-count="{{ count(\App\Favorite::idsFor(Auth::id())) }}">{{ count(\App\Favorite::idsFor(Auth::id())) ?: '' }}</span></a>
                         <a href="{{ route('chat.index') }}" rel="nofollow" class="header-link link-register" style="position:relative;">
                             {{ app()->getLocale() === 'ru' ? 'Сообщения' : 'Повідомлення' }}
                             <span id="chat-unread-badge" style="display:none; background:#e74c3c; color:#fff; border-radius:10px; font-size:11px; font-weight:700; padding:1px 6px; margin-left:4px; vertical-align:top;"></span>
@@ -271,6 +273,40 @@
 @yield('script')
 
 @auth
+<script>
+// Обране: перемикання сердечка без перезавантаження сторінки
+(function () {
+    var token = '{{ csrf_token() }}';
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest ? e.target.closest('.fav-btn[data-fav-url]') : null;
+        if (!btn || btn.disabled) return;
+        e.preventDefault();
+        btn.disabled = true;
+        fetch(btn.getAttribute('data-fav-url'), {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'X-CSRF-TOKEN': token, 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+        })
+            .then(function (r) {
+                if (r.status === 401 || r.status === 419) { window.location.reload(); throw new Error('auth'); }
+                return r.json();
+            })
+            .then(function (data) {
+                document.querySelectorAll('.fav-btn[data-fav-url="' + btn.getAttribute('data-fav-url') + '"]').forEach(function (b) {
+                    b.classList.toggle('is-active', data.active);
+                    b.setAttribute('aria-pressed', data.active ? 'true' : 'false');
+                    b.title = b.getAttribute(data.active ? 'data-title-on' : 'data-title-off');
+                });
+                document.querySelectorAll('.fav-count').forEach(function (c) {
+                    c.setAttribute('data-count', data.count);
+                    c.textContent = data.count > 0 ? data.count : '';
+                });
+            })
+            .catch(function () {})
+            .then(function () { btn.disabled = false; });
+    });
+})();
+</script>
 <script>
 (function () {
     var badges = [document.getElementById('chat-unread-badge')]

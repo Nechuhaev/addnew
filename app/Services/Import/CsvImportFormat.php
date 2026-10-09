@@ -34,6 +34,6 @@ class CsvImportFormat extends AbstractImportFormat
 
     public function getHeaders(): array
     {
-        return ['id', 'title', 'description', 'link', 'image_link', 'price', 'availability', 'condition', 'brand', 'mpn', 'additional_image_link'];
+        return ['id', 'title', 'description', 'link', 'image_link', 'price', 'availability', 'condition', 'brand', 'mpn', 'gtin', 'additional_image_link'];
     }
 }

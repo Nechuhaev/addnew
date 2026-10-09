@@ -287,7 +287,15 @@ $frontRoutes = function () {
         Route::get('/profile/shop/product/{id}/edit', 'Front\User\Shop\ProductEditController@edit')->name('profile.shop.product.edit');
         Route::post('/profile/shop/product/{id}/edit', 'Front\User\Shop\ProductEditController@update')->name('profile.shop.product.update');
         Route::get('/impersonate/leave', 'Front\ImpersonationController@leave')->name('impersonate.leave');
+
+        // Обране + сповіщення про зниження ціни
+        Route::get('/profile/favorites', 'Front\User\FavoriteController@index')->name('profile.favorites');
+        Route::post('/profile/favorites/alerts', 'Front\User\FavoriteController@alerts')->name('profile.favorites.alerts');
+        Route::post('/profile/favorites/{id}/notify', 'Front\User\FavoriteController@notify')->name('profile.favorites.notify')->where('id', '[0-9]+');
+        Route::post('/profile/favorites/{id}/delete', 'Front\User\FavoriteController@destroy')->name('profile.favorites.delete')->where('id', '[0-9]+');
+        Route::post('/favorites/{adId}/toggle', 'Front\User\FavoriteController@toggle')->name('favorites.toggle')->where('adId', '[0-9]+');
     });
+    Route::get('/favorites/unsubscribe/{user}/{token}', 'Front\User\FavoriteController@unsubscribe')->name('favorites.unsubscribe')->where('user', '[0-9]+');
 
 
 // Блог

@@ -1,5 +1,6 @@
 <div class="category">
     @if($ads)
+        @php($favIds = \App\Favorite::idsFor(auth()->id()))
         @foreach($ads as $ad)
             <div class="category-item">
                 <div class="category-count">{{ $loop->iteration }}</div>
@@ -20,6 +21,7 @@
                 </div>
                 <div class="category-price">
                     <strong>{{ $ad['price'] }}</strong>
+                    @include('front.partials.fav-button', ['adId' => $ad['id'], 'favIds' => $favIds])
                 </div>
             </div>
         @endforeach

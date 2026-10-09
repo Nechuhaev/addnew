@@ -103,14 +103,26 @@ class Ad extends Controller
             ->take(6)
             ->get();
 
-        if ($ad->is_product && !empty($ad->code) && !empty($ad->brand)) {
-            $same_products = \App\Ad::where([
-                'code' => $ad->code,
-                'brand' => $ad->brand,
-                ])->where('id', '!=', $ad->id)->get();
-        } else {
-            $same_products = collect([]);
-
+        // Той самий товар в інших продавців: за штрихкодом (gtin) або бренд+артикул
+        $same_products = collect([]);
+        $hasBrandCode = !empty($ad->code) && !empty($ad->brand);
+        if ($ad->is_product && ($hasBrandCode || !empty($ad->gtin))) {
+            $same_products = \App\Ad::with(['user', 'currency'])
+                ->where('status', 1)
+                ->where('id', '!=', $ad->id)
+                ->where('user_id', '!=', $ad->user_id)
+                ->where(function ($q) use ($ad, $hasBrandCode) {
+                    if (!empty($ad->gtin)) {
+                        $q->orWhere('gtin', $ad->gtin);
+                    }
+                    if ($hasBrandCode) {
+                        $q->orWhere(function ($q) use ($ad) {
+                            $q->where('code', $ad->code)->where('brand', $ad->brand);
+                        });
+                    }
+                })
+                ->limit(20)
+                ->get();
         }
         // Дата останньої успішної перевірки ціни (для імпортованих товарів)
         $priceCheckedAt = null;

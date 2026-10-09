@@ -5844,3 +5844,39 @@ li.active {
         min-width: 0;
     }
 }
+
+/* Обране */
+.fav-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:34px;height:34px;padding:0 8px;border:1px solid #d6dbe6;border-radius:17px;background:#fff;color:#9aa3b5;font:inherit;font-size:14px;line-height:1;cursor:pointer;text-decoration:none;vertical-align:middle;transition:color .15s,border-color .15s,background .15s}
+.fav-btn:hover{color:#e53950;border-color:#e53950;text-decoration:none}
+.fav-btn.is-active{color:#fff;background:#e53950;border-color:#e53950}
+.fav-btn .fav-heart{font-size:18px;line-height:1}
+.fav-btn.with-label{padding:0 14px;margin-top:10px}
+.fav-btn[disabled]{opacity:.6;cursor:wait}
+.category-price .fav-btn{display:flex;margin:8px 0 0 auto}
+.header-fav .fav-count:not(:empty),.nav-mobile .fav-count:not(:empty){display:inline-block;background:#e53950;color:#fff;border-radius:10px;font-size:11px;font-weight:700;padding:1px 6px;margin-left:2px;vertical-align:top}
+.fav-alerts{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin:0 0 20px;padding:12px 16px;border-radius:6px;background:#f4f6fa;border:1px solid #e1e6ef}
+.fav-alerts.is-on{background:#eef8f0;border-color:#cfe8d4}
+.fav-list{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+.fav-item{display:flex;align-items:flex-start;gap:14px;padding:12px;border:1px solid #e1e6ef;border-radius:6px;background:#fff}
+.fav-item.is-inactive{opacity:.6}
+.fav-img img{display:block;width:90px;height:90px;object-fit:cover;border-radius:4px}
+.fav-body{flex:1 1 auto;min-width:0}
+.fav-name{display:block;font-weight:600;word-wrap:break-word}
+.fav-seller,.fav-note{font-size:13px;color:#777;margin-top:2px}
+.fav-prices{margin-top:6px}
+.fav-prices strong{font-size:17px;color:#3b5998}
+.fav-was{margin-left:8px;font-size:13px}
+.fav-was.down{color:#2e7d32}
+.fav-was.up{color:#c62828}
+.fav-actions{display:flex;flex-direction:column;gap:6px;flex:0 0 auto}
+.fav-actions button{width:100%;padding:6px 10px;border:1px solid #d6dbe6;border-radius:4px;background:#fff;font:inherit;font-size:13px;cursor:pointer;white-space:nowrap}
+.fav-actions .fav-notify.is-on{border-color:#cfe8d4;background:#eef8f0}
+.fav-actions .fav-remove:hover{border-color:#e53950;color:#e53950}
+@media screen and (max-width:767px){
+.category-price .fav-btn{display:inline-flex;margin:0 0 0 10px;height:30px;min-width:30px}
+.fav-item{flex-wrap:wrap}
+.fav-img img{width:70px;height:70px}
+.fav-body{flex-basis:calc(100% - 84px)}
+.fav-actions{flex-direction:row;width:100%}
+.fav-actions form{flex:1 1 0}
+}

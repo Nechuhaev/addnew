@@ -22,6 +22,7 @@ class Ad extends Model
         'images',
         'name',
         'code',
+        'gtin',
         'slug',
         'content',
         'is_product',

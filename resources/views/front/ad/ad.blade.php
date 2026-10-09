@@ -200,6 +200,9 @@
                                     <span class="active">{{ __('ad_create.free_label') }}</span>
                                 @endif
                             </div>
+                            @if($ad->status == 'active')
+                                @include('front.partials.fav-button', ['adId' => $ad->id, 'favIds' => \App\Favorite::idsFor(auth()->id()), 'withLabel' => true])
+                            @endif
                         </div>
                     </div>
                     <div class="adv-meta">
