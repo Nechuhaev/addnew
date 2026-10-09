@@ -134,6 +134,7 @@ class Ad extends Controller
 
         return view('front.ad.ad')->with([
             'price_checked_at' => $priceCheckedAt,
+            'price_chart' => \App\AdPriceHistory::chartFor($ad),
             'ad' => $ad,
             'same_products' => $same_products,
             'related' => $related_ads,
