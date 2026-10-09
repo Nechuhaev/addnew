@@ -78,10 +78,12 @@ class ProductImportService
         ];
     }
 
-    public function startImport(User $user, string $filePath, int $total, int $newCount, int $updateCount): Import
+    public function startImport(User $user, string $filePath, int $total, int $newCount, int $updateCount, ?int $categoryId = null, ?int $cityId = null): Import
     {
         $import = Import::create([
             'user_id' => $user->id,
+            'category_id' => $categoryId,
+            'city_id' => $cityId,
             'file_path' => $filePath,
             'status' => Import::STATUS_PENDING,
             'total' => $total,
@@ -170,6 +172,9 @@ class ProductImportService
                     'new_count' => $import->new_count,
                     'update_count' => $import->update_count,
                     'error_count' => $import->error_count,
+                    'missing_count' => $import->missing_count,
+                    'is_feed' => (bool) $import->feed_id,
+                    'error_message' => $import->error_message,
                     'created_at' => $import->created_at->format('d.m.Y H:i'),
                 ];
             })

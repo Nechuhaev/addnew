@@ -24,9 +24,17 @@ class ProductImportController extends Controller
         $progress = $this->importService->getProgress($user);
         $history = $this->importService->getHistory($user);
 
+        // Категорія/місто за замовчуванням: з налаштувань фіда або з останнього імпорту
+        $feed = \App\ShopFeed::where('user_id', $user->id)->first();
+        $lastImport = \App\Import::where('user_id', $user->id)->whereNotNull('category_id')->latest()->first();
+
         return view('front.user.profile.shop.import', [
             'progress' => $progress,
             'history' => $history,
+            'feed' => $feed,
+            'feedRuns' => $feed ? \App\Import::where('feed_id', $feed->id)->latest()->limit(10)->get() : collect(),
+            'defaultCategory' => optional($feed)->category_id ?? optional($lastImport)->category_id,
+            'defaultCity' => optional($feed)->city_id ?? optional($lastImport)->city_id,
         ]);
     }
 
@@ -69,17 +77,36 @@ class ProductImportController extends Controller
             'total' => 'required|integer',
             'new_count' => 'required|integer',
             'update_count' => 'required|integer',
+            // Для нових товарів обов'язкові (без них товар не створиться)
+            'category_id' => 'required_unless:new_count,0|nullable|integer|exists:ad_categories,id',
+            'city_id' => 'required_unless:new_count,0|nullable|integer|exists:ad_cities,id',
+        ], [
+            'category_id.required_unless' => app()->getLocale() === 'ru' ? 'Выберите категорию для новых товаров.' : 'Оберіть категорію для нових товарів.',
+            'city_id.required_unless' => app()->getLocale() === 'ru' ? 'Выберите город для новых товаров.' : 'Оберіть місто для нових товарів.',
         ]);
 
         $user = auth()->user();
 
+        // Шлях приходить із браузера: дозволяємо лише власний файл у storage/app/imports
+        $real = realpath((string) $request->file_path);
+        $dir = realpath(storage_path('app/imports'));
+        if (!$real || !$dir || strpos($real, $dir . DIRECTORY_SEPARATOR) !== 0
+            || strpos(basename($real), 'import_' . $user->id . '_') !== 0) {
+            return response()->json([
+                'success' => false,
+                'message' => app()->getLocale() === 'ru' ? 'Файл импорта не найден. Загрузите его ещё раз.' : 'Файл імпорту не знайдено. Завантажте його ще раз.',
+            ], 422);
+        }
+
         try {
             $import = $this->importService->startImport(
                 $user,
-                $request->file_path,
+                $real,
                 $request->total,
                 $request->new_count,
-                $request->update_count
+                $request->update_count,
+                $request->category_id ? (int) $request->category_id : null,
+                $request->city_id ? (int) $request->city_id : null
             );
 
             return response()->json([

@@ -43,6 +43,50 @@
                         </div>
                     @endif
 
+                    <div class="border rounded p-3 mb-4">
+                        <h5 class="mb-2">Фід (автооновлення товарів)</h5>
+                        @if(!$feed)
+                            <p class="text-muted mb-0">Магазин не налаштував фід. Налаштування — у кабінеті магазину: Імпорт товарів (можна зайти через «Увійти як магазин»).</p>
+                        @else
+                            <div class="mb-2" style="word-break:break-all;"><b>URL:</b> <a href="{{ $feed->url }}" target="_blank" rel="noopener nofollow">{{ $feed->url }}</a></div>
+                            <div class="mb-2">
+                                <b>Статус:</b>
+                                @php
+                                    $badgeMap = ['ok' => 'success', 'failed' => 'danger', 'running' => 'warning', 'idle' => 'secondary'];
+                                    $badge = $badgeMap[$feed->isRunning() ? 'running' : $feed->status] ?? 'secondary';
+                                @endphp
+                                <span class="badge badge-{{ $badge }}">{{ $feed->isRunning() ? 'оновлюється' : $feed->status }}</span>
+                                @if(!$feed->enabled)<span class="badge badge-secondary">вимкнено</span>@endif
+                                · кожні {{ $feed->frequency_hours }} год
+                                · останнє: {{ optional($feed->last_run_at)->format('d.m.Y H:i') ?? '—' }}
+                                · успішне: {{ optional($feed->last_success_at)->format('d.m.Y H:i') ?? '—' }}
+                                · наступне: {{ optional($feed->next_run_at)->format('d.m.Y H:i') ?? '—' }}
+                            </div>
+                            @if($feed->last_error)
+                                <div class="alert alert-danger py-2 mb-2">{{ $feed->last_error }} (невдач поспіль: {{ $feed->fail_count }})</div>
+                            @endif
+                            @if($feedRuns->isNotEmpty())
+                                <div class="table-responsive">
+                                    <table class="table table-sm mb-2">
+                                        <thead><tr><th>Коли</th><th>Статус</th><th>У фіді</th><th>Нових</th><th>Оновлено</th><th>Помилок</th><th>Зникли</th></tr></thead>
+                                        <tbody>
+                                            @foreach($feedRuns as $run)
+                                                <tr class="{{ $run->status === 'failed' ? 'table-danger' : '' }}">
+                                                    <td>{{ $run->created_at->format('d.m.Y H:i') }}</td><td>{{ $run->status }}</td><td>{{ $run->total }}</td><td>{{ $run->new_count }}</td><td>{{ $run->update_count }}</td><td>{{ $run->error_count }}</td><td>{{ $run->missing_count }}</td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @endif
+                            <form action="{{ route('admin.shops.feeds.run', $feed->id) }}" method="post" class="d-inline">
+                                @csrf
+                                <button type="submit" class="btn btn-sm btn-primary" {{ $feed->isRunning() ? 'disabled' : '' }}>Оновити зараз</button>
+                            </form>
+                            <a href="{{ route('admin.shops.feeds') }}" class="btn btn-sm btn-link">Усі фіди</a>
+                        @endif
+                    </div>
+
                     @php
                         $logoUrl = $shop->image;
                         if ($logoUrl && strpos($logoUrl, 'http') !== 0) {

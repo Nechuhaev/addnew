@@ -47,4 +47,9 @@ return [
         'redirect' => env('FACEBOOK_REDIRECT_URI'),
     ],
 
+    // Автооновлення фідів магазинів: дозволити внутрішні адреси (лише для локальних тестів)
+    'feeds' => [
+        'allow_private' => env('FEED_ALLOW_PRIVATE', false),
+    ],
+
 ];

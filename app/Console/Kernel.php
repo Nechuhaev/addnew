@@ -128,6 +128,12 @@ class Kernel extends ConsoleKernel
         ->withoutOverlapping()
         ->appendOutputTo(storage_path('logs/search-prune.log'));
 
+    // Кожні 5 хв — оновлює фіди магазинів, яким настав час (частота — у налаштуваннях фіда).
+    $schedule->command('feeds:sync')
+        ->everyFiveMinutes()
+        ->withoutOverlapping(180)
+        ->appendOutputTo(storage_path('logs/feeds-sync.log'));
+
     $schedule->command('report:daily')
         ->dailyAt('00:10')
         ->withoutOverlapping()
