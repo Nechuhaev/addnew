@@ -112,7 +112,14 @@
                                             @if($lead->email)
                                                 {{ $lead->email }}
                                                 <div class="text-muted" style="font-size:11px;">{{ $lead->email_source === 'site' ? 'знайдено на сайті' : 'вказано вручну' }}</div>
-                                            @else
+                                            @endif
+                                            @php($otherEmails = array_values(array_diff((array) $lead->email_candidates, [$lead->email])))
+                                            @if($otherEmails)
+                                                <div style="font-size:11px;" title="Інші адреси з сайту — вставте в поле email праворуч, якщо потрібна інша">
+                                                    ще на сайті: {{ implode(', ', $otherEmails) }}
+                                                </div>
+                                            @endif
+                                            @if(!$lead->email)
                                                 <span class="text-muted">{{ $lead->email_lookup_status === 'unreachable' ? 'сайт не відповідає' : 'не знайдено' }}</span>
                                             @endif
                                             <form action="{{ route('admin.shops.leads.lookup', $lead->id) }}" method="post" style="display:inline;">

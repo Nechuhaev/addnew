@@ -27,11 +27,12 @@ class ShopLead extends Model
 
     protected $fillable = [
         'name', 'site_url', 'domain', 'category', 'email', 'email_source',
-        'email_lookup_status', 'status', 'note', 'contacted_at',
+        'email_lookup_status', 'email_candidates', 'status', 'note', 'contacted_at',
     ];
 
     protected $casts = [
         'contacted_at' => 'datetime',
+        'email_candidates' => 'array',
     ];
 
     public function messages()
