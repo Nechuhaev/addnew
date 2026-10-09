@@ -2,7 +2,7 @@
 @section('meta_title', $meta['meta_title'] ?? $entity->name)
 @section('meta_description', $meta['meta_description'] ?? $entity->content)
 @section('style')
-    @if(empty($ads))
+    @if(empty($ads) || $listingFilters->isActive())
         <meta name="robots" content="noindex, follow" />
     @endif
 @endsection
@@ -43,6 +43,7 @@
                     <div class="banner">
                         @include('front.adsense.top-listing')
                     </div>
+                    @include('front.widgets.listing-filters')
                     @include('front.loop.ads', ['ads' => $ads])
                     {!!  $links  !!}
                     <div class="banner">

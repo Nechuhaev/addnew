@@ -5,7 +5,7 @@
 @section('meta_description', $meta['meta_description'] ?? $entity->content)
 
 @section('style')
-    @if(empty($ads) || !empty($noindex))
+    @if(empty($ads) || !empty($noindex) || (isset($listingFilters) && $listingFilters->isActive()))
         <meta name="robots" content="noindex, follow" />
     @endif
 @endsection
@@ -45,6 +45,9 @@
                     @include('front.adsense.top-listing')
                 </div>
 
+                @isset($listingFilters)
+                    @include('front.widgets.listing-filters')
+                @endisset
                 @include('front.loop.ads', ['ads' => $ads])
 
                 {!!  $links  !!}

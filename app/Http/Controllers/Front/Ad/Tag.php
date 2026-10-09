@@ -6,6 +6,7 @@ use App\Ad;
 use App\AdTag;
 use App\Http\Controllers\Controller;
 use App\SeoField;
+use App\Services\ListingFilters;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -39,10 +40,12 @@ class Tag extends Controller
             $meta['description'] = false;
         }
 
-        $results = Ad::getAds()
-            ->leftJoin('ad_tag', 'ad_tag.ad_id', '=', 'ads.id')
-            ->where('ad_tag.tag_id', $entity->id)
-            ->paginate(15);
+        $listingFilters = ListingFilters::fromRequest(request());
+        $results = $listingFilters->apply(Ad::getAds()
+                ->leftJoin('ad_tag', 'ad_tag.ad_id', '=', 'ads.id')
+                ->where('ad_tag.tag_id', $entity->id))
+            ->paginate(15)
+            ->appends($listingFilters->query());
 
         $ads = Ad::getLoopArray($results);
 
@@ -82,6 +85,8 @@ class Tag extends Controller
             'microdata' => $microdata_info,
             'breadcrumbs' => 'ad_tag',
             'noindex' => $noindex,
+            'listingFilters' => $listingFilters,
+            'total' => $results->total(),
             'meta' => $meta
         ]);
     }
