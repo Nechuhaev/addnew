@@ -97,6 +97,47 @@
                             <textarea name="info" id="info" class="form-control" rows="6">{{ old('info', $user->info) }}</textarea>
                         </div>
 
+                        @php($ru = app()->getLocale() === 'ru')
+                        @php($SD = \App\Services\ShopDelivery::class)
+                        @php($selDelivery = old('delivery_methods', $user->delivery_methods ?? []))
+                        @php($selPayment = old('payment_methods', $user->payment_methods ?? []))
+                        <fieldset class="shop-delivery-form">
+                            <legend>{{ $ru ? 'Доставка и оплата' : 'Доставка й оплата' }}</legend>
+                            <p class="shop-delivery-form__hint">{{ $ru ? 'Покупатели увидят это на странице магазина и на страницах ваших товаров.' : 'Покупці побачать це на сторінці магазину і на сторінках ваших товарів.' }}</p>
+
+                            <div class="shop-delivery-form__group">
+                                <div class="shop-delivery-form__title">{{ $ru ? 'Способы доставки' : 'Способи доставки' }}</div>
+                                @foreach($SD::DELIVERY as $key => $pair)
+                                    <label class="shop-delivery-form__check">
+                                        <input type="checkbox" name="delivery_methods[]" value="{{ $key }}" {{ in_array($key, (array) $selDelivery, true) ? 'checked' : '' }}>
+                                        <span>{{ $SD::label($SD::DELIVERY, $key) }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+
+                            <div class="shop-delivery-form__group">
+                                <div class="shop-delivery-form__title">{{ $ru ? 'Способы оплаты' : 'Способи оплати' }}</div>
+                                @foreach($SD::PAYMENT as $key => $pair)
+                                    <label class="shop-delivery-form__check">
+                                        <input type="checkbox" name="payment_methods[]" value="{{ $key }}" {{ in_array($key, (array) $selPayment, true) ? 'checked' : '' }}>
+                                        <span>{{ $SD::label($SD::PAYMENT, $key) }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+
+                            <div class="form-group">
+                                <label for="free_delivery_from">{{ $ru ? 'Бесплатная доставка от, грн' : 'Безкоштовна доставка від, грн' }}</label>
+                                <input type="number" name="free_delivery_from" id="free_delivery_from" class="form-control shop-delivery-form__sum" min="1" step="1" inputmode="numeric"
+                                       value="{{ old('free_delivery_from', $user->free_delivery_from) }}" placeholder="{{ $ru ? 'не обязательно' : 'необов\'язково' }}">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="delivery_note">{{ $ru ? 'Примечание (сроки отправки, возврат и т. п.)' : 'Примітка (терміни відправлення, повернення тощо)' }}</label>
+                                <textarea name="delivery_note" id="delivery_note" class="form-control" rows="3" maxlength="500"
+                                          placeholder="{{ $ru ? 'Например: отправляем в день заказа до 15:00, возврат 14 дней' : 'Наприклад: відправляємо в день замовлення до 15:00, повернення 14 днів' }}">{{ old('delivery_note', $user->delivery_note) }}</textarea>
+                            </div>
+                        </fieldset>
+
                         <button type="submit" class="btn btn-success">{{ __('shop.save_changes_button') }}</button>
                     </form>
                 </div>

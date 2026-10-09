@@ -5909,3 +5909,25 @@ li.active {
 .price-history__table table{margin-top:8px;border-collapse:collapse;min-width:240px}
 .price-history__table th,.price-history__table td{padding:4px 14px 4px 0;text-align:left;border-bottom:1px solid #eee}
 @media screen and (max-width:767px){.price-history{padding:12px}.price-history__chart{grid-template-rows:150px auto}}
+
+/* Доставка й оплата магазину */
+.shop-delivery{margin:20px 0;padding:14px 16px;border:1px solid #e1e6ef;border-radius:6px;background:#f8f9fc;font-size:14px;line-height:1.45}
+.shop-delivery--compact{margin:14px 0 0;padding:10px 12px}
+.shop-delivery__h{margin:0 0 10px;font-size:17px}
+.shop-delivery__row{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;margin:0 0 8px}
+.shop-delivery__row:last-child{margin-bottom:0}
+.shop-delivery__icon{flex:0 0 auto;width:20px;text-align:center}
+.shop-delivery__label{flex:0 0 auto;font-weight:600;color:#444}
+.shop-delivery__items{display:flex;flex-wrap:wrap;gap:6px;flex:1 1 200px;min-width:0}
+.shop-delivery__chip{display:inline-block;padding:2px 10px;border-radius:12px;background:#fff;border:1px solid #d6dbe6;white-space:nowrap}
+.shop-delivery__free{font-weight:600;color:#1b5e20}
+.shop-delivery__note{margin:8px 0 0;color:#555;word-wrap:break-word}
+.shop-delivery-form{margin:24px 0;padding:16px 18px;border:1px solid #e1e6ef;border-radius:6px}
+.shop-delivery-form legend{padding:0 6px;font-size:17px;font-weight:600;width:auto;border:0;margin:0}
+.shop-delivery-form__hint{margin:0 0 14px;color:#727272;font-size:13px}
+.shop-delivery-form__group{margin:0 0 16px}
+.shop-delivery-form__title{font-weight:600;margin:0 0 8px}
+.shop-delivery-form__check{display:inline-flex;align-items:center;gap:6px;margin:0 18px 8px 0;font-weight:400;cursor:pointer}
+.shop-delivery-form__check input{margin:0}
+.shop-delivery-form__sum{max-width:220px}
+@media screen and (max-width:767px){.shop-delivery-form{padding:12px}.shop-delivery-form__check{display:flex;margin-right:0}.shop-delivery-form__sum{max-width:none}.shop-delivery__chip{white-space:normal}}

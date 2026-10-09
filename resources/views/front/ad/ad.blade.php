@@ -241,6 +241,10 @@
                         <div class="shop_product">
                             <h2 class="display-inline-block">{{ __('ad_page.buy_prefix') }} <b>{{ $ad->name }}</b> {{ __('ad_page.buy_suffix') }}</h2>
                             <a href="{{ route('ad.trackShopLink', ['id' => $ad->id]) }}" target="_blank" rel="nofollow noopener" class="btn btn-success pull-right">{{ __('ad_page.goto_shop_button') }}</a>
+                            @if($shopDelivery = \App\Services\ShopDelivery::forShop($ad->user))
+                                <div style="clear: both;"></div>
+                                @include('front.partials.shop-delivery', ['delivery' => $shopDelivery, 'compact' => true])
+                            @endif
 
 
                             <p style="padding-top: 20px">{{ __('ad_page.other_sellers_prefix') }} <b>{{ $ad->name }}</b></p>
