@@ -146,8 +146,12 @@ class ShopController extends Controller
 
         $messageTemplates = \App\ShopMessageTemplate::orderBy('name')->get();
 
+        $feed = \App\ShopFeed::where('user_id', $shop->id)->first();
+
         return view('admin.shops.edit', [
             'shop' => $shop,
+            'feed' => $feed,
+            'feedRuns' => $feed ? \App\Import::where('feed_id', $feed->id)->latest()->limit(5)->get() : collect(),
             'messages' => $messages,
             'messageTemplates' => $messageTemplates,
         ]);

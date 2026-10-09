@@ -29,6 +29,9 @@
                         </div>
                     @endif
 
+                    @include('front.user.profile.shop.feed-card')
+
+                    <h2 class="feed-card__h" style="margin-top:28px;">{{ app()->getLocale() === 'ru' ? 'Загрузить файл вручную' : 'Завантажити файл вручну' }}</h2>
                     <p>{!! __('shop_import.intro_text') !!}</p>
 
                     <div id="upload-area" class="upload-area">
@@ -304,6 +307,11 @@
                 </div>
                 <div class="modal-body">
                     <div id="import-statistics" class="import-statistics"></div>
+
+                    <div id="import-targets-block" style="display:none; margin-top:16px;">
+                        @include('front.partials.import-targets', ['prefix' => 'imp_', 'selCategory' => $defaultCategory, 'selCity' => $defaultCity])
+                    </div>
+                    <div id="import-confirm-error" class="alert" style="display:none; margin-top:12px;"></div>
 
                     <h6 style="margin-top: 20px; margin-bottom: 10px;">{{ __('shop_import.example_products_label') }}</h6>
                     <div class="table-responsive">
@@ -649,6 +657,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     var importModal = {
         show: function () {
+            document.getElementById('import-targets-block').style.display = (pendingStats.new_count > 0) ? 'block' : 'none';
+            document.getElementById('import-confirm-error').style.display = 'none';
             document.getElementById('import-confirm-modal').style.display = 'flex';
             document.getElementById('import-modal-backdrop').style.display = 'block';
             document.body.style.overflow = 'hidden';
@@ -862,6 +872,20 @@ document.addEventListener('DOMContentLoaded', function () {
         formData.append('total', pendingStats.total);
         formData.append('new_count', pendingStats.new_count);
         formData.append('update_count', pendingStats.update_count);
+        if (pendingStats.new_count > 0) {
+            var cat = document.getElementById('imp_category_id').value, city = document.getElementById('imp_city_id').value;
+            var errBox = document.getElementById('import-confirm-error');
+            if (!cat || !city) {
+                errBox.textContent = '{{ app()->getLocale() === 'ru' ? 'Выберите категорию и город для новых товаров.' : 'Оберіть категорію й місто для нових товарів.' }}';
+                errBox.style.display = 'block';
+                btn.disabled = false;
+                btn.textContent = '{{ __('shop_import.confirm_import_button') }}';
+                return;
+            }
+            errBox.style.display = 'none';
+            formData.append('category_id', cat);
+            formData.append('city_id', city);
+        }
 
         var xhr = new XMLHttpRequest();
         xhr.open('POST', '{{ route('profile.shop.import.confirm') }}', true);
@@ -876,7 +900,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 showProgressSection();
                 startProgressPolling();
             } else {
-                showError('{{ __('shop_import.err_start_import') }}');
+                var msg = '{{ __('shop_import.err_start_import') }}';
+                try {
+                    var r = JSON.parse(xhr.responseText);
+                    if (r.errors) { msg = r.errors[Object.keys(r.errors)[0]][0]; }
+                    else if (r.message) { msg = r.message; }
+                } catch (e) {}
+                var box = document.getElementById('import-confirm-error');
+                box.textContent = msg;
+                box.style.display = 'block';
             }
         };
 

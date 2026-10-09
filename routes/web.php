@@ -38,6 +38,8 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::post('/shops/leads/{id}/lookup', 'Admin\Shop\ShopLeadController@lookup')->name('admin.shops.leads.lookup');
     Route::delete('/shops/leads/{id}', 'Admin\Shop\ShopLeadController@destroy')->name('admin.shops.leads.destroy');
     Route::get('/shops/stats', 'Admin\Shop\ShopStatsController@index')->name('admin.shops.stats');
+    Route::get('/shops/feeds', 'Admin\Shop\ShopFeedController@index')->name('admin.shops.feeds');
+    Route::post('/shops/feeds/{id}/run', 'Admin\Shop\ShopFeedController@run')->name('admin.shops.feeds.run');
     Route::get('/shops/{id}', 'Admin\Shop\ShopController@edit')->name('admin.shops.edit');
     Route::post('/shops/{id}/update', 'Admin\Shop\ShopController@update')->name('admin.shops.update');
     Route::get('/shops/{id}/products', 'Admin\Shop\ShopController@products')->name('admin.shops.products');
@@ -281,6 +283,10 @@ $frontRoutes = function () {
         Route::post('/profile/shop/import/confirm', 'Front\User\Shop\ProductImportController@confirm')->name('profile.shop.import.confirm')->middleware('shop_owner');
         Route::get('/profile/shop/import/progress', 'Front\User\Shop\ProductImportController@progress')->name('profile.shop.import.progress')->middleware('shop_owner');
         Route::post('/profile/shop/import/cancel', 'Front\User\Shop\ProductImportController@cancel')->name('profile.shop.import.cancel')->middleware('shop_owner');
+        Route::post('/profile/shop/feed', 'Front\User\Shop\ShopFeedController@save')->name('profile.shop.feed.save')->middleware('shop_owner');
+        Route::post('/profile/shop/feed/check', 'Front\User\Shop\ShopFeedController@check')->name('profile.shop.feed.check')->middleware('shop_owner');
+        Route::post('/profile/shop/feed/run', 'Front\User\Shop\ShopFeedController@run')->name('profile.shop.feed.run')->middleware('shop_owner');
+        Route::post('/profile/shop/feed/delete', 'Front\User\Shop\ShopFeedController@destroy')->name('profile.shop.feed.delete')->middleware('shop_owner');
         Route::get('/profile/shop/export', 'Front\User\Shop\AllActionsController@export')->name('profile.shop.export');
         Route::post('/profile/shop/export', 'Front\User\Shop\AllActionsController@generateExport')->name('profile.shop.export.generate');
         Route::get('/profile/shop/info', 'Front\User\Shop\ShopInfoController@index')->name('profile.shop.info');
