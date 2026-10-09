@@ -213,6 +213,25 @@ function openLeadSend(id) {
     card.scrollIntoView({ behavior: 'smooth' });
 }
 
+// Повернення після 419: відкрити форму того ж кандидата з уже набраним текстом
+@if(session('reopen_lead') && old('subject') !== null)
+document.addEventListener('DOMContentLoaded', function () {
+    openLeadSend({{ (int) session('reopen_lead') }});
+    document.getElementById('lead-template-select').value = '';
+    document.getElementById('subject').value = {!! json_encode(old('subject'), JSON_UNESCAPED_UNICODE) !!};
+    var oldBody = {!! json_encode(old('body'), JSON_UNESCAPED_UNICODE) !!};
+    var setBody = function () {
+        if (typeof tinymce !== 'undefined' && tinymce.get('body')) {
+            tinymce.get('body').setContent(oldBody);
+        } else {
+            document.getElementById('body').value = oldBody;
+        }
+    };
+    setBody();
+    setTimeout(setBody, 1500); // TinyMCE може ініціалізуватись пізніше
+});
+@endif
+
 document.getElementById('lead-template-select').addEventListener('change', function () {
     applyLeadTemplate(this.value);
 });
