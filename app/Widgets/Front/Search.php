@@ -56,7 +56,7 @@ class Search extends AbstractWidget
 
 
 
-        $this->config['action'] = route('ad.search');
+        $this->config['action'] = route(app()->getLocale() === 'ru' && \Route::has('ru.ad.search') ? 'ru.ad.search' : 'ad.search');
 
         return view('widgets.front.search', [
             'config' => $this->config,

@@ -31,8 +31,8 @@
         <label class="listing-filters__sort">
             <span>{{ $t('Сортування', 'Сортировка') }}:</span>
             <select name="sort" onchange="this.form.submit()">
-                @foreach($LF::SORTS as $key => $labels)
-                    <option value="{{ $key }}" {{ ($f['sort'] ?? 'new') === $key ? 'selected' : '' }}>{{ $LF::label($LF::SORTS, $key) }}</option>
+                @foreach($listingFilters->sorts as $key => $labels)
+                    <option value="{{ $key }}" {{ ($f['sort'] ?? $listingFilters->defaultSort) === $key ? 'selected' : '' }}>{{ $LF::label($listingFilters->sorts, $key) }}</option>
                 @endforeach
             </select>
         </label>
@@ -47,6 +47,7 @@
             <input type="number" min="0" name="price_from" value="{{ $f['price_from'] }}" placeholder="{{ $t('від', 'от') }}" inputmode="numeric">
             <input type="number" min="0" name="price_to" value="{{ $f['price_to'] }}" placeholder="{{ $t('до', 'до') }}" inputmode="numeric">
         </div>
+        @if(empty($hideSeller))
         <label class="listing-filters__field">
             <span>{{ $t('Продавець', 'Продавец') }}</span>
             <select name="seller">
@@ -56,6 +57,7 @@
                 @endforeach
             </select>
         </label>
+        @endif
         <label class="listing-filters__field">
             <span>{{ $t('Стан', 'Состояние') }}</span>
             <select name="condition">

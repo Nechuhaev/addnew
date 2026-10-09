@@ -8,7 +8,7 @@
 @section('og_card', !empty($entity->image) ? 'summary' : '')
 
 @section('style')
-    @if(empty($ads))
+    @if(empty($ads) || $term !== '' || $listingFilters->isActive())
         <meta name="robots" content="noindex, follow" />
     @endif
 @endsection
@@ -109,6 +109,24 @@
                     <div class="banner">
                         @include('front.adsense.top-listing')
                     </div>
+
+                    @php($ru = app()->getLocale() === 'ru')
+                    <form class="in-shop-search" method="get" action="{{ url()->current() }}" role="search">
+                        <label for="in-shop-q" class="in-shop-search__label">{{ $is_shop ? ($ru ? 'Поиск в товарах магазина' : 'Пошук у товарах магазину') : ($ru ? 'Поиск в объявлениях автора' : 'Пошук в оголошеннях автора') }}</label>
+                        <div class="in-shop-search__row">
+                            <input type="search" id="in-shop-q" name="s" value="{{ $term }}" maxlength="100" placeholder="{{ $ru ? 'Название, бренд или артикул' : 'Назва, бренд або артикул' }}">
+                            <button type="submit" class="btn">{{ $ru ? 'Найти' : 'Знайти' }}</button>
+                        </div>
+                        @if($term !== '')
+                            <a href="{{ url()->current() }}" class="in-shop-search__reset">{{ $ru ? 'Сбросить поиск' : 'Скинути пошук' }}</a>
+                        @endif
+                    </form>
+
+                    @include('front.widgets.listing-filters', ['hideSeller' => true])
+
+                    @if($total === 0 && $term !== '')
+                        @include('front.partials.search-empty', ['listingFilters' => $listingFilters])
+                    @endif
 
                     @include('front.loop.ads', ['ads' => $ads])
 

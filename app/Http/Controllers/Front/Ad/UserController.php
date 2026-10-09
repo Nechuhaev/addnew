@@ -44,9 +44,22 @@ class UserController extends Controller
             $meta['description'] = false;
         }
 
-        $results = Ad::getAds()
-            ->where('user_id', $user->id)
-            ->paginate(15);
+        // Пошук і фільтри в межах магазину/автора
+        $term = trim((string) request()->get('s'));
+        $search = new \App\Services\AdSearch($term);
+        $results = Ad::getAds()->where('ads.user_id', $user->id);
+        $search->apply($results);
+        $listingFilters = \App\Services\ListingFilters::fromRequest(request(), !$search->isEmpty());
+        $listingFilters->apply($results);
+        if (!$search->isEmpty() && $listingFilters->wantsRelevance()) {
+            $search->orderByRelevance($results);
+        }
+        $results = $results->paginate(15)
+            ->appends(array_merge(request()->only(['s']), $listingFilters->query()));
+
+        if ($term !== '') {
+            \App\SearchQuery::record($term, $results->total(), 'shop', $user->id);
+        }
 
         $ads = Ad::getLoopArray($results);
 
@@ -96,6 +109,9 @@ class UserController extends Controller
             'avgRating' => $avgRating ?? null,
             'myReview' => $myReview ?? null,
             'ads' => $ads,
+            'term' => $term,
+            'total' => $results->total(),
+            'listingFilters' => $listingFilters,
             'links' => $results->onEachSide(1)->links('front.widgets.paginate'),
             'tags' => AdTag::getAdsTags($ads),
             'microdata' => $microdata_info,

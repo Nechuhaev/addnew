@@ -122,6 +122,12 @@ class Kernel extends ConsoleKernel
         ->withoutOverlapping()
         ->appendOutputTo(storage_path('logs/favorites-price-drops.log'));
 
+    // Щонеділі — прибирає журнал пошукових запитів, старший за 12 місяців.
+    $schedule->command('search:prune')
+        ->weeklyOn(0, '03:47')
+        ->withoutOverlapping()
+        ->appendOutputTo(storage_path('logs/search-prune.log'));
+
     $schedule->command('report:daily')
         ->dailyAt('00:10')
         ->withoutOverlapping()
