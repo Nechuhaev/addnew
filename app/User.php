@@ -64,6 +64,7 @@ class User extends Authenticatable
     protected $fillable = [
         'firstname', 'email', 'password', 'is_shop_owner', 'site_url', 'country', 'banner',
         'telephone', 'info', 'info_uk', 'image',
+        'delivery_methods', 'payment_methods', 'free_delivery_from', 'delivery_note',
     ];
 
         public function getInfoAttribute($value)
@@ -90,6 +91,8 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'delivery_methods' => 'array',
+        'payment_methods' => 'array',
     ];
 
     /**

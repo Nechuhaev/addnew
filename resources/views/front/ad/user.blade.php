@@ -90,6 +90,9 @@
                 @endif
             </div>
 
+            @if($is_shop && ($shopDelivery = \App\Services\ShopDelivery::forShop($entity)))
+                @include('front.partials.shop-delivery', ['delivery' => $shopDelivery])
+            @endif
 
             <hr>
 

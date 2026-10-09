@@ -22,9 +22,16 @@ class ShopInfoController extends Controller
     public function update(UpdateShopInfoRequest $request)
     {
         $user = Auth::user();
+        $data = $request->validated();
+        // Незняті чекбокси не приходять у запиті — без цього їх не можна було б зняти
+        $data['delivery_methods'] = array_values(array_unique($data['delivery_methods'] ?? []));
+        $data['payment_methods'] = array_values(array_unique($data['payment_methods'] ?? []));
+        $data['free_delivery_from'] = $data['free_delivery_from'] ?? null;
+        $data['delivery_note'] = $data['delivery_note'] ?? null;
+
         $this->shopInfoService->update(
             $user,
-            $request->validated(),
+            $data,
             $request->file('logo'),
             $request->file('banner')
         );
