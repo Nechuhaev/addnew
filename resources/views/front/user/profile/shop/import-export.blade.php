@@ -70,6 +70,38 @@
                         </div>
                     </div>
 
+                    @php($ru = app()->getLocale() === 'ru')
+                    <div class="ie-info">
+                        <h2>{{ $ru ? 'Какие файлы можно загрузить' : 'Які файли можна завантажити' }}</h2>
+                        <ul>
+                            <li><strong>YML</strong> (.xml, .yml) — {{ $ru ? 'файл выгрузки товаров для Prom.ua, Rozetka, Hotline' : 'файл вивантаження товарів для Prom.ua, Rozetka, Hotline' }}</li>
+                            <li><strong>XML Google Merchant Center</strong> (RSS) — {{ $ru ? 'фид для Google Покупок' : 'фід для Google Покупок' }}</li>
+                            <li><strong>CSV</strong> — {{ $ru ? 'первая строка — названия колонок:' : 'перший рядок — назви колонок:' }}
+                                <code>id, title, description, link, image_link, price, availability, condition, brand, mpn, gtin</code></li>
+                        </ul>
+                        <p>{{ $ru ? 'Размер файла — до 25 МБ. Повторная загрузка обновляет товары с тем же id (цена, наличие, фото) и добавляет новые.' : 'Розмір файлу — до 25 МБ. Повторне завантаження оновлює товари з тим самим id (ціна, наявність, фото) і додає нові.' }}</p>
+
+                        <h2>{{ $ru ? 'Заполняйте бренд, артикул и штрихкод' : 'Заповнюйте бренд, артикул і штрихкод' }}</h2>
+                        <p>{{ $ru ? 'По ним мы находим такой же товар у других магазинов: ваше предложение появится в блоке «Другие продавцы» на их страницах, и покупатель увидит вашу цену рядом.' : 'За ними ми знаходимо такий самий товар в інших магазинах: ваша пропозиція з\'явиться в блоці «Інші продавці» на їхніх сторінках, і покупець побачить вашу ціну поруч.' }}</p>
+                        <div class="ie-table-wrap">
+                            <table class="ie-table">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>YML</th>
+                                        <th>Google Merchant</th>
+                                        <th>CSV</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>{{ $ru ? 'Бренд' : 'Бренд' }}</td><td><code>vendor</code></td><td><code>g:brand</code></td><td><code>brand</code></td></tr>
+                                    <tr><td>{{ $ru ? 'Артикул производителя' : 'Артикул виробника' }}</td><td><code>vendorCode</code></td><td><code>g:mpn</code></td><td><code>mpn</code></td></tr>
+                                    <tr><td>{{ $ru ? 'Штрихкод (EAN/GTIN)' : 'Штрихкод (EAN/GTIN)' }}</td><td><code>barcode</code></td><td><code>g:gtin</code></td><td><code>gtin</code> / <code>ean</code></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
                     <style>
                         .ie-card {
                             display: block;
@@ -87,6 +119,25 @@
                             text-decoration: none;
                             color: inherit;
                         }
+                        .ie-info {
+                            margin-top: 30px;
+                            padding: 20px 24px;
+                            border: 1px solid #e1e6ef;
+                            border-radius: 6px;
+                            background: #f8f9fc;
+                            font-size: 14px;
+                            line-height: 1.55;
+                        }
+                        .ie-info h2 { font-size: 17px; margin: 0 0 10px; }
+                        .ie-info h2 + ul, .ie-info p { margin: 0 0 16px; }
+                        .ie-info ul { padding-left: 18px; }
+                        .ie-info li { margin-bottom: 6px; }
+                        .ie-info code { background: #eef2fa; padding: 1px 5px; border-radius: 3px; font-size: 13px; word-break: break-word; }
+                        .ie-table-wrap { overflow-x: auto; }
+                        .ie-table { border-collapse: collapse; width: 100%; min-width: 420px; background: #fff; }
+                        .ie-table th, .ie-table td { border: 1px solid #e1e6ef; padding: 7px 10px; text-align: left; }
+                        .ie-table th { background: #eef2fa; }
+                        .ie-table code { white-space: nowrap; word-break: normal; }
                         .ie-card:hover .btn {
                             background-color: #3b5998;
                             border-color: #3b5998;
