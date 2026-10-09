@@ -254,7 +254,7 @@ class Ad extends Model
                 'date_active' => date ("Y-m-d H:i", strtotime($ad->date_active)),
                 'url' => route('ad.page', ['slug' => $ad->slug]),
                 'image' => $image,
-                'price' => AdCurrency::convert($ad->price),
+                'price' => AdCurrency::convert($ad->price, $ad->currency_id ?? null),
                 'content' => Str::words(strip_tags($ad->content), 20, "..."),
                 'city' => $ad->city,
                 'city_url' => $category ? $category->getFilteredUrl($ad->city_slug) : '',

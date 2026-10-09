@@ -48,7 +48,21 @@ class AdCurrency extends Model
         return ($this->ad->price == 0);
     }
 
-    public static function convert($amount, $to = false, $format = true) {
+    /**
+     * Ціна для карток у списках: у гривнях — «N грн.», в іншій валюті —
+     * з її символом (раніше будь-яка валюта підписувалась «грн.»).
+     */
+    public static function convert($amount, $currencyId = null) {
+        static $currencies = null;
+        if ($currencyId) {
+            if ($currencies === null) {
+                $currencies = self::all()->keyBy('id');
+            }
+            $currency = $currencies->get((int) $currencyId);
+            if ($currency && strtoupper($currency->code) !== 'UAH' && (float) $currency->rate != 1.0) {
+                return $amount . ' ' . ($currency->symbol ?: $currency->code);
+            }
+        }
         return $amount .' грн.';
     }
 }
