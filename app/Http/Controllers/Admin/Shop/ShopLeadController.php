@@ -195,6 +195,7 @@ class ShopLeadController extends Controller
     {
         $result = $finder->find($lead->site_url);
         $lead->email_lookup_status = $result['status'];
+        $lead->email_candidates = $result['emails'] ?: null;
         if ($result['email']) {
             $lead->email = $result['email'];
             $lead->email_source = 'site';
