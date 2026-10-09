@@ -16,13 +16,7 @@ class UpdateShopInfoRequest extends FormRequest
             'info' => 'nullable|string|max:5000',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'banner' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:3072',
-            'delivery_methods' => 'nullable|array',
-            'delivery_methods.*' => 'in:' . implode(',', array_keys(\App\Services\ShopDelivery::DELIVERY)),
-            'payment_methods' => 'nullable|array',
-            'payment_methods.*' => 'in:' . implode(',', array_keys(\App\Services\ShopDelivery::PAYMENT)),
-            'free_delivery_from' => 'nullable|integer|min:1|max:10000000',
-            'delivery_note' => 'nullable|string|max:500',
-        ];
+        ] + \App\Services\ShopDelivery::rules();
     }
     public function messages()
     {

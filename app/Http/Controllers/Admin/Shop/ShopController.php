@@ -213,7 +213,11 @@ class ShopController extends Controller
             'country' => 'nullable|string|max:100',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'banner' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:3072',
-        ], [
+        ] + \App\Services\ShopDelivery::rules(), [
+            'free_delivery_from.*' => 'Сума безкоштовної доставки — ціле число, більше 0.',
+            'delivery_note.max' => 'Примітка до доставки — не більше 500 символів.',
+            'delivery_methods.*' => 'Вибрано невідомий спосіб доставки.',
+            'payment_methods.*' => 'Вибрано невідомий спосіб оплати.',
             'logo.image' => 'Недопустимий формат файлу.',
             'logo.mimes' => 'Недопустимий формат файлу.',
             'logo.max' => 'Максимальний розмір файлу: 2 МБ.',
@@ -225,7 +229,7 @@ class ShopController extends Controller
 
         $this->shopInfoService->update(
             $shop,
-            $validated,
+            \App\Services\ShopDelivery::normalize($validated),
             $request->file('logo'),
             $request->file('banner'),
             $request->boolean('delete_banner')
