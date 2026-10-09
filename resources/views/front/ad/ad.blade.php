@@ -288,6 +288,10 @@
                     @endif
 
 
+                    @if(!empty($price_chart))
+                        @include('front.ad.price-history', ['chart' => $price_chart])
+                    @endif
+
                     <div class="adv-description">
                         <div class="adv-h">{{ __('ad_create.content_label') }}</div>
                         <p>{!! nl2br(e($ad->content, false)) !!}</p>

@@ -42,6 +42,22 @@ class Ad extends Model
 
     protected $dates = ['date_active'];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Історія ціни: нова точка при створенні та при зміні ціни/валюти
+        static::saved(function (Ad $ad) {
+            if ($ad->wasRecentlyCreated || $ad->wasChanged(['price', 'currency_id'])) {
+                AdPriceHistory::record($ad);
+            }
+        });
+
+        static::deleted(function (Ad $ad) {
+            AdPriceHistory::where('ad_id', $ad->id)->delete();
+        });
+    }
+
     /**
      * Дата начала показа объявления
      * @return false|string
