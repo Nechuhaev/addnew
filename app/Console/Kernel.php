@@ -116,6 +116,12 @@ class Kernel extends ConsoleKernel
 
             // Щоночі о 00:10 — рахує оголошення/нових користувачів/нові
     // магазини за ВЧОРАШНІЙ день і зберігає в адмінський звіт.
+    // Щодня о 10:47 — листи про зниження ціни на товари з обраного (≥3%).
+    $schedule->command('favorites:notify-price-drops')
+        ->dailyAt('10:47')
+        ->withoutOverlapping()
+        ->appendOutputTo(storage_path('logs/favorites-price-drops.log'));
+
     $schedule->command('report:daily')
         ->dailyAt('00:10')
         ->withoutOverlapping()

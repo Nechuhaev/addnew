@@ -52,8 +52,29 @@ abstract class AbstractImportFormat implements ImportFormatInterface
             'currency_code' => $currencyCode,
             'brand'         => strtolower($record['brand'] ?? ''),
             'code'          => strtolower($record['ean'] ?? $record['mpn'] ?? ''),
+            'gtin'          => self::normalizeGtin($record['gtin'] ?? $record['ean'] ?? ''),
             'stock'         => $stock,
             'condition'     => $condition,
         ];
+    }
+
+    /**
+     * GTIN/EAN — лише цифри, 8–14 знаків (EAN-8, UPC-12, EAN-13, GTIN-14).
+     * Ведучі нулі до 13 знаків прибираємо, щоб UPC-12 і EAN-13 «0…» збігались.
+     */
+    public static function normalizeGtin($value): ?string
+    {
+        $digits = preg_replace('/\D+/', '', (string) $value);
+        $len = strlen($digits);
+        if ($len < 8 || $len > 14 || trim($digits, '0') === '') {
+            return null;
+        }
+        if ($len > 13 && $digits[0] === '0') {
+            $digits = substr($digits, 1);
+        }
+        if (strlen($digits) === 13 && $digits[0] === '0') {
+            $digits = substr($digits, 1);
+        }
+        return $digits;
     }
 }

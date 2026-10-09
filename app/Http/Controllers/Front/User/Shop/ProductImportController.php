@@ -33,7 +33,7 @@ class ProductImportController extends Controller
     public function upload(Request $request)
     {
         $request->validate([
-            'file' => 'required|file|mimes:csv,txt,xml|max:25600',
+            'file' => 'required|file|mimes:csv,txt,xml,yml|max:25600',
         ]);
 
         $user = auth()->user();

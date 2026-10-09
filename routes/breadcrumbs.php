@@ -358,3 +358,8 @@ Breadcrumbs::for('ad.page', function ($trail, $ad) {
     $trail->push($ad->name, route('ad.page', ['slug', $ad->slug]));
 
 });
+// Главная > Обране
+Breadcrumbs::for('profile.favorites', function ($trail) {
+    $trail->parent('index');
+    $trail->push(app()->getLocale() === 'ru' ? 'Избранное' : 'Обране', route('profile.favorites'));
+});

@@ -125,6 +125,7 @@ class Uploader extends Controller
                         'url' => $record['link'],
                         'brand' => $brand,
                         'code' => $code,
+                        'gtin' => \App\Services\Import\AbstractImportFormat::normalizeGtin($record['gtin'] ?? $record['ean'] ?? ''),
                         'stock' => $stock,
                         'condition' => $condition,
                     ];
@@ -207,6 +208,7 @@ class Uploader extends Controller
                 'content' => $product->content,
                 'price' => $product->price,
                 'brand' => $product->brand,
+                'gtin' => $product->gtin,
                 'stock' => $product->stock,
                 'condition' => $product->condition,
                 'url' => $product->url,

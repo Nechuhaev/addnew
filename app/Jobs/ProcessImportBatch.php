@@ -110,6 +110,7 @@ class ProcessImportBatch implements ShouldQueue
                     $existingProduct->currency_id = $currency->id;
                     $existingProduct->brand = $record['brand'];
                     $existingProduct->code = $record['code'];
+                    $existingProduct->gtin = $record['gtin'];
                     $existingProduct->stock = $record['stock'];
                     $existingProduct->condition = $record['condition'];
                     $existingProduct->url = $record['link'];
@@ -129,6 +130,7 @@ class ProcessImportBatch implements ShouldQueue
                         'currency_id' => $currency->id,
                         'brand' => $record['brand'],
                         'code' => $record['code'],
+                        'gtin' => $record['gtin'],
                         'stock' => $record['stock'],
                         'condition' => $record['condition'],
                         'url' => $record['link'],

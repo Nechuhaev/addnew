@@ -13,6 +13,7 @@
             <li><a href="{{ route('profile.index') }}">{{ __('profile.edit_heading') }}</a></li>
             <li><a href="{{ route('profile.password') }}">{{ __('profile.password_heading') }}</a></li>
         @endis_shop_owner
+        <li><a href="{{ route('profile.favorites') }}">{{ app()->getLocale() === 'ru' ? 'Избранное' : 'Обране' }}</a></li>
         <li>
             <form action="{{ route('logout') }}" method="POST" style="display:inline;">
                 @csrf

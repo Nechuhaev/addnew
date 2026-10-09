@@ -40,7 +40,7 @@
                             </svg>
                             <p style="margin: 0 0 8px; font-size: 15px; color: #333;">{{ __('shop_import.dropzone_text1') }}</p>
                             <p style="margin: 0; font-size: 13px; color: #727272;">{{ __('shop_import.dropzone_text2') }}</p>
-                            <input type="file" id="file-input" accept=".csv,.txt,.xml" style="display: none;">
+                            <input type="file" id="file-input" accept=".csv,.txt,.xml,.yml" style="display: none;">
                         </div>
                         <div id="upload-progress" style="display: none;">
                             <div class="spinner"></div>
@@ -70,13 +70,13 @@
                     <h2 id="how-it-works" style="margin-top: 30px; font-size: 18px;">{{ __('shop_import.how_it_works_heading') }}</h2>
                     <p>{{ __('shop_import.process_steps_intro') }}</p>
                     <ol>
-                        <li><strong>Загрузка и обработка файла</strong> — вы перетаскиваете CSV или XML файл в область выше (или выбираете вручную). Система обрабатывает файл и показывает предварительные результаты.</li>
+                        <li><strong>Загрузка и обработка файла</strong> — вы перетаскиваете CSV, XML или YML файл в область выше (или выбираете вручную). Система обрабатывает файл и показывает предварительные результаты.</li>
                         <li><strong>Подтверждение импорта</strong> — в модальном окне отображается статистика (всего товаров, новых, на обновление) и список 20 случайных товаров. Вы можете подтвердить импорт или отменить его.</li>
                     </ol>
 
                     <h2 style="margin-top: 30px; font-size: 18px;">{{ __('shop_import.requirements_heading') }}</h2>
                     <ul>
-                        <li>Форматы: <strong>CSV</strong> (разделитель — запятая) или <strong>XML</strong> (Google Merchant Center RSS)</li>
+                        <li>Форматы: <strong>CSV</strong> (разделитель — запятая) или <strong>XML</strong> (Google Merchant Center RSS) или <strong>YML</strong> (Prom.ua, Rozetka)</li>
                         <li>Максимальный размер: <strong>25 МБ</strong></li>
                         <li>Кодировка: <strong>UTF-8</strong></li>
                         <li>{{ __('shop_import.req_csv_header') }}</li>

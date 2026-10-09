@@ -8,20 +8,21 @@ class ImportFormatDetector
     {
         $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
 
-        if ($ext === 'xml') {
-            return new XmlImportFormat();
-        }
-
-        // Визначення за вмістом файлу
+        // Визначення за вмістом файлу (YML і Google Merchant RSS — обидва XML)
         $handle = fopen($filePath, 'r');
-        $peek = $handle ? fread($handle, 500) : '';
+        $peek = $handle ? fread($handle, 2000) : '';
         if ($handle) {
             fclose($handle);
         }
 
         $peek = ltrim($peek);
 
-        if (strpos($peek, '<?xml') !== false || strpos($peek, '<rss') !== false || strpos($peek, '<feed') !== false) {
+        if (stripos($peek, '<yml_catalog') !== false || stripos($peek, 'DOCTYPE yml_catalog') !== false) {
+            return new YmlImportFormat();
+        }
+
+        if (in_array($ext, ['xml', 'yml'], true)
+            || strpos($peek, '<?xml') !== false || strpos($peek, '<rss') !== false || strpos($peek, '<feed') !== false) {
             return new XmlImportFormat();
         }
 

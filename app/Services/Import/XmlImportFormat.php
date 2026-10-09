@@ -30,6 +30,7 @@ class XmlImportFormat extends AbstractImportFormat
                 'price'                  => trim((string) $g->price),
                 'brand'                  => trim((string) $g->brand),
                 'mpn'                    => trim((string) $g->mpn),
+                'gtin'                   => trim((string) $g->gtin),
             ];
 
             $records[] = $this->normalizeRecord($raw);
@@ -40,6 +41,6 @@ class XmlImportFormat extends AbstractImportFormat
 
     public function getHeaders(): array
     {
-        return ['id', 'title', 'description', 'link', 'image_link', 'condition', 'availability', 'price', 'brand', 'mpn'];
+        return ['id', 'title', 'description', 'link', 'image_link', 'condition', 'availability', 'price', 'brand', 'mpn', 'gtin'];
     }
 }
