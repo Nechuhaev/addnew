@@ -10,6 +10,7 @@ use App\AdRegion;
 use App\AdTag;
 use App\Http\Controllers\Controller;
 use App\SeoField;
+use App\Services\ListingFilters;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
@@ -59,7 +60,10 @@ class Category extends Controller
         }
 
 
-        $results = $this->getFilteredResultsQuery()->paginate(15);
+        $listingFilters = ListingFilters::fromRequest(request());
+        $results = $listingFilters->apply($this->getFilteredResultsQuery())
+            ->paginate(15)
+            ->appends($listingFilters->query());
 
         // SEO fields
         $seo_field = SeoField::where('index', 'ad-category')->first();
@@ -113,6 +117,8 @@ class Category extends Controller
         return view('front.ad.category')->with([
             'entity' => $entity,
             'filters' => $this->getFilters(),
+            'listingFilters' => $listingFilters,
+            'total' => $results->total(),
             'filter' => $this->filter,
             'ads' => $ads,
             'links' => $results->onEachSide(1)->links('front.widgets.paginate'),

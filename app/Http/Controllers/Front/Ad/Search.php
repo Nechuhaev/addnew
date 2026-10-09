@@ -7,6 +7,7 @@ use App\AdCategory;
 use App\AdTag;
 use App\Http\Controllers\Controller;
 use App\SeoField;
+use App\Services\ListingFilters;
 use Illuminate\Http\Request;
 
 class Search extends Controller
@@ -67,7 +68,11 @@ class Search extends Controller
             }
         }
 
-        $results = $results->paginate(15);
+        $listingFilters = ListingFilters::fromRequest($request);
+        // appends: раніше друга сторінка пошуку губила сам пошуковий запит
+        $results = $listingFilters->apply($results)
+            ->paginate(15)
+            ->appends(array_merge($request->only(['s', 'cat_id', 'sub_cat_id', 'city_id']), $listingFilters->query()));
 
         $ads = Ad::getLoopArray($results);
 
@@ -104,6 +109,7 @@ class Search extends Controller
             'tags' => AdTag::getAdsTags($ads),
             'breadcrumbs' => 'region.page',
             'total' => $results->total(),
+            'listingFilters' => $listingFilters,
             'meta' => $meta
         ]);
     }

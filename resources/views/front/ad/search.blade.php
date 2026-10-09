@@ -5,7 +5,7 @@
 @section('meta_description', $meta['meta_description'] ?? $entity->content)
 
 @section('style')
-    @if(empty($ads))
+    @if(empty($ads) || $listingFilters->isActive())
         <meta name="robots" content="noindex, follow" />
     @endif
 @endsection
@@ -28,6 +28,7 @@
                         @include('front.adsense.top-listing')
                     </div>
                     <h1>Результат поиска '{{ request()->get('s') }}' — {{ $total }} шт.</h1>
+                    @include('front.widgets.listing-filters')
                     @include('front.loop.ads', ['ads' => $ads])
 
                     {!!  $links  !!}
