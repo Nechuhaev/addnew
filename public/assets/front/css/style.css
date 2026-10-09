@@ -5931,3 +5931,29 @@ li.active {
 .shop-delivery-form__check input{margin:0}
 .shop-delivery-form__sum{max-width:220px}
 @media screen and (max-width:767px){.shop-delivery-form{padding:12px}.shop-delivery-form__check{display:flex;margin-right:0}.shop-delivery-form__sum{max-width:none}.shop-delivery__chip{white-space:normal}}
+
+/* Пошук: заголовок, магазини, порожній результат, пошук у магазині */
+.search-h1{word-wrap:break-word}
+.search-h1__count{color:#727272;font-weight:400;white-space:nowrap}
+.search-shops{margin:0 0 16px;padding:12px 14px;border:1px solid #e1e6ef;border-radius:6px;background:#fff}
+.search-shops__h{font-weight:600;margin:0 0 10px}
+.search-shops__list{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.search-shops__item{display:flex;align-items:center;gap:10px;padding:8px;border:1px solid #eef1f6;border-radius:6px;color:inherit;text-decoration:none;min-width:0}
+.search-shops__item:hover{border-color:#c5cfe8;text-decoration:none}
+.search-shops__item img{flex:0 0 44px;width:44px;height:44px;object-fit:contain;border-radius:4px;background:#f5f7fb}
+.search-shops__text{display:flex;flex-direction:column;min-width:0}
+.search-shops__text strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#3b5998}
+.search-shops__text small{color:#727272}
+.search-shops__all{display:inline-block;margin-top:10px;font-size:14px}
+.search-empty{margin:0 0 16px;padding:14px 16px;border-radius:6px;background:#fff8e1;border:1px solid #ffe08a;font-size:14px}
+.search-empty ul{margin:6px 0 0;padding-left:18px}
+.search-empty li{margin:3px 0}
+.search-empty__text{margin:0}
+.in-shop-search{margin:0 0 14px}
+.in-shop-search__label{display:block;font-weight:600;margin:0 0 6px}
+.in-shop-search__row{display:flex;gap:8px;max-width:560px}
+.in-shop-search__row input{flex:1 1 auto;min-width:0;height:40px;padding:0 12px;border:1px solid #d6dbe6;border-radius:4px;font:inherit;font-size:16px}
+.in-shop-search__row .btn{flex:0 0 auto;height:40px}
+.in-shop-search__reset{display:inline-block;margin-top:6px;font-size:14px}
+.stores-search{margin-top:6px}
+@media screen and (max-width:767px){.search-shops__list{grid-template-columns:1fr}.in-shop-search__row{max-width:none}}

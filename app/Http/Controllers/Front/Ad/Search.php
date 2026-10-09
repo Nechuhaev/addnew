@@ -7,7 +7,10 @@ use App\AdCategory;
 use App\AdTag;
 use App\Http\Controllers\Controller;
 use App\SeoField;
+use App\SearchQuery;
+use App\Services\AdSearch;
 use App\Services\ListingFilters;
+use App\Services\StoreSearch;
 use Illuminate\Http\Request;
 
 class Search extends Controller
@@ -15,13 +18,8 @@ class Search extends Controller
     public function page(Request $request) {
 
         $results = Ad::getAds();
-
-        if ($request->has('s') && $request->get('s') != '') {
-            $results->where(function($query) use ($request) {
-                $query->where('ads.name', 'LIKE', '%' . $request->get('s') . '%')
-                    ->orWhere('ads.content', 'LIKE', '%' . $request->get('s') . '%');
-            });
-        }
+        $search = new AdSearch((string) $request->get('s'));
+        $search->apply($results);
 
 
         if ($request->has('city_id') && $request->get('city_id') != 0) {
@@ -29,50 +27,55 @@ class Search extends Controller
         }
 
         if ($request->has('sub_cat_id') || $request->has('cat_id')) {
-            $category_id = 0;
-
             if ($request->get('sub_cat_id')) {
-                $category_id = $request->get('sub_cat_id');
                 $results->where('ads.category_id', (int)$request->get('sub_cat_id'));
-            } else {
-                if ($request->get('cat_id')) {
+            } elseif ($request->get('cat_id')) {
+                $cat_ids = AdCategory::select('id')
+                    ->where('parent_id', (int)$request->get('cat_id'))
+                    ->pluck('id')
+                    ->toArray();
 
-                    $cat_ids = AdCategory::select('id')
-                        ->where('parent_id', (int)$request->get('cat_id'))
-                        ->pluck('id')
-                        ->toArray();
-
-                    if (count($cat_ids)) {
-                        $results->whereIn('ads.category_id', $cat_ids);
-                    }
-
-                }
-            }
-
-
-
-            if ($category_id) {
-                $category = $category = AdCategory::find($category_id);
-                $results->where('ads.category_id', $category->id);
-            }
-        }
-
-        if ($results->count() >= 1 && mb_strlen(trim($request->get('s'))) >= 5) {
-            $tag = AdTag::where('name', trim($request->get('s')))->first();
-            if (!$tag) {
-                $tag = AdTag::create(['name' => trim($request->get('s')), 'slug' => null]);
-                $ads_ids = $results->pluck('ads.id')->toArray();
-                if (count($ads_ids)) {
-                    $tag->ads()->attach($ads_ids);
+                if (count($cat_ids)) {
+                    $results->whereIn('ads.category_id', $cat_ids);
                 }
             }
         }
 
-        $listingFilters = ListingFilters::fromRequest($request);
+        $listingFilters = ListingFilters::fromRequest($request, !$search->isEmpty());
+        $listingFilters->apply($results);
+        if (!$search->isEmpty() && $listingFilters->wantsRelevance()) {
+            $search->orderByRelevance($results);
+        }
+
         // appends: раніше друга сторінка пошуку губила сам пошуковий запит
-        $results = $listingFilters->apply($results)
+        $results = $results
             ->paginate(15)
             ->appends(array_merge($request->only(['s', 'cat_id', 'sub_cat_id', 'city_id']), $listingFilters->query()));
+
+        $term = trim((string) $request->get('s'));
+
+        // Тег із запиту (SEO-сторінка /ad-tag/…): лише перші 100 найрелевантніших,
+        // а не всі знайдені (широкий запит прив'язував тисячі оголошень).
+        if ($results->total() >= 1 && mb_strlen($term) >= 5 && (int) $request->get('page', 1) === 1) {
+            $tag = AdTag::where('name', $term)->first();
+            if (!$tag) {
+                $tag = AdTag::create(['name' => $term, 'slug' => null]);
+                $topIds = $search->orderByRelevance($search->apply(Ad::getAds()))->limit(100)->pluck('ads.id')->toArray();
+                if (count($topIds)) {
+                    $tag->ads()->attach($topIds);
+                }
+            }
+        }
+
+        // Магазини, чия назва збігається із запитом
+        $shops = collect();
+        if (!$search->isEmpty() && (int) $request->get('page', 1) === 1) {
+            $shops = StoreSearch::shops($term, 4);
+        }
+
+        if ($term !== '') {
+            SearchQuery::record($term, $results->total(), 'site');
+        }
 
         $ads = Ad::getLoopArray($results);
 
@@ -91,9 +94,12 @@ class Search extends Controller
                 'description' => strtr($seo_field->description, $entity_values)
             ];
         } else {
+            $title = app()->getLocale() === 'ru'
+                ? 'Результаты поиска на доске объявлений Addnew.biz'
+                : 'Результати пошуку на дошці оголошень Addnew.biz';
             $meta = [
-                'meta_title' => "Результаты поиска на доске объявлений Addnew.biz",
-                'meta_description' => "Результаты поиска на доске объявлений Addnew.biz",
+                'meta_title' => $title,
+                'meta_description' => $title,
                 'description' => false,
             ];
         }
@@ -105,6 +111,8 @@ class Search extends Controller
 
         return view('front.ad.search')->with([
             'ads' => $ads,
+            'term' => $term,
+            'shops' => $shops,
             'links' => $results->onEachSide(1)->links('front.widgets.paginate'),
             'tags' => AdTag::getAdsTags($ads),
             'breadcrumbs' => 'region.page',

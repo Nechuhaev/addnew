@@ -28,6 +28,7 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::delete('/shops/{shopId}/reviews/{reviewId}', 'Admin\Shop\ShopController@deleteReview')->name('admin.shops.reviews.delete');
     
     Route::get('/shops', 'Admin\Shop\ShopController@index')->name('admin.shops');
+    Route::get('/search-queries', 'Admin\SearchQueryController@index')->name('admin.searchQueries');
     Route::get('/shops/skipped-domains', 'Admin\Shop\SkippedDomainController@index')->name('admin.shops.skippedDomains');
     Route::get('/shops/competitor-monitor', 'Admin\Shop\CompetitorMonitorController@index')->name('admin.shops.competitorMonitor');
     Route::get('/shops/leads', 'Admin\Shop\ShopLeadController@index')->name('admin.shops.leads');

@@ -15,6 +15,8 @@ class ListingFilters
     const SELLERS = ['shop' => ['Магазини', 'Магазины'], 'private' => ['Приватні', 'Частные']];
     const CONDITIONS = ['new' => ['Нове', 'Новое'], 'used' => ['Б/в', 'Б/у'], 'refurbished' => ['Відновлене', 'Восстановленное']];
     const SORTS = ['new' => ['Спочатку нові', 'Сначала новые'], 'cheap' => ['Спочатку дешевші', 'Сначала дешевле'], 'expensive' => ['Спочатку дорожчі', 'Сначала дороже']];
+    // Для пошуку — сортування за релевантністю (за замовчуванням)
+    const SORT_RELEVANT = ['relevant' => ['За релевантністю', 'По релевантности']];
 
     /** Підпис значення поточною мовою сайту */
     public static function label(array $map, string $key): string
@@ -28,13 +30,23 @@ class ListingFilters
     /** @var array */
     public $values;
 
+    /** @var array Доступні сортування [ключ => [uk, ru]] */
+    public $sorts = self::SORTS;
+
+    /** @var string Сортування за замовчуванням */
+    public $defaultSort = 'new';
+
     public function __construct(array $values)
     {
         $this->values = $values;
     }
 
-    public static function fromRequest(Request $request): self
+    /**
+     * @param bool $relevance сторінка з пошуковим запитом: є «За релевантністю» (за замовчуванням)
+     */
+    public static function fromRequest(Request $request, bool $relevance = false): self
     {
+        $sorts = $relevance ? self::SORT_RELEVANT + self::SORTS : self::SORTS;
         $int = function ($key) use ($request) {
             $v = preg_replace('/\D/', '', (string) $request->get($key));
             return $v === '' ? null : (int) $v;
@@ -50,14 +62,23 @@ class ListingFilters
             [$from, $to] = [$to, $from];
         }
 
-        return new self([
+        $filters = new self([
             'price_from' => $from,
             'price_to' => $to,
             'seller' => $pick('seller', self::SELLERS),
             'condition' => $pick('condition', self::CONDITIONS),
             'in_stock' => $request->get('in_stock') ? 1 : null,
-            'sort' => $pick('sort', self::SORTS),
+            'sort' => $pick('sort', $sorts),
         ]);
+        $filters->sorts = $sorts;
+        $filters->defaultSort = $relevance ? 'relevant' : 'new';
+        return $filters;
+    }
+
+    /** Чи сортувати за релевантністю (обрано явно або за замовчуванням на сторінці пошуку) */
+    public function wantsRelevance(): bool
+    {
+        return ($this->values['sort'] ?? $this->defaultSort) === 'relevant';
     }
 
     /**
@@ -106,7 +127,7 @@ class ListingFilters
     public function isActive(): bool
     {
         foreach ($this->values as $key => $value) {
-            if ($value !== null && !($key === 'sort' && $value === 'new')) {
+            if ($value !== null && !($key === 'sort' && $value === $this->defaultSort)) {
                 return true;
             }
         }

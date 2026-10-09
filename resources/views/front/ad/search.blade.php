@@ -17,9 +17,10 @@
                 @include('front.adsense.top')
             </div>
 
+            @php($ru = app()->getLocale() === 'ru')
             <ul class="breadcrumb">
-                <li><a href="/">Главная</a></li>
-                <li><span>Поиск - "{{ request()->get('s') }}"</span></li>
+                <li><a href="{{ $ru ? url('/ru') : url('/') }}">{{ $ru ? 'Главная' : 'Головна' }}</a></li>
+                <li><span>{{ $ru ? 'Поиск' : 'Пошук' }}@if($term !== '') — «{{ $term }}»@endif</span></li>
             </ul>
 
             <div class="columns columns-nowrap">
@@ -27,8 +28,22 @@
                     <div class="banner">
                         @include('front.adsense.top-listing')
                     </div>
-                    <h1>Результат поиска '{{ request()->get('s') }}' — {{ $total }} шт.</h1>
+                    <h1 class="search-h1">
+                        @if($term !== '')
+                            {{ $ru ? 'Результаты поиска' : 'Результати пошуку' }} «{{ $term }}»
+                        @else
+                            {{ $ru ? 'Все объявления' : 'Усі оголошення' }}
+                        @endif
+                        <span class="search-h1__count">— {{ number_format($total, 0, '', ' ') }}</span>
+                    </h1>
+
+                    @include('front.partials.search-shops', ['shops' => $shops, 'term' => $term])
+
                     @include('front.widgets.listing-filters')
+
+                    @if($total === 0 && $term !== '')
+                        @include('front.partials.search-empty', ['listingFilters' => $listingFilters, 'hasShops' => $shops->isNotEmpty()])
+                    @endif
                     @include('front.loop.ads', ['ads' => $ads])
 
                     {!!  $links  !!}

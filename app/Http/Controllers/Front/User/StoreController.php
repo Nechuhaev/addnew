@@ -37,6 +37,8 @@ class StoreController extends Controller
         } else {
             $filter_cities = null;
         }
+        $term = trim((string) $request->get('q'));
+
         $shop_users = User::withCount('ads')
             ->whereHas('ads', function ($query) use ($filter_cities) {
                 if ($filter_cities) {
@@ -44,8 +46,16 @@ class StoreController extends Controller
                 } else {
                     $query->products();
                 }
-            })
-            ->orderBy('created_at', 'desc')->paginate(15);
+            });
+        if ($term !== '') {
+            \App\Services\StoreSearch::apply($shop_users, $term);
+        }
+        $shop_users = $shop_users->orderBy('created_at', 'desc')->paginate(15)
+            ->appends($request->only(['country', 'q']));
+
+        if ($term !== '') {
+            \App\SearchQuery::record($term, $shop_users->total(), 'stores');
+        }
 
         $seo_field = SeoField::where('index', 'shop-list')->first();
 
@@ -70,6 +80,7 @@ class StoreController extends Controller
             'countries' => $countries,
             'shop_users' => $shop_users,
             'selected_country' => $selected_country,
+            'term' => $term,
             'meta' => $meta
         ]);
     }
