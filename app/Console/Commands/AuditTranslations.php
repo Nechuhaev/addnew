@@ -140,6 +140,7 @@ class AuditTranslations extends Command
 
         $this->line('');
         $this->info('Готово. Переклади інтерфейсу — адмінка «Переклади»; SEO-шаблони — «SEO тексти»; назви й тексти — у формах категорій/областей/міст/тегів.');
+        $this->line('Автопереклад через DeepL: php artisan geo:translate-deepl (області, міста, країни, категорії, тексти тегів); назви тегів — php artisan tags:translate-deepl. Обидві без --apply лише показують звіт.');
     }
 
     protected function section(string $title): void

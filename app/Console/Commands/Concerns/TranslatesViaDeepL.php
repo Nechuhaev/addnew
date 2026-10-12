@@ -21,9 +21,10 @@ trait TranslatesViaDeepL
      * САМІЙ послідовності, що й вхідний масив $texts.
      *
      * @param string[] $texts
+     * @param array $extra додаткові параметри DeepL (напр. ['ignore_tags' => 'keep'])
      * @return string[]
      */
-    protected function translateViaDeepL(array $texts, string $sourceLang = 'UK', string $targetLang = 'RU'): array
+    protected function translateViaDeepL(array $texts, string $sourceLang = 'UK', string $targetLang = 'RU', array $extra = []): array
     {
         $apiKey = env('DEEPL_API_KEY');
         if (empty($apiKey)) {
@@ -49,6 +50,9 @@ trait TranslatesViaDeepL
         $bodyParts[] = 'source_lang=' . urlencode($sourceLang);
         $bodyParts[] = 'target_lang=' . urlencode($targetLang);
         $bodyParts[] = 'tag_handling=html';
+        foreach ($extra as $k => $v) {
+            $bodyParts[] = urlencode($k) . '=' . urlencode($v);   // напр. ignore_tags=keep
+        }
         $body = implode('&', $bodyParts);
 
         $client = property_exists($this, 'http') && $this->http instanceof Client
