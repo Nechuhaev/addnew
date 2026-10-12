@@ -8,9 +8,15 @@ class AdSense {
     const CLIENT = 'ca-pub-1409649052535600';
     const MOBILE_MAX_WIDTH = 767;
 
+    // Завантажувач adsbygoogle.js виводимо лише перед першим блоком на сторінці
+    protected static $loaderPrinted = false;
+
     public static function block($position) {
         if (env('APP_ENV') == 'production') {
-            echo '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1409649052535600" crossorigin="anonymous"></script>';
+            if (!self::$loaderPrinted) {
+                self::$loaderPrinted = true;
+                echo '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' . self::CLIENT . '" crossorigin="anonymous"></script>';
+            }
             switch ($position) {
                 case 'top':
                     echo self::adaptiveBanner('8755878337');
