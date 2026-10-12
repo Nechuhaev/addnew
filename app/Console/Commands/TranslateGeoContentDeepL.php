@@ -19,6 +19,11 @@ use Illuminate\Support\Facades\Schema;
  * - Бюджет символів на запуск: --max-chars; запобіжник квоти — RESERVE символів
  *   лишаються для статей блогу.
  * - Плейсхолдери ---name--- DeepL не чіпає (ignore_tags), HTML зберігається.
+ * - Назви міст/областей ідуть із контекстом («город Кожанка» → «місто Кожанка»):
+ *   без нього DeepL перекладає їх як звичайні слова («Кожанка» → «Шкіряна куртка»).
+ *   Переклад назви відхиляється, якщо змінилась кількість слів, перша літера
+ *   чи довжина; відхилені пишуться в окремий CSV і в наступних запусках пропускаються
+ *   (--retry-rejected — спробувати знову).
  * - Пише лише в порожні *_uk (заповнене вручну не перезаписує).
  * - Журнал записаного (CSV); --rollback=ФАЙЛ обнуляє записане тим запуском.
  */
@@ -33,13 +38,20 @@ class TranslateGeoContentDeepL extends Command
         {--only-ukraine : Лише області/міста України}
         {--max-chars=100000 : Максимум символів DeepL за один запуск}
         {--sample=8 : Скільки коротких пробних перекладів показати у звіті}
-        {--rollback= : Шлях до CSV-журналу: обнулити *_uk, записані тим запуском}';
+        {--rollback= : Шлях до CSV-журналу: обнулити *_uk, записані тим запуском}
+        {--retry-rejected : Повторно спробувати назви, відхилені перевіркою раніше}';
 
     protected $description = 'Перекладає назви й SEO-тексти областей/міст/країн/категорій/тегів RU→UK через DeepL; за замовчуванням лише звіт';
 
     const RESERVE = 150000;      // символів квоти, які лишаємо для статей блогу
     const BATCH_TEXTS = 40;      // текстів в одному запиті (ліміт DeepL — 50)
     const BATCH_CHARS = 30000;   // символів в одному запиті (ліміт тіла — 128 KiB)
+
+    // Контекст для назв: що додаємо перед RU-назвою і що очікуємо побачити в UK-перекладі
+    const CONTEXT = [
+        'city' => ['город ', '/^(місто|м\.)\s+/iu'],
+        'region' => ['регион ', '/^(регіон|область)\s+/iu'],
+    ];
 
     public function handle()
     {
@@ -56,14 +68,14 @@ class TranslateGeoContentDeepL extends Command
         $chars = 0;
         $skippedBudget = 0;
         foreach ($items as $it) {
-            $key = $it['text'];
+            $key = $it['kind'] . '|' . $it['text'];
             if (!isset($plan[$key])) {
-                $len = mb_strlen($it['text']);
+                $len = mb_strlen($it['text']) + (isset(self::CONTEXT[$it['kind']]) ? mb_strlen(self::CONTEXT[$it['kind']][0]) : 0);
                 if ($chars + $len > $maxChars) {
                     $skippedBudget++;
                     continue;
                 }
-                $plan[$key] = ['text' => $it['text'], 'targets' => []];
+                $plan[$key] = ['text' => $it['text'], 'kind' => $it['kind'], 'cost' => $len, 'targets' => []];
                 $chars += $len;
             }
             $plan[$key]['targets'][] = $it;
@@ -102,22 +114,28 @@ class TranslateGeoContentDeepL extends Command
         $logPath = storage_path('app/geo_deepl_' . date('Ymd_His') . '.csv');
         $log = fopen($logPath, 'w');
         fputcsv($log, ['table', 'id', 'field', 'value_uk']);
+        $rejPath = storage_path('app/geo_deepl_rejected_' . date('Ymd_His') . '.csv');
+        $rej = fopen($rejPath, 'w');
+        fputcsv($rej, ['table', 'id', 'field', 'ru', 'deepl']);
 
         $written = 0;
+        $rejected = 0;
         $used = 0;
         $batches = $this->batches(array_values($plan));
         foreach ($batches as $bi => $batch) {
             try {
-                $out = $this->translateTexts(array_column($batch, 'text'));
+                $out = $this->translateTexts($batch);
             } catch (\Throwable $e) {
                 $this->error('DeepL: ' . $e->getMessage());
                 break;
             }
             foreach ($batch as $i => $p) {
-                $used += mb_strlen($p['text']);
+                $used += $p['cost'];
+                $uk = $this->clean($p['kind'], $p['text'], $out[$i]);
                 foreach ($p['targets'] as $t) {
-                    $uk = $this->clean($t['field'], $p['text'], $out[$i]);
-                    if ($uk === '') {
+                    if ($uk === null) {
+                        fputcsv($rej, [$t['table'], $t['id'], $t['field'], $p['text'], $out[$i]]);
+                        $rejected++;
                         continue;
                     }
                     $col = $t['field'] . '_uk';
@@ -132,13 +150,15 @@ class TranslateGeoContentDeepL extends Command
                     }
                 }
             }
-            $this->line('порція ' . ($bi + 1) . '/' . count($batches) . ": записано {$written}, символів DeepL ≈{$used}");
+            $this->line('порція ' . ($bi + 1) . '/' . count($batches) . ": записано {$written}, відхилено {$rejected}, символів DeepL ≈{$used}");
             usleep(250000);
         }
         fclose($log);
+        fclose($rej);
 
-        $this->info("Готово. Записано {$written} полів, символів DeepL ≈{$used}.");
+        $this->info("Готово. Записано {$written} полів, відхилено перевіркою {$rejected}, символів DeepL ≈{$used}.");
         $this->line("Журнал: {$logPath}");
+        $this->line("Відхилені (лишились без перекладу, на сайті — RU-назва): {$rejPath}");
         $this->line("Відкат цього запуску: php artisan geo:translate-deepl --rollback={$logPath}");
         $this->line('Після запису: php artisan cache:clear (кеш блоків сторінок областей/міст).');
 
@@ -154,6 +174,8 @@ class TranslateGeoContentDeepL extends Command
         $tables = array_filter(array_map('trim', explode(',', (string) $this->option('tables'))));
         $fields = array_filter(array_map('trim', explode(',', (string) $this->option('fields'))));
         $ukraineId = DB::table('ad_countries')->where('slug', 'ukraina')->value('id');
+
+        $skip = $this->option('retry-rejected') ? [] : $this->previouslyRejected();
 
         $first = [];
         $rest = [];
@@ -187,6 +209,9 @@ class TranslateGeoContentDeepL extends Command
                     $q->where($table === 'ad_cities' ? 'r.country_id' : 't.country_id', $ukraineId);
                 }
                 foreach ($q->select($select)->cursor() as $r) {
+                    if (isset($skip["{$table}:{$r->id}:{$field}"])) {
+                        continue;   // відхилено раніше — результат був би той самий
+                    }
                     $text = trim((string) $r->text);
                     $plain = strip_tags($text);
                     if ($field === 'name' && !preg_match('/[\x{0400}-\x{04FF}]/u', $plain)) {
@@ -195,9 +220,12 @@ class TranslateGeoContentDeepL extends Command
                     if (preg_match('/[іїєґІЇЄҐ]/u', $plain) && !preg_match('/[ыэъёЫЭЪЁ]/u', $plain)) {
                         continue;   // у RU-колонці вже український текст — квоту не витрачаємо
                     }
-                    $isUa = !isset($r->country_id) || (int) $r->country_id === (int) $ukraineId;
-                    $item = ['table' => $table, 'id' => $r->id, 'field' => $field, 'text' => $text, 'ua' => $isUa];
-                    if ($isUa) {
+                    // null — таблиця без країни (категорії, теги); у пріоритеті разом з Україною
+                    $isUa = isset($r->country_id) ? (int) $r->country_id === (int) $ukraineId : null;
+                    $kind = $field !== 'name' ? 'text'
+                        : ($table === 'ad_cities' ? 'city' : ($table === 'ad_regions' ? 'region' : 'name'));
+                    $item = ['table' => $table, 'id' => $r->id, 'field' => $field, 'text' => $text, 'ua' => $isUa, 'kind' => $kind];
+                    if ($isUa !== false) {
                         $first[] = $item;
                     } else {
                         $rest[] = $item;
@@ -213,7 +241,7 @@ class TranslateGeoContentDeepL extends Command
     {
         $rows = [];
         foreach ($items as $it) {
-            $k = $it['table'] . '.' . $it['field'] . '_uk|' . ($it['ua'] ? 'Україна' : 'інші країни');
+            $k = $it['table'] . '.' . $it['field'] . '_uk|' . ($it['ua'] === null ? '—' : ($it['ua'] ? 'Україна' : 'інші країни'));
             if (!isset($rows[$k])) {
                 [$name, $where] = explode('|', $k);
                 $rows[$k] = [$name, $where, 0, 0];
@@ -252,11 +280,15 @@ class TranslateGeoContentDeepL extends Command
     /**
      * Плейсхолдери ---x--- обгортаються в <keep>, які DeepL не перекладає.
      */
-    protected function translateTexts(array $texts): array
+    protected function translateTexts(array $plans): array
     {
-        $send = array_map(function ($t) {
-            return preg_replace('/---[a-z_]+---/', '<keep>$0</keep>', $t);
-        }, $texts);
+        $send = array_map(function ($p) {
+            if (isset(self::CONTEXT[$p['kind']])) {
+                return self::CONTEXT[$p['kind']][0] . $p['text'];
+            }
+
+            return preg_replace('/---[a-z_]+---/', '<keep>$0</keep>', $p['text']);
+        }, $plans);
         $out = $this->translateViaDeepL($send, 'RU', 'UK', ['ignore_tags' => 'keep']);
 
         return array_map(function ($t) {
@@ -265,23 +297,82 @@ class TranslateGeoContentDeepL extends Command
     }
 
     /**
-     * Назви: без доданих DeepL лапок і крапки в кінці. Тексти — як є.
+     * Тексти — як є. Назви: прибирається контекст («місто …»), додані DeepL лапки
+     * й крапка; null — переклад відхилено (див. nameLooksRight).
      */
-    protected function clean(string $field, string $src, string $dst): string
+    protected function clean(string $kind, string $src, string $dst): ?string
     {
         $dst = trim($dst);
-        if ($field !== 'name') {
-            return $dst;
+        if ($kind === 'text') {
+            return $dst === '' ? null : $dst;
         }
         $dst = trim(html_entity_decode($dst, ENT_QUOTES, 'UTF-8'));
+        if (isset(self::CONTEXT[$kind])) {
+            // Буває, що DeepL опускає «місто» («Шеки» → «Шекі») — тоді вирішують перевірки нижче
+            $dst = trim(preg_replace(self::CONTEXT[$kind][1], '', $dst, 1));
+        }
         if (mb_strpos($src, '«') === false && mb_strpos($src, '"') === false) {
             $dst = trim(str_replace(['«', '»', '"', '„', '“', '”'], '', $dst));
         }
         if (mb_substr($src, -1) !== '.' && mb_substr($dst, -1) === '.') {
             $dst = rtrim(mb_substr($dst, 0, -1));
         }
+        if ($dst !== '' && mb_strtolower(mb_substr($src, 0, 1)) !== mb_substr($src, 0, 1)) {
+            $dst = mb_strtoupper(mb_substr($dst, 0, 1)) . mb_substr($dst, 1);   // «місто кожанка» → «Кожанка»
+        }
 
-        return $dst;
+        return $this->nameLooksRight($src, $dst) ? $dst : null;
+    }
+
+    /**
+     * Назва перекладена як назва, а не як слово: та сама кількість слів; для
+     * однослівних ще сумісна перша літера (И→І, Е→Є, Э→Е, Ё→Й, Ы→И, Г→Ґ) і схожа
+     * довжина. У багатослівних слова перекладаються («Северная Территория» →
+     * «Північна Територія»), тому там лише кількість слів.
+     */
+    protected function nameLooksRight(string $src, string $dst): bool
+    {
+        if ($dst === '') {
+            return false;
+        }
+        $words = function ($v) {
+            return count(preg_split('/\s+/u', trim($v)));
+        };
+        if ($words($src) !== $words($dst)) {
+            return false;
+        }
+        if ($words($src) > 1) {
+            return true;
+        }
+        $a = mb_strtoupper(mb_substr($src, 0, 1));
+        $b = mb_strtoupper(mb_substr($dst, 0, 1));
+        $ok = ['И' => ['І', 'И'], 'Е' => ['Є', 'Е'], 'Э' => ['Е'], 'Ё' => ['Й', 'Е'], 'Ы' => ['И'], 'Г' => ['Г', 'Ґ']];
+        if ($a !== $b && !in_array($b, $ok[$a] ?? [], true)) {
+            return false;
+        }
+        $ratio = mb_strlen($dst) / max(1, mb_strlen($src));
+
+        return $ratio >= 0.7 && $ratio <= 1.5;
+    }
+
+    /**
+     * Ключі table:id:field, відхилені перевіркою в попередніх запусках.
+     */
+    protected function previouslyRejected(): array
+    {
+        $keys = [];
+        foreach (glob(storage_path('app/geo_deepl_rejected_*.csv')) ?: [] as $f) {
+            $fh = fopen($f, 'r');
+            fgetcsv($fh);
+            while (($r = fgetcsv($fh)) !== false) {
+                if (count($r) >= 3) {
+                    $keys["{$r[0]}:{$r[1]}:{$r[2]}"] = true;
+                }
+            }
+            fclose($fh);
+        }
+
+        return $keys;
     }
 
     protected function showSample(array $plan, int $n): void
@@ -302,7 +393,7 @@ class TranslateGeoContentDeepL extends Command
             $pick[] = $short[$i];
         }
         try {
-            $out = $this->translateTexts(array_column($pick, 'text'));
+            $out = $this->translateTexts($pick);
         } catch (\Throwable $e) {
             $this->error('Не вдалося отримати пробні переклади: ' . $e->getMessage());
 
@@ -311,7 +402,9 @@ class TranslateGeoContentDeepL extends Command
         $this->line('Пробні переклади (у БД нічого не пишеться):');
         foreach ($pick as $i => $p) {
             $t = $p['targets'][0];
-            $this->line("  [{$t['table']}.{$t['field']}] {$p['text']}  →  " . $this->clean($t['field'], $p['text'], $out[$i]));
+            $uk = $this->clean($p['kind'], $p['text'], $out[$i]);
+            $verdict = $uk !== null ? $uk : 'ВІДХИЛЕНО (DeepL: «' . trim($out[$i]) . '»)';
+            $this->line("  [{$t['table']}.{$t['field']}] {$p['text']}  →  {$verdict}");
         }
     }
 
