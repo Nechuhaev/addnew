@@ -14,26 +14,50 @@ use Illuminate\Http\Request;
 class Ad extends Controller
 {
     public function showList(Request $request) {
-        //dd($request->all());
-        if ($request->has('search')) {
-            $ads = AdModel::where('name', 'like', '%' . $request->get('search') . '%')
-                ->orWhere('content', 'like', '%' . $request->get('search') . '%')
-                ->orWhere('email', 'like', '%' . $request->get('search') . '%')
-                ->orWhere('telephone', 'like', '%' . $request->get('search') . '%')
-                ->orWhereIn('user_id', function ($q) use ($request) {
-                    $q->select('id')->from('users')->where('email', 'like', '%' . $request->get('search') . '%');
-                })
-                ->orderBy('created_at', 'desc')
-                ->paginate(15);
-        } else {
-            $ads = AdModel::orderBy('created_at', 'desc')
-                ->paginate(15);
+        $query = AdModel::query();
+
+        if ($request->filled('search')) {
+            $search = $request->get('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('content', 'like', '%' . $search . '%')
+                    ->orWhere('email', 'like', '%' . $search . '%')
+                    ->orWhere('telephone', 'like', '%' . $search . '%')
+                    ->orWhereIn('user_id', function ($q) use ($search) {
+                        $q->select('id')->from('users')->where('email', 'like', '%' . $search . '%');
+                    });
+            });
         }
+
+        // Фільтри з посилань «кількість оголошень» (області, міста)
+        $filters = [];
+        if ($request->filled('region_id')) {
+            $region = \App\AdRegion::find((int) $request->get('region_id'));
+            $query->whereIn('city_id', function ($q) use ($request) {
+                $q->select('id')->from('ad_cities')->where('region_id', (int) $request->get('region_id'));
+            });
+            $filters['region_id'] = 'Область: ' . (optional($region)->name ?? '#' . (int) $request->get('region_id'));
+        }
+        if ($request->filled('city_id')) {
+            $city = \App\AdCity::find((int) $request->get('city_id'));
+            $query->where('city_id', (int) $request->get('city_id'));
+            $filters['city_id'] = 'Місто: ' . (optional($city)->name ?? '#' . (int) $request->get('city_id'));
+        }
+        $statuses = ['0' => 'на модерації', '1' => 'активні', '2' => 'архів'];
+        if ($request->filled('status') && isset($statuses[(string) $request->get('status')])) {
+            $query->where('status', (int) $request->get('status'));
+            $filters['status'] = 'Статус: ' . $statuses[(string) $request->get('status')];
+        }
+
+        $ads = $query->orderBy('created_at', 'desc')
+            ->paginate(15)
+            ->appends($request->only(['search', 'region_id', 'city_id', 'status']));
 
         return view('admin.ad.ads')->with([
             'ads' => $ads,
             'search_action' => route('admin.ads'),
-            'search' => $request->get('search')
+            'search' => $request->get('search'),
+            'filters' => $filters,
         ]);
     }
 
