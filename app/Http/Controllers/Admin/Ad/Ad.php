@@ -38,6 +38,15 @@ class Ad extends Controller
             });
             $filters['region_id'] = 'Область: ' . (optional($region)->name ?? '#' . (int) $request->get('region_id'));
         }
+        if ($request->filled('country_id')) {
+            $country = \App\AdCountry::find((int) $request->get('country_id'));
+            $query->whereIn('city_id', function ($q) use ($request) {
+                $q->select('ad_cities.id')->from('ad_cities')
+                    ->join('ad_regions', 'ad_regions.id', '=', 'ad_cities.region_id')
+                    ->where('ad_regions.country_id', (int) $request->get('country_id'));
+            });
+            $filters['country_id'] = 'Країна: ' . (optional($country)->name ?? '#' . (int) $request->get('country_id'));
+        }
         if ($request->filled('city_id')) {
             $city = \App\AdCity::find((int) $request->get('city_id'));
             $query->where('city_id', (int) $request->get('city_id'));
@@ -51,7 +60,7 @@ class Ad extends Controller
 
         $ads = $query->orderBy('created_at', 'desc')
             ->paginate(15)
-            ->appends($request->only(['search', 'region_id', 'city_id', 'status']));
+            ->appends($request->only(['search', 'country_id', 'region_id', 'city_id', 'status']));
 
         return view('admin.ad.ads')->with([
             'ads' => $ads,

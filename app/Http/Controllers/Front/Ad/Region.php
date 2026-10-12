@@ -20,7 +20,7 @@ class Region extends Controller
         $entity = AdRegion::where('slug', '=', $region)->first();
         if (!$entity) abort(404);
 
-        $cache_key = sprintf('region_categories_%s', $entity->id);
+        $cache_key = sprintf('region_categories_v2_%s_%s', app()->getLocale(), $entity->id);
         $categories = Cache::remember($cache_key, 43200, function () use ($entity) {
             return GeoPageBlocks::filteredCategories($entity->slug);
         });
@@ -54,13 +54,20 @@ class Region extends Controller
             ->where('region_id', $entity->id)
             ->get();
 
+        $counts = GeoPageBlocks::regionCounts($entity->id);
+
         $cities = [];
         foreach ($citiesQuery as $city) {
             $cities[] = [
                 'name' => $city->name,
-                'url' => $city->url
+                'url' => $city->url,
+                'count' => $counts['cities'][$city->id] ?? 0,
             ];
         }
+        // Міста з оголошеннями — першими
+        usort($cities, function ($a, $b) {
+            return $b['count'] <=> $a['count'] ?: strcmp($a['name'], $b['name']);
+        });
 
         $shop_users = GeoPageBlocks::latestShops($localization);
 
@@ -69,6 +76,7 @@ class Region extends Controller
             'breadcrumbs' => 'city.page',
             'meta' => $meta,
             'categories' => $categories,
+            'categoryCounts' => $counts['categories'],
             'adsense' => new AdSense(),
             'cities' => $cities,
             'tags' => [],

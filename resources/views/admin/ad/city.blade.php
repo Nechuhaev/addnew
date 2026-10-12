@@ -170,52 +170,105 @@
         <div class="col-8">
             <div class="card">
                 <div class="card-body">
-                    <form action="{{ $action_search }}" method="GET">
-                        <div class="row">
-                            <div class="col-md-7">
-                                <input type="text"
-                                       name="name"
-                                       value="{{ $requested_city ?? "" }}"
-                                       placeholder="Поиск городов"
-                                       class="form-control form-control-line">
-                            </div>
-                            <div class="col-md-3"><button class="btn btn-primary btn-block">Найти город</button></div>
-                            <div class="col-2">
-                                <a id="deleteMany" href="/admin/cities/deleteMany" class="btn btn-danger btn-block">Удалить</a>
-                            </div>
+    @php($min = (array) request('min', []))
+                    <form action="{{ route('admin.adCities') }}" method="GET" id="geo-filters">
+                        @foreach(request()->only(['sort', 'dir', 'per_page']) as $name => $value)
+                            <input type="hidden" name="{{ $name }}" value="{{ $value }}">
+                        @endforeach
+                        <div class="d-flex flex-wrap align-items-center mb-2" style="gap:8px;">
+                            <button class="btn btn-sm btn-primary">Застосувати фільтри</button>
+                            @if(request()->hasAny(['q', 'country_id', 'region_id', 'has_ads', 'min']))
+                                <a href="{{ route('admin.adCities') }}" class="btn btn-sm btn-link">Скинути</a>
+                            @endif
+                            <span class="text-muted" style="font-size:13px;">Знайдено: {{ $cities->total() }}</span>
+                            <a id="deleteMany" href="/admin/cities/deleteMany" class="btn btn-sm btn-danger ml-auto">Удалить выбранные</a>
                         </div>
-                    </form>
-                    <hr>
-                    @if ($cities->items())
+                        <div class="table-responsive">
                         <table class="table table-bordered table-hover table-middle-cell">
-                            <tr>
-                                <th></th>
-                                <th class="text-center">ID</th>
-                                <th>Город</th>
-                                <th>Регион</th>
-                                <th>Страна</th>
-                                <th><a style="color: black" href="?order=ads_count&direction={{ ($direction == 'asc') ? 'desc' : 'asc'  }}">Кол-во</a> {!! ($order == 'ads_count') ? ($direction != 'asc') ? '<i class="mdi mdi-arrow-down"></i>' : '<i class="mdi mdi-arrow-up"></i>' : '';   !!}</th>
-                                <th></th>
-                            </tr>
-                            @foreach($cities as $city_item)
+                            <thead>
                                 <tr>
-                                    <td style="width: 30px"><input type="checkbox" name="id[]" value="{{ $city_item->id }}"></td>
+                                    <th></th>
+                                    @include('admin.ad.partials.sort-th', ['route' => 'admin.adCities', 'col' => 'id', 'label' => 'ID', 'class' => 'text-center'])
+                                    @include('admin.ad.partials.sort-th', ['route' => 'admin.adCities', 'col' => 'name', 'label' => 'Город', 'class' => ''])
+                                    @include('admin.ad.partials.sort-th', ['route' => 'admin.adCities', 'col' => 'region', 'label' => 'Регион', 'class' => ''])
+                                    @include('admin.ad.partials.sort-th', ['route' => 'admin.adCities', 'col' => 'country', 'label' => 'Страна', 'class' => ''])
+                                    @include('admin.ad.partials.sort-th', ['route' => 'admin.adCities', 'col' => 'ads_count', 'label' => 'Оголошень', 'class' => 'text-center'])
+                                    @include('admin.ad.partials.sort-th', ['route' => 'admin.adCities', 'col' => 'active_count', 'label' => 'Активних', 'class' => 'text-center'])
+                                    <th></th>
+                                </tr>
+                                <tr class="geo-filter">
+                                    <th></th><th></th>
+                                    <th><input type="search" name="q" value="{{ request('q') }}" placeholder="Назва, slug або ID" class="form-control"></th>
+                                    <th>
+                                        <select name="region_id" class="form-control" onchange="this.form.submit()">
+                                            <option value="">Усі</option>
+                                            @foreach($allRegions as $r)
+                                                @if(!request('country_id') || (int) request('country_id') === (int) $r->country_id)
+                                                    <option value="{{ $r->id }}" {{ (string) request('region_id') === (string) $r->id ? 'selected' : '' }}>{{ $r->name }}</option>
+                                                @endif
+                                            @endforeach
+                                        </select>
+                                    </th>
+                                    <th>
+                                        <select name="country_id" class="form-control" onchange="this.form.submit()">
+                                            <option value="">Усі</option>
+                                            @foreach($countries as $c)
+                                                <option value="{{ $c->id }}" {{ (string) request('country_id') === (string) $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </th>
+                                    <th>
+                                        <select name="has_ads" class="form-control mb-1" onchange="this.form.submit()">
+                                            <option value="">Усі</option>
+                                            <option value="yes" {{ request('has_ads') === 'yes' ? 'selected' : '' }}>Є оголошення</option>
+                                            <option value="no" {{ request('has_ads') === 'no' ? 'selected' : '' }}>Без оголошень</option>
+                                        </select>
+                                        <input type="number" min="0" name="min[ads_count]" value="{{ $min['ads_count'] ?? '' }}" placeholder="від" class="form-control">
+                                    </th>
+                                    <th><input type="number" min="0" name="min[active_count]" value="{{ $min['active_count'] ?? '' }}" placeholder="від" class="form-control"></th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            @forelse($cities as $city_item)
+                                @php($cRegion = $city_item->region)
+                                @php($cCountry = optional($cRegion)->country)
+                                <tr>
+                                    <td style="width: 30px"><input type="checkbox" name="id[]" value="{{ $city_item->id }}" form="geo-select"></td>
                                     <td class="text-center">{{ $city_item->id }}</td>
                                     <td><b>{{ $city_item->name }}</b></td>
-                                    <td>{{ $city_item->region->name }}</td>
-                                    <td>{{ $city_item->region->country->name }}</td>
-                                    <td>{{ $city_item->ads_count }}</td>
+                                    <td>{{ optional($cRegion)->name }}</td>
+                                    <td>{{ optional($cCountry)->name }}</td>
+                                    <td class="text-center geo-count">
+                                        @if($city_item->ads_count > 0)
+                                            <a href="{{ route('admin.ads', ['city_id' => $city_item->id]) }}" title="Усі оголошення міста в адмінці">{{ $city_item->ads_count }}</a>
+                                        @else
+                                            <span class="text-muted">0</span>
+                                        @endif
+                                    </td>
+                                    <td class="text-center geo-count">
+                                        @if($city_item->active_count > 0)
+                                            <a href="{{ route('admin.ads', ['city_id' => $city_item->id, 'status' => 1]) }}" title="Активні оголошення міста в адмінці">{{ $city_item->active_count }}</a>
+                                            @if($cCountry && $cRegion && $city_item->slug)
+                                                <a href="{{ route('city.page', ['country' => $cCountry->slug, 'region' => $cRegion->slug, 'city' => $city_item->slug]) }}" target="_blank" rel="noopener" title="Сторінка міста на сайті" class="ml-1"><i class="mdi mdi-open-in-new"></i></a>
+                                            @endif
+                                        @else
+                                            <span class="text-muted">0</span>
+                                        @endif
+                                    </td>
                                     <td class="text-center cell-actions">
                                         <a href="{{ route('admin.adCities.edit', ['id' => $city_item->id]) }}"><i class="mdi mdi-18px mdi-table-edit"></i></a>
                                         <a href="{{ route('admin.adCities.delete', ['id' => $city_item->id]) }}" onclick="return confirm('Вы пытаетесь удалить город {{ $city_item->name }}. Подтвердите действие.')" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
                                     </td>
                                 </tr>
-                            @endforeach
+                            @empty
+                                <tr><td colspan="8" class="text-muted">Міст за цими фільтрами немає.</td></tr>
+                            @endforelse
+                            </tbody>
                         </table>
-                        {{ $cities->appends($_GET)->links() }}
-                    @else
-                        <p>Города не найдены</p>
-                    @endif
+                        </div>
+                    </form>
+                    @include('admin.ad.partials.list-pager', ['paginator' => $cities, 'route' => 'admin.adCities'])
                 </div>
             </div>
         </div>

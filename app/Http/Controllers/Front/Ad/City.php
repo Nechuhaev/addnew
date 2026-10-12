@@ -19,7 +19,7 @@ class City extends Controller
         $entity = AdCity::where('slug', '=', $city)->first();
         if (!$entity) abort(404);
 
-        $cache_key = sprintf('city_categories_%s', $entity->id);
+        $cache_key = sprintf('city_categories_%s_%s', app()->getLocale(), $entity->id);
         
         $categories = Cache::remember($cache_key, 43200, function () use ($entity) {
             return GeoPageBlocks::filteredCategories($entity->slug);
