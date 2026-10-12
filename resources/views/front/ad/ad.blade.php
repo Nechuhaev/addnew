@@ -208,7 +208,7 @@
                     <div class="adv-meta">
                         <ul class="adv-meta-list">
                             <li><span>{{ __('ad_create.country_label') }}:</span><a href="{{ $ad->category->url }}">{{ $ad->city->region->country->name }}</a></li>
-                            <li><span>{{ __('ad_create.author_short_label') }}:</span><a href="{{ route('author', ['id'=>$ad->user->id]) }}">{{ $ad->user->username }}</a></li>
+                            <li><span>{{ __('ad_create.author_short_label') }}:</span><a href="{{ route('author', ['id'=>$ad->user->id]) }}">{{ $ad->user->username }}</a>@include('front.partials.shop-rating', ['rating' => $shop_ratings[$ad->user_id] ?? null, 'userId' => $ad->user_id])</li>
                             <li><span>{{ __('ad_create.city_label') }}:</span><a href="{{ $ad->category->getFilteredUrl($ad->city->slug) }}">{{ $ad->city->name }}</a></li>
                             <li><span>{{ __('ad_create.date_created_label') }}:</span>{{ $ad->date_created}}</li>
                             @if(!empty($price_checked_at))
@@ -241,6 +241,10 @@
                         <div class="shop_product">
                             <h2 class="display-inline-block">{{ __('ad_page.buy_prefix') }} <b>{{ $ad->name }}</b> {{ __('ad_page.buy_suffix') }}</h2>
                             <a href="{{ route('ad.trackShopLink', ['id' => $ad->id]) }}" target="_blank" rel="nofollow noopener" class="btn btn-success pull-right">{{ __('ad_page.goto_shop_button') }}</a>
+                            @if(!empty($shop_ratings[$ad->user_id]))
+                                <div style="clear: both;"></div>
+                                <p class="shop-rating-line" style="margin:10px 0 0;">{{ $ad->user->username }} @include('front.partials.shop-rating', ['rating' => $shop_ratings[$ad->user_id], 'userId' => $ad->user_id])</p>
+                            @endif
                             @if($shopDelivery = \App\Services\ShopDelivery::forShop($ad->user))
                                 <div style="clear: both;"></div>
                                 @include('front.partials.shop-delivery', ['delivery' => $shopDelivery, 'compact' => true])
@@ -272,6 +276,7 @@
                                             </div>
                                             <div class="seller-name">
                                                 {{ $same_product->user->username }}
+                                                @include('front.partials.shop-rating', ['rating' => $shop_ratings[$same_product->user_id] ?? null, 'userId' => $same_product->user_id])
                                             </div>
                                             <div class="product-price">
                                                 {{ $same_product->price }} {{ $same_product->currency->symbol }}
