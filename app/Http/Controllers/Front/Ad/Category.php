@@ -85,13 +85,8 @@ class Category extends Controller
                 '---filtered_name---'  => $filter_entity->name ?? (app()->getLocale() === 'ru' ? 'Украине' : 'Україні'),
                 '---full_filtered_name---'    => $filter_entity->address_format ?? (app()->getLocale() === 'ru' ? 'Украине' : 'Україні'),
             ];
-            $meta = [
-                // strtr() ніколи не повертає null, тож «??» не спрацьовував:
-                // беремо власні поля категорії, а якщо вони порожні — загальний шаблон.
-                'meta_title' => strtr($entity->meta_title ?: (string) $seo_field->meta_title, $entity_values),
-                'meta_description' => strtr($entity->meta_description ?: (string) $seo_field->meta_description, $entity_values),
-                'description' => strtr($entity->content ?: (string) $seo_field->description, $entity_values)
-            ];
+            // Власні поля категорії, якщо порожні — загальний шаблон (з урахуванням мови)
+            $meta = \App\Services\LocalizedMeta::build($entity, $seo_field, $entity_values);
         } else {
             $entity_values = [
                 '---filtered_name---'  => $filter_entity->name ?? (app()->getLocale() === 'ru' ? 'Украине' : 'Україні'),
