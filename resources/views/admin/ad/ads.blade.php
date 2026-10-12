@@ -23,7 +23,7 @@
             <div class="card">
                 <div class="card-body">
                 <form action="{{ $search_action }}" method="get" class="search-form">
-                    @foreach(request()->only(['region_id', 'city_id', 'status']) as $name => $value)
+                    @foreach(request()->only(['country_id', 'region_id', 'city_id', 'status']) as $name => $value)
                         @if($value !== null && $value !== '')<input type="hidden" name="{{ $name }}" value="{{ $value }}">@endif
                     @endforeach
                     @if(!empty($filters))

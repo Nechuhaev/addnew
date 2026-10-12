@@ -22,6 +22,10 @@
                                 <li class="first first-64">
                                     <img src="{{ asset($category['image']) }}" alt="{{ $category['name'] }}" class="catalog-img">
                                     <a href="{{ $category['url'] }}">{{ $category['name'] }}</a>
+                                    @if(isset($categoryCounts) && isset($category['id']))
+                                        @php($catCount = $categoryCounts[$category['id']] ?? 0)
+                                        <span class="geo-count{{ $catCount ? '' : ' geo-count--zero' }}" title="{{ app()->getLocale() === 'ru' ? 'Объявлений' : 'Оголошень' }}">{{ number_format($catCount, 0, '', ' ') }}</span>
+                                    @endif
                                 </li>
                             </ul>
                         </div>
@@ -45,7 +49,7 @@
             @if($cities)
                 <div class="random-cities">
                     @foreach($cities as $city)
-                        <a href="{{ $city['url'] }}">{{ $city['name'] }}</a>
+                        <a href="{{ $city['url'] }}">{{ $city['name'] }}@isset($city['count'])<span class="geo-count{{ $city['count'] ? '' : ' geo-count--zero' }}">{{ $city['count'] }}</span>@endisset</a>
                     @endforeach
                 </div>
             @endif

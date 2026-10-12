@@ -224,7 +224,7 @@
                                     <td class="text-center">{{ $region_item->id }}</td>
                                     <td><b>{{ $region_item->name }}</b></td>
                                     <td>{{ optional($region_item->country)->name }}</td>
-                                    <td class="text-center">{{ $region_item->cities_count }}</td>
+                                    <td class="text-center"><a href="{{ route('admin.adCities', ['region_id' => $region_item->id]) }}" title="Міста області">{{ $region_item->cities_count }}</a></td>
                                     <td class="text-center rg-count">
                                         @if($region_item->ads_count > 0)
                                             <a href="{{ route('admin.ads', ['region_id' => $region_item->id]) }}" title="Усі оголошення області в адмінці">{{ $region_item->ads_count }}</a>

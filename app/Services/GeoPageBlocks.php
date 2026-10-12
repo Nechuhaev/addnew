@@ -33,12 +33,41 @@ class GeoPageBlocks
      * Плоский список батьківських категорій з посиланнями, відфільтрованими
      * за регіоном/містом ($slug) — для сторінок регіону й міста.
      */
+    /**
+     * Кількість активних оголошень у містах області — по розділах (батьківська
+     * категорія разом із підкатегоріями) і по містах. Один запит, кеш 1 год.
+     *
+     * @return array ['categories' => [category_id => n], 'cities' => [city_id => n], 'total' => n]
+     */
+    public static function regionCounts(int $regionId): array
+    {
+        return \Illuminate\Support\Facades\Cache::remember('region_counts_' . $regionId, 3600, function () use ($regionId) {
+            $rows = \Illuminate\Support\Facades\DB::table('ads')
+                ->join('ad_cities', 'ad_cities.id', '=', 'ads.city_id')
+                ->join('ad_categories', 'ad_categories.id', '=', 'ads.category_id')
+                ->where('ad_cities.region_id', $regionId)
+                ->where('ads.status', 1)
+                ->selectRaw('ads.city_id, IF(ad_categories.parent_id = 0, ad_categories.id, ad_categories.parent_id) AS root_id, COUNT(*) AS n')
+                ->groupBy('ads.city_id', 'root_id')
+                ->get();
+
+            $out = ['categories' => [], 'cities' => [], 'total' => 0];
+            foreach ($rows as $r) {
+                $out['categories'][$r->root_id] = ($out['categories'][$r->root_id] ?? 0) + $r->n;
+                $out['cities'][$r->city_id] = ($out['cities'][$r->city_id] ?? 0) + $r->n;
+                $out['total'] += $r->n;
+            }
+            return $out;
+        });
+    }
+
     public static function filteredCategories(string $slug): array
     {
         $categories = [];
         foreach (self::parentCategoriesByColumn() as $parents) {
             foreach ($parents as $parent) {
                 $categories[] = [
+                    'id' => $parent->id,
                     'name' => $parent->name,
                     'url' => $parent->getFilteredUrl($slug),
                     'image' => $parent->image,

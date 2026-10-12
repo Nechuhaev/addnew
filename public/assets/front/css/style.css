@@ -6001,3 +6001,9 @@ li.active {
 .feed-runs__row{grid-template-columns:1fr 1fr;gap:2px 10px}
 .feed-runs__row span::before{content:attr(data-l) ": ";color:#727272}
 }
+
+/* Кількість оголошень на сторінці області (розділи й міста) */
+.geo-count{display:inline-block;min-width:22px;margin-left:6px;padding:1px 7px;border-radius:10px;background:#eef2fa;color:#3b5998;font-size:13px;font-weight:600;line-height:18px;text-align:center;vertical-align:middle}
+.geo-count--zero{background:#f4f4f4;color:#9a9a9a;font-weight:400}
+.random-cities a .geo-count{margin-left:4px;font-size:12px}
+@media screen and (max-width:767px){.catalog .first .geo-count{float:right;margin-top:14px}}
