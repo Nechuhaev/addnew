@@ -23,7 +23,9 @@
                                     <img src="{{ asset($category['image']) }}" alt="{{ $category['name'] }}" class="catalog-img">
                                     <a href="{{ $category['url'] }}">{{ $category['name'] }}</a>
                                     @if(isset($categoryCounts) && isset($category['id']))
-                                        @php($catCount = $categoryCounts[$category['id']] ?? 0)
+                                        @php
+                                            $catCount = $categoryCounts[$category['id']] ?? 0;
+                                        @endphp
                                         <span class="geo-count{{ $catCount ? '' : ' geo-count--zero' }}" title="{{ app()->getLocale() === 'ru' ? 'Объявлений' : 'Оголошень' }}">{{ number_format($catCount, 0, '', ' ') }}</span>
                                     @endif
                                 </li>
@@ -82,18 +84,29 @@
             @endif
 
             <section>
-                <p class="section-heading">{{ app()->getLocale() === 'ru' ? 'Популярные магазины' : 'Популярні магазини' }}</p>
-                <p class="text-center"><a class="btn" href="{{ route('stores') }}">Перейти к списку всех магазинов</a></p>
+                @php
+                    $ruShops = app()->getLocale() === 'ru';
+                    // Тексти — ті самі переклади, що й на головній; запасний варіант, якщо ключа немає
+                    $tr = function ($key, $uk, $ru, $repl = []) use ($ruShops) {
+                        $v = __('front.' . $key, $repl);
+                        return $v === 'front.' . $key ? ($ruShops ? $ru : $uk) : $v;
+                    };
+                @endphp
+                <p class="section-heading">{{ $tr('popular_shops', 'Популярні магазини', 'Популярные магазины') }}</p>
+                <p class="text-center"><a class="btn" href="{{ route($ruShops ? 'ru.stores' : 'stores') }}">{{ $tr('all_shops_link', 'Перейти до списку всіх магазинів', 'Перейти к списку всех магазинов') }}</a></p>
                 <div class="related-ads">
                     @foreach($shop_users as $user)
                         <div class="related-ad">
                             <div class="image">
-                                <a href="{{ route('author', $user->id)  }}" title="Продавец {{ $user->username }} на сайте addnew.biz">
-                                    <img src="{{ $user->image ?? asset('assets/front/img/placeholder.png') }}" alt="Страница магазина {{ $user->username }} на сайте addnew.biz" class="img-responsive">
+                                <a href="{{ route('author', $user->id)  }}" title="{{ $tr('seller_on_site', 'Продавець ' . $user->username . ' на addnew.biz', 'Продавец ' . $user->username . ' на addnew.biz', ['name' => $user->username]) }}">
+                                    <img src="{{ $user->image ?? asset('assets/front/img/placeholder.png') }}" alt="{{ $tr('shop_page_on_site', 'Сторінка магазину ' . $user->username, 'Страница магазина ' . $user->username, ['name' => $user->username]) }}" class="img-responsive" loading="lazy">
                                 </a>
                             </div>
-                            <div class="price">{{ $user->ads_count }} предложений</div>
-                            <a href="{{ route('author', $user->id) }}" title="Продавец {{ $user->username }} на сайте addnew.biz" class="ad-heading">{{ $user->username }}</a>
+                            @php
+                                $offers = \App\Translation::pluralChoice('front', 'offers_count', $user->ads_count);
+                            @endphp
+                            <div class="price">{{ strpos($offers, 'front.') === 0 ? $user->ads_count . ' ' . ($ruShops ? 'предложений' : 'пропозицій') : $offers }}</div>
+                            <a href="{{ route('author', $user->id) }}" title="{{ $tr('seller_on_site', 'Продавець ' . $user->username . ' на addnew.biz', 'Продавец ' . $user->username . ' на addnew.biz', ['name' => $user->username]) }}" class="ad-heading">{{ $user->username }}</a>
                         </div>
                     @endforeach
                 </div>
