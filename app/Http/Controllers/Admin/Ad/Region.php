@@ -6,7 +6,6 @@ use App\AdCountry;
 use App\AdRegion;
 use App\AdCity;
 use App\Ad;
-use Illuminate\Pagination\LengthAwarePaginator;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -27,63 +26,9 @@ class Region extends Controller
      */
     public function showForm(Request $request, $region_id = null) {
 
-        $direction = $request->get('direction') ?? 'asc';
-        $order = $request->get('order') ?? 'name';
-        $page = $request->get('page') ?? 1;
-
+        [$regions, $sort, $dir] = $this->listRegions($request);
         $countries_list = AdCountry::select(['id', 'name'])->get()->toArray();
-        $regions = AdRegion::orderBy('name', 'ASC')->get();
-        
-        //получаем кол-во
-        foreach ($regions as $region) {
-            $count = 0;
-            foreach ($region->cities as $city) {
-                $count += Ad::where('city_id', '=', $city->id)->count();
-            }
-            $region['ads_count'] = $count;
-        }
 
-        if ($order == 'ads_count') {
-            $size = count($regions);
-            //сортируем по количеству
-            if ($direction == 'desc') {
-                do {
-                    $swapped = false;
-                    for ($i = 0; $i < $size - 1; $i++) {
-                        if ($regions[$i]->ads_count < $regions[$i + 1]->ads_count) {
-                            $temp = $regions[$i];
-                            $regions[$i] = $regions[$i + 1];
-                            $regions[$i + 1] = $temp;
-                            $swapped = true;
-                        }
-                    }
-                    $size--;
-                } while ($swapped);
-            } else {
-                do {
-                    $swapped = false;
-                    for ($i = 0; $i < $size - 1; $i++) {
-                        if ($regions[$i]->ads_count > $regions[$i + 1]->ads_count) {
-                            $temp = $regions[$i];
-                            $regions[$i] = $regions[$i + 1];
-                            $regions[$i + 1] = $temp;
-                            $swapped = true;
-                        }
-                    }
-                    $size--;
-                } while ($swapped);
-            }
-        }
-
-        //пагинация
-        $regions = new LengthAwarePaginator(
-            $regions->forPage($page, $this->per_page),
-            count($regions),
-            $this->per_page,
-            $page,
-            ['path' => url('admin/regions?order='.$order.'&direction='.$direction)]
-        );
-        
         $region = null;
 
         if ($region_id) {
@@ -95,12 +40,76 @@ class Region extends Controller
         return view('admin.ad.region')->with([
             'action' => $action,
             'countries' => $countries_list,
-            'direction' => $direction,
-            'order' => $order,
+            'sort' => $sort,
+            'dir' => $dir,
             'region' => $region,
             'regions' => $regions,
-            'action_search' => route('admin.adRegions.search')
+            'action_search' => route('admin.adRegions'),
+            'perPageOptions' => self::PER_PAGE,
         ]);
+    }
+
+    const PER_PAGE = [20, 50, 100];
+    const SORTS = ['id', 'name', 'country', 'cities_count', 'ads_count', 'active_count'];
+
+    /**
+     * Список областей з кількістю міст / оголошень одним запитом (раніше —
+     * окремий COUNT на кожне місто кожної області), з фільтрами й сортуванням.
+     */
+    protected function listRegions(Request $request): array
+    {
+        $stats = \Illuminate\Support\Facades\DB::table('ad_cities as c')
+            ->leftJoin('ads as a', 'a.city_id', '=', 'c.id')
+            ->selectRaw('c.region_id, COUNT(DISTINCT c.id) AS cities_count, COUNT(a.id) AS ads_count, COALESCE(SUM(a.status = 1), 0) AS active_count')
+            ->groupBy('c.region_id');
+
+        $query = AdRegion::with('country')
+            ->leftJoinSub($stats, 'st', 'st.region_id', '=', 'ad_regions.id')
+            ->select('ad_regions.*')
+            ->selectRaw('COALESCE(st.cities_count, 0) AS cities_count, COALESCE(st.ads_count, 0) AS ads_count, COALESCE(st.active_count, 0) AS active_count');
+
+        $q = trim((string) ($request->get('q') ?? $request->get('name')));
+        if ($q !== '') {
+            $query->where(function ($w) use ($q) {
+                $like = '%' . addcslashes($q, '%_\\') . '%';
+                $w->where('ad_regions.name', 'like', $like)
+                    ->orWhere('ad_regions.name_uk', 'like', $like)
+                    ->orWhere('ad_regions.slug', 'like', $like);
+                if (ctype_digit($q)) {
+                    $w->orWhere('ad_regions.id', (int) $q);
+                }
+            });
+        }
+        if ($request->filled('country_id')) {
+            $query->where('ad_regions.country_id', (int) $request->get('country_id'));
+        }
+        if ($request->get('has_ads') === 'yes') {
+            $query->whereRaw('COALESCE(st.ads_count, 0) > 0');
+        } elseif ($request->get('has_ads') === 'no') {
+            $query->whereRaw('COALESCE(st.ads_count, 0) = 0');
+        }
+        foreach (['cities_count', 'ads_count', 'active_count'] as $col) {
+            $min = $request->input('min.' . $col);
+            if ($min !== null && $min !== '' && is_numeric($min)) {
+                $query->whereRaw("COALESCE(st.{$col}, 0) >= ?", [(int) $min]);
+            }
+        }
+
+        $sort = in_array($request->get('sort'), self::SORTS, true) ? $request->get('sort') : 'name';
+        $dir = $request->get('dir') === 'desc' ? 'desc' : 'asc';
+        if ($sort === 'country') {
+            $query->orderBy(AdCountry::select('name')->whereColumn('ad_countries.id', 'ad_regions.country_id'), $dir);
+        } elseif (in_array($sort, ['cities_count', 'ads_count', 'active_count'], true)) {
+            $query->orderBy($sort, $dir);
+        } else {
+            $query->orderBy('ad_regions.' . $sort, $dir);
+        }
+        $query->orderBy('ad_regions.id');
+
+        $perPage = in_array((int) $request->get('per_page'), self::PER_PAGE, true) ? (int) $request->get('per_page') : self::PER_PAGE[0];
+        $regions = $query->paginate($perPage)->appends($request->except('page'));
+
+        return [$regions, $sort, $dir];
     }
 
     /**
@@ -110,25 +119,8 @@ class Region extends Controller
      */
     public function search(Request $request)
     {
-        $requested_region = $request->name;
-
-        $countries_list = AdCountry::select(['id', 'name'])->get()->toArray();
-
-        $regions = AdRegion::where('name', 'like', '%' . $requested_region . '%')
-            ->orderBy('name', "ASC")->paginate($this->per_page);
-
-        $region = null;
-
-        $action = route('admin.adRegions.create');
-
-        return view('admin.ad.region')->with([
-            'countries' => $countries_list,
-            'action' => $action,
-            'region' => $region,
-            'regions' => $regions,
-            'action_search' => route('admin.adRegions.search'),
-            'requested_region' => $requested_region
-        ]);
+        // Старий URL пошуку: тепер пошук — фільтр списку
+        return redirect()->route('admin.adRegions', array_filter(['q' => $request->get('name')]));
     }
 
     /**

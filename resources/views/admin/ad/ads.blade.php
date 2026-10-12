@@ -23,6 +23,17 @@
             <div class="card">
                 <div class="card-body">
                 <form action="{{ $search_action }}" method="get" class="search-form">
+                    @foreach(request()->only(['region_id', 'city_id', 'status']) as $name => $value)
+                        @if($value !== null && $value !== '')<input type="hidden" name="{{ $name }}" value="{{ $value }}">@endif
+                    @endforeach
+                    @if(!empty($filters))
+                        <div class="mb-2">
+                            @foreach($filters as $key => $label)
+                                <a href="{{ route('admin.ads', request()->except([$key, 'page'])) }}" class="badge badge-info p-2 mr-1" title="Прибрати фільтр">{{ $label }} &times;</a>
+                            @endforeach
+                            <span class="text-muted ml-1">Знайдено: {{ $ads->total() }}</span>
+                        </div>
+                    @endif
                     <div class="row">
                         <div class="col-9">
                             <input type="text"
