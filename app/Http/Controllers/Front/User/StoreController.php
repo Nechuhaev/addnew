@@ -69,11 +69,10 @@ class StoreController extends Controller
                 'description' => strtr($seo_field->description, $entity_values)
             ];
         } else {
-            $meta = [
-                'meta_title' => "Интернет-магазины на доске объявлений addnew.biz",
-                'meta_description' => "Интернет-магазины на доске объявлений addnew.biz",
-                'description' => "Интернет-магазины на доске объявлений addnew.biz",
-            ];
+            $text = app()->getLocale() === 'ru'
+                ? "Интернет-магазины на доске объявлений addnew.biz"
+                : "Інтернет-магазини на дошці оголошень addnew.biz";
+            $meta = ['meta_title' => $text, 'meta_description' => $text, 'description' => $text];
         }
 
         return view('front.store.store_list')->with([
