@@ -208,7 +208,7 @@
                     <div class="adv-meta">
                         <ul class="adv-meta-list">
                             <li><span>{{ __('ad_create.country_label') }}:</span><a href="{{ $ad->category->url }}">{{ $ad->city->region->country->name }}</a></li>
-                            <li><span>{{ __('ad_create.author_short_label') }}:</span><a href="{{ route('author', ['id'=>$ad->user->id]) }}">{{ $ad->user->username }}</a>@include('front.partials.shop-rating', ['rating' => $shop_ratings[$ad->user_id] ?? null, 'userId' => $ad->user_id])</li>
+                            <li><span>{{ __('ad_create.author_short_label') }}:</span><a href="{{ route('author', ['id'=>$ad->user->id]) }}">{{ $ad->user->username }}</a>@include('front.partials.shop-rating', ['rating' => $shop_ratings[$ad->user_id] ?? null, 'userId' => $ad->user_id, 'stacked' => true])</li>
                             <li><span>{{ __('ad_create.city_label') }}:</span><a href="{{ $ad->category->getFilteredUrl($ad->city->slug) }}">{{ $ad->city->name }}</a></li>
                             <li><span>{{ __('ad_create.date_created_label') }}:</span>{{ $ad->date_created}}</li>
                             @if(!empty($price_checked_at))
@@ -276,7 +276,7 @@
                                             </div>
                                             <div class="seller-name">
                                                 {{ $same_product->user->username }}
-                                                @include('front.partials.shop-rating', ['rating' => $shop_ratings[$same_product->user_id] ?? null, 'userId' => $same_product->user_id])
+                                                @include('front.partials.shop-rating', ['rating' => $shop_ratings[$same_product->user_id] ?? null, 'userId' => $same_product->user_id, 'stacked' => true])
                                             </div>
                                             <div class="product-price">
                                                 {{ $same_product->price }} {{ $same_product->currency->symbol }}
