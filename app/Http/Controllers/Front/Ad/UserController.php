@@ -33,11 +33,10 @@ class UserController extends Controller
                 'description' => strtr($seo_field->description, $entity_values)
             ];
         } else {
-            $meta = [
-                'meta_title' => "Объявления пользователя $user->username на доске объявлений addnew.biz",
-                'meta_description' => "Объявления пользователя $user->username на доске объявлений addnew.biz",
-                'description' => "Объявления пользователя $user->username на доске объявлений addnew.biz",
-            ];
+            $text = app()->getLocale() === 'ru'
+                ? "Объявления пользователя $user->username на доске объявлений addnew.biz"
+                : "Оголошення користувача $user->username на дошці оголошень addnew.biz";
+            $meta = ['meta_title' => $text, 'meta_description' => $text, 'description' => $text];
         }
 
         if (request()->get('page')) {

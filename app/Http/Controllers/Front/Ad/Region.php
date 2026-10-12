@@ -84,12 +84,17 @@ class Region extends Controller
         $entity_values = [
             '---country_name---'  => $entity->name
         ];
-        $meta = [
-            'meta_title' => strtr($seo_field->meta_title, $entity_values),
-            'meta_description' => strtr($seo_field->meta_description, $entity_values),
-            'description' => strtr($seo_field->description, $entity_values)
-        ];
-        
+        if ($seo_field) {
+            $meta = [
+                'meta_title' => strtr((string) $seo_field->meta_title, $entity_values),
+                'meta_description' => strtr((string) $seo_field->meta_description, $entity_values),
+                'description' => strtr((string) $seo_field->description, $entity_values)
+            ];
+        } else {
+            $text = app()->getLocale() === 'ru' ? 'Регионы: ' . $entity->name : 'Регіони: ' . $entity->name;
+            $meta = ['meta_title' => $text, 'meta_description' => $text, 'description' => false];
+        }
+
         $results = Ad::getAds()
             ->selectRaw('COUNT(ads.id) as ads_count')
             ->where('country_id', $entity->id)

@@ -13,7 +13,7 @@ class AdTags extends AbstractWidget
      * @var array
      */
     protected $config = [
-        'heading' => 'Метки объявлений',
+        'heading' => null,
         'tags' => null,
         'output' => []
     ];
@@ -24,6 +24,8 @@ class AdTags extends AbstractWidget
      */
     public function run()
     {
+        $this->config['heading'] = $this->config['heading']
+            ?? (app()->getLocale() === 'ru' ? 'Метки объявлений' : 'Мітки оголошень');
         $tags = [];
         if ($this->config['tags']) {
             foreach ($this->config['tags'] as $tag) {

@@ -140,7 +140,7 @@
                         <h3>Share &amp; Like</h3>
                         <ul class="share42init social-link">
                             <li><a href="https://twitter.com/intent/tweet?url={{ $ad->full_url }}&text={{ $ad->name }}" class="tw" target="_blank" rel="noreferrer"></a></li>
-                            <li><a href="https://www.facebook.com/sharer/sharer.php?u={{ $ad->full_url }}" class="fb" target="_blank" rel="noreferrer" alt="Доска бесплатных объявлений Addnew.biz в социальной сети Facebook"></a></li>
+                            <li><a href="https://www.facebook.com/sharer/sharer.php?u={{ $ad->full_url }}" class="fb" target="_blank" rel="noreferrer" alt="{{ app()->getLocale() === 'ru' ? 'Доска бесплатных объявлений Addnew.biz в социальной сети Facebook' : 'Дошка безкоштовних оголошень Addnew.biz у соцмережі Facebook' }}"></a></li>
                         </ul>
                     </div>
                     <div class="banner">

@@ -1,7 +1,7 @@
 @extends('front.layout')
 
-@section('meta_title', "Регистрация бизнес-пользователя | Доска объявлений addnew.biz")
-@section('meta_description', "Регистрация бизнес-пользователя | Доска объявлений addnew.biz")
+@section('meta_title', app()->getLocale() === 'ru' ? "Регистрация бизнес-пользователя | Доска объявлений addnew.biz" : "Реєстрація бізнес-користувача | Дошка оголошень addnew.biz")
+@section('meta_description', app()->getLocale() === 'ru' ? "Регистрация бизнес-пользователя | Доска объявлений addnew.biz" : "Реєстрація бізнес-користувача | Дошка оголошень addnew.biz")
 
 @section('content')
     <main class="login-page">

@@ -24,23 +24,29 @@ class AuditTranslations extends Command
     protected $description = 'Звіт: що на UK-версії сайту ще не перекладено';
 
     // Літери, яких немає в українській абетці, та типові російські слова
-    const RU_PATTERN = '[ыэъёЫЭЪЁ]|(^|[^а-яіїєґ])(и|или|для|что|это|все|при|объявлен|поиск|город|область|страна|магазин[ао]в|предложени|перейти к|показать)([^а-яіїєґ]|$)';
+    const RU_PATTERN = '/[ыэъёЫЭЪЁ]|(?<![\\p{L}])(и|или|что|это|объявлени\\p{L}*|поиск\\p{L}*|город\\p{L}*|страна|магазинов|предложени\\p{L}*|перейти к|показать)(?![\\p{L}])/iu';
+
+    public static function looksRussian(?string $v): bool
+    {
+        return $v !== null && $v !== '' && preg_match(self::RU_PATTERN, strip_tags($v)) === 1;
+    }
 
     public function handle()
     {
         $limit = (int) $this->option('limit');
 
         $this->section('Переклади інтерфейсу (translations, uk) — схожі на російські або порожні');
+        // Перевірка в PHP (/u): REGEXP у MySQL 5.x порівнює побайтово й на кирилиці
+        // дає хибні збіги майже для кожного рядка.
         $rows = DB::table('translations')->where('locale', 'uk')
-            ->where(function ($q) {
-                $q->whereRaw('value REGEXP ?', [self::RU_PATTERN])
-                    ->orWhereNull('value')->orWhere('value', '')
-                    ->orWhereRaw('value = `key`');
-            })
-            ->orderBy('group')->orderBy('key')->get(['group', 'key', 'value']);
+            ->orderBy('group')->orderBy('key')->get(['group', 'key', 'value'])
+            ->filter(function ($r) {
+                $v = trim((string) $r->value);
+                return $v === '' || $v === $r->key || self::looksRussian($v);
+            });
         $this->report($rows->map(function ($r) {
             return [$r->group . '.' . $r->key, mb_strimwidth((string) $r->value, 0, 90, '…')];
-        })->all(), ['ключ', 'значення (uk)'], $limit);
+        })->values()->all(), ['ключ', 'значення (uk)'], $limit);
 
         $this->section('Ключі, які є для ru, але відсутні для uk');
         $missing = DB::table('translations as r')
@@ -80,23 +86,61 @@ class AuditTranslations extends Command
             }
             $this->section("{$title}: є RU-текст, немає UK");
             $rows = [];
+            $byCountry = in_array($table, ['ad_regions', 'ad_cities'], true);
             foreach (['name', 'meta_title', 'meta_description', 'content'] as $col) {
                 if (!Schema::hasColumn($table, $col) || !Schema::hasColumn($table, $col . '_uk')) {
                     continue;
                 }
-                $q = DB::table($table)->whereRaw("TRIM(COALESCE(`{$col}`, '')) <> ''")
-                    ->whereRaw("TRIM(COALESCE(`{$col}_uk`, '')) = ''");
+                $q = DB::table($table . ' as t')->whereRaw("TRIM(COALESCE(t.`{$col}`, '')) <> ''")
+                    ->whereRaw("TRIM(COALESCE(t.`{$col}_uk`, '')) = ''");
+
+                if ($table === 'ad_tags' && $col === 'name') {
+                    // Назви тегів — переважно бренди/моделі; рахуємо лише ті, що схожі на російські
+                    $names = [];
+                    $q->select('t.id', 't.name')->orderBy('t.id')->chunk(2000, function ($chunk) use (&$names) {
+                        foreach ($chunk as $r) {
+                            if (self::looksRussian($r->name)) {
+                                $names[] = $r->name;
+                            }
+                        }
+                    });
+                    if ($names) {
+                        $rows[] = [$col . '_uk (схожі на RU)', count($names), mb_strimwidth(implode(', ', array_slice($names, 0, 5)), 0, 80, '…')];
+                    }
+                    continue;
+                }
+
+                if ($byCountry) {
+                    // Окремо по країнах: українські — пріоритет, закордонні — другорядні
+                    if ($table === 'ad_cities') {
+                        $q->join('ad_regions as r', 'r.id', '=', 't.region_id')->join('ad_countries as c', 'c.id', '=', 'r.country_id');
+                    } else {
+                        $q->join('ad_countries as c', 'c.id', '=', 't.country_id');
+                    }
+                    foreach ((clone $q)->selectRaw('c.id, COALESCE(NULLIF(c.name_uk, ""), c.name) as country, COUNT(*) as cnt')
+                                 ->groupBy('c.id', 'c.name', 'c.name_uk')->orderByDesc('cnt')->get() as $g) {
+                        $examples = (clone $q)->where('c.id', $g->id)->limit(5)->pluck('t.name')->implode(', ');
+                        $rows[] = [$col . '_uk', $g->country, $g->cnt, mb_strimwidth($examples, 0, 70, '…')];
+                    }
+                    continue;
+                }
+
                 $count = (clone $q)->count();
                 if ($count) {
-                    $examples = $q->limit(5)->pluck(Schema::hasColumn($table, 'name') ? 'name' : 'id')->implode(', ');
+                    $examples = $q->limit(5)->pluck(Schema::hasColumn($table, 'name') ? 't.name' : 't.id')->implode(', ');
                     $rows[] = [$col . '_uk', $count, mb_strimwidth($examples, 0, 80, '…')];
                 }
+            }
+            if ($byCountry) {
+                $this->report($rows, ['поле', 'країна', 'скільки', 'приклади'], 100);
+                continue;
             }
             $this->report($rows, ['поле', 'скільки', 'приклади'], 100);
         }
 
         $this->line('');
         $this->info('Готово. Переклади інтерфейсу — адмінка «Переклади»; SEO-шаблони — «SEO тексти»; назви й тексти — у формах категорій/областей/міст/тегів.');
+        $this->line('Автопереклад через DeepL: php artisan geo:translate-deepl (області, міста, країни, категорії, тексти тегів); назви тегів — php artisan tags:translate-deepl. Обидві без --apply лише показують звіт.');
     }
 
     protected function section(string $title): void

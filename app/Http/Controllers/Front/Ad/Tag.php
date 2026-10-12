@@ -53,11 +53,15 @@ class Tag extends Controller
         // SEO-текст: власний (AI) текст тегу, якщо він є; інакше короткий фактичний
         // вступ із даних (TagSeoText). Універсального шаблону більше немає.
         $total = $results->total();
-        $ownContent = trim((string) $entity->content);
+        // На UK — лише content_uk: RU-текст на українській сторінці не показуємо,
+        // замість нього — згенерований український вступ.
+        $raw = $entity->getAttributes();
+        $ownContent = trim((string) (app()->getLocale() === 'uk' ? ($raw['content_uk'] ?? '') : ($raw['content'] ?? '')));
+        $hasAnyContent = $ownContent !== '' || trim((string) ($raw['content'] ?? '')) !== '';
         if (request()->get('page')) {
             $meta['description'] = false;
         } elseif ($ownContent !== '') {
-            $meta['description'] = $entity->content;
+            $meta['description'] = $ownContent;
         } elseif ($total > 0) {
             $meta['description'] = app(\App\Services\Seo\TagSeoText::class)->build($entity, $total);
         } else {
@@ -66,7 +70,7 @@ class Tag extends Controller
 
         // Тонкі теги (менше 5 оголошень і без власного тексту) не індексуємо,
         // але посилання з них лишаються доступними (noindex, follow).
-        $noindex = ($ownContent === '' && $total < 5);
+        $noindex = (!$hasAnyContent && $total < 5);
 
         return view('front.ad.country')->with([
             'entity' => $entity,
