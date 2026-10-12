@@ -34,6 +34,15 @@
                         </form>
                     @endif
 
+                    <div class="d-flex flex-wrap mb-3" style="gap:8px;">
+                        <span class="badge badge-light border p-2" style="font-size:14px;">Усього: <b>{{ number_format((int) $counts->total, 0, '', ' ') }}</b></span>
+                        <span class="badge badge-success p-2" style="font-size:14px;">Активних: <b>{{ number_format((int) $counts->active, 0, '', ' ') }}</b></span>
+                        <span class="badge badge-warning p-2" style="font-size:14px;">Немає в наявності: <b>{{ number_format((int) $inactiveCount, 0, '', ' ') }}</b></span>
+                        @if((int) $counts->hidden > 0)
+                            <span class="badge badge-secondary p-2" style="font-size:14px;" title="Статус оголошення не «активне» (на модерації або в архіві)">Приховані: <b>{{ number_format((int) $counts->hidden, 0, '', ' ') }}</b></span>
+                        @endif
+                    </div>
+
                     <div class="table-responsive">
                         <table class="table">
                             <thead>

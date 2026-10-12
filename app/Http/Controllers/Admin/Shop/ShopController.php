@@ -259,6 +259,14 @@ class ShopController extends Controller
             ->where('stock', '!=', 'in_stock')
             ->count();
 
+        // Лічильники над списком: всього / активні (опубліковані й в наявності) / приховані
+        $counts = Ad::where('user_id', $shop->id)
+            ->where('is_product', 1)
+            ->selectRaw("COUNT(*) AS total,
+                SUM(status = 1 AND (stock IS NULL OR stock = 'in_stock')) AS active,
+                SUM(status <> 1) AS hidden")
+            ->first();
+
         // Позначаємо товари, чиє джерело виключено з моніторингу цін
         // (захищені від ботів сайти) — щоб було видно в списку одразу,
         // а не тільки в логах команди products:monitor-prices.
@@ -284,6 +292,7 @@ class ShopController extends Controller
             'products' => $products,
             'competitorChecks' => \App\ProductPriceCheck::lastCompetitorChecks($products->pluck('id')->all()),
             'inactiveCount' => $inactiveCount,
+            'counts' => $counts,
         ]);
     }
 
