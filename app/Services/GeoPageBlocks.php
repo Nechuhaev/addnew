@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\AdCity;
+
 use App\AdCategory;
 use App\Localization\Localization;
 use App\User;
@@ -42,23 +44,44 @@ class GeoPageBlocks
     public static function regionCounts(int $regionId): array
     {
         return \Illuminate\Support\Facades\Cache::remember('region_counts_' . $regionId, 3600, function () use ($regionId) {
-            $rows = \Illuminate\Support\Facades\DB::table('ads')
-                ->join('ad_cities', 'ad_cities.id', '=', 'ads.city_id')
-                ->join('ad_categories', 'ad_categories.id', '=', 'ads.category_id')
-                ->where('ad_cities.region_id', $regionId)
-                ->where('ads.status', 1)
-                ->selectRaw('ads.city_id, IF(ad_categories.parent_id = 0, ad_categories.id, ad_categories.parent_id) AS root_id, COUNT(*) AS n')
-                ->groupBy('ads.city_id', 'root_id')
-                ->get();
-
-            $out = ['categories' => [], 'cities' => [], 'total' => 0];
-            foreach ($rows as $r) {
-                $out['categories'][$r->root_id] = ($out['categories'][$r->root_id] ?? 0) + $r->n;
-                $out['cities'][$r->city_id] = ($out['cities'][$r->city_id] ?? 0) + $r->n;
-                $out['total'] += $r->n;
-            }
-            return $out;
+            return self::countActiveAds(function ($q) use ($regionId) {
+                $q->where('ad_cities.region_id', $regionId);
+            });
         });
+    }
+
+    /**
+     * Те саме для сторінки міста: розділи — по самому місту, а «cities» —
+     * по містах області (для списку сусідніх міст). Кеш 1 год.
+     */
+    public static function cityCounts(AdCity $city): array
+    {
+        return \Illuminate\Support\Facades\Cache::remember('city_counts_' . $city->id, 3600, function () use ($city) {
+            $region = self::regionCounts((int) $city->region_id);
+            $own = self::countActiveAds(function ($q) use ($city) {
+                $q->where('ads.city_id', $city->id);
+            });
+            return ['categories' => $own['categories'], 'cities' => $region['cities'], 'total' => $own['total']];
+        });
+    }
+
+    protected static function countActiveAds(\Closure $scope): array
+    {
+        $query = \Illuminate\Support\Facades\DB::table('ads')
+            ->join('ad_cities', 'ad_cities.id', '=', 'ads.city_id')
+            ->join('ad_categories', 'ad_categories.id', '=', 'ads.category_id')
+            ->where('ads.status', 1)
+            ->selectRaw('ads.city_id, IF(ad_categories.parent_id = 0, ad_categories.id, ad_categories.parent_id) AS root_id, COUNT(*) AS n')
+            ->groupBy('ads.city_id', 'root_id');
+        $scope($query);
+
+        $out = ['categories' => [], 'cities' => [], 'total' => 0];
+        foreach ($query->get() as $r) {
+            $out['categories'][$r->root_id] = ($out['categories'][$r->root_id] ?? 0) + $r->n;
+            $out['cities'][$r->city_id] = ($out['cities'][$r->city_id] ?? 0) + $r->n;
+            $out['total'] += $r->n;
+        }
+        return $out;
     }
 
     public static function filteredCategories(string $slug): array

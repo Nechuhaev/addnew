@@ -19,15 +19,13 @@ class City extends Controller
         $entity = AdCity::where('slug', '=', $city)->first();
         if (!$entity) abort(404);
 
-        $cache_key = sprintf('city_categories_%s_%s', app()->getLocale(), $entity->id);
-        
+        $cache_key = sprintf('city_categories_v2_%s_%s', app()->getLocale(), $entity->id);
+
         $categories = Cache::remember($cache_key, 43200, function () use ($entity) {
             return GeoPageBlocks::filteredCategories($entity->slug);
         });
 
-        
-
-        $categories = [];
+        $counts = GeoPageBlocks::cityCounts($entity);
 
         $seo_field = SeoField::where('index', 'ad-city')->first();
         
@@ -64,7 +62,8 @@ class City extends Controller
         foreach ($citiesQuery as $city) {
             $cities[] = [
                 'name' => $city->name,
-                'url' => $city->url
+                'url' => $city->url,
+                'count' => $counts['cities'][$city->id] ?? 0,
             ];
         }
 
@@ -96,6 +95,7 @@ class City extends Controller
             'breadcrumbs' => 'city.page',
             'meta' => $meta,
             'categories' => $categories,
+            'categoryCounts' => $counts['categories'],
             'adsense' => new AdSense(),
             'cities' => $cities,
             'tags' => $tags,
