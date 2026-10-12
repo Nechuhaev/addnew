@@ -23,17 +23,9 @@ class Tag extends Controller
             $entity_values = [
                 '---tag_name---'  => $entity->name,
             ];
-            $meta = [
-                'meta_title' => $entity->meta_title ?? strtr($seo_field->meta_title, $entity_values),
-                'meta_description' => $entity->meta_description ?? strtr($seo_field->meta_description, $entity_values),
-                'description' => $entity->content ?? strtr($seo_field->description, $entity_values)
-            ];
+            $meta = \App\Services\LocalizedMeta::build($entity, $seo_field, $entity_values);
         } else {
-            $meta = [
-                'meta_title' => $entity->meta_title,
-                'meta_description' => $entity->meta_description,
-                'description' => $entity->content,
-            ];
+            $meta = \App\Services\LocalizedMeta::build($entity, null);
         }
 
         if (request()->get('page')) {

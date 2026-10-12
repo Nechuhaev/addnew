@@ -7,7 +7,7 @@
             <!-- <div class="search-mob">
                 <div class="form-group">
                     <select class="form-control" name="cat_id" id="search_category" style="width: 100%;">
-                        <option value="0">Выберите категорию</option>
+                        <option value="0">{{ app()->getLocale() === 'ru' ? 'Выберите категорию' : 'Оберіть категорію' }}</option>
                         @foreach($config['categories'] as $category)
                         <option {{ ($config['category_id'] == $category['id']) ? 'selected' : '' }} value="{{ $category['id'] }}">{{ $category['name'] }}</option>
                         @endforeach

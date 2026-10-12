@@ -1,6 +1,6 @@
 @extends('front.layout')
 
-@section('meta_title', $meta['meta_title'] ?? 'Addnew.biz | Главная страница')
+@section('meta_title', ($meta['meta_title'] ?? '') ?: (app()->getLocale() === 'ru' ? 'Addnew.biz | Главная страница' : 'Addnew.biz | Головна сторінка'))
 
 @section('meta_description', $meta['meta_description'] ?? '')
 
