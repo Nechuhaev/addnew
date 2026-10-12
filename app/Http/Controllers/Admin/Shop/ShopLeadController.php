@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\Shop;
 
 use App\Http\Controllers\Controller;
 use App\Mail\ShopAdminMessage;
+use App\Services\ShopLeadFunnel;
 use App\Services\SiteContactEmailFinder;
 use App\ShopLead;
 use App\ShopLeadMessage;
@@ -25,18 +26,34 @@ class ShopLeadController extends Controller
     public function index(Request $request)
     {
         $status = $request->get('status');
+        $stage = $request->get('stage');
+
+        // Воронка рахується по всіх кандидатах (лічильники), фільтр етапу — по id
+        $funnel = ShopLeadFunnel::build(ShopLead::get(['id', 'email', 'domain', 'status']));
+        $stageIds = null;
+        if ($stage) {
+            $stageIds = array_keys(array_filter($funnel, function ($f) use ($stage) {
+                return ShopLeadFunnel::reached($f, $stage);
+            }));
+        }
 
         $leads = ShopLead::with('messages')->when($status && isset(ShopLead::STATUSES[$status]), function ($q) use ($status) {
                 $q->where('status', $status);
             })
+            ->when($stageIds !== null, function ($q) use ($stageIds) {
+                $q->whereIn('id', $stageIds ?: [0]);
+            })
             ->orderByRaw("FIELD(status, 'replied', 'new', 'contacted', 'joined', 'declined')")
             ->orderByDesc('created_at')
             ->paginate(50)
-            ->appends(['status' => $status]);
+            ->appends(['status' => $status, 'stage' => $stage]);
 
         return view('admin.shops.leads', [
             'leads' => $leads,
             'status' => $status,
+            'stage' => $stage,
+            'funnel' => $funnel,
+            'funnelCounts' => ShopLeadFunnel::counts($funnel),
             'counts' => ShopLead::selectRaw('status, COUNT(*) AS n')->groupBy('status')->pluck('n', 'status'),
             'messageTemplates' => ShopMessageTemplate::orderBy('name')->get(),
             'defaultTemplate' => ShopMessageTemplate::where('name', self::INVITATION_TEMPLATE)->first(),
