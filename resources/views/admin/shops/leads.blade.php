@@ -65,10 +65,43 @@
                         </div>
                     </div>
 
+                    @php
+                        $fc = $funnelCounts;
+                        $pct = function ($a, $b) { return $b > 0 ? round($a * 100 / $b) . '%' : '—'; };
+                        $stageUrl = function ($key) use ($status) {
+                            return route('admin.shops.leads', array_filter(['status' => $status, 'stage' => $key]));
+                        };
+                        $funnelCards = [
+                            [null, 'Усього кандидатів', $fc['all'], ''],
+                            ['sent', 'Лист надіслано', $fc['sent'], $pct($fc['sent'], $fc['all']) . ' від усіх'],
+                            ['registered', 'Зареєструвались', $fc['registered'], 'з тих, кому писали: ' . $fc['sent_registered'] . ' (' . $pct($fc['sent_registered'], $fc['sent']) . ') · після листа: ' . $fc['registered_after_letter']],
+                            ['with_products', 'Завантажили товари', $fc['with_products'], $pct($fc['with_products'], $fc['registered']) . ' від зареєстрованих'],
+                        ];
+                    @endphp
+                    <h5>Воронка</h5>
+                    <div class="row mb-2">
+                        @foreach($funnelCards as [$key, $label, $n, $hint])
+                            <div class="col-6 col-md-3 mb-2">
+                                <a href="{{ $stageUrl($key) }}" class="d-block border rounded p-2 h-100 {{ $stage === $key || (!$stage && !$key) ? 'border-primary bg-light' : '' }}" style="text-decoration:none; color:inherit;">
+                                    <div class="text-muted" style="font-size:12px;">{{ $label }}</div>
+                                    <div style="font-size:24px; font-weight:700; line-height:1.2;">{{ $n }}</div>
+                                    @if($hint)<div class="text-muted" style="font-size:11px;">{{ $hint }}</div>@endif
+                                </a>
+                            </div>
+                        @endforeach
+                    </div>
+                    <div class="mb-3" style="font-size:13px;">
+                        Застрягли:
+                        @foreach(['not_sent' => 'ще не писали', 'sent_not_registered' => 'написали — не зареєструвались', 'registered_no_products' => 'зареєструвались — без товарів'] as $key => $label)
+                            <a href="{{ $stageUrl($key) }}" class="badge {{ $stage === $key ? 'badge-primary' : 'badge-light' }} mr-1" style="font-size:12px;">{{ $label }}</a>
+                        @endforeach
+                        <div class="text-muted" style="font-size:11px;">«Зареєструвались» — на addnew є магазин з тим самим email, доменом сайту або email на домені кандидата, або вручну виставлено статус «Підключились».</div>
+                    </div>
+
                     <div class="mb-3">
-                        <a href="{{ route('admin.shops.leads') }}" class="btn btn-sm {{ !$status ? 'btn-primary' : 'btn-outline-secondary' }}">Усі ({{ $counts->sum() }})</a>
+                        <a href="{{ route('admin.shops.leads', array_filter(['stage' => $stage])) }}" class="btn btn-sm {{ !$status ? 'btn-primary' : 'btn-outline-secondary' }}">Усі ({{ $counts->sum() }})</a>
                         @foreach(\App\ShopLead::STATUSES as $key => $label)
-                            <a href="{{ route('admin.shops.leads', ['status' => $key]) }}"
+                            <a href="{{ route('admin.shops.leads', array_filter(['status' => $key, 'stage' => $stage])) }}"
                                class="btn btn-sm {{ $status === $key ? 'btn-primary' : 'btn-outline-secondary' }}">{{ $label }} ({{ $counts[$key] ?? 0 }})</a>
                         @endforeach
                     </div>
@@ -79,6 +112,7 @@
                                 <tr>
                                     <th>Магазин</th>
                                     <th>Email</th>
+                                    <th>На addnew</th>
                                     <th>Статус і примітка</th>
                                     <th></th>
                                 </tr>
@@ -86,7 +120,9 @@
                             <tbody>
                                 @forelse($leads as $lead)
                                     @php
-                                        $existingShop = $lead->existingShop();
+                                        $f = $funnel[$lead->id] ?? ['shop' => null, 'products' => 0, 'active' => 0, 'after_letter' => false, 'registered' => false];
+                                        $existingShop = $f['shop'];
+                                        $otherEmails = array_values(array_diff((array) $lead->email_candidates, [$lead->email]));
                                         $lastMessage = $lead->messages->first();
                                         $canSend = $lead->email && !in_array($lead->status, ['joined', 'declined']) && !$existingShop;
                                         if ($canSend) {
@@ -113,7 +149,6 @@
                                                 {{ $lead->email }}
                                                 <div class="text-muted" style="font-size:11px;">{{ $lead->email_source === 'site' ? 'знайдено на сайті' : 'вказано вручну' }}</div>
                                             @endif
-                                            @php($otherEmails = array_values(array_diff((array) $lead->email_candidates, [$lead->email])))
                                             @if($otherEmails)
                                                 <div style="font-size:11px;" title="Інші адреси з сайту — вставте в поле email праворуч, якщо потрібна інша">
                                                     ще на сайті: {{ implode(', ', $otherEmails) }}
@@ -126,6 +161,21 @@
                                                 @csrf
                                                 <button class="btn btn-link btn-sm p-0">шукати на сайті</button>
                                             </form>
+                                        </td>
+                                        <td style="font-size:13px; min-width:140px;">
+                                            @if($existingShop)
+                                                <a href="{{ route('admin.shops.products', $existingShop->id) }}">{{ $existingShop->username }}</a>
+                                                <div class="text-muted" style="font-size:11px;">з {{ optional($existingShop->created_at)->format('d.m.Y') }}@if($f['after_letter']) · <span class="text-success">після листа</span>@endif</div>
+                                                @if($f['products'] > 0)
+                                                    <div>товарів: <strong>{{ $f['active'] }}</strong> акт. / {{ $f['products'] }}</div>
+                                                @else
+                                                    <div class="text-warning">товарів ще немає</div>
+                                                @endif
+                                            @elseif($lead->status === 'joined')
+                                                <span class="text-muted">статус «Підключились», магазин не знайдено автоматично</span>
+                                            @else
+                                                <span class="text-muted">—</span>
+                                            @endif
                                         </td>
                                         <td style="min-width:280px;">
                                             <form action="{{ route('admin.shops.leads.update', $lead->id) }}" method="post">
@@ -168,7 +218,7 @@
                                         </td>
                                     </tr>
                                 @empty
-                                    <tr><td colspan="4">Поки порожньо — додайте перший магазин формою вище.</td></tr>
+                                    <tr><td colspan="5">Поки порожньо — додайте перший магазин формою вище.</td></tr>
                                 @endforelse
                             </tbody>
                         </table>

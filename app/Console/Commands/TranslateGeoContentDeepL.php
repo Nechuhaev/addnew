@@ -45,7 +45,9 @@ class TranslateGeoContentDeepL extends Command
 
     const RESERVE = 150000;      // символів квоти, які лишаємо для статей блогу
     const BATCH_TEXTS = 40;      // текстів в одному запиті (ліміт DeepL — 50)
-    const BATCH_CHARS = 30000;   // символів в одному запиті (ліміт тіла — 128 KiB)
+    // Ліміт тіла запиту DeepL — 128 KiB ПІСЛЯ urlencode: кирилична літера займає 6 байт
+    // (%D0%BE), тож рахуємо закодовані байти, а не символи. Довші тексти ріжемо по абзацах.
+    const MAX_BYTES = 100000;
 
     // Контекст для назв: що додаємо перед RU-назвою і що очікуємо побачити в UK-перекладі
     const CONTEXT = [
@@ -259,16 +261,16 @@ class TranslateGeoContentDeepL extends Command
     {
         $out = [];
         $cur = [];
-        $len = 0;
+        $bytes = 0;
         foreach ($plan as $p) {
-            $l = mb_strlen($p['text']);
-            if ($cur && (count($cur) >= self::BATCH_TEXTS || $len + $l > self::BATCH_CHARS)) {
+            $b = strlen(urlencode($p['text']));
+            if ($cur && (count($cur) >= self::BATCH_TEXTS || $bytes + $b > self::MAX_BYTES)) {
                 $out[] = $cur;
                 $cur = [];
-                $len = 0;
+                $bytes = 0;
             }
             $cur[] = $p;
-            $len += $l;
+            $bytes += $b;
         }
         if ($cur) {
             $out[] = $cur;
@@ -289,11 +291,87 @@ class TranslateGeoContentDeepL extends Command
 
             return preg_replace('/---[a-z_]+---/', '<keep>$0</keep>', $p['text']);
         }, $plans);
-        $out = $this->translateViaDeepL($send, 'RU', 'UK', ['ignore_tags' => 'keep']);
+
+        // Кожен текст → один або кілька шматків (довгі — по абзацах), шматки — в запити ≤ MAX_BYTES
+        $pieces = [];   // [індекс тексту, шматок]
+        foreach ($send as $i => $text) {
+            foreach ($this->splitForDeepL($text) as $piece) {
+                $pieces[] = [$i, $piece];
+            }
+        }
+        $translated = array_fill(0, count($send), '');
+        $req = [];
+        $bytes = 0;
+        $flush = function () use (&$req, &$bytes, &$translated) {
+            if (!$req) {
+                return;
+            }
+            $res = $this->translateViaDeepL(array_column($req, 1), 'RU', 'UK', ['ignore_tags' => 'keep']);
+            foreach ($req as $k => $pc) {
+                $translated[$pc[0]] .= $res[$k];
+            }
+            $req = [];
+            $bytes = 0;
+        };
+        foreach ($pieces as $pc) {
+            $b = strlen(urlencode($pc[1]));
+            if ($req && (count($req) >= self::BATCH_TEXTS || $bytes + $b > self::MAX_BYTES)) {
+                $flush();
+            }
+            $req[] = $pc;
+            $bytes += $b;
+        }
+        $flush();
 
         return array_map(function ($t) {
             return str_replace(['<keep>', '</keep>'], '', $t);
-        }, $out);
+        }, $translated);
+    }
+
+    /**
+     * Ріже довгий HTML на шматки ≤ MAX_BYTES (у закодованому вигляді) по межах
+     * блоків верхнього рівня (</p>, </h2>, </ul>…), щоб кожен шматок лишався
+     * цілісним HTML. Блок, що й сам задовгий, ріжеться по реченнях.
+     */
+    protected function splitForDeepL(string $text): array
+    {
+        if (strlen(urlencode($text)) <= self::MAX_BYTES) {
+            return [$text];
+        }
+        $parts = preg_split('~(</(?:p|h[1-6]|ul|ol|table|blockquote)>)~i', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
+        $blocks = [];
+        foreach ($parts as $k => $part) {
+            if ($k % 2 === 1) {
+                $blocks[count($blocks) - 1] .= $part;   // закривальний тег — до свого блоку
+            } elseif ($part !== '') {
+                $blocks[] = $part;
+            }
+        }
+        $chunks = [];
+        $cur = '';
+        foreach ($blocks as $block) {
+            if (strlen(urlencode($block)) > self::MAX_BYTES) {
+                // Окремий задовгий блок: по реченнях
+                foreach (preg_split('/(?<=[.!?])\s+/u', $block) as $sentence) {
+                    if ($cur !== '' && strlen(urlencode($cur . ' ' . $sentence)) > self::MAX_BYTES) {
+                        $chunks[] = $cur;
+                        $cur = '';
+                    }
+                    $cur .= ($cur === '' ? '' : ' ') . $sentence;
+                }
+                continue;
+            }
+            if ($cur !== '' && strlen(urlencode($cur . $block)) > self::MAX_BYTES) {
+                $chunks[] = $cur;
+                $cur = '';
+            }
+            $cur .= $block;
+        }
+        if ($cur !== '') {
+            $chunks[] = $cur;
+        }
+
+        return $chunks;
     }
 
     /**

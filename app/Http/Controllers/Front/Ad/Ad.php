@@ -132,7 +132,13 @@ class Ad extends Controller
             $priceCheckedAt = ($last && $last->found_price !== null && $last->checked_at) ? \Carbon\Carbon::parse($last->checked_at) : null;
         }
 
+        // Рейтинги продавця й «Інших продавців» — одним запитом (з кешем)
+        $shopRatings = \App\Services\ShopRating::forUsers(
+            array_merge([$ad->user_id], $same_products->pluck('user_id')->all())
+        );
+
         return view('front.ad.ad')->with([
+            'shop_ratings' => $shopRatings,
             'price_checked_at' => $priceCheckedAt,
             'price_chart' => \App\AdPriceHistory::chartFor($ad),
             'ad' => $ad,

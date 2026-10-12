@@ -14,6 +14,14 @@
 @endsection
 
 @section('content')
+    @php
+        $isRuPage = app()->getLocale() === 'ru';
+        $reviewWord = function ($n) use ($isRuPage) {
+            $m10 = $n % 10; $m100 = $n % 100;
+            $f = ($m10 === 1 && $m100 !== 11) ? 0 : (($m10 >= 2 && $m10 <= 4 && ($m100 < 12 || $m100 > 14)) ? 1 : 2);
+            return $isRuPage ? ['отзыв', 'отзыва', 'отзывов'][$f] : ['відгук', 'відгуки', 'відгуків'][$f];
+        };
+    @endphp
 
     <main class="category-page">
         <div class="container">
@@ -28,14 +36,14 @@
                 @if(auth()->id() != $entity->id)
                     <form action="{{ route('chat.start', $entity->id) }}" method="POST" style="display:inline-block; margin-bottom:10px;">
                         @csrf
-                        <button type="submit" class="btn btn-success">Написати продавцю</button>
+                        <button type="submit" class="btn btn-success">{{ $isRuPage ? 'Написать продавцу' : 'Написати продавцю' }}</button>
                     </form>
                 @endif
             @endauth
             
 
             <div class="author" style="display:flex; flex-wrap:wrap; gap: 20px; align-items:flex-start;">
-                <div class="author-photo"><img alt="Пользователь {{ $entity->username }}" src="{{ $entity->image ?? asset('assets/front/img/placeholder.png') }}" class="author-avatar" height="250" width="250"></div>
+                <div class="author-photo"><img alt="{{ $isRuPage ? 'Пользователь' : 'Користувач' }} {{ $entity->username }}" src="{{ $entity->image ?? asset('assets/front/img/placeholder.png') }}" class="author-avatar" height="250" width="250"></div>
                 <div class="author-details" style="flex: 1 1 250px; min-width: 250px;">
                     @if($is_shop)
                         <div class="author-info"><strong>{{ __('front.offers_count') }} </strong> {{ $entity->ads()->count() }}</div>
@@ -43,9 +51,9 @@
                             <strong>Рейтинг:</strong>
                             @if($avgRating)
                                 <span style="color:#f5a623;">{{ str_repeat('★', round($avgRating)) }}{{ str_repeat('☆', 5 - round($avgRating)) }}</span>
-                                {{ $avgRating }} / 5 ({{ $reviews->count() }} {{ $reviews->count() == 1 ? 'відгук' : 'відгуків' }})
+                                {{ $avgRating }} / 5 ({{ $reviews->count() }} {{ $reviewWord($reviews->count()) }})
                             @else
-                                <span style="color:#888;">немає відгуків</span>
+                                <span style="color:#888;">{{ $isRuPage ? 'нет отзывов' : 'немає відгуків' }}</span>
                             @endif
                         </div>
                         @if($entity->telephone)
@@ -55,7 +63,7 @@
                             <div class="author-info">
                                 <strong>{{ __('front.email_label') }}</strong> {{ $entity->email }}
                                 @if($emailVerified)
-                                    <span style="display:inline-block; background-color:#28a745; color:#fff; font-weight:700; font-size:12px; padding:3px 10px; border-radius:4px; margin-left:8px; vertical-align:middle; white-space:nowrap;">&#10003; Підтверджено</span>
+                                    <span style="display:inline-block; background-color:#28a745; color:#fff; font-weight:700; font-size:12px; padding:3px 10px; border-radius:4px; margin-left:8px; vertical-align:middle; white-space:nowrap;">&#10003; {{ $isRuPage ? 'Подтверждено' : 'Підтверджено' }}</span>
                                 @endif
                             </div>
                         @endif
@@ -85,7 +93,7 @@
                         $bannerUrl = strpos($entity->banner, 'http') === 0 ? $entity->banner : asset($entity->banner);
                     @endphp
                     <div class="author-banner" style="flex: 1 1 320px; max-width: 420px; height: 150px; overflow:hidden; border-radius:6px;">
-                        <img src="{{ $bannerUrl }}" alt="Баннер магазина {{ $entity->username }}" style="width:100%; height:100%; object-fit:cover; display:block;">
+                        <img src="{{ $bannerUrl }}" alt="{{ $isRuPage ? 'Баннер магазина' : 'Банер магазину' }} {{ $entity->username }}" style="width:100%; height:100%; object-fit:cover; display:block;">
                     </div>
                 @endif
             </div>
@@ -110,7 +118,7 @@
                         @include('front.adsense.top-listing')
                     </div>
 
-                    @php($ru = app()->getLocale() === 'ru')
+                    @php $ru = app()->getLocale() === 'ru'; @endphp
                     <form class="in-shop-search" method="get" action="{{ url()->current() }}" role="search">
                         <label for="in-shop-q" class="in-shop-search__label">{{ $is_shop ? ($ru ? 'Поиск в товарах магазина' : 'Пошук у товарах магазину') : ($ru ? 'Поиск в объявлениях автора' : 'Пошук в оголошеннях автора') }}</label>
                         <div class="in-shop-search__row">
@@ -131,47 +139,47 @@
                     @include('front.loop.ads', ['ads' => $ads])
 
                     @if($is_shop)
-                        <div style="margin: 25px 0; padding: 20px; background:#f9f9f9; border-radius:8px; box-sizing:border-box;">
-                            <h3 style="margin-top:0;">Рейтинг магазину</h3>
+                        <div id="reviews" style="margin: 25px 0; padding: 20px; background:#f9f9f9; border-radius:8px; box-sizing:border-box; scroll-margin-top: 80px;">
+                            <h3 style="margin-top:0;">{{ $isRuPage ? 'Рейтинг магазина' : 'Рейтинг магазину' }}</h3>
                             @if($avgRating)
                                 <div style="font-size:22px; color:#f5a623; font-weight:700; margin-bottom:5px;">
                                     {{ str_repeat('★', round($avgRating)) }}{{ str_repeat('☆', 5 - round($avgRating)) }}
-                                    <span style="font-size:16px; color:#555; font-weight:400;">{{ $avgRating }} / 5 ({{ $reviews->count() }} {{ $reviews->count() == 1 ? 'відгук' : 'відгуків' }})</span>
+                                    <span style="font-size:16px; color:#555; font-weight:400;">{{ $avgRating }} / 5 ({{ $reviews->count() }} {{ $reviewWord($reviews->count()) }})</span>
                                 </div>
                             @else
-                                <p style="color:#888; margin-bottom:0;">Поки що немає відгуків</p>
+                                <p style="color:#888; margin-bottom:0;">{{ $isRuPage ? 'Пока нет отзывов' : 'Поки що немає відгуків' }}</p>
                             @endif
 
                             @auth
                                 @if(auth()->id() != $entity->id)
                                     <div style="margin-top:20px; padding:15px; background:#fff; border:1px solid #e0e0e0; border-radius:6px; box-sizing:border-box;">
-                                        <strong>{{ $myReview ? 'Змінити ваш відгук' : 'Залишити відгук' }}</strong>
+                                        <strong>{{ $myReview ? ($isRuPage ? 'Изменить ваш отзыв' : 'Змінити ваш відгук') : ($isRuPage ? 'Оставить отзыв' : 'Залишити відгук') }}</strong>
                                         <form action="{{ route('shop.review.store', $entity->id) }}" method="POST" style="margin-top:12px;">
                                             @csrf
                                             <div style="margin-bottom:12px;">
                                                 <select name="rating" class="form-control" required style="width:100%; max-width:220px; box-sizing:border-box;">
-                                                    <option value="">Оцінка</option>
+                                                    <option value="">{{ $isRuPage ? 'Оценка' : 'Оцінка' }}</option>
                                                     @for($i = 5; $i >= 1; $i--)
-                                                        <option value="{{ $i }}" {{ optional($myReview)->rating == $i ? 'selected' : '' }}>{{ $i }} {{ $i == 1 ? 'зірка' : ($i < 5 ? 'зірки' : 'зірок') }}</option>
+                                                        <option value="{{ $i }}" {{ optional($myReview)->rating == $i ? 'selected' : '' }}>{{ $i }} {{ $isRuPage ? ($i == 1 ? 'звезда' : ($i < 5 ? 'звезды' : 'звёзд')) : ($i == 1 ? 'зірка' : ($i < 5 ? 'зірки' : 'зірок')) }}</option>
                                                     @endfor
                                                 </select>
                                             </div>
-                                            <textarea name="comment" rows="3" class="form-control" placeholder="Коментар (необов'язково)" style="width:100%; box-sizing:border-box; margin-bottom:12px;">{{ old('comment', optional($myReview)->comment) }}</textarea>
-                                            <button type="submit" class="btn btn-success" style="width:100%; max-width:220px;">{{ $myReview ? 'Оновити відгук' : 'Надіслати відгук' }}</button>
+                                            <textarea name="comment" rows="3" class="form-control" placeholder="{{ $isRuPage ? 'Комментарий (необязательно)' : "Коментар (необов'язково)" }}" style="width:100%; box-sizing:border-box; margin-bottom:12px;">{{ old('comment', optional($myReview)->comment) }}</textarea>
+                                            <button type="submit" class="btn btn-success" style="width:100%; max-width:220px;">{{ $myReview ? ($isRuPage ? 'Обновить отзыв' : 'Оновити відгук') : ($isRuPage ? 'Отправить отзыв' : 'Надіслати відгук') }}</button>
                                         </form>
                                     </div>
                                 @endif
                             @else
-                                <p style="margin-top:15px; margin-bottom:0;"><a href="{{ route('login') }}">Увійдіть</a>, щоб залишити відгук.</p>
+                                <p style="margin-top:15px; margin-bottom:0;">@if($isRuPage)<a href="{{ route('ru.login') }}">Войдите</a>, чтобы оставить отзыв.@else<a href="{{ route('login') }}">Увійдіть</a>, щоб залишити відгук.@endif</p>
                             @endauth
 
                             @if($reviews->isNotEmpty())
                                 <div style="margin-top:25px;">
-                                    <h4>Відгуки ({{ $reviews->count() }})</h4>
+                                    <h4>{{ $isRuPage ? 'Отзывы' : 'Відгуки' }} ({{ $reviews->count() }})</h4>
                                     @foreach($reviews as $review)
                                         <div style="border-bottom:1px solid #e5e5e5; padding:12px 0;">
                                             <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px;">
-                                                <strong>{{ optional($review->reviewer)->username ?? 'Користувач' }}</strong>
+                                                <strong>{{ optional($review->reviewer)->username ?? ($isRuPage ? 'Пользователь' : 'Користувач') }}</strong>
                                                 <span style="color:#f5a623;">{{ str_repeat('★', $review->rating) }}{{ str_repeat('☆', 5 - $review->rating) }}</span>
                                                 <span style="color:#999; font-size:13px;">{{ $review->created_at->format('d.m.Y') }}</span>
                                             </div>
