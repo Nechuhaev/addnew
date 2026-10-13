@@ -83,6 +83,7 @@ class City extends Controller
         $ads_groups = GeoPageBlocks::latestAdsGroups($localization->ads()->where('city_id', $entity->id));
         
         return view('front.ad.filtered-categories')->with([
+            'noindex' => \App\Services\SeoRules::isNoindexCountry(optional(optional($entity->region)->country)->slug),
             'entity' => $entity,
             'breadcrumbs' => 'city.page',
             'meta' => $meta,

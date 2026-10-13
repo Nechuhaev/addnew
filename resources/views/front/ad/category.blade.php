@@ -2,7 +2,7 @@
 @section('meta_title', $meta['meta_title'] ?? $entity->name)
 @section('meta_description', $meta['meta_description'] ?? $entity->content)
 @section('style')
-    @if(empty($ads) || $listingFilters->isActive())
+    @if(empty($ads) || $listingFilters->isActive() || !empty($noindex))
         <meta name="robots" content="noindex, follow" />
     @endif
 @endsection

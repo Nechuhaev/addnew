@@ -79,7 +79,13 @@ class GenerateFilterSitemap extends Command
 
 
 
-        AdCategory::where('parent_id', 0)->get()->each(function ($category) {
+        // Лише міста країн, не закритих noindex (config('seo.noindex_countries'))
+        $indexableCityIds = AdCity::join('ad_regions', 'ad_regions.id', '=', 'ad_cities.region_id')
+            ->join('ad_countries', 'ad_countries.id', '=', 'ad_regions.country_id')
+            ->whereNotIn('ad_countries.slug', \App\Services\SeoRules::noindexCountries())
+            ->pluck('ad_cities.id')->all();
+
+        AdCategory::where('parent_id', 0)->get()->each(function ($category) use ($indexableCityIds) {
             // Дочерние категории
             $category_children = $category->children;
             $sitemap = Sitemap::create();
@@ -87,6 +93,7 @@ class GenerateFilterSitemap extends Command
 
             // Активные города в категории
             $active_cities = AdCity::with('ads')
+                ->whereIn('id', $indexableCityIds)
                 ->whereHas('ads', function ($query) use ($category_children, $category) {
                     $query->whereIn('category_id', $category_children->pluck('id')->toArray())
                     ->orWhere('category_id', $category->id);
@@ -119,10 +126,11 @@ class GenerateFilterSitemap extends Command
             });
 
 
-            $category_children->each(function ($subcategory) use ($sitemap, $category) {
+            $category_children->each(function ($subcategory) use ($sitemap, $category, $indexableCityIds) {
 
                 // Города
                 $active_cities = AdCity::with('ads')
+                    ->whereIn('id', $indexableCityIds)
                     ->whereHas('ads', function ($query) use ($subcategory) {
                         $query->where('category_id', $subcategory->id);
                     })

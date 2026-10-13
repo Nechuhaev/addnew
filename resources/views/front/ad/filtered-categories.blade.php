@@ -4,6 +4,12 @@
 
 @section('meta_description', $meta['meta_description'] ?? '')
 
+@section('style')
+    @if(!empty($noindex))
+        <meta name="robots" content="noindex, follow" />
+    @endif
+@endsection
+
 @section('content')
 
     <main class="home-page">

@@ -109,7 +109,16 @@ class Category extends Controller
 
         $ads = Ad::getLoopArray($results);
 
+        // Гео-сторінки країн із config('seo.noindex_countries') — noindex, follow
+        $filterCountry = null;
+        if (!empty($filter_entity)) {
+            $filterCountry = $filter_entity instanceof AdCity
+                ? optional(optional($filter_entity->region)->country)->slug
+                : optional($filter_entity->country)->slug;
+        }
+
         return view('front.ad.category')->with([
+            'noindex' => \App\Services\SeoRules::isNoindexCountry($filterCountry),
             'entity' => $entity,
             'filters' => $this->getFilters(),
             'listingFilters' => $listingFilters,

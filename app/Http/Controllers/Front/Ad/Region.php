@@ -64,6 +64,7 @@ class Region extends Controller
         $shop_users = GeoPageBlocks::latestShops($localization);
 
         return view('front.ad.filtered-categories')->with([
+            'noindex' => \App\Services\SeoRules::isNoindexCountry(optional($entity->country)->slug),
             'entity' => $entity,
             'breadcrumbs' => 'city.page',
             'meta' => $meta,
