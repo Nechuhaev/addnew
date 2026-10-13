@@ -148,7 +148,29 @@ class ShopController extends Controller
 
         $feed = \App\ShopFeed::where('user_id', $shop->id)->first();
 
+        // Моніторинг цін конкурентів для товарів цього магазину (за останньою перевіркою кожного)
+        $competitorIds = \App\Ad::where('user_id', $shop->id)->where('is_product', 1)
+            ->whereNotNull('competitor_url')->where('competitor_url', '!=', '')->pluck('id')->all();
+        $competitor = ['total' => count($competitorIds), 'changed' => 0, 'unchanged' => 0, 'problems' => 0, 'never' => 0, 'last' => null];
+        if ($competitorIds) {
+            $last = \App\ProductPriceCheck::lastCompetitorChecks($competitorIds);
+            foreach ($competitorIds as $adId) {
+                $c = $last->get($adId);
+                if (!$c) {
+                    $competitor['never']++;
+                } elseif (in_array($c->status, CompetitorMonitorController::PROBLEM_STATUSES, true) || $c->isCurrencyMismatch()) {
+                    $competitor['problems']++;
+                } elseif ($c->price_applied) {
+                    $competitor['changed']++;
+                } else {
+                    $competitor['unchanged']++;
+                }
+            }
+            $competitor['last'] = $last->max('checked_at');
+        }
+
         return view('admin.shops.edit', [
+            'competitor' => $competitor,
             'shop' => $shop,
             'feed' => $feed,
             'feedRuns' => $feed ? \App\Import::where('feed_id', $feed->id)->latest()->limit(5)->get() : collect(),

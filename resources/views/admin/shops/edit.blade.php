@@ -44,6 +44,33 @@
                     @endif
 
                     <div class="border rounded p-3 mb-4">
+                        <h5 class="mb-2">Моніторинг цін конкурентів</h5>
+                        @if(!$competitor['total'])
+                            <p class="text-muted mb-0">
+                                Жоден товар магазину не має посилання на конкурента. Додати можна в
+                                <a href="{{ route('admin.shops.products', $shop->id) }}">товарах магазину</a> → «Редагувати» → поле «Конкурент (моніторинг ціни)».
+                            </p>
+                        @else
+                            <p class="mb-2">
+                                Товарів із посиланням на конкурента: <strong>{{ $competitor['total'] }}</strong>
+                                @if($competitor['last'])
+                                    · остання перевірка {{ \Carbon\Carbon::parse($competitor['last'])->format('d.m.Y H:i') }}
+                                @endif
+                            </p>
+                            <p class="mb-2">
+                                <span class="badge badge-success">Ціну змінено: {{ $competitor['changed'] }}</span>
+                                <span class="badge badge-secondary">Без змін: {{ $competitor['unchanged'] }}</span>
+                                <span class="badge badge-danger">Проблеми: {{ $competitor['problems'] }}</span>
+                                <span class="badge badge-light">Ще не перевірялись: {{ $competitor['never'] }}</span>
+                            </p>
+                            <a href="{{ route('admin.shops.competitorMonitor', ['shop' => $shop->id]) }}" class="btn btn-sm btn-outline-primary">Моніторинг цього магазину</a>
+                            @if($competitor['problems'])
+                                <a href="{{ route('admin.shops.competitorMonitor', ['shop' => $shop->id, 'filter' => 'problems']) }}" class="btn btn-sm btn-outline-danger">Проблемні ({{ $competitor['problems'] }})</a>
+                            @endif
+                        @endif
+                    </div>
+
+                    <div class="border rounded p-3 mb-4">
                         <h5 class="mb-2">Фід (автооновлення товарів)</h5>
                         @if(!$feed)
                             <p class="text-muted mb-0">Магазин не налаштував фід. Налаштування — у кабінеті магазину: Імпорт товарів (можна зайти через «Увійти як магазин»).</p>

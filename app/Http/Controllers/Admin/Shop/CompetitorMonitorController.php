@@ -18,6 +18,9 @@ class CompetitorMonitorController extends Controller
     public function index(Request $request)
     {
         $filter = $request->get('filter', 'all');
+        // ?shop={id} — лише товари одного магазину (посилання зі сторінки магазину)
+        $shop = $request->get('shop') ? \App\User::find((int) $request->get('shop')) : null;
+        $shopIds = $shop ? [$shop->id] : null;
 
         $lastChecks = ProductPriceCheck::selectRaw('ad_id, MAX(id) AS last_check_id')
             ->where('status', 'like', 'competitor\\_%')
@@ -28,6 +31,9 @@ class CompetitorMonitorController extends Controller
             ->where('is_product', 1)
             ->whereNotNull('competitor_url')
             ->where('competitor_url', '!=', '')
+            ->when($shopIds, function ($q) use ($shopIds) {
+                $q->whereIn('ads.user_id', $shopIds);
+            })
             ->leftJoinSub($lastChecks, 'lc', 'lc.ad_id', '=', 'ads.id')
             ->leftJoin('product_price_checks AS pc', 'pc.id', '=', 'lc.last_check_id');
 
@@ -46,13 +52,16 @@ class CompetitorMonitorController extends Controller
         $products = $query->orderByRaw('pc.checked_at IS NULL')
             ->orderByDesc('pc.checked_at')
             ->paginate(50)
-            ->appends(['filter' => $filter]);
+            ->appends(array_filter(['filter' => $filter, 'shop' => $shop ? $shop->id : null]));
 
         $checks = ProductPriceCheck::lastCompetitorChecks($products->pluck('id')->all());
 
         // Скільки перевірок конкурентів за останню добу — за результатом
         $day = ProductPriceCheck::where('status', 'like', 'competitor\\_%')
             ->where('checked_at', '>=', now()->subDay())
+            ->when($shopIds, function ($q) use ($shopIds) {
+                $q->whereIn('ad_id', Ad::whereIn('user_id', $shopIds)->select('id'));
+            })
             ->get(['status', 'price_applied', 'note']);
 
         $summary = [
@@ -73,7 +82,11 @@ class CompetitorMonitorController extends Controller
             'checks' => $checks,
             'summary' => $summary,
             'filter' => $filter,
-            'totalWithCompetitor' => Ad::where('is_product', 1)->whereNotNull('competitor_url')->where('competitor_url', '!=', '')->count(),
+            'shop' => $shop,
+            'totalWithCompetitor' => Ad::where('is_product', 1)->whereNotNull('competitor_url')->where('competitor_url', '!=', '')
+                ->when($shopIds, function ($q) use ($shopIds) {
+                    $q->whereIn('user_id', $shopIds);
+                })->count(),
         ]);
     }
 }
