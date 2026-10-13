@@ -32,10 +32,15 @@ class Tag extends Controller
             $meta['description'] = false;
         }
 
+        $sensitiveTag = \App\Services\SeoRules::isSensitiveTag($entity);
         $listingFilters = ListingFilters::fromRequest(request());
-        $results = $listingFilters->apply(Ad::getAds()
-                ->leftJoin('ad_tag', 'ad_tag.ad_id', '=', 'ads.id')
-                ->where('ad_tag.tag_id', $entity->id))
+        $tagQuery = Ad::getAds()
+            ->leftJoin('ad_tag', 'ad_tag.ad_id', '=', 'ads.id')
+            ->where('ad_tag.tag_id', $entity->id);
+        if (!$sensitiveTag) {
+            Ad::withoutSensitive($tagQuery);   // у звичайному тезі чутливих оголошень не показуємо
+        }
+        $results = $listingFilters->apply($tagQuery)
             ->paginate(15)
             ->appends($listingFilters->query());
 
@@ -73,7 +78,7 @@ class Tag extends Controller
         $noindex = (!$hasAnyContent && $total < 5);
 
         // Тег із noindex-стоп-словом («девушки по вызову», «кодграббер»…) — noindex + без AdSense
-        if (\App\Services\SeoRules::isSensitiveTag($entity)) {
+        if ($sensitiveTag) {
             $noindex = true;
             \App\Http\AdSense::disable();
         }

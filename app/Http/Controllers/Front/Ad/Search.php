@@ -17,7 +17,7 @@ class Search extends Controller
 {
     public function page(Request $request) {
 
-        $results = Ad::getAds();
+        $results = Ad::withoutSensitive(Ad::getAds());
         $search = new AdSearch((string) $request->get('s'));
         $search->apply($results);
 
@@ -60,7 +60,7 @@ class Search extends Controller
             $tag = AdTag::where('name', $term)->first();
             if (!$tag) {
                 $tag = AdTag::create(['name' => $term, 'slug' => null]);
-                $topIds = $search->orderByRelevance($search->apply(Ad::getAds()))->limit(100)->pluck('ads.id')->toArray();
+                $topIds = $search->orderByRelevance($search->apply(Ad::withoutSensitive(Ad::getAds())))->limit(100)->pluck('ads.id')->toArray();
                 if (count($topIds)) {
                     $tag->ads()->attach($topIds);
                 }

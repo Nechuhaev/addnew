@@ -95,8 +95,12 @@ class Ad extends Controller
         // Стоимость
         $prices = $this->pricesInCurrencies($ad['price'], $ad['currency_id'], AdCurrency::all());
 
+        $currentSensitive = \App\Services\SeoRules::isSensitiveAd($ad);
         $related_ads = \App\Ad::with(['user', 'currency'])
             ->where('category_id', $ad->category_id)
+            ->when(!$currentSensitive, function ($q) {
+                $q->where('is_sensitive', 0);
+            })
             ->where('id', '<', $ad->id)
             ->orderBy('created_at', 'desc')
             ->groupBy('user_id')
@@ -111,6 +115,7 @@ class Ad extends Controller
                 ->where('status', 1)
                 ->where('id', '!=', $ad->id)
                 ->where('user_id', '!=', $ad->user_id)
+                ->where('is_sensitive', 0)
                 ->where(function ($q) use ($ad, $hasBrandCode) {
                     if (!empty($ad->gtin)) {
                         $q->orWhere('gtin', $ad->gtin);
@@ -138,7 +143,7 @@ class Ad extends Controller
         );
 
         // Чутливий вміст (інтим, стероїди, кодграбери, продаж акаунтів): noindex + без AdSense
-        $sensitive = \App\Services\SeoRules::isSensitiveAd($ad);
+        $sensitive = $currentSensitive;
         if ($sensitive) {
             \App\Http\AdSense::disable();
         }

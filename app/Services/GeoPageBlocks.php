@@ -123,7 +123,7 @@ class GeoPageBlocks
     public static function latestAdsGroups($query): array
     {
         $groups = [];
-        foreach ($query->orderBy('created_at', 'desc')->groupBy('user_id')->take(20)->get()->chunk(5) as $key => $group) {
+        foreach ($query->where('is_sensitive', 0)->orderBy('created_at', 'desc')->groupBy('user_id')->take(20)->get()->chunk(5) as $key => $group) {
             foreach ($group as $ad) {
                 $groups[$key][] = [
                     'name' => $ad->name,

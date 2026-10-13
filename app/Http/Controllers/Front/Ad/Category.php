@@ -25,6 +25,9 @@ class Category extends Controller
 
     private $included_categories = [];
 
+    // Чутлива категорія (SeoRules): у ній власні оголошення показуються, в інших — ні
+    private $sensitive = false;
+
     public function page($category, $subcategory = null) {
         return $this->getList($category, $subcategory, null);
     }
@@ -42,6 +45,7 @@ class Category extends Controller
         $entity = AdCategory::where('slug', $categorySlug)->first();
 
         if (!$entity) abort(404);
+        $this->sensitive = \App\Services\SeoRules::isSensitiveCategory($entity);
 
         // фикс ошибки с ad-category/slug
         if (!$entity->parent_id && $subcategory) return  redirect(route('category.page', [
@@ -161,7 +165,10 @@ class Category extends Controller
             ->leftJoin('ad_regions', 'ad_regions.id', '=', 'ad_cities.region_id')
             ->leftJoin('ad_countries', 'ad_countries.id', '=', 'ad_regions.country_id')
             ->whereIn('ad_categories.id', $this->included_categories)
-            ->where('ads.price', '>', 0);
+            ->where('ads.price', '>', 0)
+            ->when(!$this->sensitive, function ($q) {
+                $q->where('ads.is_sensitive', 0);
+            });
 
         if ($this->filter) {
             $entity = AdCountry::whereSlug($this->filter)->first();
@@ -195,6 +202,9 @@ class Category extends Controller
             }
         }
         $results = Ad::getAds()->whereIn('ad_categories.id', $this->included_categories);
+        if (!$this->sensitive) {
+            Ad::withoutSensitive($results);
+        }
                 
         // Обмеження "тільки Україна" прибрано — категорії тепер показують товари з будь-якої країни.
         if ($this->filter) {
@@ -220,6 +230,7 @@ class Category extends Controller
             if ($entity) {
                 $results = Ad::getAds()
                     ->selectRaw('COUNT(ads.id) as ads_count')
+                    ->where('ads.is_sensitive', $this->sensitive ? 1 : 0)
                     ->whereIn('ad_categories.id', $this->included_categories)
                     ->where('region_id', $entity->id)
                     ->groupBy('city_id')
@@ -239,6 +250,7 @@ class Category extends Controller
 
             $results = Ad::getAds()
                 ->selectRaw('COUNT(ads.id) as ads_count')
+                ->where('ads.is_sensitive', $this->sensitive ? 1 : 0)
                 ->whereIn('ad_categories.id', $this->included_categories)
                 ->where('country_id', $entity->id)
                 ->groupBy('region_id')

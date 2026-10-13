@@ -47,6 +47,10 @@ class UserController extends Controller
         $term = trim((string) request()->get('s'));
         $search = new \App\Services\AdSearch($term);
         $results = Ad::getAds()->where('ads.user_id', $user->id);
+        // Серед оголошень автора є чутливі — сторінка без реклами AdSense (правила AdSense)
+        if (Ad::where('user_id', $user->id)->where('status', 1)->where('is_sensitive', 1)->exists()) {
+            \App\Http\AdSense::disable();
+        }
         $search->apply($results);
         $listingFilters = \App\Services\ListingFilters::fromRequest(request(), !$search->isEmpty());
         $listingFilters->apply($results);
