@@ -244,6 +244,14 @@ Route::get('/login/{provider}/callback', 'Front\User\Auth\SocialAuthController@c
 
 // Опис сайту для AI-пошуку (llmstxt.org) — поза uk/ru групами, одна адреса
 Route::get('/llms.txt', 'Front\Seo\LlmsTxtController@show')->name('llms.txt');
+
+// Файл ключа IndexNow (keyLocation у запитах seo:indexnow); без ключа в .env — 404
+Route::get('/indexnow-key.txt', function () {
+    $key = (string) config('seo.indexnow_key', '');
+    abort_unless(preg_match('/^[a-zA-Z0-9\-]{8,128}$/', $key), 404);
+
+    return response($key, 200)->header('Content-Type', 'text/plain; charset=UTF-8');
+})->name('indexnow.key');
  
 $frontRoutes = function () {
     // Главная

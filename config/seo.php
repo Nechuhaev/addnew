@@ -10,5 +10,8 @@ return [
     // закриваються noindex, не йдуть у sitemap і показуються без AdSense. Через кому: SEO_NOINDEX_CATEGORIES
     'noindex_categories' => array_values(array_filter(array_map('trim', explode(',', (string) env('SEO_NOINDEX_CATEGORIES', 'znakomstva-i-kontaktyi'))))),
 
+    // Ключ IndexNow (8–128 символів a-z, 0-9, -); порожньо — seo:indexnow нічого не надсилає
+    'indexnow_key' => (string) env('INDEXNOW_KEY', ''),
+
     'noindex_countries' => array_values(array_filter(array_map('trim', explode(',', (string) env('SEO_NOINDEX_COUNTRIES', 'rossiya'))))),
 ];

@@ -34,6 +34,12 @@ class Kernel extends ConsoleKernel
         })->mondays()->at('17:00');
 
         $schedule->command('sitemap:rebuild')->fridays()->at('17:00')->runInBackground();
+
+        // IndexNow: нові й зняті з публікації оголошення → Bing (і пошук ChatGPT/Copilot). Потрібен INDEXNOW_KEY у .env
+        $schedule->command('seo:indexnow')
+            ->everyFifteenMinutes()
+            ->withoutOverlapping()
+            ->appendOutputTo(storage_path('logs/indexnow.log'));
     // Раз на тиждень (понеділок, 05:00) — поповнює семантику й контент-план,
     // якщо запланованих тем лишилось мало (MIN_PLANNED_ARTICLES).
     $schedule->command('content:build-plan')
