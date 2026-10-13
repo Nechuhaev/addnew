@@ -81,6 +81,16 @@ class Category extends Controller
             }
         }
 
+        // ---in_place---: «в Україні» / «у місті Київ» / «у регіоні Київська обл» (граматично коректно в реченні)
+        $isRuLocale = app()->getLocale() === 'ru';
+        if (empty($filter_entity)) {
+            $inPlace = $isRuLocale ? 'в Украине' : 'в Україні';
+        } elseif ($filter_entity instanceof AdCity) {
+            $inPlace = ($isRuLocale ? 'в городе ' : 'у місті ') . $filter_entity->name;
+        } else {
+            $inPlace = ($isRuLocale ? 'в регионе ' : 'у регіоні ') . $filter_entity->name;
+        }
+
         if ($seo_field) {
             $parent = $entity->parent;
             $entity_values = [
@@ -88,6 +98,7 @@ class Category extends Controller
                 '---parent_name---'    => ($parent) ? $entity->parent->name : '',
                 '---filtered_name---'  => $filter_entity->name ?? (app()->getLocale() === 'ru' ? 'Украине' : 'Україні'),
                 '---full_filtered_name---'    => $filter_entity->address_format ?? (app()->getLocale() === 'ru' ? 'Украине' : 'Україні'),
+                '---in_place---' => $inPlace,
             ];
             // Власні поля категорії, якщо порожні — загальний шаблон (з урахуванням мови)
             $meta = \App\Services\LocalizedMeta::build($entity, $seo_field, $entity_values);
@@ -95,6 +106,7 @@ class Category extends Controller
             $entity_values = [
                 '---filtered_name---'  => $filter_entity->name ?? (app()->getLocale() === 'ru' ? 'Украине' : 'Україні'),
                 '---full_filtered_name---'    => $filter_entity->address_format ?? (app()->getLocale() === 'ru' ? 'Украине' : 'Україні'),
+                '---in_place---' => $inPlace,
             ];
 
             $meta = [
