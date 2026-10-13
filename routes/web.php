@@ -241,6 +241,9 @@ Route::post('/api/track/shop/{userId}', 'Api\TrackingController@trackShopView');
 // бути один фіксований, зареєстрований у Google/Facebook Developer Console.
 Route::get('/login/{provider}', 'Front\User\Auth\SocialAuthController@redirect')->name('social.login');
 Route::get('/login/{provider}/callback', 'Front\User\Auth\SocialAuthController@callback')->name('social.callback');
+
+// Опис сайту для AI-пошуку (llmstxt.org) — поза uk/ru групами, одна адреса
+Route::get('/llms.txt', 'Front\Seo\LlmsTxtController@show')->name('llms.txt');
  
 $frontRoutes = function () {
     // Главная
@@ -368,9 +371,6 @@ $frontRoutes = function () {
         Route::get('/api/chat/unread-count', 'Front\Chat\ChatController@unreadCount')->name('chat.unread');
     });
     Route::get('/stores', 'Front\User\StoreController@index')->name('stores');
-
-// Бренды
-    Route::get('/brands', 'Front\Brand\BrandController@index')->name('brands');
 
 // Категории объявлений
     Route::get('/r/{filter}/{category}', 'Front\Ad\Category@filter')->name('filtered_category.page');

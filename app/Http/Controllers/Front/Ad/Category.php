@@ -109,9 +109,30 @@ class Category extends Controller
 
         $ads = Ad::getLoopArray($results);
 
+        // Гео-сторінки країн із config('seo.noindex_countries') — noindex, follow
+        $filterCountry = null;
+        if (!empty($filter_entity)) {
+            $filterCountry = $filter_entity instanceof AdCity
+                ? optional(optional($filter_entity->region)->country)->slug
+                : optional($filter_entity->country)->slug;
+        }
+
+        $isRu = app()->getLocale() === 'ru';
+        $h1 = !empty($filter_entity)
+            ? $entity->name . ' — ' . $filter_entity->name
+            : $entity->name . ($isRu ? ' в Украине' : ' в Україні');
+
+        $filters = $this->getFilters();
+        $faq = (!request()->get('page') && !$listingFilters->isActive())
+            ? \App\Services\GeoFaq::forCategory($entity, $filter_entity ?? null, $results->total(), $filters, $this->included_categories)
+            : [];
+
         return view('front.ad.category')->with([
+            'faq' => $faq,
+            'h1' => $h1,
+            'noindex' => \App\Services\SeoRules::isNoindexCountry($filterCountry),
             'entity' => $entity,
-            'filters' => $this->getFilters(),
+            'filters' => $filters,
             'listingFilters' => $listingFilters,
             'total' => $results->total(),
             'filter' => $this->filter,

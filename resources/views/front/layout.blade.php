@@ -24,28 +24,20 @@
 
     <link rel="icon" type="image/png" href="/favicon.png" />
 
-    @if(request()->get('page'))
-        @if(starts_with(request()->path(), 'r/ukraina/'))
-            <link rel="canonical" href="{{ url(str_replace('r/ukraina/', '', request()->path())) }}" />
-        @else
-            <link rel="canonical" href="{{ url()->current() }}" />
-        @endif
-    @elseif(starts_with(request()->path(), 'r/ukraina/'))
-        <link rel="canonical" href="{{ url(str_replace('r/ukraina/', '', request()->path())) }}" />
-    @else
-        <link rel="canonical" href="{{ url()->current() }}" />
-    @endif
+    @php
+        // Canonical: адреса без query (r/ukraina/… → коротка); сторінки пагінації ?page=N (N > 1)
+        // посилаються самі на себе — так Google сканує й індексує глибші сторінки списків.
+        $canonPage = (int) request()->get('page');
+        $canonUrl = starts_with(request()->path(), 'r/ukraina/')
+            ? url(str_replace('r/ukraina/', '', request()->path()))
+            : url()->current();
+        if ($canonPage > 1) {
+            $canonUrl .= '?page=' . $canonPage;
+        }
+    @endphp
+    <link rel="canonical" href="{{ $canonUrl }}" />
 
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "url": "https://addnew.biz",
-      "email": "info@addnew.biz",
-      "name": "Addnew.biz",
-      "logo": "https://addnew.biz/assets/front/img/logo.png"
-    }
-    </script>
+    @include('front.partials.site-schema')
 
     @include('front.partials.og')
     @include('front.partials.hreflang')

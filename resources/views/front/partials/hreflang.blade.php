@@ -36,6 +36,14 @@
         }
     }
 @endphp
+@php
+    // Сторінки пагінації — з тим самим ?page=N, що й canonical
+    $hlPage = (int) request()->get('page');
+    if ($hlUkUrl && $hlRuUrl && $hlPage > 1) {
+        $hlUkUrl .= '?page=' . $hlPage;
+        $hlRuUrl .= '?page=' . $hlPage;
+    }
+@endphp
 @if($hlUkUrl && $hlRuUrl)
 <link rel="alternate" hreflang="uk" href="{{ $hlUkUrl }}">
 <link rel="alternate" hreflang="ru" href="{{ $hlRuUrl }}">

@@ -4,6 +4,12 @@
 
 @section('meta_description', $meta['meta_description'] ?? '')
 
+@section('style')
+    @if(!empty($noindex))
+        <meta name="robots" content="noindex, follow" />
+    @endif
+@endsection
+
 @section('content')
 
     <main class="home-page">
@@ -42,6 +48,8 @@
                 <div class="show-more__shadow"></div>
                 <span class="show-more__btn btn-show">{{ app()->getLocale() === 'ru' ? 'Показать' : 'Показати' }}</span>
             </div>
+
+            @include('front.partials.faq', ['faq' => $faq ?? []])
 
             <div class="banner">
                 @include('front.adsense.bottom')
