@@ -19,6 +19,7 @@
         </div>
 
         {{ Breadcrumbs::render($breadcrumbs, $entity) }}
+        <h1>{{ mb_strtoupper(mb_substr($entity->name, 0, 1)) . mb_substr($entity->name, 1) }}</h1>
 
         @if(isset($children))
         <div class="children">

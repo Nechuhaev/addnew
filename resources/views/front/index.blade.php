@@ -10,6 +10,7 @@
             <div class="banner">
                 @include('front.adsense.top')
             </div>
+            <h1 class="home-h1">{{ app()->getLocale() === 'ru' ? 'Бесплатная доска объявлений Украины' : 'Безкоштовна дошка оголошень України' }}</h1>
             @if($categories)
                 <div class="columns">
                 @foreach($categories as $category)

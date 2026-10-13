@@ -117,10 +117,22 @@ class Category extends Controller
                 : optional($filter_entity->country)->slug;
         }
 
+        $isRu = app()->getLocale() === 'ru';
+        $h1 = !empty($filter_entity)
+            ? $entity->name . ' — ' . $filter_entity->name
+            : $entity->name . ($isRu ? ' в Украине' : ' в Україні');
+
+        $filters = $this->getFilters();
+        $faq = (!request()->get('page') && !$listingFilters->isActive())
+            ? \App\Services\GeoFaq::forCategory($entity, $filter_entity ?? null, $results->total(), $filters, $this->included_categories)
+            : [];
+
         return view('front.ad.category')->with([
+            'faq' => $faq,
+            'h1' => $h1,
             'noindex' => \App\Services\SeoRules::isNoindexCountry($filterCountry),
             'entity' => $entity,
-            'filters' => $this->getFilters(),
+            'filters' => $filters,
             'listingFilters' => $listingFilters,
             'total' => $results->total(),
             'filter' => $this->filter,

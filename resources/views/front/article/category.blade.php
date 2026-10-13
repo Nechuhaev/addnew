@@ -34,6 +34,7 @@
             @else
                 {{ Breadcrumbs::render('blog') }}
             @endif
+            <h1>{{ $blogCat ? $blogCat->name : ($blogIsRu ? 'Блог доски объявлений AddNew.biz' : 'Блог дошки оголошень AddNew.biz') }}</h1>
             <div class="columns columns-nowrap">
                 <div class="column-content">
                     <div class="banner">

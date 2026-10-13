@@ -13,6 +13,7 @@
                 @include('front.adsense.top')
             </div>
             {{ Breadcrumbs::render($breadcrumbs, $entity, $filter) }}
+            <h1>{{ $h1 ?? $entity->name }}</h1>
             @if ($filters)
                 <div class="columns filter">
                     @foreach($filters as $_filter)
@@ -58,6 +59,7 @@
                         <span class="show-more__btn btn-show">{{ __('front.show_more') }}</span>
                     </div>
                     @endif
+                    @include('front.partials.faq', ['faq' => $faq ?? []])
                 </div>
                 <aside class="column-right">
                     @if($entity->parent_id)
