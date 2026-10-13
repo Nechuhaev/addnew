@@ -88,6 +88,7 @@
                     <li><a href="{{ route('chat.index') }}" rel="nofollow" class="header-link">{{ app()->getLocale() === 'ru' ? 'Сообщения' : 'Повідомлення' }} <span class="chat-unread-badge-mobile" style="display:none;"></span></a></li>
                     <li><a href="{{ route('ad.step.category') }}" class="header-link">{{ __('front.post_ad') }}</a></li>
                     <li><a href="{{ route('stores') }}" class="header-link">{{ __('front.all_shops_link') }}</a></li>
+                    <li><a href="{{ \App\Http\Controllers\Front\Ad\Prices::indexUrl() }}" class="header-link">{{ app()->getLocale() === 'ru' ? 'Цены' : 'Ціни' }}</a></li>
                     <li>
                         <form action="{{ route('logout') }}" method="POST">
                             @csrf
@@ -102,6 +103,7 @@
                     <li><a href="{{ route('register') }}" rel="nofollow" class="header-link">{{ __('front.register') }}</a></li>
                     <li><a href="{{ route('ad.step.category') }}" class="header-link">{{ __('front.post_ad') }}</a></li>
                     <li><a href="{{ route('stores') }}" class="header-link">{{ __('front.all_shops_link') }}</a></li>
+                    <li><a href="{{ \App\Http\Controllers\Front\Ad\Prices::indexUrl() }}" class="header-link">{{ app()->getLocale() === 'ru' ? 'Цены' : 'Ціни' }}</a></li>
                 </ul>
             @endif
             @php
@@ -180,6 +182,7 @@
                         <a href="{{ route('register') }}" rel="nofollow" class="header-link link-register">{{ __('front.register') }}</a>
                         <a href="{{ route('login') }}" rel="nofollow" class="header-link link-login">{{ __('front.login') }}</a>
                     @endif
+                        <a href="{{ \App\Http\Controllers\Front\Ad\Prices::indexUrl() }}" class="header-link link-register header-prices">{{ app()->getLocale() === 'ru' ? 'Цены' : 'Ціни' }}</a>
                         <a href="{{ route('ad.step.category') }}" class="btn btn-advert"><i class="icon icon-plus"></i> {{ __('front.post_ad') }}</a>
 
                 </div>
