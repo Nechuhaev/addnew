@@ -11,8 +11,21 @@ class AdSense {
     // Завантажувач adsbygoogle.js виводимо лише перед першим блоком на сторінці
     protected static $loaderPrinted = false;
 
+    // Сторінки з чутливим вмістом (App\Services\SeoRules) — без реклами: правила AdSense
+    protected static $disabled = false;
+
+    public static function disable(): void
+    {
+        self::$disabled = true;
+    }
+
+    public static function isDisabled(): bool
+    {
+        return self::$disabled;
+    }
+
     public static function block($position) {
-        if (env('APP_ENV') == 'production') {
+        if (env('APP_ENV') == 'production' && !self::$disabled) {
             if (!self::$loaderPrinted) {
                 self::$loaderPrinted = true;
                 echo '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' . self::CLIENT . '" crossorigin="anonymous"></script>';

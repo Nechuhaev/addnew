@@ -127,10 +127,17 @@ class Category extends Controller
             ? \App\Services\GeoFaq::forCategory($entity, $filter_entity ?? null, $results->total(), $filters, $this->included_categories)
             : [];
 
+        // Чутлива категорія (напр. «Знайомства і контакти») — noindex + без AdSense
+        $sensitive = \App\Services\SeoRules::isSensitiveCategory($entity);
+        if ($sensitive) {
+            \App\Http\AdSense::disable();
+            $faq = [];
+        }
+
         return view('front.ad.category')->with([
             'faq' => $faq,
             'h1' => $h1,
-            'noindex' => \App\Services\SeoRules::isNoindexCountry($filterCountry),
+            'noindex' => $sensitive || \App\Services\SeoRules::isNoindexCountry($filterCountry),
             'entity' => $entity,
             'filters' => $filters,
             'listingFilters' => $listingFilters,

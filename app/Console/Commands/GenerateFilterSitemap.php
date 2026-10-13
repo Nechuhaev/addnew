@@ -85,9 +85,13 @@ class GenerateFilterSitemap extends Command
             ->whereNotIn('ad_countries.slug', \App\Services\SeoRules::noindexCountries())
             ->pluck('ad_cities.id')->all();
 
-        AdCategory::where('parent_id', 0)->get()->each(function ($category) use ($indexableCityIds) {
-            // Дочерние категории
-            $category_children = $category->children;
+        $sensitiveCats = \App\Services\SeoRules::sensitiveCategoryIds();
+
+        AdCategory::where('parent_id', 0)->whereNotIn('id', $sensitiveCats ?: [0])->get()->each(function ($category) use ($indexableCityIds, $sensitiveCats) {
+            // Дочерние категории (без чутливих — вони під noindex)
+            $category_children = $category->children->reject(function ($c) use ($sensitiveCats) {
+                return in_array((int) $c->id, $sensitiveCats, true);
+            });
             $sitemap = Sitemap::create();
 
 

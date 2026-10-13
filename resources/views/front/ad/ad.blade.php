@@ -69,7 +69,7 @@
 @endif
 @endpush
 
-@if($ad->is_product && $ad->stock === 'out_of_stock')
+@if(!empty($sensitive) || ($ad->is_product && $ad->stock === 'out_of_stock'))
 @push('og_extra')
 <meta name="robots" content="noindex, follow" />
 @endpush

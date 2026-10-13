@@ -137,7 +137,14 @@ class Ad extends Controller
             array_merge([$ad->user_id], $same_products->pluck('user_id')->all())
         );
 
+        // Чутливий вміст (інтим, стероїди, кодграбери, продаж акаунтів): noindex + без AdSense
+        $sensitive = \App\Services\SeoRules::isSensitiveAd($ad);
+        if ($sensitive) {
+            \App\Http\AdSense::disable();
+        }
+
         return view('front.ad.ad')->with([
+            'sensitive' => $sensitive,
             'shop_ratings' => $shopRatings,
             'price_checked_at' => $priceCheckedAt,
             'price_chart' => \App\AdPriceHistory::chartFor($ad),

@@ -72,6 +72,12 @@ class Tag extends Controller
         // але посилання з них лишаються доступними (noindex, follow).
         $noindex = (!$hasAnyContent && $total < 5);
 
+        // Тег із noindex-стоп-словом («девушки по вызову», «кодграббер»…) — noindex + без AdSense
+        if (\App\Services\SeoRules::isSensitiveTag($entity)) {
+            $noindex = true;
+            \App\Http\AdSense::disable();
+        }
+
         return view('front.ad.country')->with([
             'entity' => $entity,
             'ads' => $ads,

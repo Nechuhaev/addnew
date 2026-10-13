@@ -112,7 +112,9 @@ class RebuildSitemap extends Command
         $this->writePairs('blog.xml', $posts, $index);
 
         // 4. Рубрики оголошень, регіони, міста
-        $adCats = AdCategory::all()->map(function ($c) {
+        // Чутливі категорії (SEO_NOINDEX_CATEGORIES) — під noindex, у sitemap не потрібні
+        $sensitiveCats = \App\Services\SeoRules::sensitiveCategoryIds();
+        $adCats = AdCategory::whereNotIn('id', $sensitiveCats ?: [0])->get()->map(function ($c) {
             return $c->url;
         })->all();
         $this->writePairs('ad_categories.xml', $adCats, $index);
@@ -164,6 +166,9 @@ class RebuildSitemap extends Command
             ->chunk(self::CHUNK, function ($tags, $page) use ($index, &$kept) {
                 $urls = [];
                 foreach ($tags as $t) {
+                    if (\App\Services\SeoRules::isSensitiveTag($t)) {
+                        continue;   // noindex-стоп-слово в назві
+                    }
                     $urls[] = route('tag', ['slug' => $t->slug]);
                 }
                 $kept += count($urls);
@@ -174,8 +179,9 @@ class RebuildSitemap extends Command
         // 6. Оголошення (без альтернатив: текст користувацький, один на обидві мови)
         $adsCount = 0;
         Ad::query()
-            ->select('id', 'slug')
+            ->select('id', 'slug', 'name', 'content', 'category_id')
             ->where('status', 1)
+            ->whereNotIn('category_id', $sensitiveCats ?: [0])
             ->where(function ($q) {
                 // розпродані імпортовані товари — під noindex, у sitemap не потрібні
                 $q->whereNull('is_product')->orWhere('is_product', 0)->orWhereNull('stock')->orWhere('stock', '!=', 'out_of_stock');
@@ -185,7 +191,7 @@ class RebuildSitemap extends Command
                 $sm = Sitemap::create();
                 $n = 0;
                 foreach ($ads as $ad) {
-                    if ($ad->slug) {
+                    if ($ad->slug && !\App\Services\SeoRules::isSensitiveAd($ad)) {
                         $sm->add(route('ad.page', ['slug' => $ad->slug]));
                         $n++;
                     }
