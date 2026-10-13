@@ -212,7 +212,7 @@ class ShopLeadController extends Controller
     {
         $result = $finder->find($lead->site_url);
         $lead->email_lookup_status = $result['status'];
-        $lead->email_candidates = $result['emails'] ?: null;
+        $lead->email_candidates = array_slice($result['emails'] ?? [], 0, 5) ?: null;
         if ($result['email']) {
             $lead->email = $result['email'];
             $lead->email_source = 'site';

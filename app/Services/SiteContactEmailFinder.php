@@ -21,6 +21,9 @@ class SiteContactEmailFinder
         '/kontakty', '/kontakti', '/kontakty.html', '/about', '/about-us', '/o-nas', '/pro-nas',
         '/ua/contacts', '/ua/kontakty', '/uk/contacts', '/ru/contacts', '/ru/kontakty',
         '/page/contacts', '/info/contacts',
+        '/pages/contacts', '/pages/contact', '/pages/about-us', '/kontakty/', '/contacts/',
+        '/ua/kontakty/', '/ua/contacts/', '/ru/kontakty/', '/ua/pro-nas', '/ua/about',
+        '/o-kompanii', '/pro-kompaniyu', '/about_us', '/index.php?route=information/contact',
     ];
 
     /** Скільки посилань «Контакти»/«Про нас» із головної перевіряти до типових шляхів */
@@ -38,8 +41,9 @@ class SiteContactEmailFinder
      * @return array{status: string, email: string|null, page: string|null}
      *         status: ok | not_found | unreachable; page — шлях, де знайдено ('/' — головна)
      */
-    public function find(string $siteUrl): array
+    public function find(string $siteUrl, ?string $expected = null): array
     {
+        $expected = $expected !== null ? strtolower(trim($expected)) : null;
         $homeBody = $this->fetchBody($siteUrl);
         if ($homeBody === null) {
             return ['status' => 'unreachable', 'email' => null, 'emails' => [], 'page' => null];
@@ -59,6 +63,12 @@ class SiteContactEmailFinder
             }
         };
 
+        // Наш email знайдено — далі не шукаємо (звірка пройдена)
+        $hasExpected = function () use (&$found, $expected) {
+            return $expected !== null && $expected !== '' && isset($found[$expected]);
+        };
+        $visited = [];
+
         $collect($homeBody, '/');
         $links = $this->discoverContactLinks($homeBody, $origin);
 
@@ -71,23 +81,41 @@ class SiteContactEmailFinder
         // Сторінки «Контакти»/«Про нас», на які посилається сам сайт, — завжди:
         // на головній часто стоїть шаблонний або загальний email, а справжній — у контактах
         foreach (array_unique($links) as $url) {
+            if ($hasExpected()) {
+                break;
+            }
+            $visited[rtrim(strtolower($url), '/')] = true;
             if (($body = $this->fetchBody($url)) !== null) {
                 $collect($body, parse_url($url, PHP_URL_PATH) ?: '/');
             }
             usleep(200000);
         }
 
-        // Типові шляхи — лише якщо нічого не знайшли
-        if (!$found) {
+        // Типові шляхи «Контакти»/«Про нас» — якщо нічого не знайшли, або (при звірці)
+        // наш email ще не трапився: він часто є лише в контактах, а в футері — інший
+        if (!$found || ($expected && !$hasExpected())) {
+            $notFoundStreak = 0;
             foreach (self::CONTACT_PATHS as $path) {
-                if (($body = $this->fetchBody($origin . $path)) !== null) {
+                $url = $origin . $path;
+                if (isset($visited[rtrim(strtolower($url), '/')])) {
+                    continue;
+                }
+                $visited[rtrim(strtolower($url), '/')] = true;
+                if (($body = $this->fetchBody($url, true)) !== null) {
                     $collect($body, $path);
-                    if ($found) {
+                    if ($expected ? $hasExpected() : (bool) $found) {
                         break;
                     }
+                    $notFoundStreak = 0;
+                } elseif (++$notFoundStreak >= 12) {
+                    break; // сайт віддає 404 на все — не мучимо його
                 }
                 usleep(200000);
             }
+        }
+
+        if ($hasExpected()) {
+            return ['status' => 'ok', 'email' => $expected, 'emails' => array_keys($found), 'page' => $found[$expected]];
         }
 
         if (!$found) {
@@ -105,7 +133,7 @@ class SiteContactEmailFinder
             return array_search($a, $emails) <=> array_search($b, $emails);
         });
 
-        return ['status' => 'ok', 'email' => $emails[0], 'emails' => array_slice($emails, 0, 5), 'page' => $found[$emails[0]]];
+        return ['status' => 'ok', 'email' => $emails[0], 'emails' => $emails, 'page' => $found[$emails[0]]];
     }
 
     /**
@@ -160,7 +188,7 @@ class SiteContactEmailFinder
      * timeout, відмова з'єднання, SSL) — саме це і є ознакою "домен
      * недоступний" для checkOne().
      */
-    public function fetchBody(string $url): ?string
+    public function fetchBody(string $url, bool $onlySuccess = false): ?string
     {
         try {
             $response = $this->http->get($url, [
@@ -171,6 +199,11 @@ class SiteContactEmailFinder
                 'verify' => false,
                 'http_errors' => false,
             ]);
+
+            // Для вгаданих шляхів 404 — не сторінка контактів (тіло — та сама сторінка помилки)
+            if ($onlySuccess && $response->getStatusCode() >= 400) {
+                return null;
+            }
 
             return (string) $response->getBody();
         } catch (\Throwable $e) {

@@ -96,6 +96,15 @@
                                             </span>
                                         @elseif($shop->email_matched === true)
                                             <span class="text-success">{{ $shop->email }}</span>
+                                        @elseif($shop->email_check_status === 'mismatch')
+                                            <span class="text-danger">{{ $shop->email }}</span>
+                                            <span class="badge badge-danger" title="На сайті магазину вказано інший email (у нас не змінено)">на сайті: {{ $shop->email_found }}</span>
+                                        @elseif($shop->email_check_status === 'not_found')
+                                            {{ $shop->email }}
+                                            <span class="badge badge-light" title="Сайт відповідає, але email не знайдено ні на головній (футер), ні в «Контактах» / «Про нас»">на сайті не знайдено</span>
+                                        @elseif($shop->email_check_status === 'duplicate_ignored')
+                                            {{ $shop->email }}
+                                            <span class="badge badge-light" title="Email із сайту ({{ $shop->email_found }}) уже належить іншому магазину — не змінено">спільний email</span>
                                         @elseif($shop->email_matched === false)
                                             <span class="text-warning">{{ $shop->email }}</span>
                                             <span class="text-warning" role="img" aria-label="Email автоматично оновлено" title="Email автоматично оновлено після звірки з сайтом магазину" style="cursor:help;">&#9888;</span>
