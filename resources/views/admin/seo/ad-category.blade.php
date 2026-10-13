@@ -39,6 +39,7 @@
                     <div class="card-body">
                         <p><span class="text-danger" style="background: #eee">---category_name---</span> <span class="float-right">Категория</span></p>
                         <p><span class="text-danger" style="background: #eee">---parent_name---</span> <span class="float-right">Родительская</span></p>
+                        <p><span class="text-danger" style="background: #eee">---in_place---</span> <span class="float-right">«в Україні» / «у місті …»</span></p>
                         <button class="btn btn-success btn-block">Сохранить</button>
                     </div>
                 </div>
