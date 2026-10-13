@@ -21,7 +21,10 @@ class ULoginController extends Controller
 
         $network = $user['network'];
 
-        // Find user in DB.
+        // Find user in DB. Без email не шукаємо: where('email', null) знайшов би магазин без email
+        if (empty($user['email'])) {
+            return redirect('/');
+        }
         $userData = User::where('email', $user['email'])->first();
 
         // Check exist user.
