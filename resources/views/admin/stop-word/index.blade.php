@@ -19,19 +19,26 @@
             <div class="card">
                 <div class="card-body">
                     <h2>Постійний список стоп-слів</h2>
-                    <p>Ці слова блокують публікацію НОВИХ оголошень, що їх містять.</p>
-                    <p class="text-danger"><b>Увага:</b> додавання слова одразу сканує й ВИДАЛЯЄ вже існуючі
-                        оголошення, що містять це слово (без окремого підтвердження).</p>
+                    <p><b>Блокувати публікацію</b> — нові оголошення з таким словом не публікуються.
+                        <span class="text-danger">Додавання такого слова одразу ВИДАЛЯЄ вже існуючі оголошення, що його містять.</span></p>
+                    <p><b>Прибрати з індексації</b> — оголошення лишаються на сайті, але їхні сторінки й теги з таким словом
+                        отримують <code>noindex, follow</code>, не потрапляють у sitemap і показуються без реклами AdSense.
+                        Нічого не видаляється.</p>
 
                     @if(session('success'))
                         <div class="alert alert-success">{{ session('success') }}</div>
                     @endif
 
                     <form action="{{ route('admin.stop-word.store') }}" method="post" class="form-inline mb-3"
-                          onsubmit="return confirm('Увага! Це негайно видалить усі існуючі оголошення, що містять ці слова. Продовжити?');">
+                          onsubmit="return this.stop_action.value !== 'block' || confirm('Увага! Це негайно видалить усі існуючі оголошення, що містять ці слова. Продовжити?');">
                         @csrf
-                        <input type="text" name="new_words" class="form-control mr-2" style="min-width: 300px;"
+                        <input type="text" name="new_words" class="form-control mr-2 mb-2" style="min-width: 300px;"
                                placeholder="слово1, слово2, слово3" required>
+                        <select name="stop_action" class="form-control mr-2 mb-2">
+                            @foreach(\App\StopWord::ACTIONS as $key => $label)
+                                <option value="{{ $key }}" {{ $key === 'noindex' ? 'selected' : '' }}>{{ $label }}</option>
+                            @endforeach
+                        </select>
                         <button class="btn btn-success">Додати</button>
                     </form>
 
@@ -40,6 +47,7 @@
                             <thead>
                                 <tr>
                                     <th>Слово</th>
+                                    <th>Тип</th>
                                     <th>Додано</th>
                                     <th></th>
                                 </tr>
@@ -48,7 +56,14 @@
                                 @forelse($stopWords as $sw)
                                     <tr>
                                         <td>{{ $sw->word }}</td>
-                                        <td>{{ $sw->created_at->format('d.m.Y H:i') }}</td>
+                                        <td>
+                                            @if($sw->action === 'noindex')
+                                                <span class="badge badge-warning">Прибрати з індексації</span>
+                                            @else
+                                                <span class="badge badge-danger">Блокувати публікацію</span>
+                                            @endif
+                                        </td>
+                                        <td>{{ optional($sw->created_at)->format('d.m.Y H:i') }}</td>
                                         <td>
                                             <form action="{{ route('admin.stop-word.destroy', $sw->id) }}" method="post"
                                                   onsubmit="return confirm('Видалити слово «{{ $sw->word }}» зі списку?');">
@@ -60,7 +75,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="3">Список порожній</td>
+                                        <td colspan="4">Список порожній</td>
                                     </tr>
                                 @endforelse
                             </tbody>

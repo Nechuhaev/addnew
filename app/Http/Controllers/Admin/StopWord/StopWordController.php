@@ -13,7 +13,7 @@ class StopWordController extends Controller
      */
     public function index(Request $request) {
         $data = [];
-        $data['stopWords'] = StopWord::orderBy('word')->get();
+        $data['stopWords'] = StopWord::orderBy('action')->orderBy('word')->get();
         $data['action'] = route('admin.stop-word.check');
         $data['words'] = $request->input('words');
         return view('admin.stop-word.index')->with($data);
@@ -36,6 +36,8 @@ class StopWordController extends Controller
                 return Str::length($word) >= 3;
             });
 
+        $action = $request->input('stop_action') === StopWord::ACTION_BLOCK ? StopWord::ACTION_BLOCK : StopWord::ACTION_NOINDEX;
+
         $existingLower = StopWord::pluck('word')->map(function ($w) {
             return mb_strtolower(trim($w));
         })->all();
@@ -43,14 +45,16 @@ class StopWordController extends Controller
         $newlyAdded = [];
         foreach ($words as $word) {
             if (!in_array(mb_strtolower($word), $existingLower, true)) {
-                StopWord::create(['word' => $word]);
+                StopWord::create(['word' => $word, 'action' => $action]);
                 $existingLower[] = mb_strtolower($word);
                 $newlyAdded[] = $word;
             }
         }
 
         $deletedCount = 0;
-        if (!empty($newlyAdded)) {
+        // Видаляємо наявні оголошення лише для слів, що блокують публікацію;
+        // «прибрати з індексації» нічого не видаляє.
+        if ($action === StopWord::ACTION_BLOCK && !empty($newlyAdded)) {
             $query = Ad::query();
             foreach ($newlyAdded as $word) {
                 $query->orWhere('content', 'LIKE', '%' . $word . '%')
@@ -63,7 +67,9 @@ class StopWordController extends Controller
             }
         }
 
-        $message = 'Стоп-слова додано.';
+        $message = $action === StopWord::ACTION_NOINDEX
+            ? 'Слова додано: сторінки з ними прибрано з індексації (оголошення не видалялись).'
+            : 'Стоп-слова додано.';
         if ($deletedCount > 0) {
             $message .= " Автоматично видалено оголошень: {$deletedCount} (містили ці слова).";
         }
