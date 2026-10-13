@@ -26,6 +26,20 @@ class AuditTranslations extends Command
     // Літери, яких немає в українській абетці, та типові російські слова
     const RU_PATTERN = '/[ыэъёЫЭЪЁ]|(?<![\\p{L}])(и|или|что|это|объявлени\\p{L}*|поиск\\p{L}*|город\\p{L}*|страна|магазинов|предложени\\p{L}*|перейти к|показать)(?![\\p{L}])/iu';
 
+    /**
+     * Текст у RU-колонці справді треба перекласти: є кирилиця і він ще не українською
+     * (ті самі правила, що в geo:translate-deepl).
+     */
+    public static function needsUkrainian(string $v): bool
+    {
+        $plain = strip_tags($v);
+        if (!preg_match('/[\x{0400}-\x{04FF}]/u', $plain)) {
+            return false;
+        }
+
+        return !(preg_match('/[іїєґІЇЄҐ]/u', $plain) && !preg_match('/[ыэъёЫЭЪЁ]/u', $plain));
+    }
+
     public static function looksRussian(?string $v): bool
     {
         return $v !== null && $v !== '' && preg_match(self::RU_PATTERN, strip_tags($v)) === 1;
@@ -110,25 +124,37 @@ class AuditTranslations extends Command
                     continue;
                 }
 
+                // Рахуємо в PHP за тими ж правилами, що й geo:translate-deepl: тексти без кирилиці
+                // (Auckland, Cheju) і тексти, що в RU-колонці вже українською, перекладу не потребують
                 if ($byCountry) {
-                    // Окремо по країнах: українські — пріоритет, закордонні — другорядні
                     if ($table === 'ad_cities') {
                         $q->join('ad_regions as r', 'r.id', '=', 't.region_id')->join('ad_countries as c', 'c.id', '=', 'r.country_id');
                     } else {
                         $q->join('ad_countries as c', 'c.id', '=', 't.country_id');
                     }
-                    foreach ((clone $q)->selectRaw('c.id, COALESCE(NULLIF(c.name_uk, ""), c.name) as country, COUNT(*) as cnt')
-                                 ->groupBy('c.id', 'c.name', 'c.name_uk')->orderByDesc('cnt')->get() as $g) {
-                        $examples = (clone $q)->where('c.id', $g->id)->limit(5)->pluck('t.name')->implode(', ');
-                        $rows[] = [$col . '_uk', $g->country, $g->cnt, mb_strimwidth($examples, 0, 70, '…')];
-                    }
-                    continue;
+                    $q->select('t.id', 't.name', "t.{$col} as text", 'c.id as country_id', DB::raw('COALESCE(NULLIF(c.name_uk, ""), c.name) as country'));
+                } else {
+                    $q->select('t.id', Schema::hasColumn($table, 'name') ? 't.name' : 't.id as name', "t.{$col} as text");
                 }
-
-                $count = (clone $q)->count();
-                if ($count) {
-                    $examples = $q->limit(5)->pluck(Schema::hasColumn($table, 'name') ? 't.name' : 't.id')->implode(', ');
-                    $rows[] = [$col . '_uk', $count, mb_strimwidth($examples, 0, 80, '…')];
+                $groups = [];
+                $q->orderBy('t.id')->chunk(2000, function ($chunk) use (&$groups, $byCountry) {
+                    foreach ($chunk as $r) {
+                        if (!self::needsUkrainian((string) $r->text)) {
+                            continue;
+                        }
+                        $g = $byCountry ? $r->country : '';
+                        $groups[$g]['n'] = ($groups[$g]['n'] ?? 0) + 1;
+                        if (count($groups[$g]['ex'] ?? []) < 5) {
+                            $groups[$g]['ex'][] = $r->name;
+                        }
+                    }
+                });
+                uasort($groups, function ($a, $b) {
+                    return $b['n'] <=> $a['n'];
+                });
+                foreach ($groups as $country => $g) {
+                    $examples = mb_strimwidth(implode(', ', $g['ex']), 0, 70, '…');
+                    $rows[] = $byCountry ? [$col . '_uk', $country, $g['n'], $examples] : [$col . '_uk', $g['n'], $examples];
                 }
             }
             if ($byCountry) {
