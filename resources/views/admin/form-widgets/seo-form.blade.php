@@ -1,144 +1,55 @@
-<?php
+{{--
+    Форма SEO-шаблону (адмінка → «SEO тексти» → тип сторінки).
+    Змінні з контролерів Admin\Seo\*: $meta_title, $meta_description, $description
+    та *_uk. Українська — основна мова сайту, російська — для /ru/.
+    Плейсхолдери на кшталт ---city_name--- підставляються на сторінці (список праворуч).
+--}}
+@if ($errors->any())
+    <div class="alert alert-danger">
+        <ul class="mb-0 pl-3">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
 
-namespace App\Console\Commands;
+@foreach ([['uk', 'Українська версія (основна)', '_uk'], ['ru', 'Російська версія (/ru/)', '']] as [$seoLang, $seoLabel, $seoSuffix])
+    @php
+        $seoTitle = old('meta_title' . $seoSuffix, ${'meta_title' . $seoSuffix} ?? '');
+        $seoDesc = old('meta_description' . $seoSuffix, ${'meta_description' . $seoSuffix} ?? '');
+        $seoText = old('description' . $seoSuffix, ${'description' . $seoSuffix} ?? '');
+    @endphp
+    <h4 class="card-title {{ $loop->first ? '' : 'mt-4' }}">{{ $seoLabel }}</h4>
 
-use App\SeoField;
-use GuzzleHttp\Client;
-use Illuminate\Console\Command;
+    <div class="form-group">
+        <label for="meta_title{{ $seoSuffix }}">Meta title
+            <small class="text-muted">— до 60 символів видно в Google; зараз <span class="seo-count" data-for="meta_title{{ $seoSuffix }}">{{ mb_strlen((string) $seoTitle) }}</span></small>
+        </label>
+        <input type="text" maxlength="255" id="meta_title{{ $seoSuffix }}" name="meta_title{{ $seoSuffix }}"
+               value="{{ $seoTitle }}" class="form-control form-control-line">
+    </div>
 
-class TranslateSeoFields extends Command
-{
-    /**
-     * php artisan seo-fields:translate
-     *
-     * Перекладає 13 SEO-шаблонів (index, ad-city, ad-category тощо) на
-     * українську. Ці шаблони містять службові плейсхолдери на кшталт
-     * ---filtered_name---, ---city_name--- — їх НЕ можна змінювати,
-     * вони підставляються кодом після перекладу.
-     */
-    protected $signature = 'seo-fields:translate {--limit=}';
+    <div class="form-group">
+        <label for="meta_description{{ $seoSuffix }}">Meta description
+            <small class="text-muted">— 140–160 символів; зараз <span class="seo-count" data-for="meta_description{{ $seoSuffix }}">{{ mb_strlen((string) $seoDesc) }}</span></small>
+        </label>
+        <textarea rows="3" maxlength="255" id="meta_description{{ $seoSuffix }}" name="meta_description{{ $seoSuffix }}"
+                  class="form-control form-control-line">{{ $seoDesc }}</textarea>
+    </div>
 
-    protected $description = 'Перекладає SEO-шаблони (SeoField) на українську, зберігаючи плейсхолдери';
+    <div class="form-group">
+        <label for="description{{ $seoSuffix }}">SEO-текст на сторінці</label>
+        <textarea rows="10" id="description{{ $seoSuffix }}" name="description{{ $seoSuffix }}"
+                  class="content form-control form-control-line">{{ $seoText }}</textarea>
+    </div>
+@endforeach
 
-    /** @var Client */
-    protected $http;
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->http = new Client();
-    }
-
-    public function handle()
-    {
-        $anthropicKey = env('ANTHROPIC_API_KEY');
-        if (empty($anthropicKey)) {
-            $this->error('ANTHROPIC_API_KEY не задан у .env');
-            return 1;
+<script>
+    document.querySelectorAll('.seo-count').forEach(function (counter) {
+        var field = document.getElementById(counter.getAttribute('data-for'));
+        if (field) {
+            field.addEventListener('input', function () { counter.textContent = field.value.length; });
         }
-
-        $limit = (int) ($this->option('limit') ?: 20);
-
-        $fields = SeoField::where(function ($q) {
-                $q->whereNull('meta_title_uk')->orWhere('meta_title_uk', '');
-            })
-            ->limit($limit)
-            ->get();
-
-        if ($fields->isEmpty()) {
-            $this->info('Усі SEO-шаблони вже перекладені.');
-            return 0;
-        }
-
-        $this->info('Перекладаю ' . $fields->count() . ' SEO-шаблонів');
-
-        foreach ($fields as $field) {
-            $this->info("Обробляю: {$field->index}");
-
-            try {
-                $result = $this->translateOne($field);
-
-                $field->meta_title_uk = $result['meta_title'] ?? null;
-                $field->meta_description_uk = $result['meta_description'] ?? null;
-                $field->description_uk = $result['description'] ?? null;
-                $field->save();
-
-                $this->info('  -> OK');
-            } catch (\Throwable $e) {
-                $this->error('  Помилка: ' . $e->getMessage());
-            }
-
-            usleep(300000);
-        }
-
-        return 0;
-    }
-
-    protected function translateOne(SeoField $field): array
-    {
-        $metaTitle = $field->getOriginal('meta_title') ?? '';
-        $metaDescription = $field->getOriginal('meta_description') ?? '';
-        $description = $field->getOriginal('description') ?? '';
-
-        $prompt = "Ти — професійний перекладач і SEO-копірайтер. Переклади наступний SEO-шаблон "
-            . "з російської на українську.\n\n"
-            . "КРИТИЧНО ВАЖЛИВО: текст містить службові плейсхолдери у форматі "
-            . "---якесь_слово--- (наприклад ---filtered_name---, ---city_name---, "
-            . "---region_name---, ---country_name---, ---full_filtered_name---, "
-            . "---user_name---, ---ads_count---, ---shop_count---). Ці плейсхолдери "
-            . "ПОТРІБНО залишити ТОЧНО як є, без жодних змін і без перекладу — вони "
-            . "автоматично підставляються кодом після твого перекладу. Переклади лише "
-            . "звичайний текст навколо них.\n\n"
-            . "Meta title: \"{$metaTitle}\"\n\n"
-            . "Meta description: \"{$metaDescription}\"\n\n"
-            . "Description:\n{$description}\n\n"
-            . "Відповідь — ТІЛЬКИ валідний JSON без markdown-обрамлення, формату:\n"
-            . "{\"meta_title\": \"...\", \"meta_description\": \"...\", \"description\": \"...\"}";
-
-        $raw = $this->callClaude($prompt, 4000);
-        $json = $this->extractJsonObject($raw);
-        $data = json_decode($json, true);
-
-        if (!is_array($data)) {
-            throw new \RuntimeException('Не вдалося розпарсити JSON відповіді моделі');
-        }
-
-        return $data;
-    }
-
-    protected function callClaude(string $prompt, int $maxTokens): string
-    {
-        $response = $this->http->post('https://api.anthropic.com/v1/messages', [
-            'headers' => [
-                'x-api-key' => env('ANTHROPIC_API_KEY'),
-                'anthropic-version' => '2023-06-01',
-                'content-type' => 'application/json',
-            ],
-            'json' => [
-                'model' => env('ANTHROPIC_MODEL', 'claude-sonnet-4-6'),
-                'max_tokens' => $maxTokens,
-                'messages' => [['role' => 'user', 'content' => $prompt]],
-            ],
-            'timeout' => 90,
-        ]);
-
-        $data = json_decode((string) $response->getBody(), true);
-        $textBlocks = array_filter($data['content'] ?? [], function ($b) {
-            return ($b['type'] ?? '') === 'text';
-        });
-        return trim(implode("\n", array_map(function ($b) {
-            return $b['text'];
-        }, $textBlocks)));
-    }
-
-    protected function extractJsonObject(string $text): string
-    {
-        $text = trim($text);
-        $start = strpos($text, '{');
-        $end = strrpos($text, '}');
-        if ($start === false || $end === false || $end < $start) {
-            throw new \RuntimeException('У відповіді моделі не знайдено JSON-об\'єкт');
-        }
-        return substr($text, $start, $end - $start + 1);
-    }
-}
+    });
+</script>
