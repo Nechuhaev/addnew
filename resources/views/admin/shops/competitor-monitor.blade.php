@@ -20,6 +20,14 @@
                         Ціни, що відрізняються від поточної більш ніж у {{ env('PRICE_MONITOR_MAX_RATIO', 2) }} рази, не застосовуються — позначаються як «Підозріла ціна».
                     </p>
 
+                    @if($shop)
+                        <div class="alert alert-info py-2">
+                            Лише магазин <strong>{{ $shop->username }}</strong>
+                            · <a href="{{ route('admin.shops.edit', $shop->id) }}">до магазину</a>
+                            · <a href="{{ route('admin.shops.competitorMonitor', ['filter' => $filter]) }}">усі магазини</a>
+                        </div>
+                    @endif
+
                     <h5 class="mt-3">За останню добу</h5>
                     <p>
                         Перевірок: <strong>{{ $summary['total'] }}</strong> ·
@@ -32,7 +40,7 @@
 
                     <div class="mb-3">
                         @foreach(['all' => "Усі ({$totalWithCompetitor})", 'problems' => 'Проблемні', 'changed' => 'Ціну змінено', 'never' => 'Ще не перевірялись'] as $key => $label)
-                            <a href="{{ route('admin.shops.competitorMonitor', ['filter' => $key]) }}"
+                            <a href="{{ route('admin.shops.competitorMonitor', array_filter(['filter' => $key, 'shop' => optional($shop)->id])) }}"
                                class="btn btn-sm {{ $filter === $key ? 'btn-primary' : 'btn-outline-secondary' }}">{{ $label }}</a>
                         @endforeach
                     </div>
