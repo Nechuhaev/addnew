@@ -380,6 +380,10 @@ $frontRoutes = function () {
     });
     Route::get('/stores', 'Front\User\StoreController@index')->name('stores');
 
+// Ціни за розділами (статистика з оголошень)
+    Route::get('/ceny', 'Front\Ad\Prices@index')->name('prices.index');
+    Route::get('/ceny/{slug}', 'Front\Ad\Prices@page')->name('prices.page');
+
 // Категории объявлений
     Route::get('/r/{filter}/{category}', 'Front\Ad\Category@filter')->name('filtered_category.page');
     Route::get('/r/{filter}/{category}/{subcategory}', 'Front\Ad\Category@filter')->name('filtered_subcategory.page');

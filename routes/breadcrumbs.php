@@ -363,3 +363,14 @@ Breadcrumbs::for('profile.favorites', function ($trail) {
     $trail->parent('index');
     $trail->push(app()->getLocale() === 'ru' ? 'Избранное' : 'Обране', route('profile.favorites'));
 });
+
+
+// Главная > Ціни / Главная > Ціни > Розділ
+Breadcrumbs::for('prices.index', function ($trail) {
+    $trail->parent('index');
+    $trail->push(app()->getLocale() === 'ru' ? 'Цены' : 'Ціни', \App\Http\Controllers\Front\Ad\Prices::indexUrl());
+});
+Breadcrumbs::for('prices.page', function ($trail, $category) {
+    $trail->parent('prices.index');
+    $trail->push($category->name, \App\Http\Controllers\Front\Ad\Prices::url($category));
+});
