@@ -46,6 +46,18 @@ class Ad extends Model
     {
         parent::boot();
 
+        // Чутливий вміст (SeoRules) — позначка для фільтра списків; імпорт без моделі
+        // доганяє команда ads:mark-sensitive
+        static::saving(function (Ad $ad) {
+            static $hasColumn = null;
+            if ($hasColumn === null) {
+                $hasColumn = \Illuminate\Support\Facades\Schema::hasColumn('ads', 'is_sensitive');
+            }
+            if ($hasColumn) {
+                $ad->attributes['is_sensitive'] = \App\Services\SeoRules::isSensitiveAd($ad) ? 1 : 0;
+            }
+        });
+
         // Історія ціни: нова точка при створенні та при зміні ціни/валюти
         static::saved(function (Ad $ad) {
             if ($ad->wasRecentlyCreated || $ad->wasChanged(['price', 'currency_id'])) {
@@ -280,6 +292,16 @@ class Ad extends Model
         }
 
         return $ads;
+    }
+
+    /**
+     * Прибрати з запиту Ad::getAds() оголошення з чутливим вмістом (ads.is_sensitive).
+     *
+     * @param \Illuminate\Database\Query\Builder $query
+     */
+    public static function withoutSensitive($query)
+    {
+        return $query->where('ads.is_sensitive', 0);
     }
 
     public static function getAds($defaults = true)

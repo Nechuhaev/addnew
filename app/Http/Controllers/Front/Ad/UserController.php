@@ -47,6 +47,10 @@ class UserController extends Controller
         $term = trim((string) request()->get('s'));
         $search = new \App\Services\AdSearch($term);
         $results = Ad::getAds()->where('ads.user_id', $user->id);
+        // Серед оголошень автора є чутливі — сторінка без реклами AdSense (правила AdSense)
+        if (Ad::where('user_id', $user->id)->where('status', 1)->where('is_sensitive', 1)->exists()) {
+            \App\Http\AdSense::disable();
+        }
         $search->apply($results);
         $listingFilters = \App\Services\ListingFilters::fromRequest(request(), !$search->isEmpty());
         $listingFilters->apply($results);
@@ -100,6 +104,33 @@ class UserController extends Controller
             $meta['description'] = app(\App\Services\Seo\ShopSeoText::class)->build($user);
         }
 
+        // Магазин: власні title/description замість шаблону «Оголошення користувача…»
+        // (на сторінки магазинів шукають саме за назвою магазину, а такий заголовок майже не клікають)
+        if ($is_shop) {
+            $isRu = app()->getLocale() === 'ru';
+            $name = $user->username;
+            $activeCount = $user->ads()->where('status', 1)->count();
+            $meta['meta_title'] = $isRu
+                ? "{$name} — товары и цены, отзывы | Addnew.biz"
+                : "{$name} — товари й ціни, відгуки | Addnew.biz";
+            if ((int) request()->get('page') > 1) {
+                $meta['meta_title'] = ($isRu ? "{$name} — товары, страница " : "{$name} — товари, сторінка ") . (int) request()->get('page') . ' | Addnew.biz';
+            }
+            $countText = number_format($activeCount, 0, ',', ' ') . ' ' . ($isRu
+                ? $this->plural($activeCount, ['товар', 'товара', 'товаров'])
+                : $this->plural($activeCount, ['товар', 'товари', 'товарів']));
+            $ratingText = '';
+            if ($avgRating) {
+                $n = $reviews->count();
+                $ratingText = $isRu
+                    ? ', рейтинг ' . number_format($avgRating, 1, ',', '') . ' из 5 (' . $n . ' ' . $this->plural($n, ['отзыв', 'отзыва', 'отзывов']) . ')'
+                    : ', рейтинг ' . number_format($avgRating, 1, ',', '') . ' з 5 (' . $n . ' ' . $this->plural($n, ['відгук', 'відгуки', 'відгуків']) . ')';
+            }
+            $meta['meta_description'] = $isRu
+                ? "{$name} на Addnew.biz: {$countText} с ценами{$ratingText}. Сравните цены с другими продавцами и перейдите в магазин."
+                : "{$name} на Addnew.biz: {$countText} з цінами{$ratingText}. Порівняйте ціни з іншими продавцями й перейдіть у магазин.";
+        }
+
         return view('front.ad.user')->with([
             'entity' => $user,
             'is_shop' => $is_shop,
@@ -117,5 +148,20 @@ class UserController extends Controller
             'breadcrumbs' => 'ad_user',
             'meta' => $meta
         ]);
+    }
+
+    /** «1 товар», «3 товари», «25 товарів» */
+    protected function plural(int $n, array $forms): string
+    {
+        $m10 = $n % 10;
+        $m100 = $n % 100;
+        if ($m10 === 1 && $m100 !== 11) {
+            return $forms[0];
+        }
+        if ($m10 >= 2 && $m10 <= 4 && ($m100 < 12 || $m100 > 14)) {
+            return $forms[1];
+        }
+
+        return $forms[2];
     }
 }

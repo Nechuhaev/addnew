@@ -35,6 +35,12 @@ class Kernel extends ConsoleKernel
 
         $schedule->command('sitemap:rebuild')->fridays()->at('17:00')->runInBackground();
 
+        // Позначка чутливих оголошень (ads.is_sensitive) — для фільтра списків
+        $schedule->command('ads:mark-sensitive')
+            ->hourly()
+            ->withoutOverlapping()
+            ->appendOutputTo(storage_path('logs/mark-sensitive.log'));
+
         // IndexNow: нові й зняті з публікації оголошення → Bing (і пошук ChatGPT/Copilot). Потрібен INDEXNOW_KEY у .env
         $schedule->command('seo:indexnow')
             ->everyFifteenMinutes()

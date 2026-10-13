@@ -67,6 +67,7 @@
                         <span class="show-more__btn btn-show">{{ app()->getLocale() === 'ru' ? 'Показать' : 'Показати' }}</span>
                     </div>
                 @endif
+                @include('front.partials.itemlist', ['ads' => $ads, 'perPage' => 15])
 
             </div>
 

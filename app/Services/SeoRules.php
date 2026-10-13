@@ -55,10 +55,10 @@ class SeoRules
         if (!$ad) {
             return false;
         }
-        if (in_array((int) $ad->category_id, self::sensitiveCategoryIds(), true)) {
+        $raw = method_exists($ad, 'getAttributes') ? $ad->getAttributes() : (array) $ad;   // модель або рядок DB::table
+        if (in_array((int) ($raw['category_id'] ?? 0), self::sensitiveCategoryIds(), true)) {
             return true;
         }
-        $raw = $ad->getAttributes();
 
         return \App\StopWord::findNoindexMatchIn(trim(($raw['name'] ?? '') . ' ' . strip_tags((string) ($raw['content'] ?? '')))) !== null;
     }

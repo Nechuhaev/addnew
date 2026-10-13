@@ -141,7 +141,7 @@
     <div id="login-modal" class="modal visible">
         <div class="modal-wrap">
             <button class="close" onclick="modal.close()">
-                <img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/no-alt.svg') }}" />
+                <img class="img-svg" height="20" width="20" alt="" aria-hidden="true" src="{{ asset('assets/front/img/dashicons/no-alt.svg') }}" />
             </button>
 
             <div class="form-subscribe">
@@ -167,7 +167,7 @@
     <div id="errors-modal" class="modal visible">
         <div class="modal-wrap">
             <button class="close" onclick="modal.close()">
-                <img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/no-alt.svg') }}" />
+                <img class="img-svg" height="20" width="20" alt="" aria-hidden="true" src="{{ asset('assets/front/img/dashicons/no-alt.svg') }}" />
             </button>
             <div class="modal-content">
                 <ul></ul>
