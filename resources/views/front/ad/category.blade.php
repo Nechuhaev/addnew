@@ -60,6 +60,7 @@
                     </div>
                     @endif
                     @include('front.partials.faq', ['faq' => $faq ?? []])
+                    @include('front.partials.itemlist', ['ads' => $ads, 'perPage' => 15])
                 </div>
                 <aside class="column-right">
                     @if($entity->parent_id)

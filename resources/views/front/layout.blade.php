@@ -217,12 +217,12 @@
         <div class="copyright">© {{ date("Y") }} {{ __('front.copyright_text') }}</div>
     </div>
 </footer>
-<div class="toTop"><img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/arrow-up-alt2.svg') }}" /></div>
+<div class="toTop"><img class="img-svg" height="20" width="20" alt="" aria-hidden="true" src="{{ asset('assets/front/img/dashicons/arrow-up-alt2.svg') }}" /></div>
 
 <div id="subscribe-modal" class="modal">
     <div class="modal-wrap">
         <button class="close" onclick="modal.close()">
-            <img class="img-svg" height="20" width="20" src="{{ asset('assets/front/img/dashicons/no-alt.svg') }}" />
+            <img class="img-svg" height="20" width="20" alt="" aria-hidden="true" src="{{ asset('assets/front/img/dashicons/no-alt.svg') }}" />
         </button>
 
         <div class="form-subscribe">
