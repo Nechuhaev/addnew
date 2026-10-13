@@ -101,13 +101,14 @@ class ShopController extends Controller
         $emailCheckStatus = DB::table('shop_email_checks as t1')
             ->whereIn('user_id', $shopIds)
             ->whereRaw('t1.checked_at = (SELECT MAX(t2.checked_at) FROM shop_email_checks t2 WHERE t2.user_id = t1.user_id)')
-            ->get(['user_id', 'matched', 'status'])
+            ->get(['user_id', 'matched', 'status', 'found_email'])
             ->keyBy('user_id');
 
         foreach ($shops as $shop) {
             $checkRow = $emailCheckStatus->get($shop->id);
             $shop->email_matched = $checkRow ? (bool) $checkRow->matched : null; // null = ще не перевірялось
             $shop->email_check_status = $checkRow->status ?? null;
+            $shop->email_found = $checkRow->found_email ?? null;
         }
 
         // Дата останнього надісланого запрошення на реєстрацію/підключення
