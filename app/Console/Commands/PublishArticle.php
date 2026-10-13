@@ -15,6 +15,24 @@ use Illuminate\Support\Str;
 
 class PublishArticle extends Command
 {
+    /**
+     * Формат статті для пошуку й AI-відповідей (ChatGPT, Perplexity, AI-огляди Google).
+     * Частина головного промпту article_generate; міграція 2026_10_21_110000 дописує його
+     * і в уже збережений (відредагований в адмінці) промпт.
+     */
+    const AI_FORMAT_RULES = "ФОРМАТ ДЛЯ ПОШУКУ Й AI-ВІДПОВІДЕЙ (обов'язково):\n"
+        . "- content_html починається з блоку <div class=\"article-summary\"><p><strong>Коротко:</strong> …</p></div> — "
+        . "3-4 речення з прямою відповіддю на головне питання статті, без води.\n"
+        . "- Більшість <h2> сформулюй як питання, які люди ставлять пошуку чи AI (\"Як перевірити…\", \"Скільки коштує…\"), "
+        . "а перше речення після кожного <h2> — коротка пряма відповідь.\n"
+        . "- Додай хоча б один чек-лист (<ol> або <ul>) і, де доречно, порівняльну таблицю у "
+        . "<div class=\"table-wrap\"><table>…</table></div> з <thead>.\n"
+        . "- У кінці — розділ <h2>Часті запитання</h2> і одразу <div class=\"article-faq\"> з 4-5 парами "
+        . "<h3>питання</h3><p>відповідь 1-3 речення</p> (без інших тегів усередині цього div).\n"
+        . "- Не вигадуй статистику, ціни, закони й назви сервісів; якщо не впевнений — пиши загально (\"зазвичай\", \"уточніть у…\").\n"
+        . "- Природно встав 1-3 посилання на розділи сайту, якщо вони дійсно стосуються теми, — ТІЛЬКИ з цього списку:\n"
+        . "{{site_sections}}\n";
+
     use CallsLlm;
     use TranslatesViaDeepL;
     use UpdatesDailyReport;
@@ -409,6 +427,7 @@ class PublishArticle extends Command
                 . "- focus_keyword має природно зустрічатися в тексті (перший абзац і хоча б один підзаголовок).\n"
                 . "- Приблизно в середині статті встав окремим рядком маркер [SECOND_IMAGE] — "
                 . "на його місце буде підставлена друга картинка.\n\n"
+                . self::AI_FORMAT_RULES . "\n"
                 . "ВНУТРІШНЯ ПЕРЕЛІНКОВКА:\nОсь список вже опублікованих статей на сайті:\n{{recent_articles}}\n\n"
                 . "Якщо серед них є статті, ДІЙСНО релевантні темі поточної статті — природно встав у content_html "
                 . "1-3 текстових посилання на них у форматі <a href=\"URL\">текст анкора</a>, вплетені в речення. "
@@ -420,6 +439,7 @@ class PublishArticle extends Command
                 'topic' => $topic,
                 'language' => $language,
                 'recent_articles' => $prevListStr,
+                'site_sections' => $this->siteSectionsList(),
             ],
             'Головний промпт публікації статей: генерує заголовок, повний текст, SEO-поля, теги і контекстні внутрішні посилання.'
         );
@@ -437,6 +457,35 @@ class PublishArticle extends Command
     // Картинки — сам код тепер у трейті FetchesImages
     // -----------------------------------------------------------------
 
+    /** @var array|null [назва => URL] кореневих розділів оголошень + сторінка цін */
+    protected $siteSectionsCache = null;
+
+    protected function siteSections(): array
+    {
+        if ($this->siteSectionsCache === null) {
+            $sensitive = \App\Services\SeoRules::sensitiveCategoryIds();
+            $this->siteSectionsCache = [];
+            foreach (\App\AdCategory::whereNull('parent_id')->orWhere('parent_id', 0)->get() as $c) {
+                if (!in_array($c->id, $sensitive)) {
+                    $this->siteSectionsCache[$c->name_uk ?: $c->name] = $c->url;
+                }
+            }
+            $this->siteSectionsCache['Ціни за розділами'] = url('/ceny');
+        }
+
+        return $this->siteSectionsCache;
+    }
+
+    protected function siteSectionsList(): string
+    {
+        $lines = [];
+        foreach ($this->siteSections() as $name => $url) {
+            $lines[] = "- {$name} — {$url}";
+        }
+
+        return implode("\n", $lines);
+    }
+
     /**
      * Прибирає посилання на /blog/..., яких немає серед реально існуючих
      * статей (список $recentArticles). Модель іноді "вигадує" правдоподібні
@@ -450,13 +499,22 @@ class PublishArticle extends Command
         foreach ($recentArticles as $a) {
             $whitelist[$a->url] = true;
         }
+        foreach ($this->siteSections() as $url) {
+            $whitelist[$url] = true;
+        }
+        $host = parse_url(url('/'), PHP_URL_HOST);
 
         return preg_replace_callback(
             '/<a\s+href="([^"]*)"[^>]*>(.*?)<\/a>/is',
-            function ($m) use ($whitelist) {
+            function ($m) use ($whitelist, $host) {
                 $href = $m[1];
                 $anchorText = $m[2];
                 if (Str::contains($href, '/blog/') && !isset($whitelist[$href])) {
+                    return $anchorText;
+                }
+                // Посилання на розділи сайту — лише з переданого моделі списку (вигадані URL дають 404)
+                $isInternal = Str::startsWith($href, '/') || ($host && parse_url($href, PHP_URL_HOST) === $host);
+                if ($isInternal && !isset($whitelist[$href])) {
                     return $anchorText;
                 }
                 return $m[0];

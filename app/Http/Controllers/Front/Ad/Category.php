@@ -150,7 +150,17 @@ class Category extends Controller
             $faq = [];
         }
 
+        // Посилання на сторінку цін розділу (/ceny/{slug}), якщо статистика є
+        $pricesLink = null;
+        if (!$sensitive && !request()->get('page')) {
+            $priceStats = \App\Services\PriceStats::forCategory($entity);
+            if ($priceStats) {
+                $pricesLink = ['url' => \App\Http\Controllers\Front\Ad\Prices::url($entity), 'median' => $priceStats['median']];
+            }
+        }
+
         return view('front.ad.category')->with([
+            'pricesLink' => $pricesLink,
             'faq' => $faq,
             'h1' => $h1,
             'noindex' => $sensitive || \App\Services\SeoRules::isNoindexCountry($filterCountry),

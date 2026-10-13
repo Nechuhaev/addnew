@@ -6010,3 +6010,6 @@ li.active {
 
 /* SEO-текст під списком: маркери списків */
 .show-more__text ul,.show-more__text ol{margin:8px 0 12px;padding-left:22px}.show-more__text ul{list-style:disc}.show-more__text ol{list-style:decimal}.show-more__text li{margin:0 0 6px;line-height:1.5}
+
+/* Гайди в блозі: нумеровані списки, таблиці, «Коротко», FAQ */
+.post-content ol{list-style:decimal;padding-left:40px;margin:0 0 10px}.post-content table{width:100%;border-collapse:collapse;margin:10px 0 16px;font-size:13px}.post-content th,.post-content td{border:1px solid #e3e4e7;padding:7px 9px;text-align:left;vertical-align:top}.post-content th{background:#f4f6fa;font-weight:600}.post-content .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}.post-content .article-summary{background:#f4f6fa;border-left:4px solid #3b5998;padding:10px 14px;margin:0 0 16px;border-radius:4px}.post-content .article-summary p{margin:0}.post-content .article-faq h3{font-size:15px;font-weight:700;margin:14px 0 4px}

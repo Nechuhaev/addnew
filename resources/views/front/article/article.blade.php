@@ -60,6 +60,23 @@
     }
 @endphp
 <script type="application/ld+json">{!! json_encode($ldData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) !!}</script>
+@php
+    // FAQPage з блоку <div class="article-faq"> у тексті статті: пари <h3>питання</h3> + <p>відповідь</p>
+    $ldFaq = [];
+    if (preg_match('~<div class="article-faq">(.*?)</div>~su', (string) $article->content, $faqBlock)
+        && preg_match_all('~<h3[^>]*>(.*?)</h3>\s*<p[^>]*>(.*?)</p>~su', $faqBlock[1], $faqPairs, PREG_SET_ORDER)) {
+        foreach ($faqPairs as $pair) {
+            $q = trim(html_entity_decode(strip_tags($pair[1]), ENT_QUOTES, 'UTF-8'));
+            $a = trim(html_entity_decode(strip_tags($pair[2]), ENT_QUOTES, 'UTF-8'));
+            if ($q !== '' && $a !== '') {
+                $ldFaq[] = ['@type' => 'Question', 'name' => $q, 'acceptedAnswer' => ['@type' => 'Answer', 'text' => $a]];
+            }
+        }
+    }
+@endphp
+@if($ldFaq)
+<script type="application/ld+json">{!! json_encode(['@context' => 'https://schema.org', '@type' => 'FAQPage', 'mainEntity' => $ldFaq], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) !!}</script>
+@endif
 @endpush
 
 @section('content')

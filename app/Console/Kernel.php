@@ -46,6 +46,12 @@ class Kernel extends ConsoleKernel
             ->everyFifteenMinutes()
             ->withoutOverlapping()
             ->appendOutputTo(storage_path('logs/indexnow.log'));
+
+        // Щодня о 04:40 — статистика цін для сторінок /ceny
+        $schedule->command('prices:warm')
+            ->dailyAt('04:40')
+            ->withoutOverlapping()
+            ->appendOutputTo(storage_path('logs/prices-warm.log'));
     // Раз на тиждень (понеділок, 05:00) — поповнює семантику й контент-план,
     // якщо запланованих тем лишилось мало (MIN_PLANNED_ARTICLES).
     $schedule->command('content:build-plan')

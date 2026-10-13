@@ -119,6 +119,13 @@ class RebuildSitemap extends Command
         })->all();
         $this->writePairs('ad_categories.xml', $adCats, $index);
 
+        // Сторінки цін (/ceny/{slug}) — лише розділи з достатньою статистикою
+        $prices = [url('/ceny')];
+        foreach (AdCategory::whereIn('id', array_keys(\App\Services\PriceStats::available()) ?: [0])->get() as $c) {
+            $prices[] = url('/ceny/' . $c->slug);
+        }
+        $this->writePairs('prices.xml', $prices, $index);
+
         $regions = [];
         DB::table('ad_regions')
             ->where('country_id', $country->id)
