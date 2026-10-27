@@ -99,11 +99,9 @@ class Kernel extends ConsoleKernel
         ->withoutOverlapping()
         ->appendOutputTo(storage_path('logs/products-monitor-prices.log'));
 
-    // Раз на день — SEO-оптимізація карток товарів через Claude API.
-    $schedule->command('products:seo-optimize')
-        ->weeklyOn(2, '11:00')
-        ->withoutOverlapping()
-        ->appendOutputTo(storage_path('logs/products-seo-optimize.log'));
+    // products:seo-optimize (AI-переписування карток товарів) вимкнено: синхронізація фіду
+    // щоразу перезаписує назву й опис даними магазину, тож результат AI зникав. Команда лишається
+    // для ручного запуску.
         
         // Щогодини — перевіряє доступність зображень оголошень, замінює
     // биті (403/404 на S3) на локальний placeholder. mod_pagespeed
@@ -113,11 +111,12 @@ class Kernel extends ConsoleKernel
         ->withoutOverlapping()
         ->appendOutputTo(storage_path('logs/ads-check-images.log'));
         
-        // Раз на день — SEO-оптимізація назви й опису звичайних оголошень.
-    $schedule->command('ads:seo-optimize')
+        // Щосереди — чистка назв приватних оголошень кодом (телефони, посилання, емодзі,
+    // ВЕЛИКІ ЛІТЕРИ) замість AI-переписування ads:seo-optimize (лишається для ручного запуску).
+    $schedule->command('ads:clean-titles --apply')
         ->weeklyOn(3, '12:00')
         ->withoutOverlapping()
-        ->appendOutputTo(storage_path('logs/ads-seo-optimize.log'));
+        ->appendOutputTo(storage_path('logs/ads-clean-titles.log'));
         
             // Раз на день — звіряє email магазинів з тим, що реально вказано
     // на їхніх сайтах, автоматично оновлює при розбіжності.
@@ -126,11 +125,8 @@ class Kernel extends ConsoleKernel
         ->withoutOverlapping()
         ->appendOutputTo(storage_path('logs/shops-check-email.log'));
 
-            // Раз на день — SEO-генерація тегів оголошень (10 за раз, найпопулярніші спершу).
-    $schedule->command('tags:seo-optimize --limit=10')
-        ->dailyAt('14:00')
-        ->withoutOverlapping()
-        ->appendOutputTo(storage_path('logs/tags-seo-optimize.log'));
+            // tags:seo-optimize (AI-тексти тегів) вимкнено: сторінка тегу без власного тексту
+    // показує фактичний вступ із даних (App\Services\Seo\TagSeoText). Команда лишається для ручного запуску.
 
             // Щоночі о 00:10 — рахує оголошення/нових користувачів/нові
     // магазини за ВЧОРАШНІЙ день і зберігає в адмінський звіт.
