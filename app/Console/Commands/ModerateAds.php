@@ -26,7 +26,7 @@ class ModerateAds extends Command
             ->chunk(3000, function ($rows) use ($rules, &$cand, &$checked) {
                 foreach ($rows as $r) {
                     $checked++;
-                    $t = mb_strtolower($r->name);
+                    $t = mb_strtolower(\App\StopWord::normalizeHomoglyphs((string) $r->name));
                     foreach ($rules as $g => $p) {
                         if (preg_match($p[0], $t) && !preg_match($p[1], $t)) {
                             $cand[$r->id] = ['g' => $g, 'u' => $r->user_id, 'n' => $r->name, 'v' => $r->total_views, 'rule' => true];
