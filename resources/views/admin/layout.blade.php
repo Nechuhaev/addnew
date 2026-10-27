@@ -235,7 +235,8 @@
 <script src="{{ asset('assets/admin/dist/js/pages/dashboards/dashboard1.js') }}"></script>
 <script src="/vendor/laravel-filemanager/js/lfm.js"></script>
 <script src="{{ asset('assets/admin/assets/libs/addnew_file.js') }}"></script>
-<script src="https://cdn.tiny.cloud/1/acl3zjjcwn2wu5y9ad8741ibtyz1fcoi1iwhsdhpqblv1q2y/tinymce/4/tinymce.min.js"></script>
+{{-- TinyMCE 4 (LGPL) з cdnjs — без ключа й ліміту завантажень tiny.cloud (там закінчився безкоштовний місячний ліміт → редактор ставав read-only) --}}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.9.11/tinymce.min.js" referrerpolicy="origin"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/caret/1.3.7/jquery.caret.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tag-editor/1.0.20/jquery.tag-editor.min.js"></script>
