@@ -16,6 +16,7 @@
     <!-- <base href=""> -->
     <meta name="description" content="@yield('meta_description')">
 
+    <link rel="preload" href="{{ asset('assets/front/fonts/FiraSans.woff2') }}" as="font" type="font/woff2" crossorigin>
     <link href="{{ asset('assets/front/css/start.min.css') }}" rel="stylesheet">
     <!-- Styles -->
     <link rel="stylesheet" href="{{ asset('assets/front/css/style.min.css') }}?v={{ filemtime(public_path('assets/front/css/style.min.css')) }}" media="all">
@@ -260,9 +261,9 @@
         font-size: 18px;
     }
 </style>
-<script src="{{ asset('assets/front/js/common.js') }}"></script>
+<script src="{{ asset('assets/front/js/common.js') }}?v={{ filemtime(public_path('assets/front/js/common.js')) }}"></script>
 <script src="{{ asset('assets/front/js/global.js') }}?v={{ filemtime(public_path('assets/front/js/global.js')) }}"></script>
-<script src="{{ asset('assets/front/js/maps.js') }}"></script>
+<script src="{{ asset('assets/front/js/maps.js') }}?v={{ filemtime(public_path('assets/front/js/maps.js')) }}"></script>
 @yield('load-scripts')
 
 @yield('script')

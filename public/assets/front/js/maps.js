@@ -1,4 +1,4 @@
-function init_google_map(title, address) {
+function run_google_map(title, address) {
     (function (t, a) {
         var address = t;
         //var directionDisplay;
@@ -83,4 +83,38 @@ function init_google_map(title, address) {
         }
         map_init();
     })(title, address)
+}
+
+// Google Maps API вантажимо, лише коли блок карти видимий і наближається до екрана
+// (на мобільних він прихований — API не вантажиться зовсім). Адресу API задає сторінка: window.GMAPS_SRC.
+function init_google_map(title, address) {
+    var el = document.getElementById('map');
+    if (!el || !window.GMAPS_SRC || !el.offsetParent) {
+        return;
+    }
+    var started = false;
+    function start() {
+        if (started) return;
+        started = true;
+        if (window.google && window.google.maps) {
+            run_google_map(title, address);
+            return;
+        }
+        window.__gmapsReady = function () { run_google_map(title, address); };
+        var s = document.createElement('script');
+        s.src = window.GMAPS_SRC + '&callback=__gmapsReady';
+        s.async = true;
+        document.head.appendChild(s);
+    }
+    if (!('IntersectionObserver' in window)) {
+        window.addEventListener('load', start);
+        return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+        if (entries[0].isIntersecting) {
+            io.disconnect();
+            start();
+        }
+    }, { rootMargin: '300px' });
+    io.observe(el);
 }
