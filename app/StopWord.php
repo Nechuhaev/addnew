@@ -72,9 +72,35 @@ class StopWord extends Model
         return $text === null || $text === '' ? null : self::matchIn($text, self::noindexWords());
     }
 
+    /**
+     * Латинські літери-двійники → кирилиця, але лише в словах, де вже є кирилиця
+     * («Кoдгрaббep» з латинськими o/a/p → «Кодграббер»). Так обходять фільтри;
+     * чисто латинські слова (бренди, «Pandora») не змінюються.
+     */
+    public static function normalizeHomoglyphs(string $text): string
+    {
+        static $map = [
+            'A' => 'А', 'B' => 'В', 'C' => 'С', 'E' => 'Е', 'H' => 'Н', 'I' => 'І', 'K' => 'К', 'M' => 'М',
+            'O' => 'О', 'P' => 'Р', 'T' => 'Т', 'X' => 'Х', 'Y' => 'У',
+            'a' => 'а', 'c' => 'с', 'e' => 'е', 'i' => 'і', 'o' => 'о', 'p' => 'р', 'x' => 'х', 'y' => 'у',
+        ];
+
+        return preg_replace_callback('/[\p{L}]+/u', function ($m) use ($map) {
+            $word = $m[0];
+            if (preg_match('/\p{Cyrillic}/u', $word) && preg_match('/[A-Za-z]/', $word)) {
+                return strtr($word, $map);
+            }
+            return $word;
+        }, $text);
+    }
+
     protected static function matchIn(string $text, array $words): ?string
     {
         $textLower = mb_strtolower($text);
+        $normalized = mb_strtolower(self::normalizeHomoglyphs($text));
+        if ($normalized !== $textLower) {
+            $textLower .= "\n" . $normalized;
+        }
         foreach ($words as $word) {
             $word = trim($word);
             if (Str::length($word) < 3) {
