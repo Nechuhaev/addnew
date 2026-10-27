@@ -4,8 +4,17 @@
 
 @section('meta_description', $meta['meta_description'] ?? $ad->content)
 
+@section('style')
+    @php $imgHost = parse_url((string) $ad->image, PHP_URL_HOST); @endphp
+    @if($imgHost && $imgHost !== request()->getHost())
+        {{-- Головне фото (LCP) лежить на іншому домені (S3) — з'єднання відкриваємо заздалегідь --}}
+        <link rel="preconnect" href="https://{{ $imgHost }}">
+    @endif
+@endsection
+
 @section('load-scripts')
-    <script type="text/javascript" charset="UTF-8" src="https://maps.googleapis.com/maps/api/js?language=ru&region=RU&key=AIzaSyCndp-qqA81hIeD45u32313k_MUY3um2Ds&ver=3.0"></script>
+    {{-- Google Maps (~240 KB) вантажиться лише коли блок карти з'являється біля екрана (maps.js); на мобільних карта прихована — не вантажиться зовсім --}}
+    <script>window.GMAPS_SRC = 'https://maps.googleapis.com/maps/api/js?language=ru&region=RU&key=AIzaSyCndp-qqA81hIeD45u32313k_MUY3um2Ds&ver=3.0';</script>
 @endsection
 
 @php
@@ -116,7 +125,7 @@
                 <aside class="column-left hidden-xs">
                     <div class="adv-img">
                         <a href="{{ $ad->image }}" data-rel="colorbox" class="colorbox group1" title="{{ $ad->name }}">
-                            <img class="img-responsive" src="{{ $ad->image }}" title="{{ $ad->name }}" alt="{{ $ad->name }}" style="opacity: 1;" onerror="this.onerror=null;this.src='{{ asset('assets/front/img/placeholder.png') }}';">
+                            <img class="img-responsive" src="{{ $ad->image }}" title="{{ $ad->name }}" alt="{{ $ad->name }}" fetchpriority="high" style="opacity: 1;" onerror="this.onerror=null;this.src='{{ asset('assets/front/img/placeholder.png') }}';">
                         </a>
 
                         @if($ad->images && !empty($ad->images[0]))
@@ -164,7 +173,7 @@
 
                         <div class="adv-img visible-xs">
                             <a href="{{ $ad->image }}" data-rel="colorbox" class="colorbox group1" title="{{ $ad->name }}">
-                                <img class="img-responsive" src="{{ $ad->image }}" title="{{ $ad->name }}" alt="{{ $ad->name }}" style="opacity: 1;" onerror="this.onerror=null;this.src='{{ asset('assets/front/img/placeholder.png') }}';">
+                                <img class="img-responsive" src="{{ $ad->image }}" title="{{ $ad->name }}" alt="{{ $ad->name }}" fetchpriority="high" style="opacity: 1;" onerror="this.onerror=null;this.src='{{ asset('assets/front/img/placeholder.png') }}';">
                             </a>
                             @if($ad->images)
                                 <div class="adv-imgs">

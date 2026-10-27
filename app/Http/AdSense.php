@@ -7,6 +7,9 @@ class AdSense {
     const MOBILE_SLOT = '4313028875';
     const CLIENT = 'ca-pub-1409649052535600';
     const MOBILE_MAX_WIDTH = 767;
+    // Фіксована висота мобільного банера (320×100): місце зарезервоване ще до завантаження реклами,
+    // тож вміст не стрибає вниз (раніше блок data-ad-format="auto" виростав з 0 до ~410px — CLS 0.4–0.8)
+    const MOBILE_HEIGHT = 100;
 
     // Завантажувач adsbygoogle.js виводимо лише перед першим блоком на сторінці
     protected static $loaderPrinted = false;
@@ -64,7 +67,7 @@ class AdSense {
     }
 
     /**
-     * Банер 728×90 на десктопі й адаптивний блок на екранах до 768px.
+     * Банер 728×90 на десктопі й 100% × 100px на екранах до 768px.
      * Виводимо обидва <ins> без класу adsbygoogle, і скрипт ще до запиту
      * реклами залишає лише потрібний — тож AdSense отримує запит на один слот.
      */
@@ -72,7 +75,7 @@ class AdSense {
     {
         return '<div class="adsense-adaptive">'
             . '<ins data-ad-variant="desktop" style="display:none;width:728px;height:90px" data-ad-client="' . self::CLIENT . '" data-ad-slot="' . $desktopSlot . '"></ins>'
-            . '<ins data-ad-variant="mobile" style="display:none" data-ad-client="' . self::CLIENT . '" data-ad-slot="' . self::MOBILE_SLOT . '" data-ad-format="auto" data-full-width-responsive="true"></ins>'
+            . '<ins data-ad-variant="mobile" style="display:none;width:100%;height:' . self::MOBILE_HEIGHT . 'px" data-ad-client="' . self::CLIENT . '" data-ad-slot="' . self::MOBILE_SLOT . '"></ins>'
             . '</div>'
             . '<script>(function(){var w=document.currentScript.previousElementSibling;'
             . 'var mobile=window.matchMedia("(max-width: ' . self::MOBILE_MAX_WIDTH . 'px)").matches;'
