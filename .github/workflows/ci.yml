@@ -1,0 +1,107 @@
+name: CI
+
+# Перевірка кожного PR у production і кожного пушу в production:
+# синтаксис PHP, компіляція Blade, усі міграції з нуля на MySQL, seed і smoke-тест ключових сторінок.
+on:
+  pull_request:
+    branches: [production]
+  push:
+    branches: [production]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: addnew
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -proot"
+          --health-interval=5s --health-timeout=5s --health-retries=20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          extensions: mbstring, pdo_mysql, curl, xml, zip, gd, intl
+          coverage: none
+
+      - name: Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache/files
+          key: composer-${{ hashFiles('composer.lock') }}
+
+      - name: Composer install
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: .env для тестів
+        run: |
+          cat > .env <<'EOF'
+          APP_NAME=Addnew
+          APP_ENV=local
+          APP_KEY=
+          APP_DEBUG=true
+          APP_URL=http://127.0.0.1:8000
+          DB_CONNECTION=mysql
+          DB_HOST=127.0.0.1
+          DB_PORT=3306
+          DB_DATABASE=addnew
+          DB_USERNAME=root
+          DB_PASSWORD=root
+          CACHE_DRIVER=file
+          SESSION_DRIVER=file
+          QUEUE_CONNECTION=sync
+          MAIL_MAILER=log
+          MAIL_DRIVER=log
+          DEBUGBAR_ENABLED=false
+          FILESYSTEM_DRIVER=local
+          EOF
+          php artisan key:generate --force
+
+      - name: Синтаксис PHP
+        run: |
+          find app config database routes resources/lang -name '*.php' -print0 \
+            | xargs -0 -n1 -P4 php -l > /tmp/lint.log 2>&1 || { grep -v '^No syntax errors' /tmp/lint.log; exit 1; }
+
+      - name: Компіляція Blade-шаблонів
+        run: php artisan view:cache
+
+      - name: Міграції з нуля
+        run: php artisan migrate --force
+
+      - name: Тестові дані
+        run: |
+          php artisan db:seed --force
+          mysql -h127.0.0.1 -uroot -proot addnew < tests/ci/fixture.sql
+
+      - name: Smoke-тест сторінок
+        run: |
+          php artisan serve --host=127.0.0.1 --port=8000 > /tmp/serve.log 2>&1 &
+          sleep 4
+          fail=0
+          for u in / /ru/ /ceny /ru/ceny /blog/ /regions /stores "/search?s=test" /login /create-listing /page/pravila /llms.txt; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:8000$u")
+            echo "$code $u"
+            [ "$code" = "200" ] || fail=1
+          done
+          if [ "$fail" = "1" ]; then
+            echo '--- laravel.log ---'; tail -n 60 storage/logs/laravel*.log || true
+            exit 1
+          fi
+
+      - name: Логи при помилці
+        if: failure()
+        run: tail -n 100 storage/logs/laravel*.log || true
