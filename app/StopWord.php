@@ -51,12 +51,16 @@ class StopWord extends Model
     }
 
     /**
-     * Слова «прибрати з індексації» (кеш 1 год; скидається при зміні списку).
+     * Слова, що роблять сторінку чутливою (noindex, без AdSense): «прибрати з індексації»
+     * і «блокувати» — заблоковане слово тим більше не має індексуватись, якщо таке
+     * оголошення вже є на сайті (кеш 1 год; скидається при зміні списку).
      */
     public static function noindexWords(): array
     {
         return Cache::remember('stop_words_noindex', 3600, function () {
-            return static::where('action', self::ACTION_NOINDEX)->pluck('word')->all();
+            return static::where(function ($q) {
+                $q->whereIn('action', [self::ACTION_NOINDEX, self::ACTION_BLOCK])->orWhereNull('action');
+            })->pluck('word')->all();
         });
     }
 
