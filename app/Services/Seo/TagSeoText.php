@@ -26,7 +26,7 @@ class TagSeoText
     {
         $locale = app()->getLocale() === 'ru' ? 'ru' : 'uk';
 
-        return Cache::remember("tag_seo_text:{$tag->id}:{$locale}:{$total}", now()->addHours(12), function () use ($tag, $total, $locale) {
+        return Cache::remember("tag_seo_text:v2:{$tag->id}:{$locale}:{$total}", now()->addHours(12), function () use ($tag, $total, $locale) {
             return $this->generate($tag, $total, $locale);
         });
     }
@@ -53,7 +53,7 @@ class TagSeoText
             ->limit(3)
             ->pluck('category_id')
             ->all();
-        $catNames = $this->namesById(AdCategory::class, $catIds);
+        $catLinks = $this->categoryLinks($catIds);
 
         $cityIds = DB::table('ad_tag')
             ->join('ads', 'ads.id', '=', 'ad_tag.ad_id')
@@ -79,9 +79,9 @@ class TagSeoText
             : 'За тегом «' . $nameE . '» на Addnew.biz опубліковано ' . $total . ' ' . $this->plural($total, ['оголошення', 'оголошення', 'оголошень']) . '.';
 
         $p2 = '';
-        if ($catNames) {
+        if ($catLinks) {
             $p2 .= ($ru ? 'Чаще всего такие объявления размещают в разделах: ' : 'Найчастіше такі оголошення розміщують у розділах: ')
-                . e(implode(', ', $catNames)) . '. ';
+                . implode(', ', $catLinks) . '. ';
         }
         if ($cityNames) {
             $p2 .= ($ru ? 'География объявлений: ' : 'Географія оголошень: ') . e(implode(', ', $cityNames)) . '.';
@@ -104,6 +104,25 @@ class TagSeoText
         }
 
         return $html;
+    }
+
+    /** Розділи як посилання (внутрішня перелінковка); чутливі розділи — без посилання */
+    protected function categoryLinks(array $ids): array
+    {
+        if (empty($ids)) {
+            return [];
+        }
+        $sensitive = \App\Services\SeoRules::sensitiveCategoryIds();
+        $items = AdCategory::whereIn('id', $ids)->get()->keyBy('id');
+        $out = [];
+        foreach ($ids as $id) {
+            if (!isset($items[$id]) || trim((string) $items[$id]->name) === '') {
+                continue;
+            }
+            $name = e(trim((string) $items[$id]->name));
+            $out[] = in_array($id, $sensitive) ? $name : '<a href="' . e($items[$id]->url) . '">' . $name . '</a>';
+        }
+        return $out;
     }
 
     protected function namesById(string $model, array $ids): array
