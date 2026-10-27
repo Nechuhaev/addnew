@@ -54,43 +54,37 @@ class BuildContentPlan extends Command
             return mb_strtolower(trim($k));
         })->flip()->toArray(); // ['ключ' => 0] — для швидкого isset()-пошуку
 
-        $serpstatToken = env('SERPSTAT_API_TOKEN');
+        // Ключі — з РЕАЛЬНОГО попиту (App\Services\ContentDemand): пошук на сайті + експорт
+        // Search Console (storage/app/gsc-queries.csv). Раніше їх вигадував AI.
         $newKeywords = [];
+        $demand = \App\Services\ContentDemand::keywords();
+        $this->info('Реальних запитів (Search Console + пошук на сайті) після фільтрів: ' . count($demand)
+            . (is_file(storage_path(\App\Services\ContentDemand::GSC_FILE)) ? '' : ' — файлу ' . \App\Services\ContentDemand::GSC_FILE . ' немає, лише пошук на сайті'));
+        foreach ($demand as $kw) {
+            if (!isset($existingKeywords[$kw['keyword']])) {
+                $newKeywords[] = $kw;
+                $existingKeywords[$kw['keyword']] = 0;
+            }
+        }
 
-        if (!empty($serpstatToken)) {
-            $this->info('Знайдено SERPSTAT_API_TOKEN — використовую реальні дані Serpstat для семантики');
+        // Serpstat (якщо підключено): затравки — найпопулярніші реальні запити, а не вигадані AI
+        $serpstatToken = env('SERPSTAT_API_TOKEN');
+        if (!empty($serpstatToken) && $demand) {
+            $seeds = array_slice(array_column($demand, 'keyword'), 0, (int) env('SERPSTAT_SEED_COUNT', 10));
+            $this->info('Затравки для Serpstat: ' . implode(', ', $seeds));
             try {
-                $seeds = $this->generateSeedKeywords();
-                $this->info('Кореневі запити для Serpstat: ' . implode(', ', $seeds));
-                $fetched = $this->fetchSerpstatKeywords($seeds);
-                foreach ($fetched as $kw) {
+                foreach ($this->fetchSerpstatKeywords($seeds) as $kw) {
                     $lower = mb_strtolower(trim($kw['keyword']));
-                    if (!isset($existingKeywords[$lower])) {
+                    if (!isset($existingKeywords[$lower]) && \App\Services\ContentDemand::isUsable($lower)) {
                         $newKeywords[] = $kw;
                         $existingKeywords[$lower] = 0;
                     }
                 }
-                $this->info('Serpstat повернув ' . count($newKeywords) . ' нових унікальних ключів (з реальними метриками)');
             } catch (\Throwable $e) {
-                $this->warn('Помилка при роботі з Serpstat API, переходжу на резервний варіант (Claude): ' . $e->getMessage());
+                $this->warn('Помилка Serpstat API, продовжую без нього: ' . $e->getMessage());
             }
         }
-
-        if (empty($newKeywords)) {
-            $this->info('Генерую ключі через Claude (без реальних обсягів пошуку)');
-            try {
-                $claudeKeywords = $this->generateNewKeywordsClaude(array_keys($existingKeywords));
-                foreach ($claudeKeywords as $kw) {
-                    $lower = mb_strtolower(trim($kw));
-                    if (!isset($existingKeywords[$lower]) && $kw !== '') {
-                        $newKeywords[] = ['keyword' => $kw, 'volume' => null, 'cpc' => null, 'source' => 'claude'];
-                        $existingKeywords[$lower] = 0;
-                    }
-                }
-            } catch (\Throwable $e) {
-                $this->error('Не вдалося згенерувати нові ключові фрази: ' . $e->getMessage());
-            }
-        }
+        $this->info('Нових ключів для пулу: ' . count($newKeywords));
 
         if (!empty($newKeywords)) {
             $now = now();
@@ -108,7 +102,8 @@ class BuildContentPlan extends Command
             $this->info('Додано ' . count($rows) . ' нових ключів у пул');
         }
 
-        $keywordsPool = DB::table('semantic_keywords')->get(['keyword', 'volume'])->map(function ($row) {
+        // У кластеризацію — 300 найпопулярніших ключів пулу (раніше весь пул, що з часом лише росте)
+        $keywordsPool = DB::table('semantic_keywords')->orderByDesc('volume')->limit(300)->get(['keyword', 'volume'])->map(function ($row) {
             return ['keyword' => $row->keyword, 'volume' => $row->volume];
         })->toArray();
 
@@ -216,30 +211,6 @@ class BuildContentPlan extends Command
         return $data['result'] ?? [];
     }
 
-    protected function generateSeedKeywords(): array
-    {
-        $siteTopic = env('SITE_TOPIC', 'дошка оголошень');
-        $seedCount = (int) env('SERPSTAT_SEED_COUNT', 10);
-
-        $prompt = $this->prompt(
-            'content_seed_keywords',
-            'Контент-план — кореневі ключі для Serpstat',
-            "Ти — SEO-спеціаліст. Тема сайту: \"{{site_topic}}\".\n\n"
-                . "Дай {{seed_count}} КОРОТКИХ кореневих пошукових запитів (1-2 слова кожен) — "
-                . "базових тем, які реально шукають в Google люди, зацікавлені цією темою. "
-                . "Це будуть \"затравки\" для подальшого пошуку пов'язаних запитів, тому обирай "
-                . "саме широкі, популярні кореневі слова, а не вузькі фрази.\n\n"
-                . "Дай відповідь СТРОГО у форматі JSON-масиву рядків, без пояснень і без "
-                . "markdown-розмітки, наприклад:\n[\"слово1\", \"слово2\"]",
-            ['site_topic' => $siteTopic, 'seed_count' => $seedCount],
-            'Генерує короткі кореневі запити, якими потім опитується Serpstat API для пошуку реальних пов\'язаних ключів.'
-        );
-
-        $raw = $this->callLlm($prompt, 500, $this->validatesAsJsonArray());
-        $json = $this->extractJson($raw, '[', ']');
-        return json_decode($json, true) ?: [];
-    }
-
     protected function fetchSerpstatKeywords(array $seeds): array
     {
         $se = env('SERPSTAT_SE', 'g_ua');
@@ -300,43 +271,6 @@ class BuildContentPlan extends Command
     }
 
     // -----------------------------------------------------------------
-    // Резервний варіант без Serpstat
-    // -----------------------------------------------------------------
-
-    protected function generateNewKeywordsClaude(array $existingKeywords): array
-    {
-        $siteTopic = env('SITE_TOPIC', 'дошка оголошень');
-        $language = env('ARTICLE_LANGUAGE', 'українська');
-        $target = (int) env('TARGET_NEW_KEYWORDS', 60);
-
-        $existingStr = !empty($existingKeywords)
-            ? implode(', ', array_slice($existingKeywords, -300))
-            : '(поки що немає)';
-
-        $prompt = $this->prompt(
-            'content_fallback_keywords',
-            'Контент-план — резервна генерація ключів (без Serpstat)',
-            "Ти — SEO-спеціаліст. Тема сайту: \"{{site_topic}}\".\nМова: {{language}}.\n\n"
-                . "Згенеруй {{target}} НОВИХ пошукових ключових фраз (семантичне ядро) для цього сайту — "
-                . "конкретні фрази, які реально могли б вводити в Google люди, зацікавлені цією темою. "
-                . "Включай суміш: короткі (2-3 слова) і довші (4-6 слів) запити, різні наміри пошуку.\n\n"
-                . "НЕ повторюй ці вже наявні ключі:\n{{existing_keywords}}\n\n"
-                . "Дай відповідь СТРОГО у форматі JSON-масиву рядків, без пояснень і без markdown-розмітки.",
-            [
-                'site_topic' => $siteTopic,
-                'language' => $language,
-                'target' => $target,
-                'existing_keywords' => $existingStr,
-            ],
-            'Використовується, лише якщо SERPSTAT_API_TOKEN не задано — Claude вигадує ключі зі своїх знань замість реальних даних Serpstat.'
-        );
-
-        $raw = $this->callLlm($prompt, 3000, $this->validatesAsJsonArray());
-        $json = $this->extractJson($raw, '[', ']');
-        return json_decode($json, true) ?: [];
-    }
-
-    // -----------------------------------------------------------------
     // Кластеризація і побудова плану
     // -----------------------------------------------------------------
 
@@ -351,14 +285,14 @@ class BuildContentPlan extends Command
         foreach ($keywordsPool as $k) {
             if (!empty($k['volume'])) {
                 $hasVolumes = true;
-                $lines[] = "- {$k['keyword']} (обсяг: ~{$k['volume']}/міс)";
+                $lines[] = "- {$k['keyword']} (попит: ~{$k['volume']})";
             } else {
                 $lines[] = "- {$k['keyword']}";
             }
         }
         $keywordsStr = implode("\n", $lines);
         $volumeNote = $hasVolumes
-            ? 'У списку вказано реальний щомісячний обсяг пошуку — врахуй це при формуванні кластерів і тем.'
+            ? 'Біля ключів — реальний попит (покази в Google за ~3 місяці або кількість пошуків на сайті). Це справжні запити людей: теми мають відповідати саме на них, пріоритет — кластерам із більшим попитом.'
             : '';
 
         $categoryNames = array_map(function ($c) {
