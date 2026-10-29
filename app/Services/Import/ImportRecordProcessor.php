@@ -157,7 +157,7 @@ class ImportRecordProcessor
         $dir = 'imports/' . $userId . '/' . substr(md5($importKey), 0, 12) . '-' . time();
 
         $ownBases = array_filter([
-            rtrim($disk->url(''), '/'),
+            static::cloudBaseUrl($disk),
             ($b = config('filesystems.disks.s3.bucket')) ? "https://{$b}.s3" : null,
         ]);
 
@@ -200,6 +200,16 @@ class ImportRecordProcessor
         }
 
         return $uploadedUrls;
+    }
+
+    /**
+     * Базова адреса хмарного диска без «/» у кінці. Не url(''): без AWS_URL адресу будує
+     * AWS SDK (getObjectUrl), а порожній ключ він відхиляє — «[Key] expected string length
+     * to be >= 1», і через це падав кожен товар імпорту.
+     */
+    public static function cloudBaseUrl($disk): string
+    {
+        return rtrim(substr($disk->url('_'), 0, -1), '/');
     }
 
     protected function getImageExtension(string $url, ?string $contentType = null): string
@@ -246,7 +256,7 @@ class ImportRecordProcessor
 
     protected function deleteImageFromStorage($disk, string $url): void
     {
-        $baseUrl = rtrim($disk->url(''), '/') . '/';
+        $baseUrl = static::cloudBaseUrl($disk) . '/';
         if (strpos($url, $baseUrl) === 0) {
             $path = substr($url, strlen($baseUrl));
         } else {

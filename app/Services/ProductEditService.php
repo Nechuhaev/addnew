@@ -165,7 +165,7 @@ class ProductEditService
      */
     protected function deleteImageFromStorage($disk, string $url): void
     {
-        $baseUrl = rtrim($disk->url(''), '/') . '/';
+        $baseUrl = \App\Services\Import\ImportRecordProcessor::cloudBaseUrl($disk) . '/';
         if (strpos($url, $baseUrl) === 0) {
             $path = substr($url, strlen($baseUrl));
         } else {
