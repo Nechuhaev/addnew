@@ -114,6 +114,8 @@ class ImportRecordProcessor
                     'source_id' => $record['source_id'],
                     'import_key' => $importKey,
                     'name' => $record['title'],
+                    // Слаг генерує мутатор Ad::setSlugAttribute з назви — лише коли поле передано (після name)
+                    'slug' => null,
                     'content' => $record['description'],
                     'price' => $record['price'],
                     'currency_id' => $currency->id,
