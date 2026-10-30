@@ -146,6 +146,14 @@ class Category extends Controller
             ? \App\Services\GeoFaq::forCategory($entity, $filter_entity ?? null, $results->total(), $filters, $this->included_categories)
             : [];
 
+        // Ручні FAQ з тексту розділу — першими в спільному блоці «Часті запитання» (один FAQPage)
+        if (!empty($meta['description'])) {
+            [$textFaq, $meta['description']] = \App\Services\GeoFaq::extractFromHtml((string) $meta['description']);
+            if ($textFaq && !request()->get('page') && !$listingFilters->isActive()) {
+                $faq = array_merge($textFaq, $faq);
+            }
+        }
+
         // Чутлива категорія (напр. «Знайомства і контакти») — noindex + без AdSense
         $sensitive = \App\Services\SeoRules::isSensitiveCategory($entity);
         if ($sensitive) {
