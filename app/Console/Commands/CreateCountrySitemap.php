@@ -95,7 +95,7 @@ class CreateCountrySitemap extends Command
 
                 // Блог
                 $sitemap_blog = Sitemap::create();
-                Article::all()->each(function ($item) use ($sitemap_blog) {
+                Article::where('slug', '<>', '')->whereNotNull('slug')->get()->each(function ($item) use ($sitemap_blog) {
                     $sitemap_blog->add($item->url);
                 });
 
