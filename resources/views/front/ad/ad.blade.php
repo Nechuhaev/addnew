@@ -99,28 +99,12 @@
             </div>
             @endif
 
-            <div class="columns columns-nowrap" itemtype="http://schema.org/Product">
-                <meta itemprop="name" content="{{ $ad->name }}" />
-                <link itemprop="image" href="{{ $ad->image }}" />
-                @if($ad->images && !empty($ad->images[0]))
-                    @foreach($ad->images as $image)
-                        <link itemprop="image" href="{{ $image }}" />
-                    @endforeach
+            <div class="columns columns-nowrap">
+                {{-- Product + Offer (JSON-LD) для розширених результатів і товарних оголошень Google --}}
+                @php($productSchema = \App\Services\Seo\ProductSchema::forAd($ad, $prices ?? [], request()->url()))
+                @if($productSchema)
+                    <script type="application/ld+json">{!! json_encode($productSchema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) !!}</script>
                 @endif
-                <meta itemprop="description" content="{{ $ad->content }}" />
-                <div itemprop="offers" itemtype="http://schema.org/Offer" itemscope>
-                    <link itemprop="url" href="{{ $ad->url }}" />
-                    <meta itemprop="availability" content="https://schema.org/{{ ($ad->is_product && $ad->stock === 'out_of_stock') ? 'OutOfStock' : 'InStock' }}" />
-                    @foreach($prices as $price)
-                        @if($price['selected'])
-                            <meta itemprop="priceCurrency" content="{{ $price['currency'] }}" />
-                            <meta itemprop="price" content="{{ $price['value'] }}" />
-                        @endif
-                    @endforeach
-                    <div itemprop="seller" itemtype="http://schema.org/Organization" itemscope>
-                        <meta itemprop="name" content="{{ $ad->user->username }}" />
-                    </div>
-                </div>
 
                 <aside class="column-left hidden-xs">
                     <div class="adv-img">
