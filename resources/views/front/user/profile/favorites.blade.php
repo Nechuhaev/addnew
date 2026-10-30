@@ -42,7 +42,7 @@
                                 @php($was = (float) $favorite->price_at_add_uah)
                                 <div class="fav-item {{ $ad->status !== 'active' ? 'is-inactive' : '' }}">
                                     <a href="{{ route('ad.page', ['slug' => $ad->slug]) }}" class="fav-img">
-                                        <img src="{{ $ad->image }}" alt="{{ $ad->name }}" width="90" height="90" loading="lazy"
+                                        <img src="{{ \App\Support\Thumb::url($ad->image, 320) }}" alt="{{ $ad->name }}" width="90" height="90" loading="lazy"
                                              onerror="this.onerror=null;this.src='{{ asset('assets/front/img/placeholder.png') }}';">
                                     </a>
                                     <div class="fav-body">

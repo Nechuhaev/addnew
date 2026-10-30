@@ -6,7 +6,7 @@
                 <div class="category-count">{{ $loop->iteration }}</div>
                 <div class="category-img">
                     <a href="{{ $ad['url'] }}" title="{{ $ad['name'] }}" class="preview" data-rel="{{ $ad['image'] }}">
-                        <img width="250" height="250" src="{{ $ad['image'] }}" class="attachment-ad-medium size-ad-medium" alt="{{ $ad['name'] }}" onerror="this.onerror=null;this.src='{{ asset('assets/front/img/placeholder.png') }}';">
+                        <img width="250" height="250" src="{{ \App\Support\Thumb::url($ad['image'], 320) }}" @if($ss = \App\Support\Thumb::srcset($ad['image'], 320)) srcset="{{ $ss }}" @endif class="attachment-ad-medium size-ad-medium" alt="{{ $ad['name'] }}" onerror="this.onerror=null;this.src='{{ asset('assets/front/img/placeholder.png') }}';">
                     </a>
                 </div>
                 <div class="category-caption">

@@ -125,14 +125,14 @@
                 <aside class="column-left hidden-xs">
                     <div class="adv-img">
                         <a href="{{ $ad->image }}" data-rel="colorbox" class="colorbox group1" title="{{ $ad->name }}">
-                            <img class="img-responsive" src="{{ $ad->image }}" title="{{ $ad->name }}" alt="{{ $ad->name }}" fetchpriority="high" style="opacity: 1;" onerror="this.onerror=null;this.src='{{ asset('assets/front/img/placeholder.png') }}';">
+                            <img class="img-responsive" src="{{ \App\Support\Thumb::url($ad->image, 640) }}" @if($ss = \App\Support\Thumb::srcsetW($ad->image, [640, 960])) srcset="{{ $ss }}" sizes="(max-width: 767px) 100vw, 360px" @endif title="{{ $ad->name }}" alt="{{ $ad->name }}" fetchpriority="high" style="opacity: 1;" onerror="this.onerror=null;this.src='{{ asset('assets/front/img/placeholder.png') }}';">
                         </a>
 
                         @if($ad->images && !empty($ad->images[0]))
                             <div class="adv-imgs">
                             @foreach($ad->images as $image)
                                     <a href="{{ $image }}" id="thumb{{ $loop->iteration }}" class="colorbox group1" data-rel="colorbox" title="{{ $ad->name }} - {{ __('ad_create.image_number_suffix', ['n' => $loop->iteration]) }}">
-                                        <img src="{{ $image }}" alt="{{ $ad->name . $loop->iteration }}" title="{{ $ad->name . $loop->iteration }}" width="50" height="50" style="opacity: 1;" onerror="this.onerror=null;this.src='{{ asset('assets/front/img/placeholder.png') }}';">
+                                        <img src="{{ \App\Support\Thumb::url($image, 320) }}" alt="{{ $ad->name . $loop->iteration }}" title="{{ $ad->name . $loop->iteration }}" width="50" height="50" loading="lazy" style="opacity: 1;" onerror="this.onerror=null;this.src='{{ asset('assets/front/img/placeholder.png') }}';">
                                     </a>
                             @endforeach
                             </div>
@@ -173,12 +173,12 @@
 
                         <div class="adv-img visible-xs">
                             <a href="{{ $ad->image }}" data-rel="colorbox" class="colorbox group1" title="{{ $ad->name }}">
-                                <img class="img-responsive" src="{{ $ad->image }}" title="{{ $ad->name }}" alt="{{ $ad->name }}" fetchpriority="high" style="opacity: 1;" onerror="this.onerror=null;this.src='{{ asset('assets/front/img/placeholder.png') }}';">
+                                <img class="img-responsive" src="{{ \App\Support\Thumb::url($ad->image, 640) }}" @if($ss = \App\Support\Thumb::srcsetW($ad->image, [640, 960])) srcset="{{ $ss }}" sizes="(max-width: 767px) 100vw, 360px" @endif title="{{ $ad->name }}" alt="{{ $ad->name }}" fetchpriority="high" style="opacity: 1;" onerror="this.onerror=null;this.src='{{ asset('assets/front/img/placeholder.png') }}';">
                             </a>
                             @if($ad->images)
                                 <div class="adv-imgs">
                                     @foreach($ad->images as $image)
-                                        <a href="{{ $ad->image }}" id="thumb{{ $loop->iteration }}" class="colorbox group1" data-rel="colorbox" title="{{ $ad->name }} - {{ __('ad_create.image_number_suffix', ['n' => $loop->iteration]) }}"><img src="{{ $ad->image }}" alt="{{ $ad->name . $loop->iteration }}" title="{{ $ad->name . $loop->iteration }}" width="50" height="50" style="opacity: 1;" onerror="this.onerror=null;this.src='{{ asset('assets/front/img/placeholder.png') }}';"></a>
+                                        <a href="{{ $ad->image }}" id="thumb{{ $loop->iteration }}" class="colorbox group1" data-rel="colorbox" title="{{ $ad->name }} - {{ __('ad_create.image_number_suffix', ['n' => $loop->iteration]) }}"><img src="{{ \App\Support\Thumb::url($ad->image, 320) }}" alt="{{ $ad->name . $loop->iteration }}" title="{{ $ad->name . $loop->iteration }}" width="50" height="50" loading="lazy" style="opacity: 1;" onerror="this.onerror=null;this.src='{{ asset('assets/front/img/placeholder.png') }}';"></a>
                                     @endforeach
                                 </div>
                             @endif
@@ -398,7 +398,7 @@
                         <div class="related-ad">
                             <div class="image">
                                 <a href="{{ $related_ad->url }}" title="{{ $related_ad->name }}">
-                                    <img src="{{ $related_ad->image }}" alt="{{ $related_ad->name }}" class="img-responsive" onerror="this.onerror=null;this.src='{{ asset('assets/front/img/placeholder.png') }}';">
+                                    <img src="{{ \App\Support\Thumb::url($related_ad->image, 320) }}" @if($ss = \App\Support\Thumb::srcset($related_ad->image, 320)) srcset="{{ $ss }}" @endif alt="{{ $related_ad->name }}" class="img-responsive" loading="lazy" onerror="this.onerror=null;this.src='{{ asset('assets/front/img/placeholder.png') }}';">
                                 </a>
                             </div>
                             <div class="price">100 грн <span class="city">Днепропетровск</span></div>
