@@ -80,7 +80,7 @@
                         @foreach($group as $ad)
                             <a href="{{ $ad['url'] }}">
                         <span class="last-adv-title">
-                            <img src="{{ $ad['image'] }}" alt="{{ $ad['name'] }}">
+                            <img src="{{ \App\Support\Thumb::url($ad['image'], 320) }}" @if($ss = \App\Support\Thumb::srcset($ad['image'], 320)) srcset="{{ $ss }}" @endif alt="{{ $ad['name'] }}">
                             <strong> {{ $ad['name'] }}</strong>
                         </span>
                                 <span class="last-adv-price"> {{ $ad['price'] }} </span>

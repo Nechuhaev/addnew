@@ -117,7 +117,13 @@ class Kernel extends ConsoleKernel
         ->weeklyOn(3, '12:00')
         ->withoutOverlapping()
         ->appendOutputTo(storage_path('logs/ads-clean-titles.log'));
-        
+
+    // Раз на місяць — старі зменшені копії фото (public/thumbs); потрібні створяться знову при показі
+    $schedule->command('thumbs:clean --days=90')
+        ->monthlyOn(2, '03:20')
+        ->withoutOverlapping()
+        ->appendOutputTo(storage_path('logs/thumbs-clean.log'));
+
             // Раз на день — звіряє email магазинів з тим, що реально вказано
     // на їхніх сайтах, автоматично оновлює при розбіжності.
     $schedule->command('shops:check-email --limit=50')

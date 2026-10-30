@@ -245,6 +245,11 @@ Route::get('/login/{provider}/callback', 'Front\User\Auth\SocialAuthController@c
 // Опис сайту для AI-пошуку (llmstxt.org) — поза uk/ru групами, одна адреса
 Route::get('/llms.txt', 'Front\Seo\LlmsTxtController@show')->name('llms.txt');
 
+// Зменшені копії фото з S3 (App\Support\Thumb): перший запит створює файл у public/thumbs
+Route::get('/thumbs/{w}/s3/{path}', 'Front\ThumbController@show')
+    ->where(['w' => '320|640|960', 'path' => '[A-Za-z0-9._\-/]+'])
+    ->name('thumb');
+
 // Файл ключа IndexNow (keyLocation у запитах seo:indexnow); без ключа в .env — 404
 Route::get('/indexnow-key.txt', function () {
     $key = (string) config('seo.indexnow_key', '');
