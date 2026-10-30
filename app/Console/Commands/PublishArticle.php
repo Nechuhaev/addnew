@@ -123,6 +123,14 @@ class PublishArticle extends Command
 
         $article = $this->generateArticleContent($topicForModel, $recentArticles);
 
+        // Битий результат генерації (стаття #90 з заголовком «...» і порожнім slug ламала sitemap):
+        // не публікуємо — тема повертається в план (catch у handle()).
+        $title = trim((string) ($article['title'] ?? ''));
+        $textLength = mb_strlen(trim(strip_tags((string) ($article['content_html'] ?? ''))));
+        if (preg_match_all('/\p{L}/u', $title) < 10 || Str::slug($title) === '' || $textLength < 1500) {
+            throw new \RuntimeException("некоректний результат генерації (заголовок «{$title}», текст {$textLength} символів)");
+        }
+
         // Claude іноді ігнорує інструкцію "не вигадуй URL" і додає правдоподібні,
         // але неіснуючі посилання на /blog/... Гарантовано прибираємо будь-яке
         // посилання на блог, якого немає в реальному списку статей — незалежно
