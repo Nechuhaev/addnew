@@ -6021,3 +6021,19 @@ li.active {
         min-height: 100px
     }
 }
+
+/* «Розділ у цифрах» на сторінці категорії (App\\Services\\Seo\\CategoryDataText) */
+.category-data {
+    margin: 24px 0 0;
+    font-size: 15px;
+    line-height: 1.55
+}
+
+.category-data h2 {
+    font-size: 20px;
+    margin: 0 0 10px
+}
+
+.category-data p {
+    margin: 0 0 10px
+}

@@ -19,6 +19,9 @@ use Illuminate\Support\Facades\DB;
 
 class Category extends Controller
 {
+    // Розділ з меншою кількістю оголошень — noindex (тонка сторінка), доки не наповниться
+    const MIN_INDEX_ADS = 3;
+
     private $filter = null;
 
     private $category_id = [];
@@ -159,11 +162,21 @@ class Category extends Controller
             }
         }
 
+        // «Розділ у цифрах» — дані розділу по Україні (лише без фільтра міста, 1-ша сторінка)
+        $dataText = '';
+        if (!$sensitive && empty($filter_entity) && !request()->get('page') && !$listingFilters->isActive()) {
+            $dataText = (new \App\Services\Seo\CategoryDataText())->build($entity, $this->included_categories);
+        }
+
+        // Менше MIN_INDEX_ADS оголошень — тонка сторінка: noindex, доки розділ не наповниться
+        $thin = $results->total() < self::MIN_INDEX_ADS;
+
         return view('front.ad.category')->with([
+            'dataText' => $dataText,
             'pricesLink' => $pricesLink,
             'faq' => $faq,
             'h1' => $h1,
-            'noindex' => $sensitive || \App\Services\SeoRules::isNoindexCountry($filterCountry),
+            'noindex' => $sensitive || $thin || \App\Services\SeoRules::isNoindexCountry($filterCountry),
             'entity' => $entity,
             'filters' => $filters,
             'listingFilters' => $listingFilters,
