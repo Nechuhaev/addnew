@@ -155,6 +155,30 @@ class GeoFaq
     /**
      * FAQPage для JSON-LD.
      */
+    /**
+     * Ручні FAQ у тексті розділу: блок <div class="article-faq"> з парами <h3>питання</h3><p>відповідь</p>
+     * (як у статтях блогу). Повертає [пари, текст без блоку і без заголовка «Часті запитання» перед ним] —
+     * на сторінці лишається один блок FAQ і один FAQPage.
+     */
+    public static function extractFromHtml(string $html): array
+    {
+        if (!preg_match('~(?:<h2[^>]*>[^<]*(?:Часті запитання|Частые вопросы)[^<]*</h2>\s*)?<div class="article-faq">(.*?)</div>~su', $html, $m)) {
+            return [[], $html];
+        }
+        $pairs = [];
+        if (preg_match_all('~<h3[^>]*>(.*?)</h3>\s*<p[^>]*>(.*?)</p>~su', $m[1], $found, PREG_SET_ORDER)) {
+            foreach ($found as $p) {
+                $q = trim(html_entity_decode(strip_tags($p[1]), ENT_QUOTES, 'UTF-8'));
+                $a = trim(html_entity_decode(strip_tags($p[2]), ENT_QUOTES, 'UTF-8'));
+                if ($q !== '' && $a !== '') {
+                    $pairs[] = [$q, $a];
+                }
+            }
+        }
+
+        return [$pairs, str_replace($m[0], '', $html)];
+    }
+
     public static function schema(array $faq): array
     {
         return [
