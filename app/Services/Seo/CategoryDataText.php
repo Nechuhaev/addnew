@@ -20,10 +20,11 @@ use Illuminate\Support\Facades\DB;
  */
 class CategoryDataText
 {
-    const VERSION = 'v1';
+    const VERSION = 'v2';
     const MIN_ADS = 3;       // менше — блоку немає (сторінка й так noindex)
     const TOP_CITIES = 6;
     const TOP_CHILDREN = 8;
+    const FRESH_DAYS = 90;
 
     public function build(AdCategory $category, array $categoryIds): string
     {
@@ -53,6 +54,10 @@ class CategoryDataText
         $byCondition = (clone $base)->selectRaw('ads.`condition` AS k, COUNT(*) AS n')->groupBy('ads.condition')->pluck('n', 'k')->all();
         $bySeller = (clone $base)->selectRaw('ads.is_product AS k, COUNT(*) AS n')->groupBy('ads.is_product')->pluck('n', 'k')->all();
         $latest = (clone $base)->max('ads.date_active');
+        // Стара дата («останнє додано 2021 року») лише відлякує — показуємо, якщо свіжіша за 90 днів
+        if ($latest && strtotime($latest) < strtotime('-' . self::FRESH_DAYS . ' days')) {
+            $latest = null;
+        }
         $cityCounts = (clone $base)->selectRaw('ads.city_id AS k, COUNT(*) AS n')->groupBy('ads.city_id')
             ->orderByDesc('n')->limit(self::TOP_CITIES)->pluck('n', 'k')->all();
         $childCounts = [];
