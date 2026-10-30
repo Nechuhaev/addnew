@@ -114,9 +114,23 @@ class RebuildSitemap extends Command
         // 4. Рубрики оголошень, регіони, міста
         // Чутливі категорії (SEO_NOINDEX_CATEGORIES) — під noindex, у sitemap не потрібні
         $sensitiveCats = \App\Services\SeoRules::sensitiveCategoryIds();
-        $adCats = AdCategory::whereNotIn('id', $sensitiveCats ?: [0])->get()->map(function ($c) {
+        // Розділи з меншою кількістю оголошень — noindex (Category::MIN_INDEX_ADS), у sitemap не потрібні
+        $catCounts = \Illuminate\Support\Facades\DB::table('ads')->where('status', 1)->where('is_sensitive', 0)
+            ->selectRaw('category_id, COUNT(*) AS n')->groupBy('category_id')->pluck('n', 'category_id')->all();
+        $allCats = AdCategory::whereNotIn('id', $sensitiveCats ?: [0])->get();
+        $adCats = $allCats->filter(function ($c) use ($catCounts, $allCats) {
+            $n = (int) ($catCounts[$c->id] ?? 0);
+            if (!$c->parent_id) {
+                foreach ($allCats as $child) {
+                    if ((int) $child->parent_id === (int) $c->id) {
+                        $n += (int) ($catCounts[$child->id] ?? 0);
+                    }
+                }
+            }
+            return $n >= \App\Http\Controllers\Front\Ad\Category::MIN_INDEX_ADS;
+        })->map(function ($c) {
             return $c->url;
-        })->all();
+        })->values()->all();
         $this->writePairs('ad_categories.xml', $adCats, $index);
 
         // Сторінки цін (/ceny/{slug}) — лише розділи з достатньою статистикою

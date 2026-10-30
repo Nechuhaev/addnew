@@ -59,7 +59,9 @@
                         <span class="show-more__btn btn-show">{{ __('front.show_more') }}</span>
                     </div>
                     @endif
-                    @if(!empty($pricesLink))
+                    @if(!empty($dataText))
+                        <section class="category-data">{!! $dataText !!}</section>
+                    @elseif(!empty($pricesLink))
                         <p class="prices-link" style="margin: 20px 0 0; font-size: 15px;">
                             <a href="{{ $pricesLink['url'] }}">{{ app()->getLocale() === 'ru' ? 'Цены в разделе' : 'Ціни в розділі' }} «{{ $entity->name }}»</a>:
                             {{ app()->getLocale() === 'ru' ? 'медиана' : 'медіана' }} {{ number_format($pricesLink['median'], 0, ',', ' ') }} грн —
