@@ -99,7 +99,8 @@ class RebuildSitemap extends Command
         $this->writePairs('articles.xml', $blogCats, $index);
 
         $posts = [];
-        foreach (Article::all() as $a) {
+        // Стаття без слагу (напр. чернетка) — адресу не побудувати (blog/{slug}), пропускаємо
+        foreach (Article::where('slug', '<>', '')->whereNotNull('slug')->get() as $a) {
             $mod = null;
             try {
                 $raw = $a->getOriginal('updated_at');
