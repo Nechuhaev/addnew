@@ -9,12 +9,15 @@ use App\Ad;
  * результатів і безкоштовних товарних оголошень Google (merchant listings).
  *
  * Замінює мікророзмітку без itemscope, яку Google ігнорував. Без ціни розмітки немає
- * (Offer без price невалідний); чутливі оголошення (SeoRules) — теж без неї.
+ * (Offer без price невалідний; ціна 1 грн — заглушка «договірна», теж без розмітки);
+ * чутливі оголошення (SeoRules) — теж без неї.
  * Доставку (shippingDetails) вказуємо лише там, де вона точно відома: безкоштовна
  * доставка магазину від суми, і ціна товару не менша за неї.
  */
 class ProductSchema
 {
+    const MIN_PRICE = 1;
+
     const CONDITIONS = [
         'new' => 'https://schema.org/NewCondition',
         'used' => 'https://schema.org/UsedCondition',
@@ -31,7 +34,8 @@ class ProductSchema
         }
         $price = null;
         foreach ($prices as $p) {
-            if (!empty($p['selected']) && (int) $p['value'] > 0) {
+            // Ціна 1 (і менше) — заглушка «договірна» в приватних оголошеннях, не реальна ціна
+            if (!empty($p['selected']) && (int) $p['value'] > self::MIN_PRICE) {
                 $price = $p;
             }
         }
