@@ -45,6 +45,7 @@ class CheckIndexStatus extends Command
         }
         foreach (['ad', 'category', 'tag'] as $type) {
             Cache::forget("seo_index_summary:{$type}");
+            Cache::forget("seo_indexed_ids:{$type}");
         }
 
         return 0;

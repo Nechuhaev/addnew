@@ -73,9 +73,11 @@ class Tag extends Controller
             $meta['description'] = false;
         }
 
-        // Тонкі теги (менше 5 оголошень і без власного тексту) не індексуємо,
-        // але посилання з них лишаються доступними (noindex, follow).
-        $noindex = (!$hasAnyContent && $total < 5);
+        // Тонкі теги (менше 5 оголошень) не індексуємо, навіть із власним текстом: Google таких
+        // не бере («Crawled - currently not indexed»). Виняток — тег із текстом, що вже має покази
+        // в Google (seo_index_status). Посилання з них лишаються доступними (noindex, follow).
+        $noindex = $total < 5
+            && !($hasAnyContent && \App\Services\Seo\IndexStatus::isIndexed('tag', (int) $entity->id));
 
         // Тег із noindex-стоп-словом («девушки по вызову», «кодграббер»…) — noindex + без AdSense
         if ($sensitiveTag) {

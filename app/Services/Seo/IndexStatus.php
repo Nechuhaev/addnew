@@ -37,6 +37,27 @@ class IndexStatus
         return self::NOT_INDEXED; // «Crawled/Discovered - currently not indexed», «URL is unknown to Google»
     }
 
+    /** Чи сутність зараз в індексі Google (за останньою перевіркою) */
+    public static function isIndexed(string $type, int $id): bool
+    {
+        return in_array($id, self::indexedIds($type), true);
+    }
+
+    /** id сутностей у стані «в індексі»; кеш 1 год (дані оновлюються раз на добу) */
+    public static function indexedIds(string $type): array
+    {
+        if (!self::tableExists()) {
+            return [];
+        }
+
+        return Cache::remember("seo_indexed_ids:{$type}", 3600, function () use ($type) {
+            return DB::table('seo_index_status')->where('entity_type', $type)->where('state', self::INDEXED)
+                ->pluck('entity_id')->map(function ($id) {
+                    return (int) $id;
+                })->all();
+        });
+    }
+
     /** [entity_id => row] для рядків на поточній сторінці адмінки */
     public static function forIds(string $type, array $ids): array
     {
