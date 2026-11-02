@@ -148,7 +148,9 @@
                         </div>
                     </form>
                     <hr>
+                    @include('admin.partials.index-summary', ['type' => 'tag'])
                     @if($tags->items())
+                        @php($indexRows = \App\Services\Seo\IndexStatus::forIds('tag', collect($tags->items())->pluck('id')->all()))
                         <table class="table table-bordered table-hover table-middle-cell">
                             <tr>
                                 <th></th>
@@ -159,6 +161,7 @@
                                     {!! ($order == 'ads_count') ? ($direction != 'asc') ? '<i class="mdi mdi-arrow-down"></i>' : '<i class="mdi mdi-arrow-up"></i>' : '';   !!}
                                 </th>
                                 <th class="text-center">SEO</th>
+                                <th class="text-center">Индекс</th>
                                 <th class="text-center"></th>
                             </tr>
                             @foreach($tags as $tag_row)
@@ -175,6 +178,7 @@
                                             <i class="mdi mdi-clock-outline text-muted" title="Ще старий/шаблонний текст"></i>
                                         @endif
                                     </td>
+                                    <td class="text-center" style="width: 110px">@include('admin.partials.index-badge', ['row' => $indexRows[$tag_row->id] ?? null])</td>
                                     <td class="text-center cell-actions">
                                         <a href="{{ route('admin.adTags.edit', ['id' => $tag_row->id]) }}"><i class="mdi mdi-18px mdi-table-edit"></i></a>
                                         <a href="{{ route('admin.adTags.delete', ['id' => $tag_row->id]) }}" onclick="return confirm('Вы пытаетесь удалить метку {{ $tag_row->name }}. Подтвердите действие.')" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>

@@ -77,6 +77,13 @@ class Kernel extends ConsoleKernel
         ->withoutOverlapping()
         ->appendOutputTo(storage_path('logs/content-check-index.log'));
 
+    // Раз на день — статус індексації оголошень, категорій і тегів (стовпчик «Индекс» в адмінці).
+    // Ліміт URL Inspection — 2000/добу на властивість: 50 бере content:check-index, решту — цей (SEO_INDEX_CHECK_PER_DAY).
+    $schedule->command('seo:index-status')
+        ->dailyAt('11:10')
+        ->withoutOverlapping(180)
+        ->appendOutputTo(storage_path('logs/seo-index-status.log'));
+
     // Safety-net: sitemap і так перегенеровується автоматично всередині
     // content:publish/content:refresh, цей запис — просто підстраховка.
     $schedule->command('content:sitemap')

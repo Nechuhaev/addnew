@@ -57,7 +57,14 @@
 
     <div class="row">
         <div class="col-12">
+            @include('admin.partials.index-summary', ['type' => 'ad'])
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
             @if($ads->items())
+                @php($indexRows = \App\Services\Seo\IndexStatus::forIds('ad', collect($ads->items())->pluck('id')->all()))
                 @foreach($ads as $ad)
                 <div class="card">
                     <div class="card-body">
@@ -73,7 +80,7 @@
                                     <div class="col-12"><h4 style="font-weight: 900">{{ $ad->name }}</h4></div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-7">
+                                    <div class="col-6">
                                         <div><small class="text-muted">Категория</small></div>
                                         {{ $ad->category->path }}
 
@@ -83,7 +90,7 @@
                                         <div><small class="text-muted">Город</small></div>
                                         {{ $ad->city->path }}
                                     </div>
-                                    <div class="col-5">
+                                    <div class="col-4">
                                         <div><small class="text-muted">Добавлено</small></div>
                                         {{ $ad->created_at }}
 
@@ -92,6 +99,10 @@
 
                                         <div><small class="text-muted">Дата истечения</small></div>
                                         {{ $ad->date_end }}
+                                    </div>
+                                    <div class="col-2">
+                                        <div><small class="text-muted">Индекс Google</small></div>
+                                        @include('admin.partials.index-badge', ['row' => $indexRows[$ad->id] ?? null])
                                     </div>
                                 </div>
 
