@@ -58,7 +58,8 @@ class ProductSchema
         $user = $ad->user;
         if ($user && trim((string) $user->username) !== '') {
             $offer['seller'] = [
-                '@type' => $user->is_shop_owner ? 'Organization' : 'Person',
+                // Товар із фіда — завжди від магазину, навіть якщо прапорець is_shop_owner не стоїть
+                '@type' => ($user->is_shop_owner || $ad->is_product) ? 'Organization' : 'Person',
                 'name' => trim((string) $user->username),
                 'url' => url((app()->getLocale() === 'ru' ? '/ru' : '') . '/author/' . $user->id),
             ];
@@ -78,7 +79,7 @@ class ProductSchema
         if ($images) {
             $schema['image'] = $images;
         }
-        $description = trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags((string) $ad->content), ENT_QUOTES, 'UTF-8')));
+        $description = trim(preg_replace('/\s+/u', ' ', self::plainText((string) $ad->content)));
         if ($description !== '') {
             $schema['description'] = mb_substr($description, 0, 5000);
         }
@@ -95,6 +96,21 @@ class ProductSchema
         $schema['offers'] = $offer;
 
         return $schema;
+    }
+
+    /** Текст без HTML; сутності декодуємо кілька разів — у фідах буває подвійне кодування («&amp;#39;») */
+    protected static function plainText(string $html): string
+    {
+        $text = strip_tags($html);
+        for ($i = 0; $i < 3; $i++) {
+            $decoded = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            if ($decoded === $text) {
+                break;
+            }
+            $text = $decoded;
+        }
+
+        return strip_tags($text);
     }
 
     protected static function images(Ad $ad): array
