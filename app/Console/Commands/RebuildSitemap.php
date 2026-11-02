@@ -182,7 +182,9 @@ class RebuildSitemap extends Command
                             })->orWhere(function ($x) {
                                 $x->whereNotNull('content_uk')->where('content_uk', '!=', '');
                             });
-                        })->whereHas('ads', $inUa);
+                        })->whereHas('ads', $inUa)
+                            // лише ті, що вже мають покази в Google (узгоджено з Tag.php)
+                            ->whereIn('id', \App\Services\Seo\IndexStatus::indexedIds('tag'));
                     });
             })
             ->chunk(self::CHUNK, function ($tags, $page) use ($index, &$kept) {
