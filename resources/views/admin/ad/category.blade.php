@@ -184,7 +184,18 @@
         <div class="col-8">
             <div class="card">
                 <div class="card-body">
+                    @include('admin.partials.index-summary', ['type' => 'category'])
                     @if($tree)
+                        @php
+                            $indexIds = [];
+                            foreach ($tree as $treeItem) {
+                                $indexIds[] = $treeItem['id'];
+                                foreach (($treeItem['children'] ?: []) as $treeChild) {
+                                    $indexIds[] = $treeChild['id'];
+                                }
+                            }
+                            $indexRows = \App\Services\Seo\IndexStatus::forIds('category', $indexIds);
+                        @endphp
                         <table class="table table-bordered table-hover table-middle-cell">
                         @foreach($tree as $item)
                                 <tr>
@@ -192,6 +203,7 @@
                                     <th>{{ $item['name'] }}</th>
                                     <th></th>
                                     <th><a style="color: black; width: 100px" href="?order=ads_count&direction={{ ($direction == 'asc') ? 'desc' : 'asc'  }}">Кол-во</a> {!! ($order == 'ads_count') ? ($direction != 'asc') ? '<i class="mdi mdi-arrow-down"></i>' : '<i class="mdi mdi-arrow-up"></i>' : '';   !!}</th>
+                                    <th style="width: 110px">@include('admin.partials.index-badge', ['row' => $indexRows[$item['id']] ?? null])</th>
                                     <th class="text-center cell-actions">
                                         <a href="{{ route('admin.adCategories.edit', ['id' => $item['id']]) }}"><i class="mdi mdi-18px mdi-table-edit"></i></a>
                                         <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
@@ -204,6 +216,7 @@
                                             <td></td>
                                             <td>{{ $child['name'] }}</td>
                                             <td style="width: 100px">{{ $child['ads_count'] }}</td>
+                                            <td style="width: 110px">@include('admin.partials.index-badge', ['row' => $indexRows[$child['id']] ?? null])</td>
                                             <td class="text-center cell-actions">
                                                 <a href="{{ route('admin.adCategories.edit', ['id' => $child['id']]) }}"><i class="mdi mdi-18px mdi-table-edit"></i></a>
                                                 <a href="{{ route('admin.adCategories.delete', ['id' => $child['id']]) }}" onclick="return confirm('Вы пытаетесь удалить категорию {{ $child['name'] }}. Подтвердите действие.')" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
