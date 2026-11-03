@@ -4,7 +4,6 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
-use Illuminate\Support\Facades\Storage;
 
 class Kernel extends ConsoleKernel
 {
@@ -25,13 +24,17 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->call(function () {
-            foreach (Storage::directories('ads') as $directory) {
-                if(time() - (int)basename($directory) > 604800) {
-                    Storage::deleteDirectory($directory);
-                }
-            }
-        })->mondays()->at('17:00');
+        // Тимчасові локальні фото нових оголошень (після публікації вони вже в S3).
+        // Раніше чистка шукала storage/app/ads замість storage/app/public/ads і нічого не видаляла.
+        $schedule->command('ads:clean-temp-images --days=7')
+            ->mondays()->at('17:00')
+            ->withoutOverlapping()
+            ->appendOutputTo(storage_path('logs/ads-clean-temp-images.log'));
+
+        // Щонеділі — обрізає логи cron-задач понад 5 МБ до останнього 1 МБ
+        $schedule->command('logs:trim --max=5 --keep=1')
+            ->weeklyOn(0, '04:20')
+            ->withoutOverlapping();
 
         $schedule->command('sitemap:rebuild')->fridays()->at('17:00')->runInBackground();
 
