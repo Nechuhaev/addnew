@@ -41,12 +41,14 @@ class IndexNowPing extends Command
             : \Carbon\Carbon::parse(Cache::get(self::LAST_RUN_KEY, $now->copy()->subHour()->toDateTimeString()));
 
         $urls = [];
+        $items = [];   // нові оголошення — у журнал відправок (звіт «надіслано / в індексі»)
         // Нові активні оголошення
         Ad::where('status', 1)->where('created_at', '>=', $since)
             ->select('id', 'slug', 'name', 'content', 'category_id')
-            ->orderBy('id')->chunk(500, function ($ads) use (&$urls) {
+            ->orderBy('id')->chunk(500, function ($ads) use (&$urls, &$items) {
                 foreach ($ads as $ad) {
                     if ($ad->slug && !SeoRules::isSensitiveAd($ad)) {
+                        $items[] = ['ad', (int) $ad->id, route('ad.page', ['slug' => $ad->slug])];
                         $urls[] = route('ad.page', ['slug' => $ad->slug]);
                         $urls[] = route('ru.ad.page', ['slug' => $ad->slug]);
                     }
@@ -104,6 +106,7 @@ class IndexNowPing extends Command
             }
         }
 
+        \App\Services\Seo\IndexSubmissions::record('indexnow', $items);
         Cache::forever(self::LAST_RUN_KEY, $now->toDateTimeString());
 
         return 0;

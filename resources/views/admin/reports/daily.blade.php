@@ -104,6 +104,18 @@
                                 </div>
 
                                 <div class="mb-2">
+                                    <strong>Відправка на індексацію:</strong>
+                                    @if($report->index_submitted_indexnow !== null || $report->index_submitted_google !== null)
+                                        IndexNow {{ (int) $report->index_submitted_indexnow }} стор., Google {{ (int) $report->index_submitted_google }} стор.
+                                        @if($report->index_submitted_summary)
+                                            <br><span class="text-muted">{{ $report->index_submitted_summary }}</span>
+                                        @endif
+                                    @else
+                                        <span class="text-muted">не запускалась цього дня</span>
+                                    @endif
+                                </div>
+
+                                <div class="mb-2">
                                     <strong>Видалено товарів (404 від джерела):</strong>
                                     {{ $report->products_deleted_404_count !== null ? $report->products_deleted_404_count . ' шт.' : '—' }}
                                 </div>

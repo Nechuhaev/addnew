@@ -37,5 +37,13 @@
                 @endif
             </span>
         </div>
+        @php($sub = \App\Services\Seo\IndexSubmissions::report())
+        @if(!empty($sub))
+            <div class="small text-muted mt-2">
+                <strong>Отправлено на индексацию</strong> (все типы страниц):
+                IndexNow — за сутки {{ $sub['indexnow']['day'] }}, за 7 дней {{ $sub['indexnow']['week'] }}, всего {{ $sub['indexnow']['total'] }}, из них в индексе {{ $sub['indexnow']['indexed'] }}
+                · Google — за сутки {{ $sub['google']['day'] }}, за 7 дней {{ $sub['google']['week'] }}, всего {{ $sub['google']['total'] }}, из них в индексе {{ $sub['google']['indexed'] }}
+            </div>
+        @endif
     </div>
 </div>

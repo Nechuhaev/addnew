@@ -15,6 +15,7 @@ class GscClient
 {
     const TOKEN_CACHE_KEY = 'google_search_console_access_token';
     const SCOPE = 'https://www.googleapis.com/auth/webmasters.readonly';
+    const INDEXING_SCOPE = 'https://www.googleapis.com/auth/indexing';
 
     /** @var Client */
     protected $http;
@@ -54,6 +55,20 @@ class GscClient
     }
 
     /**
+     * Google Indexing API: повідомити про нову/оновлену адресу (URL_UPDATED). Ліміт — 200/добу на проєкт.
+     * Потрібно: увімкнений Indexing API у Google Cloud і сервісний акаунт — власник (Owner) властивості в Search Console.
+     */
+    public function publishUrl(string $url): array
+    {
+        $response = $this->http->post('https://indexing.googleapis.com/v3/urlNotifications:publish', [
+            'headers' => ['Authorization' => 'Bearer ' . $this->token(self::INDEXING_SCOPE)],
+            'json' => ['url' => $url, 'type' => 'URL_UPDATED'],
+        ]);
+
+        return json_decode((string) $response->getBody(), true) ?: [];
+    }
+
+    /**
      * Усі сторінки з показами за період: [url => impressions]
      */
     public function pagesWithImpressions(string $startDate, string $endDate): array
@@ -84,9 +99,10 @@ class GscClient
         return $out;
     }
 
-    protected function token(): string
+    protected function token(string $scope = self::SCOPE): string
     {
-        $cached = Cache::get(self::TOKEN_CACHE_KEY);
+        $cacheKey = $scope === self::SCOPE ? self::TOKEN_CACHE_KEY : self::TOKEN_CACHE_KEY . ':' . md5($scope);
+        $cached = Cache::get($cacheKey);
         if ($cached) {
             return $cached;
         }
@@ -99,7 +115,7 @@ class GscClient
         $now = time();
         $input = self::b64(json_encode(['alg' => 'RS256', 'typ' => 'JWT'])) . '.' . self::b64(json_encode([
             'iss' => $key['client_email'],
-            'scope' => self::SCOPE,
+            'scope' => $scope,
             'aud' => $tokenUri,
             'iat' => $now,
             'exp' => $now + 3600,
@@ -117,7 +133,7 @@ class GscClient
         if (empty($data['access_token'])) {
             throw new \RuntimeException('Google не повернув access_token: ' . json_encode($data));
         }
-        Cache::put(self::TOKEN_CACHE_KEY, $data['access_token'], max(60, (int) ($data['expires_in'] ?? 3600) - 120));
+        Cache::put($cacheKey, $data['access_token'], max(60, (int) ($data['expires_in'] ?? 3600) - 120));
 
         return $data['access_token'];
     }
