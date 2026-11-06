@@ -24,15 +24,23 @@ class UserController extends Controller
         }
         $direction = $request->get('direction') ?? 'desc';
 
+        $query = User::withCount('ads');
+        // Фільтр за IP реєстрації (клік по IP у списку)
+        if ($ip = trim((string) $request->get('ip'))) {
+            $query->where('register_ip', $ip);
+        }
+
         // Сортировка по username
         if ($order == 'username') {
-            $users = User::withCount('ads')->orderBy('firstname', $direction)->orderBy('email', $direction)->paginate(15);
+            $users = $query->orderBy('firstname', $direction)->orderBy('email', $direction)->paginate(15);
         } else {
-            $users = User::withCount('ads')->orderBy($order, $direction)->paginate(15);
+            $users = $query->orderBy($order, $direction)->paginate(15);
         }
 
         return view('admin.users.list', [
             'users' => $users,
+            'ipCounts' => $this->ipCounts($users),
+            'ipFilter' => $ip,
             'order' => $order,
             'direction' => $direction,
             'action_search' => route('admin.users.search'),
@@ -64,6 +72,7 @@ class UserController extends Controller
 
         return view('admin.users.list', [
             'users' => $users,
+            'ipCounts' => $this->ipCounts($users),
             'order' => $order,
             'direction' => $direction,
             's' => $s,
@@ -133,5 +142,17 @@ class UserController extends Controller
             }
             return route('admin.users');
         } 
+    }
+
+    /** [ip => скільки всього акаунтів зареєстровано з цієї IP] для користувачів на сторінці */
+    protected function ipCounts($users): array
+    {
+        $ips = collect($users->items())->pluck('register_ip')->filter()->unique()->values()->all();
+        if (!$ips) {
+            return [];
+        }
+
+        return User::whereIn('register_ip', $ips)->selectRaw('register_ip, COUNT(*) AS n')
+            ->groupBy('register_ip')->pluck('n', 'register_ip')->all();
     }
 }
