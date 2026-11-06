@@ -25,6 +25,9 @@ class DailyReport extends Model
         'products_deleted_404_count',
         'tags_seo_optimized_count',
         'tags_seo_optimized_summary',
+        'index_submitted_indexnow',
+        'index_submitted_google',
+        'index_submitted_summary',
     ];
 
     protected $dates = ['date'];

@@ -24,9 +24,11 @@ class Tag extends Controller
         // сторінка відкрита за адресою редагування тега (/adTags/{id}),
         // бо базовий шлях для посилань "page=N" інакше визначається
         // з ПОТОЧНОГО URL (з ID у ньому), а не зі списку тегів.
-        $tags = AdTag::withCount('ads')->orderBy($order, $direction)
-            ->paginate($this->per_page)
-            ->withPath(route('admin.adTags'));
+        $tagsQuery = AdTag::withCount('ads')->orderBy($order, $direction);
+        \App\Services\Seo\IndexStatus::applyFilter($tagsQuery, 'tag', $request->get('index'), 'ad_tags.id');
+        $tags = $tagsQuery->paginate($this->per_page)
+            ->withPath(route('admin.adTags'))
+            ->appends($request->only(['index', 'order', 'direction']));
 
         $tag = null;
         if ($tag_id) {
@@ -58,9 +60,11 @@ class Tag extends Controller
         $order = $request->get('order') ?? 'name';
         $requested_tag = $request->name;
 
-        $tags = AdTag::withCount('ads')->where('name', 'like', '%' . $requested_tag . '%')->orderBy($order, $direction)
-            ->paginate($this->per_page)
-            ->withPath(route('admin.adTags'));
+        $tagsQuery = AdTag::withCount('ads')->where('name', 'like', '%' . $requested_tag . '%')->orderBy($order, $direction);
+        \App\Services\Seo\IndexStatus::applyFilter($tagsQuery, 'tag', $request->get('index'), 'ad_tags.id');
+        $tags = $tagsQuery->paginate($this->per_page)
+            ->withPath(route('admin.adTags.search'))
+            ->appends($request->only(['index', 'name', 'order', 'direction']));
 
         $tag = null;
 

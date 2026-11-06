@@ -87,6 +87,13 @@ class Kernel extends ConsoleKernel
         ->withoutOverlapping(180)
         ->appendOutputTo(storage_path('logs/seo-index-status.log'));
 
+    // Щодня о 12:20 — відправка на індексацію (IndexNow усе відкрите й ще не надіслане; Google Indexing API —
+    // до GOOGLE_INDEXING_PER_DAY сторінок, яких немає в індексі). Після seo:index-status (11:10).
+    $schedule->command('seo:submit-index')
+        ->dailyAt('12:20')
+        ->withoutOverlapping(120)
+        ->appendOutputTo(storage_path('logs/seo-submit-index.log'));
+
     // Safety-net: sitemap і так перегенеровується автоматично всередині
     // content:publish/content:refresh, цей запис — просто підстраховка.
     $schedule->command('content:sitemap')

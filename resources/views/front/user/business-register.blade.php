@@ -40,6 +40,7 @@
 
                     <form class="form-registration" action="{{ route('post-business-register') }}" method="POST">
                         @csrf
+                        @include('front.partials.bot-trap')
 
                         @if ($errors->any())
                             <div class="alert alert-danger">

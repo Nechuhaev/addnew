@@ -40,6 +40,13 @@
                     </div>
                 </div>
 
+                @if (!empty($ipFilter))
+                    <div class="alert alert-warning d-flex justify-content-between align-items-center">
+                        <span>Аккаунты, зарегистрированные с IP <b>{{ $ipFilter }}</b>: {{ $users->total() }}. Отметьте их и нажмите «Удалить», чтобы удалить разом.</span>
+                        <a href="{{ route('admin.users') }}" class="btn btn-sm btn-outline-secondary">Сбросить фильтр</a>
+                    </div>
+                @endif
+
                 <div class="card" style="margin-bottom: 5px;">
                     <div class="card-body" style="padding: 5px 1.25rem;font-weight: 900;color: #000;font-size: 12px">
                         <div class="row align-items-center">
@@ -52,7 +59,7 @@
                                 <a style="color: #6e6e6e" href="?order=email&direction={{ ($direction == 'asc') ? 'desc' : 'asc'  }}">EMAIL</a> {!! ($order == 'email') ? ($direction != 'asc') ? '<i class="mdi mdi-arrow-up"></i>' : '<i class="mdi mdi-arrow-down"></i>' : '';   !!}
                             </div>
                             <div class="col-2">
-                                <a style="color: #6e6e6e" href="?order=created_at&direction={{ ($direction == 'asc') ? 'desc' : 'asc'  }}">РЕГИСТРАЦИЯ</a> {!! ($order == 'created_at') ? ($direction != 'asc') ? '<i class="mdi mdi-arrow-up"></i>' : '<i class="mdi mdi-arrow-down"></i>' : '';   !!}
+                                <a style="color: #6e6e6e" href="?order=created_at&direction={{ ($direction == 'asc') ? 'desc' : 'asc'  }}">РЕГИСТРАЦИЯ · IP</a> {!! ($order == 'created_at') ? ($direction != 'asc') ? '<i class="mdi mdi-arrow-up"></i>' : '<i class="mdi mdi-arrow-down"></i>' : '';   !!}
                             </div>
                             <div class="col-1">
                                 <a style="color: #6e6e6e" href="?order=ads_count&direction={{ ($direction == 'asc') ? 'desc' : 'asc'  }}">КОЛ-ВО</a> {!! ($order == 'ads_count') ? ($direction != 'asc') ? '<i class="mdi mdi-arrow-up"></i>' : '<i class="mdi mdi-arrow-down"></i>' : '';   !!}
@@ -85,8 +92,20 @@
                                     {{ $user->email }}
                                 </div>
                                 <div class="col-2">
-                                    <div><small class="text-muted">Дата регистрации</small></div>
+                                    <div><small class="text-muted">Дата регистрации · IP</small></div>
                                     {{ $user->created_date }}
+                                    @if ($user->register_ip)
+                                        @php($ipN = $ipCounts[$user->register_ip] ?? 1)
+                                        <div>
+                                            <a href="{{ route('admin.users', ['ip' => $user->register_ip]) }}" title="Все аккаунты с этого IP"
+                                               style="font-size:12px">{{ $user->register_ip }}</a>
+                                            @if ($ipN > 1)
+                                                <span class="badge badge-{{ $ipN >= 3 ? 'danger' : 'warning' }}" title="Аккаунтов с этого IP">{{ $ipN }}</span>
+                                            @endif
+                                        </div>
+                                    @else
+                                        <div><small class="text-muted">IP —</small></div>
+                                    @endif
                                 </div>
                                 <div class="col-1">
                                     <div><small class="text-muted">Кол-во</small></div>

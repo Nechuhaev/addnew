@@ -56,6 +56,18 @@ class User extends Authenticatable
 {
     use Notifiable;
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        // IP реєстрації — для будь-якого способу створення акаунта з сайту (форми, соцмережі, подача оголошення гостем)
+        static::creating(function (User $user) {
+            if (empty($user->register_ip) && !app()->runningInConsole()) {
+                $user->register_ip = mb_substr((string) request()->ip(), 0, 45) ?: null;
+            }
+        });
+    }
+
     /**
      * The attributes that are mass assignable.
      *

@@ -49,11 +49,12 @@
         @if($cities)
             <h2>{{ $ru ? 'Цены по городам' : 'Ціни за містами' }}</h2>
             <div class="prices-table-wrap">
-                <table class="prices-table">
-                    <thead><tr><th>{{ $ru ? 'Город' : 'Місто' }}</th><th>{{ $ru ? 'Объявлений' : 'Оголошень' }}</th><th>{{ $ru ? 'Медиана' : 'Медіана' }}</th></tr></thead>
+                <table class="prices-table prices-table--3">
+                    <colgroup><col class="c-name"><col class="c-count"><col class="c-median"></colgroup>
+                    <thead><tr><th>{{ $ru ? 'Город' : 'Місто' }}</th><th class="num">{{ $ru ? 'Объявлений' : 'Оголошень' }}</th><th class="num">{{ $ru ? 'Медиана' : 'Медіана' }}</th></tr></thead>
                     <tbody>
                     @foreach($cities as $c)
-                        <tr><td><a href="{{ $c['url'] }}">{{ $c['name'] }}</a></td><td>{{ $c['count'] }}</td><td>{{ $uah($c['median']) }}</td></tr>
+                        <tr><td><a href="{{ $c['url'] }}">{{ $c['name'] }}</a></td><td class="num" data-label="{{ $ru ? 'объявлений' : 'оголошень' }}">{{ number_format($c['count'], 0, ',', ' ') }}</td><td class="num" data-label="{{ $ru ? 'медиана' : 'медіана' }}">{{ $uah($c['median']) }}</td></tr>
                     @endforeach
                     </tbody>
                 </table>
@@ -63,11 +64,12 @@
         @if($children)
             <h2>{{ $ru ? 'Цены в подразделах' : 'Ціни в підрозділах' }}</h2>
             <div class="prices-table-wrap">
-                <table class="prices-table">
-                    <thead><tr><th>{{ $ru ? 'Подраздел' : 'Підрозділ' }}</th><th>{{ $ru ? 'Объявлений' : 'Оголошень' }}</th><th>{{ $ru ? 'Медиана' : 'Медіана' }}</th></tr></thead>
+                <table class="prices-table prices-table--3">
+                    <colgroup><col class="c-name"><col class="c-count"><col class="c-median"></colgroup>
+                    <thead><tr><th>{{ $ru ? 'Подраздел' : 'Підрозділ' }}</th><th class="num">{{ $ru ? 'Объявлений' : 'Оголошень' }}</th><th class="num">{{ $ru ? 'Медиана' : 'Медіана' }}</th></tr></thead>
                     <tbody>
                     @foreach($children as $c)
-                        <tr><td><a href="{{ $c['url'] }}">{{ $c['name'] }}</a></td><td>{{ $c['count'] }}</td><td>{{ $uah($c['median']) }}</td></tr>
+                        <tr><td><a href="{{ $c['url'] }}">{{ $c['name'] }}</a></td><td class="num" data-label="{{ $ru ? 'объявлений' : 'оголошень' }}">{{ number_format($c['count'], 0, ',', ' ') }}</td><td class="num" data-label="{{ $ru ? 'медиана' : 'медіана' }}">{{ $uah($c['median']) }}</td></tr>
                     @endforeach
                     </tbody>
                 </table>

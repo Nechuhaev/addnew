@@ -58,9 +58,17 @@ class Ad extends Controller
             $filters['status'] = 'Статус: ' . $statuses[(string) $request->get('status')];
         }
 
+        if (isset(\App\Services\Seo\IndexStatus::FILTERS[$request->get('index')])) {
+            \App\Services\Seo\IndexStatus::applyFilter($query, 'ad', $request->get('index'), 'ads.id');
+            if ($request->get('index') !== 'indexed') {
+                $query->where('status', 1)->where('is_sensitive', 0);   // зона індексації — активні нечутливі
+            }
+            $filters['index'] = 'Индекс: ' . \App\Services\Seo\IndexStatus::FILTERS[$request->get('index')];
+        }
+
         $ads = $query->orderBy('created_at', 'desc')
             ->paginate(15)
-            ->appends($request->only(['search', 'country_id', 'region_id', 'city_id', 'status']));
+            ->appends($request->only(['search', 'country_id', 'region_id', 'city_id', 'status', 'index']));
 
         return view('admin.ad.ads')->with([
             'ads' => $ads,
