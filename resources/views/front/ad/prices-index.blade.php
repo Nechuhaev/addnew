@@ -29,15 +29,16 @@
                 @if($g['root']['url'])<a href="{{ $g['root']['url'] }}">{{ $g['root']['name'] }}</a>@else{{ $g['root']['name'] }}@endif
             </h2>
             <div class="prices-table-wrap">
-                <table class="prices-table">
-                    <thead><tr><th>{{ $ru ? 'Раздел' : 'Розділ' }}</th><th>{{ $ru ? 'Объявлений' : 'Оголошень' }}</th><th>{{ $ru ? 'Медиана' : 'Медіана' }}</th><th>{{ $ru ? 'Половина объявлений' : 'Половина оголошень' }}</th></tr></thead>
+                <table class="prices-table prices-table--4">
+                    <colgroup><col class="c-name"><col class="c-count"><col class="c-median"><col class="c-range"></colgroup>
+                    <thead><tr><th>{{ $ru ? 'Раздел' : 'Розділ' }}</th><th class="num">{{ $ru ? 'Объявлений' : 'Оголошень' }}</th><th class="num">{{ $ru ? 'Медиана' : 'Медіана' }}</th><th class="num">{{ $ru ? 'Половина объявлений' : 'Половина оголошень' }}</th></tr></thead>
                     <tbody>
                     @foreach(array_merge($g['root']['stats'] ? [$g['root']] : [], $g['children'] ?? []) as $row)
                         <tr>
                             <td><a href="{{ $row['url'] }}">{{ $row['name'] }}</a></td>
-                            <td>{{ number_format($row['stats']['count'], 0, ',', ' ') }}</td>
-                            <td>{{ $uah($row['stats']['median']) }}</td>
-                            <td>{{ $uah($row['stats']['p25']) }} – {{ $uah($row['stats']['p75']) }}</td>
+                            <td class="num" data-label="{{ $ru ? 'объявлений' : 'оголошень' }}">{{ number_format($row['stats']['count'], 0, ',', ' ') }}</td>
+                            <td class="num" data-label="{{ $ru ? 'медиана' : 'медіана' }}">{{ $uah($row['stats']['median']) }}</td>
+                            <td class="num" data-label="{{ $ru ? 'диапазон' : 'діапазон' }}">{{ $uah($row['stats']['p25']) }} – {{ $uah($row['stats']['p75']) }}</td>
                         </tr>
                     @endforeach
                     </tbody>

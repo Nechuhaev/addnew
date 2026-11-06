@@ -44,7 +44,8 @@ class CheckIndexStatus extends Command
             $this->fromInspection($only, (int) ($this->option('limit') ?: env('SEO_INDEX_CHECK_PER_DAY', 1500)));
         }
         foreach (['ad', 'category', 'tag'] as $type) {
-            Cache::forget("seo_index_summary:{$type}");
+            Cache::forget("seo_index_summary_v2:{$type}");
+            Cache::forget("seo_our_noindex_ids:{$type}");
             Cache::forget("seo_indexed_ids:{$type}");
         }
 

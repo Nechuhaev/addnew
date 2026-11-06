@@ -195,28 +195,40 @@
                                 }
                             }
                             $indexRows = \App\Services\Seo\IndexStatus::forIds('category', $indexIds);
+                            // Фільтр ?index=... : лишаємо підходящі рядки (батьківський — якщо підходить він або хоч один підрозділ)
+                            $idxMatch = null;
+                            if (isset(\App\Services\Seo\IndexStatus::FILTERS[request('index')])) {
+                                $idxQuery = \App\AdCategory::query();
+                                \App\Services\Seo\IndexStatus::applyFilter($idxQuery, 'category', request('index'));
+                                $idxMatch = array_flip($idxQuery->pluck('id')->all());
+                            }
                         @endphp
                         <table class="table table-bordered table-hover table-middle-cell">
                         @foreach($tree as $item)
-                                <tr>
+                                @php
+                                    $idxChildren = array_values(array_filter($item['children'] ?: [], function ($c) use ($idxMatch) { return $idxMatch === null || isset($idxMatch[$c['id']]); }));
+                                    $idxSelf = $idxMatch === null || isset($idxMatch[$item['id']]);
+                                @endphp
+                                @continue(!$idxSelf && !$idxChildren)
+                                <tr style="{{ $idxSelf ? '' : 'opacity:.5' }}">
                                     <th></th>
                                     <th>{{ $item['name'] }}</th>
                                     <th></th>
                                     <th><a style="color: black; width: 100px" href="?order=ads_count&direction={{ ($direction == 'asc') ? 'desc' : 'asc'  }}">Кол-во</a> {!! ($order == 'ads_count') ? ($direction != 'asc') ? '<i class="mdi mdi-arrow-down"></i>' : '<i class="mdi mdi-arrow-up"></i>' : '';   !!}</th>
-                                    <th style="width: 110px">@include('admin.partials.index-badge', ['row' => $indexRows[$item['id']] ?? null])</th>
+                                    <th style="width: 110px">@include('admin.partials.index-badge', ['row' => $indexRows[$item['id']] ?? null, 'type' => 'category', 'id' => $item['id']])</th>
                                     <th class="text-center cell-actions">
                                         <a href="{{ route('admin.adCategories.edit', ['id' => $item['id']]) }}"><i class="mdi mdi-18px mdi-table-edit"></i></a>
                                         <a href="#" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
                                     </th>
                                 </tr>
-                                @if($item['children'])
-                                    @foreach($item['children'] as $child)
+                                @if($idxChildren)
+                                    @foreach($idxChildren as $child)
                                         <tr>
                                             <td style="width: 30px"><input type="checkbox" name="id[]" value="{{ $child['id'] }}"></td>
                                             <td></td>
                                             <td>{{ $child['name'] }}</td>
                                             <td style="width: 100px">{{ $child['ads_count'] }}</td>
-                                            <td style="width: 110px">@include('admin.partials.index-badge', ['row' => $indexRows[$child['id']] ?? null])</td>
+                                            <td style="width: 110px">@include('admin.partials.index-badge', ['row' => $indexRows[$child['id']] ?? null, 'type' => 'category', 'id' => $child['id']])</td>
                                             <td class="text-center cell-actions">
                                                 <a href="{{ route('admin.adCategories.edit', ['id' => $child['id']]) }}"><i class="mdi mdi-18px mdi-table-edit"></i></a>
                                                 <a href="{{ route('admin.adCategories.delete', ['id' => $child['id']]) }}" onclick="return confirm('Вы пытаетесь удалить категорию {{ $child['name'] }}. Подтвердите действие.')" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>

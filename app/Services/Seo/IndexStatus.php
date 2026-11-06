@@ -69,34 +69,152 @@ class IndexStatus
             ->get()->keyBy('entity_id')->all();
     }
 
+    /** Фільтри адмінки (?index=...) => підпис */
+    const FILTERS = [
+        'indexed' => 'В индексе',
+        'refused' => 'Google не взял',
+        'ours' => 'Закрыто нами (noindex)',
+        'excluded' => 'Исключено',
+        'unchecked' => 'Не проверено',
+    ];
+
     /**
-     * Зведення: total — скільки сутностей має бути в індексі; checked/indexed/not_indexed/excluded.
-     * Кеш 10 хв, щоб адмінка не рахувала таблицю на кожному відкритті.
+     * Зведення: total — скільки сутностей у «зоні індексації»;
+     * indexed / refused (Google не взяв сторінку, яку ми відкрили) / ours (сторінку закрито noindex нами —
+     * що її немає в індексі, очікувано) / excluded / unchecked. Кеш 10 хв.
      */
     public static function summary(string $type): array
     {
-        return Cache::remember("seo_index_summary:{$type}", 600, function () use ($type) {
-            $counts = self::tableExists()
-                ? DB::table('seo_index_status')->where('entity_type', $type)
-                    ->selectRaw('state, COUNT(*) AS n')->groupBy('state')->pluck('n', 'state')->all()
+        return Cache::remember("seo_index_summary_v2:{$type}", 600, function () use ($type) {
+            $rows = self::tableExists()
+                ? DB::table('seo_index_status')->where('entity_type', $type)->pluck('state', 'entity_id')->all()
                 : [];
-            $last = self::tableExists()
-                ? DB::table('seo_index_status')->where('entity_type', $type)->max('checked_at')
-                : null;
+            $ours = array_flip(self::ourNoindexIds($type));
+            $out = ['indexed' => 0, 'refused' => 0, 'ours' => 0, 'excluded' => 0];
+            foreach ($rows as $id => $state) {
+                if ($state === self::INDEXED) {
+                    $out['indexed']++;
+                } elseif (isset($ours[$id])) {
+                    $out['ours']++;
+                } elseif ($state === self::EXCLUDED) {
+                    $out['excluded']++;
+                } else {
+                    $out['refused']++;
+                }
+            }
+            $oursUnchecked = count(array_diff_key($ours, $rows));
             $total = self::scopeTotal($type);
-            $checked = array_sum($counts);
+            $checked = count($rows);
 
-            return [
+            return $out + [
                 'total' => $total,
                 'checked' => $checked,
-                'indexed' => (int) ($counts[self::INDEXED] ?? 0),
-                'not_indexed' => (int) ($counts[self::NOT_INDEXED] ?? 0),
-                'excluded' => (int) ($counts[self::EXCLUDED] ?? 0),
-                'unknown' => (int) ($counts[self::UNKNOWN] ?? 0),
-                'unchecked' => max(0, $total - $checked),
-                'last_checked' => $last,
+                'open_checked' => $out['indexed'] + $out['refused'] + $out['excluded'],
+                'ours_unchecked' => $oursUnchecked,
+                'unchecked' => max(0, $total - $checked - $oursUnchecked),
+                'last_checked' => self::tableExists()
+                    ? DB::table('seo_index_status')->where('entity_type', $type)->max('checked_at')
+                    : null,
             ];
         });
+    }
+
+    /**
+     * id сутностей, які ми самі закрили noindex (узгоджено з фронтом), кеш 1 год:
+     *  tag — менше 5 активних оголошень або стоп-слово в назві (Front/Ad/Tag.php);
+     *  category — менше 3 активних оголошень з підрозділами або чутливий розділ (Front/Ad/Category.php);
+     *  ad — у зоні індексації лише активні нечутливі, тож порожньо.
+     */
+    public static function ourNoindexIds(string $type): array
+    {
+        return Cache::remember("seo_our_noindex_ids:{$type}", 3600, function () use ($type) {
+            if ($type === 'tag') {
+                $thin = DB::table('ad_tag')->join('ads', 'ads.id', '=', 'ad_tag.ad_id')->where('ads.status', 1)
+                    ->groupBy('ad_tag.tag_id')->havingRaw('SUM(ads.is_sensitive = 0) < 5')
+                    ->pluck('ad_tag.tag_id')->map(function ($id) {
+                        return (int) $id;
+                    })->all();
+                $sensitive = [];
+                if (\App\StopWord::query()->exists()) {
+                    \App\AdTag::query()->select('id', 'name', 'name_uk')->orderBy('id')->chunk(2000, function ($tags) use (&$sensitive) {
+                        foreach ($tags as $t) {
+                            if (\App\Services\SeoRules::isSensitiveTag($t)) {
+                                $sensitive[] = (int) $t->id;
+                            }
+                        }
+                    });
+                }
+
+                return array_values(array_unique(array_merge($thin, $sensitive)));
+            }
+            if ($type === 'category') {
+                $counts = DB::table('ads')->where('status', 1)->where('is_sensitive', 0)
+                    ->groupBy('category_id')->selectRaw('category_id, COUNT(*) n')->pluck('n', 'category_id')->all();
+                $cats = DB::table('ad_categories')->get(['id', 'parent_id']);
+                $total = [];
+                foreach ($cats as $c) {
+                    $total[$c->id] = ($total[$c->id] ?? 0) + (int) ($counts[$c->id] ?? 0);
+                    if ($c->parent_id) {
+                        $total[$c->parent_id] = ($total[$c->parent_id] ?? 0) + (int) ($counts[$c->id] ?? 0);
+                    }
+                }
+                $out = \App\Services\SeoRules::sensitiveCategoryIds();
+                foreach ($cats as $c) {
+                    if (($total[$c->id] ?? 0) < \App\Http\Controllers\Front\Ad\Category::MIN_INDEX_ADS) {
+                        $out[] = (int) $c->id;
+                    }
+                }
+
+                return array_values(array_unique(array_map('intval', $out)));
+            }
+
+            return [];
+        });
+    }
+
+    /**
+     * Обмежити запит списку адмінки фільтром ?index=... ($idColumn — колонка id сутності в запиті)
+     * @param \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder $query
+     */
+    public static function applyFilter($query, string $type, ?string $filter, string $idColumn = 'id'): void
+    {
+        if (!$filter || !isset(self::FILTERS[$filter]) || !self::tableExists()) {
+            return;
+        }
+        $rows = function ($states) use ($type) {
+            return function ($q) use ($type, $states) {
+                $q->select('entity_id')->from('seo_index_status')->where('entity_type', $type)->whereIn('state', (array) $states);
+            };
+        };
+        $ours = self::ourNoindexIds($type);
+        switch ($filter) {
+            case 'indexed':
+                $query->whereIn($idColumn, $rows(self::INDEXED));
+                break;
+            case 'refused':
+                $query->whereIn($idColumn, $rows([self::NOT_INDEXED, self::UNKNOWN]));
+                if ($ours) {
+                    $query->whereNotIn($idColumn, $ours);
+                }
+                break;
+            case 'excluded':
+                $query->whereIn($idColumn, $rows(self::EXCLUDED));
+                if ($ours) {
+                    $query->whereNotIn($idColumn, $ours);
+                }
+                break;
+            case 'ours':
+                $query->whereIn($idColumn, $ours ?: [0])->whereNotIn($idColumn, $rows(self::INDEXED));
+                break;
+            case 'unchecked':
+                $query->whereNotIn($idColumn, function ($q) use ($type) {
+                    $q->select('entity_id')->from('seo_index_status')->where('entity_type', $type);
+                });
+                if ($ours) {
+                    $query->whereNotIn($idColumn, $ours);
+                }
+                break;
+        }
     }
 
     /** Скільки сутностей у «зоні індексації»: активні оголошення, усі категорії, теги з активними оголошеннями */
@@ -115,8 +233,23 @@ class IndexStatus
         return 0;
     }
 
-    public static function label(?object $row): array
+    /** Чи сутність закрита noindex нами (кеш у межах запиту) */
+    public static function isOurs(string $type, int $id): bool
     {
+        static $sets = [];
+        if (!isset($sets[$type])) {
+            $sets[$type] = array_flip(self::ourNoindexIds($type));
+        }
+
+        return isset($sets[$type][$id]);
+    }
+
+    public static function label(?object $row, bool $ours = false): array
+    {
+        if ($ours && (!$row || $row->state !== self::INDEXED)) {
+            return ['Закрыто нами', 'light', 'noindex на нашей стороне (мало объявлений или стоп-слово) — отсутствие в индексе ожидаемо'
+                . ($row && $row->checked_at ? ' · проверено ' . date('d.m.Y', strtotime($row->checked_at)) : '')];
+        }
         if (!$row) {
             return ['Не проверено', 'secondary', 'Ещё не проверялось в Google Search Console'];
         }
@@ -131,7 +264,7 @@ class IndexStatus
             case self::EXCLUDED:
                 return ['Исключено', 'warning', (string) $row->coverage_state . $when];
             case self::NOT_INDEXED:
-                return ['Не в индексе', 'danger', (string) $row->coverage_state . $when];
+                return ['Google не взял', 'danger', (string) $row->coverage_state . $when];
         }
 
         return ['Неизвестно', 'secondary', (string) $row->coverage_state . $when];

@@ -178,7 +178,7 @@
                                             <i class="mdi mdi-clock-outline text-muted" title="Ще старий/шаблонний текст"></i>
                                         @endif
                                     </td>
-                                    <td class="text-center" style="width: 110px">@include('admin.partials.index-badge', ['row' => $indexRows[$tag_row->id] ?? null])</td>
+                                    <td class="text-center" style="width: 110px">@include('admin.partials.index-badge', ['row' => $indexRows[$tag_row->id] ?? null, 'type' => 'tag', 'id' => $tag_row->id])</td>
                                     <td class="text-center cell-actions">
                                         <a href="{{ route('admin.adTags.edit', ['id' => $tag_row->id]) }}"><i class="mdi mdi-18px mdi-table-edit"></i></a>
                                         <a href="{{ route('admin.adTags.delete', ['id' => $tag_row->id]) }}" onclick="return confirm('Вы пытаетесь удалить метку {{ $tag_row->name }}. Подтвердите действие.')" class="text-danger"><i class="mdi mdi-18px mdi-delete"></i></a>
