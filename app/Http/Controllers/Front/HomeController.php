@@ -65,6 +65,20 @@ class HomeController extends Controller
             ];
         }
 
+        // Текст головної: {ads_count}/{shops_count}/{cities_count} — живі цифри; блок FAQ → окремий «Часті запитання» + FAQPage
+        $faq = [];
+        if (!empty($meta['description'])) {
+            $stats = Cache::remember('home_text_stats', 3600, function () {
+                return [
+                    '{ads_count}' => number_format(\App\Ad::where('status', 1)->where('is_sensitive', 0)->count(), 0, ',', ' '),
+                    '{shops_count}' => number_format(\App\User::where('is_shop_owner', 1)->count(), 0, ',', ' '),
+                    '{cities_count}' => number_format(\Illuminate\Support\Facades\DB::table('ads')->where('status', 1)->distinct()->count('city_id'), 0, ',', ' '),
+                ];
+            });
+            $meta['description'] = strtr((string) $meta['description'], $stats);
+            [$faq, $meta['description']] = \App\Services\GeoFaq::extractFromHtml($meta['description']);
+        }
+
         // Последние объявления
 
         $ads_cache_key = sprintf('home_ads_%s', $localization->getCountry()->id);
@@ -152,6 +166,7 @@ class HomeController extends Controller
         return view('front.index')->with([
             'categories' => $categories,
             'meta' => $meta,
+            'faq' => $faq,
             'ads_groups' => $ads_groups,
             'blog_articles' => $blog_articles,
             'cities' => $cities,

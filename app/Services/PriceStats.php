@@ -19,7 +19,8 @@ class PriceStats
     const MIN_GROUP = 5;         // мінімум оголошень для медіани міста / стану / продавця
     const MIN_CHILD = 10;        // мінімум для рядка підрозділу
     const TTL = 93600;           // 26 год
-    const VERSION = 'v1';
+    const VERSION = 'v2';
+    const MAX_PRICE = 100000000;   // ціни-заглушки (2 147 483 647 тощо) спотворювали медіану
 
     /**
      * @return array|null null — сторінки цін для розділу немає
@@ -121,6 +122,7 @@ class PriceStats
             ->where('ads.status', 1)
             ->where('ads.is_sensitive', 0)
             ->where('ads.price', '>', 0)
+            ->where('ads.price', '<', self::MAX_PRICE)
             ->where('ad_currencies.code', 'UAH');
     }
 
