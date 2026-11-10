@@ -8,7 +8,8 @@ return [
     // і не потрапляють у sitemap. Через кому в .env: SEO_NOINDEX_COUNTRIES=rossiya,belarus
     // Категорії (слаги), які разом із підкатегоріями, оголошеннями й сторінками «категорія + регіон»
     // закриваються noindex, не йдуть у sitemap і показуються без AdSense. Через кому: SEO_NOINDEX_CATEGORIES
-    'noindex_categories' => array_values(array_filter(array_map('trim', explode(',', (string) env('SEO_NOINDEX_CATEGORIES', 'znakomstva-i-kontaktyi'))))),
+    // «Знакомства и контакты» відкрито з 10.11.2026 (інтим-оголошення ховає is_sensitive); «Товари для дорослих» — закрито (AdSense)
+    'noindex_categories' => array_values(array_filter(array_map('trim', explode(',', (string) env('SEO_NOINDEX_CATEGORIES', 'tovary-dlya-vzroslykh'))))),
 
     // Ключ IndexNow (8–128 символів a-z, 0-9, -); порожньо — seo:indexnow нічого не надсилає
     'indexnow_key' => (string) env('INDEXNOW_KEY', ''),

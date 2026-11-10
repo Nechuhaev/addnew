@@ -21,7 +21,7 @@ class SeoRules
     /** Слаги чутливих категорій (config/seo.php) */
     public static function noindexCategorySlugs(): array
     {
-        return (array) config('seo.noindex_categories', ['znakomstva-i-kontaktyi']);
+        return (array) config('seo.noindex_categories', ['tovary-dlya-vzroslykh']);
     }
 
     /**

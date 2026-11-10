@@ -44,6 +44,8 @@
                 <span class="show-more__btn btn-show">{{ __('front.show_more') }}</span>
             </div>
 
+            @include('front.partials.faq', ['faq' => $faq ?? []])
+
             <div class="banner">
                 @include('front.adsense.bottom')
             </div>
