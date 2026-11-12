@@ -28,6 +28,7 @@ class DailyReport extends Model
         'index_submitted_indexnow',
         'index_submitted_google',
         'index_submitted_summary',
+        'bing_summary',
     ];
 
     protected $dates = ['date'];

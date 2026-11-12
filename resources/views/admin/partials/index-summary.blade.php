@@ -37,6 +37,10 @@
                 @endif
             </span>
         </div>
+        @php($bingLine = \App\Console\Commands\BingStats::summaryLine())
+        @if($bingLine)
+            <div class="small text-muted mt-2"><strong>Bing Webmaster</strong>: {{ $bingLine }}</div>
+        @endif
         @php($sub = \App\Services\Seo\IndexSubmissions::report())
         @if(!empty($sub))
             <div class="small text-muted mt-2">
