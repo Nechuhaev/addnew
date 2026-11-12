@@ -1,0 +1,35 @@
+name: Cron runner
+
+# Запасний зовнішній тригер Laravel Scheduler (/system/cron-runner/{token}), поки хостинг блокує cron-job.org.
+# Кожні 5 хвилин (GitHub може запускати із затримкою). URL з токеном — у секреті репозиторію CRON_URL.
+# Розклад працює лише в гілці за замовчуванням репозиторію.
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: cron-runner
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Trigger scheduler
+        env:
+          CRON_URL: ${{ secrets.CRON_URL }}
+        run: |
+          if [ -z "$CRON_URL" ]; then
+            echo "::warning::Секрет CRON_URL не задано — пропускаю"
+            exit 0
+          fi
+          # schedule:run відповідає, коли відпрацюють команди; довгий запуск — не помилка (код 000 після тайм-ауту)
+          code=$(curl -s -o /tmp/out.txt -w '%{http_code}' -m 280 -A 'AddnewScheduler/1.0' "$CRON_URL" || true)
+          echo "HTTP $code"
+          head -c 1500 /tmp/out.txt 2>/dev/null || true
+          if [ "$code" = "403" ] || [ "${code:0:1}" = "5" ]; then
+            echo "::error::Cron runner відповів HTTP $code"
+            exit 1
+          fi
