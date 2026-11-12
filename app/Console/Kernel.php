@@ -94,6 +94,12 @@ class Kernel extends ConsoleKernel
         ->withoutOverlapping(120)
         ->appendOutputTo(storage_path('logs/seo-submit-index.log'));
 
+    // Щодня о 07:40 — статистика Bing Webmaster Tools (потрібен BING_WEBMASTER_API_KEY)
+    $schedule->command('seo:bing-stats')
+        ->dailyAt('07:40')
+        ->withoutOverlapping()
+        ->appendOutputTo(storage_path('logs/seo-bing-stats.log'));
+
     // Safety-net: sitemap і так перегенеровується автоматично всередині
     // content:publish/content:refresh, цей запис — просто підстраховка.
     $schedule->command('content:sitemap')
