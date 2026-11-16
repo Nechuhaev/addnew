@@ -86,11 +86,15 @@ class MergeDuplicateTags extends Command
                     if (!$dupRow) {
                         continue;
                     }
-                    // зв'язки з оголошеннями → основний тег (без повторів)
-                    DB::table('ad_tag')->where('tag_id', $dup->id)
-                        ->whereNotIn('ad_id', function ($q) use ($main) {
-                            $q->select('ad_id')->from('ad_tag')->where('tag_id', $main->id);
-                        })->update(['tag_id' => $main->id]);
+                    // зв'язки з оголошеннями → основний тег (без повторів). Списки беремо заздалегідь:
+                    // MySQL не дозволяє UPDATE ad_tag з підзапитом до тієї ж таблиці (помилка 1093)
+                    $mainAds = array_flip(DB::table('ad_tag')->where('tag_id', $main->id)->pluck('ad_id')->all());
+                    $moveAds = array_values(array_filter(DB::table('ad_tag')->where('tag_id', $dup->id)->pluck('ad_id')->all(), function ($adId) use ($mainAds) {
+                        return !isset($mainAds[$adId]);
+                    }));
+                    foreach (array_chunk($moveAds, 1000) as $chunk) {
+                        DB::table('ad_tag')->where('tag_id', $dup->id)->whereIn('ad_id', $chunk)->update(['tag_id' => $main->id]);
+                    }
                     DB::table('ad_tag')->where('tag_id', $dup->id)->delete();
                     // текст і мета — якщо в основного порожньо
                     $fill = [];
