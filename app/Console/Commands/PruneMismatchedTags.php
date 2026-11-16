@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\DB;
  *
  * Відв'язує тег від оголошення, якщо слів тегу немає ні в назві, ні в тексті оголошення
  * (колись автотеги проставлялися з помилками: «Голуб» на статуетках, «Холодильник» на оренді квартир).
- * Звіряються російська й українська назви тегу (name, name_uk). Слово тегу шукається за основою (без 2 останніх літер для слів довших за 5 — «Женщин» знайде «женщина»);
+ * Звіряються російська й українська назви тегу (name, name_uk). Кириличне слово шукається за основою (без 2 останніх літер для слів довших за 5, без 1 — для 4–5: «рацию» знайде «рация»), латинське — цілим;
+ * тег, що не згаданий у ≥90% з ≥20 своїх оголошень, не чіпається (споріднена тема від автора) — лише показується;
  * для тегу з кількох значущих слів достатньо половини. Теги, у яких ≥90% оголошень від одного магазину,
  * не чіпаються (це теги з фіда — для них tags:mark-noindex).
  * Без --apply — лише перегляд; з --apply спершу резервна копія зв'язків (storage/app/tag-prune-backup-*.json).
@@ -58,6 +59,22 @@ class PruneMismatchedTags extends Command
                 }
             }
         });
+
+        // Тег, що не збігається майже ніде (≥90% з ≥20), — швидше споріднена тема від автора
+        // («логоневроз» на оголошеннях логопеда), а не помилка автотегів: не чіпаємо, показуємо для ручної перевірки
+        $systemic = array_filter($perTag, function ($p) {
+            return ($p[0] ?? 0) >= 20 && ($p[1] ?? 0) / $p[0] >= 0.9;
+        });
+        if ($systemic) {
+            $remove = array_values(array_filter($remove, function ($pair) use ($systemic) {
+                return !isset($systemic[$pair[0]]);
+            }));
+            $this->warn('Не чіпаю (тег майже ніде не згаданий — перевірте вручну): ' . count($systemic));
+            foreach (array_slice($systemic, 0, 30, true) as $tagId => $p) {
+                $this->line(sprintf('  #%d «%s»: %d з %d', $tagId, $tags[$tagId]['name'], $p[1], $p[0]));
+            }
+            $perTag = array_diff_key($perTag, $systemic);
+        }
 
         $this->info("Зв'язків тег–оголошення до відв'язки: " . count($remove) . ' (тегів зачеплено: ' . count(array_filter($perTag, function ($p) {
             return ($p[1] ?? 0) > 0;
@@ -133,7 +150,15 @@ class PruneMismatchedTags extends Command
             if ($len < 3 && !preg_match('/\d/u', $w)) {
                 continue;
             }
-            $out[] = $len > 5 ? mb_substr($w, 0, $len - 2) : $w;
+            if (!preg_match('/\p{Cyrillic}/u', $w)) {
+                $out[] = $w; // латиниця (бренди, моделі) — ціле слово
+            } elseif ($len > 5) {
+                $out[] = mb_substr($w, 0, $len - 2);
+            } elseif ($len >= 4) {
+                $out[] = mb_substr($w, 0, $len - 1); // «рацию» → «раци» знайде «рация»
+            } else {
+                $out[] = $w;
+            }
         }
 
         return array_values(array_unique($out));
