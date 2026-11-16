@@ -72,6 +72,9 @@ class SeoRules
             return false;
         }
         $raw = $tag->getAttributes();
+        if ((int) ($raw['is_noindex'] ?? 0) === 2) {
+            return true;   // позначено вручну як чутливий (tags:mark-noindex)
+        }
 
         return \App\StopWord::findNoindexMatchIn(trim(($raw['name'] ?? '') . ' ' . ($raw['name_uk'] ?? ''))) !== null;
     }

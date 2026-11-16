@@ -145,7 +145,13 @@ class IndexStatus
                     });
                 }
 
-                return array_values(array_unique(array_merge($thin, $sensitive)));
+                $marked = \Illuminate\Support\Facades\Schema::hasColumn('ad_tags', 'is_noindex')
+                    ? DB::table('ad_tags')->where('is_noindex', '>', 0)->pluck('id')->map(function ($id) {
+                        return (int) $id;
+                    })->all()
+                    : [];
+
+                return array_values(array_unique(array_merge($thin, $sensitive, $marked)));
             }
             if ($type === 'category') {
                 $counts = DB::table('ads')->where('status', 1)->where('is_sensitive', 0)

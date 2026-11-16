@@ -173,6 +173,9 @@ class RebuildSitemap extends Command
         AdTag::query()
             ->whereNotNull('slug')
             ->where('slug', '!=', '')
+            ->when(\Illuminate\Support\Facades\Schema::hasColumn('ad_tags', 'is_noindex'), function ($q) {
+                $q->where('is_noindex', 0);   // позначені вручну tags:mark-noindex
+            })
             ->where(function ($q) use ($inUa) {
                 $q->whereHas('ads', $inUa, '>=', self::TAG_MIN_ADS)
                     ->orWhere(function ($w) use ($inUa) {

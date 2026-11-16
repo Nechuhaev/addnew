@@ -89,6 +89,10 @@ class Tag extends Controller
         // в Google (seo_index_status). Посилання з них лишаються доступними (noindex, follow).
         $noindex = $total < 5
             && !($hasAnyContent && \App\Services\Seo\IndexStatus::isIndexed('tag', (int) $entity->id));
+        // Позначено вручну (tags:mark-noindex): технічні теги магазинів, загальні слова
+        if ((int) ($raw['is_noindex'] ?? 0) > 0) {
+            $noindex = true;
+        }
 
         // Тег із noindex-стоп-словом («девушки по вызову», «кодграббер»…) — noindex + без AdSense
         if ($sensitiveTag) {
