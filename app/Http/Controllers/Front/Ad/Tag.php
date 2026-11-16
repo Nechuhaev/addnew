@@ -15,7 +15,18 @@ class Tag extends Controller
     public function page($tag) {
         $entity = AdTag::where('slug', '=', $tag)->first();
 
-        if (!$entity) abort(404);
+        if (!$entity) {
+            // Тег об'єднано з іншим (tags:merge-duplicates) — 301 на основний, зі збереженням /ru і параметрів
+            $target = \Illuminate\Support\Facades\Schema::hasTable('tag_redirects')
+                ? DB::table('tag_redirects')->join('ad_tags', 'ad_tags.id', '=', 'tag_redirects.to_tag_id')
+                    ->where('tag_redirects.from_slug', $tag)->value('ad_tags.slug')
+                : null;
+            if ($target) {
+                $uri = request()->getRequestUri();
+                return redirect(preg_replace('~/ad-tag/' . preg_quote(rawurlencode($tag), '~') . '(?=$|[/?])|/ad-tag/' . preg_quote($tag, '~') . '(?=$|[/?])~u', '/ad-tag/' . $target, $uri, 1), 301);
+            }
+            abort(404);
+        }
 
         $seo_field = SeoField::where('index', 'ad-tag')->first();
 
