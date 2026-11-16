@@ -51,7 +51,8 @@ class MergeDuplicateTags extends Command
             $dups = array_map(function ($t) {
                 return "«{$t->name}» ({$t->active})";
             }, array_slice($g, 1));
-            $this->line("  «{$main->name}» ({$main->active} огол.) ← " . implode(', ', $dups));
+            $clean = self::cleanName($main->name);
+            $this->line("  «{$clean}» ({$main->active} огол.) ← " . implode(', ', $dups) . ($clean !== $main->name ? " [назву «{$main->name}» буде очищено]" : ''));
         }
         $this->line('Повний список: ' . $csv);
 
@@ -115,6 +116,11 @@ class MergeDuplicateTags extends Command
                     DB::table('ad_tags')->where('id', $dup->id)->delete();
                     $merged++;
                 }
+                // Назва основного тегу без розділових знаків на краях («, холодильник» → «холодильник»); slug не змінюється
+                $clean = self::cleanName((string) $mainRow->name);
+                if ($clean !== '' && $clean !== $mainRow->name) {
+                    DB::table('ad_tags')->where('id', $main->id)->update(['name' => $clean]);
+                }
             });
         }
         foreach (['seo_index_summary_v2:tag', 'seo_our_noindex_ids:tag'] as $key) {
@@ -165,6 +171,12 @@ class MergeDuplicateTags extends Command
         });
 
         return $groups;
+    }
+
+    /** Назва без пробілів і розділових знаків на початку й у кінці (закрита дужка в кінці лишається) */
+    public static function cleanName(string $name): string
+    {
+        return trim((string) preg_replace('/^[^\p{L}\p{N}]+|[^\p{L}\p{N})]+$/u', '', trim($name)));
     }
 
     /** Ключ порівняння: нижній регістр, ё→е, без пробілів, дефісів і розділових знаків */

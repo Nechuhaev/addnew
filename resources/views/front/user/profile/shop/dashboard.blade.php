@@ -43,6 +43,7 @@
                             </div>
                         </div>
                     </div>
+                    @include('front.user.profile.shop.badge')
                     <h2 class="shop-products-heading">{{ __('shop.products_heading') }}</h2>
                     @if($products->count() > 0)
                         <div class="shop-products-list">
