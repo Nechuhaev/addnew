@@ -34,7 +34,27 @@ class MarkNoindexTags extends Command
         'девушек', 'девушка', 'девушки', 'женщина', 'женщин', 'досуг', 'сопровождение', 'длявзрослых', 'материнство',
     ];
 
-    const SHOP_PATTERN = '~(^xn--|[._-]|shop|market|store|magaz|^ua$)~u';
+    const SHOP_PATTERN = '~(^xn--|shop|market|store|magaz|optom|-opt$)~u';
+
+    /** Справжні бренди з дефісом — не технічні теги */
+    const BRANDS = ['dnipro-m', 'victor-reinz'];
+
+    /**
+     * Технічна назва: службові слова магазину; латинський слаг без пробілів з дефісом/крапкою;
+     * або речення замість тегу (довше 40 символів). Кириличні слова з дефісом («мини-рынки») — не технічні.
+     */
+    public static function isTechnicalName(string $name): bool
+    {
+        $s = mb_strtolower(trim($name));
+        if (in_array($s, self::BRANDS, true)) {
+            return false;
+        }
+        if (preg_match(self::SHOP_PATTERN, $s) || mb_strlen($s) > 40) {
+            return true;
+        }
+
+        return (bool) preg_match('~^[a-z0-9]+([._-][a-z0-9]+)+$~', $s);
+    }
 
     public function handle()
     {
@@ -100,7 +120,7 @@ class MarkNoindexTags extends Command
                         $out[$r->id] = [2, $r->name, $n, 'підозрілий'];
                     } elseif (isset($generic[$key])) {
                         $out[$r->id] = [1, $r->name, $n, 'загальне слово'];
-                    } elseif ($n >= 5 && preg_match(self::SHOP_PATTERN, mb_strtolower((string) $r->name))) {
+                    } elseif ($n >= 5 && self::isTechnicalName((string) $r->name)) {
                         $out[$r->id] = [1, $r->name, $n, 'технічний тег магазину'];
                     }
                 }
