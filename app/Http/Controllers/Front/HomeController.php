@@ -145,7 +145,9 @@ class HomeController extends Controller
                 'ads' => function ($query) use ($localization) {
                     return $query->whereIn('city_id', $localization->citiesIds());
                 }
-            ])->having('ads_count', '>', 15)->get()->shuffle()->take(20);
+            ])->when(AdTag::hasNoindexColumn(), function ($q) {
+                $q->where('is_noindex', 0);
+            })->having('ads_count', '>', 15)->get()->shuffle()->take(20);
 
             if ($_tags) {
                 $tags = [];

@@ -115,6 +115,9 @@ class AdTag extends Model
             ->distinct()
             ->leftJoin('ad_tag', 'ad_tags.id', '=', 'ad_tag.tag_id')
             ->whereIn('ad_tag.ad_id', $ads_ids)
+            ->when(self::hasNoindexColumn(), function ($q) {
+                $q->where('ad_tags.is_noindex', 0);   // технічні й загальні теги не показуємо (tags:mark-noindex)
+            })
             ->orderBy('ad_tags.slug', 'asc')
             ->take(30)
             ->get();
@@ -131,8 +134,19 @@ class AdTag extends Model
             ->distinct()
             ->leftJoin('ad_tag', 'ad_tags.id', '=', 'ad_tag.tag_id')
             ->where('ad_tag.ad_id', '=', $ad['id'])
+            ->when(self::hasNoindexColumn(), function ($q) {
+                $q->where('ad_tags.is_noindex', 0);   // технічні й загальні теги не показуємо (tags:mark-noindex)
+            })
             ->orderBy('ad_tags.slug', 'asc')
             ->take(30)
             ->get();
+    }
+
+    /** Чи є колонка is_noindex (міграція 2026_11_16_100300) — кеш у межах запиту */
+    public static function hasNoindexColumn(): bool
+    {
+        static $has = null;
+
+        return $has ?? ($has = \Illuminate\Support\Facades\Schema::hasColumn('ad_tags', 'is_noindex'));
     }
 }
