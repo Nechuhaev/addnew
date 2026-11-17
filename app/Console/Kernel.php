@@ -113,6 +113,9 @@ class Kernel extends ConsoleKernel
         ->withoutOverlapping()
         ->appendOutputTo(storage_path('logs/adtags-cleanup.log'));
     $schedule->command('ads:moderate --apply --no-block')->weeklyOn(1, '04:00')->withoutOverlapping()->appendOutputTo(storage_path('logs/moderation.log'));
+    // Щомісяця: noindex для оголошень, яким виповнилося 3 роки без показів у Google, і зняття позначки
+    // з тих, що отримали покази (ads:stale-audit). Sitemap підхопить зміни в найближчу п'ятницю.
+    $schedule->command('ads:stale-audit --apply')->monthlyOn(3, '04:40')->withoutOverlapping()->appendOutputTo(storage_path('logs/stale-ads.log'));
         
         // Щогодини — перевіряє ціну/наявність товарів у джерелах (competitor_url/url).
     // Ліміт підвищений порівняно з дефолтом, бо товарів багато тисяч —
