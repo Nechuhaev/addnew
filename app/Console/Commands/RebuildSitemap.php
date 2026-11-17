@@ -213,6 +213,9 @@ class RebuildSitemap extends Command
                 // розпродані імпортовані товари — під noindex, у sitemap не потрібні
                 $q->whereNull('is_product')->orWhere('is_product', 0)->orWhereNull('stock')->orWhere('stock', '!=', 'out_of_stock');
             })
+            ->when(\Illuminate\Support\Facades\Schema::hasColumn('ads', 'is_stale'), function ($q) {
+                $q->where('is_stale', 0);   // старі без показів — noindex (ads:stale-audit)
+            })
             ->whereIn('city_id', $cityIds)
             ->chunk(self::CHUNK, function ($ads, $page) use ($index, &$adsCount) {
                 $sm = Sitemap::create();

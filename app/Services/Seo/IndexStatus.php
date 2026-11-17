@@ -123,7 +123,7 @@ class IndexStatus
      * id сутностей, які ми самі закрили noindex (узгоджено з фронтом), кеш 1 год:
      *  tag — менше 5 активних оголошень або стоп-слово в назві (Front/Ad/Tag.php);
      *  category — менше 3 активних оголошень з підрозділами або чутливий розділ (Front/Ad/Category.php);
-     *  ad — у зоні індексації лише активні нечутливі, тож порожньо.
+     *  ad — старі без показів (ads.is_stale, ads:stale-audit).
      */
     public static function ourNoindexIds(string $type): array
     {
@@ -172,6 +172,11 @@ class IndexStatus
                 }
 
                 return array_values(array_unique(array_map('intval', $out)));
+            }
+            if ($type === 'ad' && \Illuminate\Support\Facades\Schema::hasColumn('ads', 'is_stale')) {
+                return DB::table('ads')->where('status', 1)->where('is_stale', 1)->pluck('id')->map(function ($id) {
+                    return (int) $id;
+                })->all();
             }
 
             return [];

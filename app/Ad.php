@@ -56,6 +56,10 @@ class Ad extends Model
             if ($hasColumn) {
                 $ad->attributes['is_sensitive'] = \App\Services\SeoRules::isSensitiveAd($ad) ? 1 : 0;
             }
+            // Автор оновив чи підняв старе оголошення — знову індексуємо (позначку ставить ads:stale-audit)
+            if ($ad->exists && !empty($ad->attributes['is_stale']) && $ad->isDirty(['name', 'content', 'image', 'images', 'price', 'date_active'])) {
+                $ad->attributes['is_stale'] = 0;
+            }
         });
 
         // Історія ціни: нова точка при створенні та при зміні ціни/валюти
