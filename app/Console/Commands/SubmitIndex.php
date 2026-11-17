@@ -226,6 +226,9 @@ class SubmitIndex extends Command
                     })->select('e.id', 'e.slug');
             case 'ad':
                 return DB::table('ads as e')->where('e.status', 1)->where('e.is_sensitive', 0)
+                    ->when(\Illuminate\Support\Facades\Schema::hasColumn('ads', 'is_stale'), function ($q) {
+                        $q->where('e.is_stale', 0);   // старі без показів — noindex
+                    })
                     ->whereNotNull('e.slug')->where('e.slug', '<>', '')->select('e.id', 'e.slug');
         }
 

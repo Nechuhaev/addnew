@@ -161,6 +161,9 @@ class CheckIndexStatus extends Command
 
         if ($type === 'ad') {
             $q->where('e.status', 1)->where('e.is_sensitive', 0)->whereNotNull('e.slug')->where('e.slug', '<>', '')
+                ->when(\Illuminate\Support\Facades\Schema::hasColumn('ads', 'is_stale'), function ($q) {
+                    $q->where('e.is_stale', 0);   // старі без показів — noindex
+                })
                 ->orderByDesc('e.id')->select('e.id', 'e.slug');
         } elseif ($type === 'tag') {
             $q->whereNotNull('e.slug')->where('e.slug', '<>', '')
