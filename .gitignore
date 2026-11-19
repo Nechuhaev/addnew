@@ -5,3 +5,4 @@
 public/storage
 node_modules/
 /public/thumbs
+/public/merchant-feed.xml
