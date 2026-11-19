@@ -1,7 +1,7 @@
 @extends('front.layout')
 
-@section('meta_title', $page->meta_title ?? $page->name);
-@section('meta_description', $page->meta_description ?? strip_tags($page->description));
+@section('meta_title', $page->meta_title ?? $page->name)
+@section('meta_description', $page->meta_description ?? \Illuminate\Support\Str::limit(trim(strip_tags((string) $page->content)), 160))
 
 @section('content')
     <main class="confid-page">
@@ -11,8 +11,8 @@
             </div>
 
             <ul class="breadcrumb">
-                <li><a href="/">Главная</a></li>
-                <li><span>Confid</span></li>
+                <li><a href="{{ route('index') }}">{{ __('front.home') }}</a></li>
+                <li><span>{{ $page->name }}</span></li>
             </ul>
 
             <h1>{{ $page->name }}</h1>
