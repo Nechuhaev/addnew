@@ -37,6 +37,8 @@ class Kernel extends ConsoleKernel
             ->withoutOverlapping();
 
         $schedule->command('sitemap:rebuild')->fridays()->at('17:00')->runInBackground();
+        // Фід товарів для Google Merchant Center (public/merchant-feed.xml) — щодня після оновлення цін
+        $schedule->command('merchant:feed')->dailyAt('05:20')->withoutOverlapping()->runInBackground()->appendOutputTo(storage_path('logs/merchant-feed.log'));
 
         // Позначка чутливих оголошень (ads.is_sensitive) — для фільтра списків
         $schedule->command('ads:mark-sensitive')
