@@ -19,6 +19,9 @@
 
 Route::get('/system/cron-runner/{token}', 'CronRunnerController@run');
 
+// AI-дзвінки: post-call вебхук ElevenLabs (HMAC-підпис, без CSRF)
+Route::post('/webhooks/elevenlabs', 'API\ElevenLabsWebhookController@handle')->name('webhooks.elevenlabs');
+
 Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::get('/', 'AdminPageController@index')->name('admin.index');
     
@@ -72,6 +75,37 @@ Route::get('/shops/{id}/stats', 'Admin\Shop\ShopStatsController@show')->name('ad
     Route::post('/prompts/{id}/reset', 'Admin\Prompt\PromptController@reset')->name('admin.prompts.reset');
         Route::get('/shops/{id}/messages', 'Admin\Shop\ShopController@messages')->name('admin.shops.messages');
     Route::get('/shops/{shopId}/messages/{conversationId}', 'Admin\Shop\ShopController@messagesShow')->name('admin.shops.messages.show');
+
+    // AI-дзвінки інтернет-магазинам
+    Route::prefix('caller')->namespace('Admin\Caller')->group(function () {
+        Route::get('/', 'DashboardController@index')->name('admin.caller');
+        Route::post('/run-now', 'DashboardController@runNow')->name('admin.caller.runNow');
+
+        Route::get('/leads', 'LeadController@index')->name('admin.caller.leads');
+        Route::get('/leads/export', 'LeadController@export')->name('admin.caller.leads.export');
+        Route::post('/leads/import', 'LeadController@import')->name('admin.caller.leads.import');
+        Route::post('/leads', 'LeadController@store')->name('admin.caller.leads.store');
+        Route::get('/leads/{id}', 'LeadController@show')->name('admin.caller.leads.show');
+        Route::post('/leads/{id}/call-now', 'LeadController@callNow')->name('admin.caller.leads.callNow');
+        Route::post('/leads/{id}/requeue', 'LeadController@requeue')->name('admin.caller.leads.requeue');
+        Route::post('/leads/{id}/dnc', 'LeadController@dnc')->name('admin.caller.leads.dnc');
+        Route::delete('/leads/{id}', 'LeadController@destroy')->name('admin.caller.leads.destroy');
+
+        Route::get('/emails', 'EmailController@index')->name('admin.caller.emails');
+        Route::get('/emails/{id}/preview', 'EmailController@preview')->name('admin.caller.emails.preview');
+        Route::post('/emails/{id}/approve', 'EmailController@approve')->name('admin.caller.emails.approve');
+        Route::post('/emails/{id}/skip', 'EmailController@skip')->name('admin.caller.emails.skip');
+        Route::post('/emails/send-now', 'EmailController@sendNow')->name('admin.caller.emails.sendNow');
+        Route::post('/emails/unsubscribe', 'EmailController@unsubscribe')->name('admin.caller.emails.unsubscribe');
+
+        Route::get('/settings', 'SettingsController@index')->name('admin.caller.settings');
+        Route::post('/settings', 'SettingsController@update')->name('admin.caller.settings.update');
+
+        Route::get('/simulator', 'SimulatorController@index')->name('admin.caller.simulator');
+        Route::post('/simulator/message', 'SimulatorController@message')->name('admin.caller.simulator.message');
+        Route::post('/simulator/analyze', 'SimulatorController@analyze')->name('admin.caller.simulator.analyze');
+        Route::post('/simulator/reset', 'SimulatorController@reset')->name('admin.caller.simulator.reset');
+    });
 
     Route::prefix('stat')->group(function () {
         Route::get('/ads', 'Admin\Stat\AdStatController@index')->name('admin.stat.ads');

@@ -63,6 +63,44 @@
             <span class="hide-menu">Пошукові запити</span>
         </a>
     </li>
+    <li class="sidebar-item">
+        <a class="sidebar-link has-arrow waves-effect waves-dark" href="javascript:void(0)" aria-expanded="false">
+            <i class="mdi mdi-phone-outgoing"></i>
+            <span class="hide-menu">AI-дзвінки</span>
+        </a>
+        <ul aria-expanded="false" class="collapse first-level">
+            <li class="sidebar-item">
+                <a href="{{ route('admin.caller') }}" class="sidebar-link">
+                    <i class="mdi mdi-view-dashboard"></i>
+                    <span class="hide-menu">Огляд</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ route('admin.caller.leads') }}" class="sidebar-link">
+                    <i class="mdi mdi-format-list-bulleted"></i>
+                    <span class="hide-menu">Ліди</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ route('admin.caller.emails') }}" class="sidebar-link">
+                    <i class="mdi mdi-email-outline"></i>
+                    <span class="hide-menu">Листи</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ route('admin.caller.simulator') }}" class="sidebar-link">
+                    <i class="mdi mdi-message-text-outline"></i>
+                    <span class="hide-menu">Тренажер</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ route('admin.caller.settings') }}" class="sidebar-link">
+                    <i class="mdi mdi-settings"></i>
+                    <span class="hide-menu">Налаштування</span>
+                </a>
+            </li>
+        </ul>
+    </li>
 
     <li class="sidebar-item">
         <a class="sidebar-link has-arrow waves-effect waves-dark" href="javascript:void(0)" aria-expanded="false">

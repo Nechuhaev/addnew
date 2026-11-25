@@ -187,6 +187,26 @@ class Kernel extends ConsoleKernel
         ->withoutOverlapping()
         ->appendOutputTo(storage_path('logs/report-daily.log'));
 
+    // AI-дзвінки магазинам (/admin/caller). Робочий час, ліміти й вимикачі —
+    // у налаштуваннях модуля в адмінці; поза робочим часом команда нічого не робить.
+    // Щохвилини: аналіз завершених розмов + автонабір.
+    $schedule->command('caller:run')
+        ->everyMinute()
+        ->withoutOverlapping(10)
+        ->appendOutputTo(storage_path('logs/caller.log'));
+
+    // Кожні 5 хв — листи з інструкцією тим, хто погодився.
+    $schedule->command('caller:send-emails')
+        ->everyFiveMinutes()
+        ->withoutOverlapping(10)
+        ->appendOutputTo(storage_path('logs/caller-emails.log'));
+
+    // Раз на день — хто з тих, кому дзвонили, зареєструвався на сайті.
+    $schedule->command('caller:track-conversions')
+        ->dailyAt('07:00')
+        ->withoutOverlapping()
+        ->appendOutputTo(storage_path('logs/caller.log'));
+
     }
     
 
