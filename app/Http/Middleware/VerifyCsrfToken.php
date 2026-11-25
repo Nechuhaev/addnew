@@ -19,5 +19,7 @@ class VerifyCsrfToken extends Middleware
         // Трекінг статистики товарів/магазину — викликається через
         // navigator.sendBeacon(), який фізично не може передати CSRF-токен.
         'api/track/*',
+        // Post-call вебхук ElevenLabs — захищений HMAC-підписом замість CSRF
+        'webhooks/elevenlabs',
     ];
 }
